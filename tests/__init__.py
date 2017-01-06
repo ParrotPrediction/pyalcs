@@ -1,0 +1,1 @@
+from tests.MazeTest import MazeTestCase
