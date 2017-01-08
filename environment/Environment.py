@@ -1,32 +1,22 @@
 from abc import ABCMeta, abstractmethod
 
+
 class Environment(metaclass=ABCMeta):
 
     @abstractmethod
     def insert_animat(self):
         """
-        Puts animat into suitable random position inside a maze
-
-        :return: animat starting position
+        Sets animat coordinates in fixed/random position inside a maze
         """
         raise NotImplementedError()
 
     @abstractmethod
     def get_animat_perception(self, **position):
         """
-        Return the perception of the animat in the given position.
+        Sets the animat perception of desired directions from given position.
 
         :param position: position of the animat in the environment
-        :return: an array of possible values is returned.
-        """
-        raise NotImplementedError()
-
-    @abstractmethod
-    def get_animat_position_value(self):
-        """
-        Gets the value of the current position
-
-        :return: the value of the current position
+        :return: an array of observable values
         """
         raise NotImplementedError()
 
@@ -35,12 +25,8 @@ class Environment(metaclass=ABCMeta):
         """
         Executes an action in the environment
         :param action: action to be executed
-        :return: ???
+        :return: reward
         """
         raise NotImplementedError()
 
-    @abstractmethod
-    def get_reward(self):
-        """Return the reward from the environment"""
-        raise NotImplementedError()
 
