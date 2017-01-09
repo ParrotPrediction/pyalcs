@@ -18,6 +18,7 @@ class MazeAction(Enum):
     DOWN = 3
 
 
+@unique
 class MazeSymbols(Enum):
     """
     Represents possible symbols in maze definition
