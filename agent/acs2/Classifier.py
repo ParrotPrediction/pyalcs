@@ -18,7 +18,7 @@ class Classifier(object):
 
         self.aav = 0  # Application average
         self.exp = 0  # Experience
-        self.num = 1  # Still Micro/macro stuff
+        self.num = 1  # Numerosity (how many classifiers were subsumed)
 
     def __copy__(self):
         raise NotImplementedError('Not yet implemented')
@@ -42,7 +42,16 @@ class Classifier(object):
 
     def is_subsumer(self, cl, theta_exp=None, theta_r=None):
         """
-        Subsumption - elimination of accurate, over-specialized classifiers
+        Subsume operation - capture another, similar but more general classifier.
+
+        In order to subsume another classifier, the subsumer needs to be experienced, reliable
+        and not marked. Moreover the subsumer condition part needs to be syntactically more general
+        and the effect part needs to be identical
+
+        :param cl: classifier to subsume
+        :param theta_exp: threshold of required classifier experience to subsume another classifier
+        :param theta_r: threshold of required classifier quality to subsume another classifier
+        :return: true if classifier cl is subsumed, false otherwise
         """
         if not isinstance(cl, self.__class__):
             raise TypeError('Illegal type of classifier passed')
@@ -53,8 +62,8 @@ class Classifier(object):
         if theta_r is None:
             theta_r = const.THETA_R
 
-        cp = 0
-        cpt = 0
+        cp = 0  # number of subsumer wildcards in condition part
+        cpt = 0  # number of wildcards in condition part in other classifier
 
         if self.exp > theta_exp and self.q > theta_r and self.mark is None:
             for i in range(const.CLASSIFIER_LENGTH):
@@ -71,15 +80,24 @@ class Classifier(object):
         return False
 
     def is_more_general(self, cl):
+        """
+        Checks if classifier is more general than classifier passed in an argument.
+        It's made sure that classifier is indeed *more* general, as well as that the
+        more specific classifier is completely included in in the more general one
+        (do not specify overlapping regions).
+
+        :param cl: classifier to compare
+        :return: true if a base classifier is more general, false otherwise
+        """
         if not isinstance(cl, self.__class__):
             raise TypeError('Illegal type of classifier passed')
 
-        ret = False
+        base_more_general = False
 
         for i in range(const.CLASSIFIER_LENGTH):
             if self.condition[i] != const.CLASSIFIER_WILDCARD and self.condition[i] != cl.condition[i]:
                 return False
             elif self.condition[i] != cl.condition[i]:
-                ret = True
+                base_more_general = True
 
-        return ret
+        return base_more_general

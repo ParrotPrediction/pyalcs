@@ -31,3 +31,36 @@ class ClassifierTest(unittest.TestCase):
         c2.action = 2
 
         self.assertTrue(self.baseClassifier != c2)
+
+    def test_should_subsume_another_more_general_classifier(self):
+        c2 = Classifier()
+        c2.condition = ['#', '#', '#', '#']  # more general condition part
+        c2.effect = ['#', '#', '1', '1']  # the same effect part
+
+        self.assertTrue(self.baseClassifier.is_subsumer(c2, -1, -1))
+
+    def test_should_not_subsume_another_less_general_classifier(self):
+        c2 = Classifier()
+        c2.condition = ['#', '1', '1', '#']  # less general part
+        c2.effect = ['#', '#', '1', '1']  # the same effect part
+
+        self.assertFalse(self.baseClassifier.is_subsumer(c2, -1, -1))
+
+    def test_should_not_subsume_another_classifier_with_different_effect(self):
+        c2 = Classifier()
+        c2.condition = ['#', '1', '#', '#']
+        c2.effect = ['#', '#', '#', '1']
+
+        self.assertFalse(self.baseClassifier.is_subsumer(c2, -1, -1))
+
+    def test_base_classifier_should_be_more_general(self):
+        c2 = Classifier()
+        c2.condition = ['1', '1', '#', '#']
+
+        self.assertTrue(self.baseClassifier.is_more_general(c2))
+
+    def test_base_classifier_should_be_less_general(self):
+        c2 = Classifier()
+        c2.condition = ['#', '#', '#', '#']
+
+        self.assertFalse(self.baseClassifier.is_more_general(c2))
