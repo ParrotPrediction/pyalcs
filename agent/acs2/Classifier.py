@@ -2,36 +2,49 @@ from agent.acs2 import Constants as const
 
 
 class Classifier(object):
+
     def __init__(self):
         self.condition = [const.CLASSIFIER_WILDCARD] * const.CLASSIFIER_LENGTH
         self.action = None
         self.effect = [const.CLASSIFIER_WILDCARD] * const.CLASSIFIER_LENGTH
+        self.mark = None  # All cases were effect was not good
         self.q = 0.5  # quality
         self.r = 0  # reward
 
-        self.mark = None  # All cases were effect was not good
         self.ir = 0  # Immediate reward
         self.t = None  # Has been created at this time
         self.tga = 0  # Last time that self was part of action set within GA
-        self.alp = 0  # Last time that self underwent
+        self.alp = 0  # Last time that self underwent ALP process
 
         self.aav = 0  # Application average
         self.exp = 0  # Experience
         self.num = 1  # Still Micro/macro stuff
-        self.gold = False  # TODO: is it useful?
-
-        if self.condition == [const.CLASSIFIER_WILDCARD] * const.CLASSIFIER_LENGTH:
-            if self.effect == [const.CLASSIFIER_WILDCARD] * const.CLASSIFIER_LENGTH:
-                if self.t == 0:
-                    self.gold = True
-        else:
-            self.gold = False
 
     def __copy__(self):
         raise NotImplementedError('Not yet implemented')
 
+    def __eq__(self, other):
+        """
+        Equality check. The other classifier is the same when it has the same condition and action part
+
+        :param other: the other classifier
+        :return: true if classifier is the same, false otherwise
+        """
+        if isinstance(other, self.__class__):
+            if other.condition == self.condition:
+                if other.action == self.action:
+                    return True
+
+        return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def is_subsumer(self, cl, theta_exp=None, theta_r=None):
-        if not isinstance(cl, Classifier):
+        """
+        Subsumption - elimination of accurate, over-specialized classifiers
+        """
+        if not isinstance(cl, self.__class__):
             raise TypeError('Illegal type of classifier passed')
 
         if theta_exp is None:
@@ -58,7 +71,7 @@ class Classifier(object):
         return False
 
     def is_more_general(self, cl):
-        if not isinstance(cl, Classifier):
+        if not isinstance(cl, self.__class__):
             raise TypeError('Illegal type of classifier passed')
 
         ret = False
@@ -70,13 +83,3 @@ class Classifier(object):
                 ret = True
 
         return ret
-
-    def equals(self, cl):
-        if not isinstance(cl, Classifier):
-            raise TypeError('Illegal type of classifier passed')
-
-        if cl.condition == self.condition:
-            if cl.action == self.action:
-                return True
-
-        return False

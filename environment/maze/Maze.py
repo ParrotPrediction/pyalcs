@@ -34,7 +34,7 @@ class Maze(Environment):
         """
         Initiate a new maze environment
         """
-        self.max_x, self.max_y, self.matrix = self.__load_maze_from_file(maze_file)
+        self.max_x, self.max_y, self.matrix = self._load_maze_from_file(maze_file)
 
         # Animat settings
         self.animat_pos_x = None
@@ -45,7 +45,7 @@ class Maze(Environment):
         self.get_animat_perception()
 
     @staticmethod
-    def __load_maze_from_file(fname):
+    def _load_maze_from_file(fname):
         """
         Reads maze definition from text file to create required internal variables
 
@@ -66,22 +66,28 @@ class Maze(Environment):
             return max_x, max_y, matrix
 
     def insert_animat(self, pos_x=None, pos_y=None):
-        if pos_x is not None and pos_y is not None and self.matrix[pos_x][pos_y] != MazeSymbols.PATH.value:
+        if pos_x is not None and pos_y is not None:
+            if not self._within_x_range(pos_x) or not self._within_y_range(pos_y):
+                raise ValueError('Values outside allowed range')
+
+            if self.matrix[pos_y][pos_x] != MazeSymbols.PATH.value:
+                raise ValueError('Animat must be inserted into path')
+
             self.animat_pos_x = pos_x
             self.animat_pos_y = pos_y
             logger.info('Animat [(%d, %d)] placed into fixed initial cords', pos_x, pos_y)
+        else:
+            possible_coords = []
+            for x in range(0, self.max_x):
+                for y in range(0, self.max_y):
+                    if self.matrix[x][y] == MazeSymbols.PATH.value:
+                        possible_coords.append((x, y))
 
-        possible_coords = []
-        for x in range(0, self.max_x):
-            for y in range(0, self.max_y):
-                if self.matrix[x][y] == MazeSymbols.PATH.value:
-                    possible_coords.append((x, y))
+            starting_position = random.choice(possible_coords)
+            self.animat_pos_x = starting_position[1]
+            self.animat_pos_y = starting_position[0]
 
-        starting_position = random.choice(possible_coords)
-        self.animat_pos_x = starting_position[1]
-        self.animat_pos_y = starting_position[0]
-
-        logger.debug('Animat [(%d, %d)] placed into random initial cords', self.animat_pos_x, self.animat_pos_y)
+            logger.debug('Animat [(%d, %d)] placed into random initial cords', self.animat_pos_x, self.animat_pos_y)
 
     def get_animat_perception(self, pos_x=None, pos_y=None):
         """
@@ -97,10 +103,10 @@ class Maze(Environment):
             pos_y = self.animat_pos_y
 
         if not self._within_x_range(pos_x):
-            raise TypeError('X position not within allowed range')
+            raise ValueError('X position not within allowed range')
 
         if not self._within_y_range(pos_y):
-            raise TypeError('Y position not within allowed range')
+            raise ValueError('Y position not within allowed range')
 
         if pos_y == 0:
             top = None
@@ -208,4 +214,3 @@ class Maze(Environment):
             pos_y = self.animat_pos_y
 
         return 0 <= pos_y < self.max_y
-

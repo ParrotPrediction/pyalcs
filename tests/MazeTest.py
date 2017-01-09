@@ -27,8 +27,8 @@ class MazeTestCase(unittest.TestCase):
         self.assertListEqual([MS.WALL.value, MS.PATH.value, MS.WALL.value, MS.PATH.value], self.env.get_animat_perception(3, 4))
 
         # Wrong input values
-        self.assertRaises(TypeError, self.env.get_animat_perception, -2, 4)
-        self.assertRaises(TypeError, self.env.get_animat_perception, 2, 9)
+        self.assertRaises(ValueError, self.env.get_animat_perception, -2, 4)
+        self.assertRaises(ValueError, self.env.get_animat_perception, 2, 9)
 
     def test_get_animat_position_value(self):
         self.assertEqual(MS.WALL.value, self.env._get_animat_position_value(0, 0))
@@ -45,8 +45,12 @@ class MazeTestCase(unittest.TestCase):
             self.assertTrue(Maze.not_wall(self.env._get_animat_position_value()))
 
     def test_should_insert_animat(self):
-        # Check for wrong values, cannot insert into wall
-        pass
+        self.env.insert_animat(4, 1)
+        self.assertEqual([MS.WALL.value, MS.PATH.value, MS.PATH.value, MS.PATH.value], self.env.get_animat_perception())
+
+        # Wrong input values
+        self.assertRaises(ValueError, self.env.insert_animat, 4, 0)  # Try to insert into wall
+        self.assertRaises(ValueError, self.env.insert_animat, 9, 2)  # Try to insert out of range
 
     def test_should_execute_action(self):
         # check if coordinates changed
