@@ -21,9 +21,11 @@ class Environment(metaclass=ABCMeta):
         raise NotImplementedError()
 
     @abstractmethod
-    def execute_action(self, action):
+    def execute_action(self, perception, action):
         """
         Executes an action in the environment
+
+        :param perception: perception of the environment
         :param action: action to be executed
         :return: reward
         """

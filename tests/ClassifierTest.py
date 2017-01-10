@@ -64,3 +64,10 @@ class ClassifierTest(unittest.TestCase):
         c2.condition = ['#', '#', '#', '#']
 
         self.assertFalse(self.baseClassifier.is_more_general(c2))
+
+    def test_should_calculate_fitness(self):
+        c2 = Classifier()
+        c2.q = 0.5
+        c2.r = 0.5
+
+        self.assertEqual(0.25, c2.fitness())
