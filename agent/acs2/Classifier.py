@@ -20,6 +20,9 @@ class Classifier(object):
         self.exp = 0  # Experience
         self.num = 1  # Numerosity (how many classifiers were subsumed)
 
+    def __repr__(self):
+        return 'Classifier{{{}-{}-{} q:{}, r:{}}}'.format(''.join(map(str, self.condition)), self.action, ''.join(map(str, self.effect)), self.q, self.r)
+
     def __copy__(self):
         raise NotImplementedError('Not yet implemented')
 
@@ -39,6 +42,9 @@ class Classifier(object):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def fitness(self):
+        return self.q * self.r
 
     def is_subsumer(self, cl, theta_exp=None, theta_r=None):
         """

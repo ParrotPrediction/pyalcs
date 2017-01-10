@@ -128,7 +128,7 @@ class Maze(Environment):
         else:
             right = self.matrix[pos_y][pos_x + 1]
 
-        logger.debug('Animat [(%d, %d)] perception: top: [%s], left: [%s], bottom: [%s], right: [%s]', self.animat_pos_x, self.animat_pos_y, top, left, bottom, right)
+        logger.debug('Animat [(%d, %d)] perception (TLBR): [%s%s%s%s]', self.animat_pos_x, self.animat_pos_y, top, left, bottom, right)
         perception = [top, left, bottom, right]
 
         self.animat_perception = perception
