@@ -4,6 +4,7 @@ from os.path import dirname, abspath, join
 from enum import Enum, unique
 
 from environment.Environment import Environment
+from environment.maze.MazeMapping import MazeMapping
 
 logger = logging.getLogger(__name__)
 
@@ -19,28 +20,21 @@ class MazeAction(Enum):
     DOWN = 3
 
 
-@unique
-class MazeSymbols(Enum):
-    """
-    Represents possible symbols in maze definition
-    """
-    WALL = '#'
-    REWARD = '$'
-    PATH = '.'
-
-
 class Maze(Environment):
 
     def __init__(self, maze_file):
         """
         Initiate a new maze environment
         """
-        self.max_x, self.max_y, self.matrix = self._load_maze_from_file(maze_file)
+        self.mapping = MazeMapping()
 
         # Animat settings
         self.animat_pos_x = None
         self.animat_pos_y = None
         self.animat_found_reward = False
+
+        self.max_x, self.max_y, self.matrix = None, None, None
+        self._load_maze_from_file(maze_file)
 
     def reset_animat_state(self):
         logger.debug('Resetting animat state')
@@ -48,8 +42,7 @@ class Maze(Environment):
         self.animat_pos_y = None
         self.animat_found_reward = False
 
-    @staticmethod
-    def _load_maze_from_file(fname):
+    def _load_maze_from_file(self, fname):
         """
         Reads maze definition from text file to create required internal variables
 
@@ -67,17 +60,17 @@ class Maze(Environment):
             for y in range(0, max_y):
                 row = file.readline()
                 for x in range(0, max_x):
-                    matrix[y][x] = row[x]
+                    matrix[y][x] = self.mapping.find_value(row[x])
 
             logger.debug('Maze (%d x %d) imported successfully from file [%s].', max_x, max_y, fname)
-            return max_x, max_y, matrix
+            self.max_x, self.max_y, self.matrix = max_x, max_y, matrix
 
     def insert_animat(self, pos_x=None, pos_y=None):
         if pos_x is not None and pos_y is not None:
             if not self._within_x_range(pos_x) or not self._within_y_range(pos_y):
                 raise ValueError('Values outside allowed range')
 
-            if self.matrix[pos_y][pos_x] != MazeSymbols.PATH.value:
+            if self.matrix[pos_y][pos_x] != self.mapping.mapping['path']['value']:
                 raise ValueError('Animat must be inserted into path')
 
             self.animat_pos_x = pos_x
@@ -87,7 +80,7 @@ class Maze(Environment):
             possible_coords = []
             for x in range(0, self.max_x):
                 for y in range(0, self.max_y):
-                    if self.matrix[x][y] == MazeSymbols.PATH.value:
+                    if self.matrix[x][y] == self.mapping.mapping['path']['value']:
                         possible_coords.append((x, y))
 
             starting_position = random.choice(possible_coords)
@@ -135,10 +128,11 @@ class Maze(Environment):
         else:
             right = self.matrix[pos_y][pos_x + 1]
 
-        logger.debug('Animat [(%d, %d)] perception (TLBR): [%s%s%s%s]', self.animat_pos_x, self.animat_pos_y, top, left, bottom, right)
-        perception = [top, left, bottom, right]
+        perception_symbols = [top, left, bottom, right]
 
-        return perception
+        logger.debug('Animat [(%d, %d)] perception (TLBR): [%s]', self.animat_pos_x, self.animat_pos_y, perception_symbols)
+
+        return perception_symbols
 
     def execute_action(self, perception: list, action: MazeAction):
         reward = 0
@@ -194,12 +188,12 @@ class Maze(Environment):
         reward = None
         position_value = self._get_animat_position_value(pos_x, pos_y)
 
-        if position_value == MazeSymbols.REWARD.value:
+        if position_value == self.mapping.mapping['reward']['value']:
             reward = 2000
             self.animat_found_reward = True
             logger.info('Animat found reward!')
 
-        if position_value == MazeSymbols.PATH.value:
+        if position_value == self.mapping.mapping['path']['value']:
             reward = 1
 
         logger.debug('Animat [(%d, %d)] received reward for position: [%d]', pos_x, pos_y, reward)
@@ -207,7 +201,7 @@ class Maze(Environment):
 
     @staticmethod
     def not_wall(perceptron):
-        return perceptron != MazeSymbols.WALL.value
+        return perceptron != MazeMapping().mapping['wall']['value']
 
     def _within_x_range(self, pos_x=None):
         if pos_x is None:

@@ -1,6 +1,5 @@
 import unittest
 from environment import Maze
-from environment import MazeSymbols as MS
 
 
 class MazeTest(unittest.TestCase):
@@ -11,33 +10,33 @@ class MazeTest(unittest.TestCase):
     def test_should_load_maze_from_file(self):
         self.assertEqual(8, self.env.max_x)
         self.assertEqual(8, self.env.max_y)
-        self.assertEqual(MS.REWARD.value, self.env.matrix[1][1])
+        self.assertEqual(self.env.mapping.mapping['reward']['value'], self.env.matrix[1][1])
 
     def test_animat_perception(self):
         # Edge conditions
-        self.assertListEqual([None, None, MS.WALL.value, MS.WALL.value], self.env.get_animat_perception(0, 0))
-        self.assertListEqual([MS.WALL.value, None, MS.WALL.value, MS.WALL.value], self.env.get_animat_perception(0, 3))
-        self.assertListEqual([MS.WALL.value, None, None, MS.WALL.value], self.env.get_animat_perception(0, 7))
-        self.assertListEqual([None, MS.WALL.value, MS.WALL.value, None], self.env.get_animat_perception(7, 0))
-        self.assertListEqual([MS.PATH.value, MS.WALL.value, None, MS.WALL.value], self.env.get_animat_perception(4, 7))
+        self.assertListEqual([None, None, self.env.mapping.mapping['wall']['value'], self.env.mapping.mapping['wall']['value']], self.env.get_animat_perception(0, 0))
+        self.assertListEqual([self.env.mapping.mapping['wall']['value'], None, self.env.mapping.mapping['wall']['value'], self.env.mapping.mapping['wall']['value']], self.env.get_animat_perception(0, 3))
+        self.assertListEqual([self.env.mapping.mapping['wall']['value'], None, None, self.env.mapping.mapping['wall']['value']], self.env.get_animat_perception(0, 7))
+        self.assertListEqual([None, self.env.mapping.mapping['wall']['value'], self.env.mapping.mapping['wall']['value'], None], self.env.get_animat_perception(7, 0))
+        self.assertListEqual([self.env.mapping.mapping['path']['value'], self.env.mapping.mapping['wall']['value'], None, self.env.mapping.mapping['wall']['value']], self.env.get_animat_perception(4, 7))
 
         # Good cases
-        self.assertListEqual([MS.PATH.value, MS.WALL.value, MS.WALL.value, MS.WALL.value], self.env.get_animat_perception(2, 5))
-        self.assertListEqual([MS.PATH.value, MS.PATH.value, MS.WALL.value, MS.PATH.value], self.env.get_animat_perception(5, 6))
-        self.assertListEqual([MS.WALL.value, MS.PATH.value, MS.WALL.value, MS.PATH.value], self.env.get_animat_perception(3, 4))
+        self.assertListEqual([self.env.mapping.mapping['path']['value'], self.env.mapping.mapping['wall']['value'], self.env.mapping.mapping['wall']['value'], self.env.mapping.mapping['wall']['value']], self.env.get_animat_perception(2, 5))
+        self.assertListEqual([self.env.mapping.mapping['path']['value'], self.env.mapping.mapping['path']['value'], self.env.mapping.mapping['wall']['value'], self.env.mapping.mapping['path']['value']], self.env.get_animat_perception(5, 6))
+        self.assertListEqual([self.env.mapping.mapping['wall']['value'], self.env.mapping.mapping['path']['value'], self.env.mapping.mapping['wall']['value'], self.env.mapping.mapping['path']['value']], self.env.get_animat_perception(3, 4))
 
         # Wrong input values
         self.assertRaises(ValueError, self.env.get_animat_perception, -2, 4)
         self.assertRaises(ValueError, self.env.get_animat_perception, 2, 9)
 
     def test_get_animat_position_value(self):
-        self.assertEqual(MS.WALL.value, self.env._get_animat_position_value(0, 0))
-        self.assertEqual(MS.REWARD.value, self.env._get_animat_position_value(1, 1))
-        self.assertEqual(MS.PATH.value, self.env._get_animat_position_value(4, 3))
-        self.assertEqual(MS.PATH.value, self.env._get_animat_position_value(3, 4))
-        self.assertEqual(MS.WALL.value, self.env._get_animat_position_value(5, 3))
-        self.assertEqual(MS.WALL.value, self.env._get_animat_position_value(3, 5))
-        self.assertEqual(MS.PATH.value, self.env._get_animat_position_value(5, 5))
+        self.assertEqual(self.env.mapping.mapping['wall']['value'], self.env._get_animat_position_value(0, 0))
+        self.assertEqual(self.env.mapping.mapping['reward']['value'], self.env._get_animat_position_value(1, 1))
+        self.assertEqual(self.env.mapping.mapping['path']['value'], self.env._get_animat_position_value(4, 3))
+        self.assertEqual(self.env.mapping.mapping['path']['value'], self.env._get_animat_position_value(3, 4))
+        self.assertEqual(self.env.mapping.mapping['wall']['value'], self.env._get_animat_position_value(5, 3))
+        self.assertEqual(self.env.mapping.mapping['wall']['value'], self.env._get_animat_position_value(3, 5))
+        self.assertEqual(self.env.mapping.mapping['path']['value'], self.env._get_animat_position_value(5, 5))
 
     def test_should_insert_animat_randomly(self):
         for i in range(0, 100):
@@ -46,7 +45,7 @@ class MazeTest(unittest.TestCase):
 
     def test_should_insert_animat(self):
         self.env.insert_animat(4, 1)
-        self.assertEqual([MS.WALL.value, MS.PATH.value, MS.PATH.value, MS.PATH.value], self.env.get_animat_perception())
+        self.assertEqual([self.env.mapping.mapping['wall']['value'], self.env.mapping.mapping['path']['value'], self.env.mapping.mapping['path']['value'], self.env.mapping.mapping['path']['value']], self.env.get_animat_perception())
 
         # Wrong input values
         self.assertRaises(ValueError, self.env.insert_animat, 4, 0)  # Try to insert into wall

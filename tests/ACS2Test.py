@@ -1,5 +1,6 @@
 import unittest
 from agent import ACS2
+from agent.acs2.Classifier import Classifier
 from agent.acs2 import Constants as const
 
 
@@ -21,3 +22,11 @@ class ACS2Test(unittest.TestCase):
             self.assertEqual(i, cls.action)
             self.assertEqual(0.5, cls.q)
             self.assertEqual(0, cls.r)
+
+    def test_classifer_should_match_perception(self):
+        cls = Classifier()
+        cls.condition = ['#', '2', '#', '#', '1']
+
+        self.assertTrue(ACS2._does_match(cls, ['1', '2', '-1', '1', '1']))
+        self.assertFalse(ACS2._does_match(cls, ['0', '1', '1', '1', '1']))  # second element different
+        self.assertRaises(ValueError, ACS2._does_match, cls, ['0', '1'])
