@@ -4,7 +4,7 @@
 ## Tests
 To execute tests type:
 
-    python3.5 -m unittest -v tests
+    python3.5 -m unittest discover
     
 ## Thoughts
 

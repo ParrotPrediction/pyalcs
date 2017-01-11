@@ -3,10 +3,10 @@ from environment import Maze
 from environment import MazeSymbols as MS
 
 
-class MazeTestCase(unittest.TestCase):
+class MazeTest(unittest.TestCase):
 
     def setUp(self):
-        self.env = Maze('../mazes/m1.maze')
+        self.env = Maze('tests/test1.maze')
 
     def test_should_load_maze_from_file(self):
         self.assertEqual(8, self.env.max_x)

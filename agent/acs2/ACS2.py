@@ -23,7 +23,7 @@ class ACS2(Agent):
         match_set = []
 
         for cls in classifiers:
-            if ACS2._does_match(cls, perception):
+            if __class__._does_match(cls, perception):
                 match_set.append(cls)
 
         logger.debug('Generated match set: [%s]', match_set)
@@ -72,7 +72,7 @@ class ACS2(Agent):
             return best_classifier.action
 
     @staticmethod
-    def _does_match(cls: Classifier, perception: list):
+    def _does_match(cls: Classifier, perception: list) -> bool:
         """
         Check if classifier condition match given perception
 
@@ -90,7 +90,7 @@ class ACS2(Agent):
         return True
 
     @staticmethod
-    def generate_initial_classifiers(number_of_actions):
+    def generate_initial_classifiers(number_of_actions: int) -> list:
         """
         Generate a list of default, general classifiers for all possible actions
 

@@ -1,5 +1,6 @@
 import logging
 import random
+from os.path import dirname, abspath, join
 from enum import Enum, unique
 
 from environment.Environment import Environment
@@ -55,7 +56,10 @@ class Maze(Environment):
         :param fname: location of .maze file
         :return: dimension and maze matrix
         """
-        with open(fname) as file:
+        basepath = dirname(__file__)
+        filepath = abspath(join(basepath, '..', '..', fname))
+
+        with open(filepath) as file:
             max_x = int(file.readline())
             max_y = int(file.readline())
             matrix = [[None for x in range(max_x)] for y in range(max_y)]

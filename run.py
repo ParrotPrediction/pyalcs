@@ -32,11 +32,10 @@ if __name__ == '__main__':
         match_set = ACS2.generate_match_set(classifiers, perception)
 
         # Here do some stuff on previous action set
-        ALP.apply(classifiers, None, time, action_set, [], [])
+        # ALP.apply(classifiers, None, time, action_set, [], [])
 
         action = ACS2.choose_action(match_set)
         action_set = ACS2.generate_action_set(match_set, action)
-
 
         time += 1
 
