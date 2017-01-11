@@ -18,6 +18,6 @@ class ACS2Test(unittest.TestCase):
             cls = initial_classifiers[i]
             self.assertListEqual(general_perception, cls.condition)
             self.assertListEqual(general_perception, cls.effect)
-            self.assertEquals(i, cls.action)
-            self.assertEquals(0.5, cls.q)
-            self.assertEquals(0, cls.r)
+            self.assertEqual(i, cls.action)
+            self.assertEqual(0.5, cls.q)
+            self.assertEqual(0, cls.r)

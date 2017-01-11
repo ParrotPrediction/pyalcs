@@ -1,5 +1,5 @@
 # ACS2
-
+[![Build Status](https://travis-ci.org/khozzy/ACS2.svg?branch=master)](https://travis-ci.org/khozzy/ACS2)
 
 ## Tests
 To execute tests type:
