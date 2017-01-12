@@ -1,12 +1,12 @@
-from agent.acs2 import Constants as const
+from agent.acs2 import Constants as c
 
 
 class Classifier(object):
 
     def __init__(self):
-        self.condition = [const.CLASSIFIER_WILDCARD] * const.CLASSIFIER_LENGTH
+        self.condition = [c.CLASSIFIER_WILDCARD] * c.CLASSIFIER_LENGTH
         self.action = None
-        self.effect = [const.CLASSIFIER_WILDCARD] * const.CLASSIFIER_LENGTH
+        self.effect = [c.CLASSIFIER_WILDCARD] * c.CLASSIFIER_LENGTH
         self.mark = None  # All cases were effect was not good
         self.q = 0.5  # quality
         self.r = 0  # reward
@@ -72,20 +72,20 @@ class Classifier(object):
             raise TypeError('Illegal type of classifier passed')
 
         if theta_exp is None:
-            theta_exp = const.THETA_EXP
+            theta_exp = c.THETA_EXP
 
         if theta_r is None:
-            theta_r = const.THETA_R
+            theta_r = c.THETA_R
 
         cp = 0  # number of subsumer wildcards in condition part
         cpt = 0  # number of wildcards in condition part in other classifier
 
         if self.exp > theta_exp and self.q > theta_r and self.mark is None:
-            for i in range(const.CLASSIFIER_LENGTH):
-                if self.condition[i] == const.CLASSIFIER_WILDCARD:
+            for i in range(c.CLASSIFIER_LENGTH):
+                if self.condition[i] == c.CLASSIFIER_WILDCARD:
                     cp += 1
 
-                if cl.condition[i] == const.CLASSIFIER_WILDCARD:
+                if cl.condition[i] == c.CLASSIFIER_WILDCARD:
                     cpt += 1
 
             if cp <= cpt:
@@ -109,8 +109,8 @@ class Classifier(object):
 
         base_more_general = False
 
-        for i in range(const.CLASSIFIER_LENGTH):
-            if (self.condition[i] != const.CLASSIFIER_WILDCARD and
+        for i in range(c.CLASSIFIER_LENGTH):
+            if (self.condition[i] != c.CLASSIFIER_WILDCARD and
                     self.condition[i] != cl.condition[i]):
 
                 return False

@@ -142,6 +142,7 @@ class MazeTest(unittest.TestCase):
         # Try to insert out of range
         self.assertRaises(ValueError, self.env.insert_animat, 9, 2)
 
+    @unittest.skip("TODO")
     def test_should_execute_action(self):
         # check if coordinates changed
         # perception changed

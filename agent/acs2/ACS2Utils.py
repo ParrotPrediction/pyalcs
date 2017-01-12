@@ -11,7 +11,31 @@ logger = logging.getLogger(__name__)
 class ACS2Utils:
 
     @staticmethod
-    def generate_match_set(classifiers: list, perception: list):
+    def generate_initial_classifiers(number_of_actions: int = None) -> list:
+        """
+        Generate a list of default, general classifiers for all
+        possible actions.
+
+        :param number_of_actions: number of general classifiers to be generated
+        :return: list of classifiers
+        """
+        if number_of_actions is None:
+            number_of_actions = c.NUMBER_OF_POSSIBLE_ACTIONS
+
+        initial_classifiers = []
+
+        for i in range(number_of_actions):
+            cl = Classifier()
+            cl.action = i
+            cl.t = 0
+
+            initial_classifiers.append(cl)
+
+        logger.debug('Generated initial classifiers: %s', initial_classifiers)
+        return initial_classifiers
+
+    @staticmethod
+    def generate_match_set(classifiers: list, perception: list) -> list:
         """
         Generates a list of classifiers from population that match given
         perception. A list is then stored
@@ -31,7 +55,7 @@ class ACS2Utils:
         return match_set
 
     @staticmethod
-    def generate_action_set(classifiers: list, action: int):
+    def generate_action_set(classifiers: list, action: int) -> list:
         """
         Generates a list of classifiers with matching action.
 
@@ -49,7 +73,7 @@ class ACS2Utils:
         return action_set
 
     @staticmethod
-    def choose_action(classifiers: list, epsilon=None):
+    def choose_action(classifiers: list, epsilon=None) -> int:
         """
         TODO: Chooses action from available classifiers.
         :param classifiers: a list of classifiers
@@ -97,27 +121,3 @@ class ACS2Utils:
                 return False
 
         return True
-
-    @staticmethod
-    def generate_initial_classifiers(number_of_actions: int = None) -> list:
-        """
-        Generate a list of default, general classifiers for all
-        possible actions.
-
-        :param number_of_actions: number of general classifiers to be generated
-        :return: list of classifiers
-        """
-        if number_of_actions is None:
-            number_of_actions = c.NUMBER_OF_POSSIBLE_ACTIONS
-
-        initial_classifiers = []
-
-        for i in range(number_of_actions):
-            cl = Classifier()
-            cl.action = i
-            cl.t = 0
-
-            initial_classifiers.append(cl)
-
-        logger.debug('Generated initial classifiers: %s', initial_classifiers)
-        return initial_classifiers

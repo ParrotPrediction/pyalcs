@@ -1,5 +1,5 @@
 from agent.acs2.Classifier import Classifier
-from agent.acs2 import Constants as const
+from agent.acs2 import Constants as c
 
 
 class ALP:
@@ -42,10 +42,10 @@ class ALP:
 
     @staticmethod
     def _update_application_average(cls: Classifier, time: int):
-        if cls.exp < 1 / const.BETA:
+        if cls.exp < 1 / c.BETA:
             cls.aav += (time - cls.tga - cls.aav) / cls.exp
         else:
-            cls.aav += const.BETA * (time - cls.tga - cls.aav)
+            cls.aav += c.BETA * (time - cls.tga - cls.aav)
 
         # TGA? Should this be in ALP module?
         # Maybe naming convention should be changed
@@ -61,8 +61,8 @@ class ALP:
         :param previous_perception: previous perception
         :return: True if classifier anticipates correctly, False otherwise
         """
-        for i in range(const.CLASSIFIER_LENGTH):
-            if cls.effect == const.CLASSIFIER_WILDCARD:
+        for i in range(c.CLASSIFIER_LENGTH):
+            if cls.effect == c.CLASSIFIER_WILDCARD:
                 if previous_perception[i] != perception[i]:
                     return False
             else:

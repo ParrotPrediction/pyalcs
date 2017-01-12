@@ -10,6 +10,8 @@ logging.basicConfig(
     level=logging.DEBUG)
 
 if __name__ == '__main__':
+    GENERATIONS = 5
+
     env = Maze('mazes/m1.maze')
 
     time = 0
@@ -20,7 +22,7 @@ if __name__ == '__main__':
     previous_action_set = None
     previous_perception = None
 
-    for _ in range(5):
+    for _ in range(GENERATIONS):
         logger.info('\n\nGeneration [%d]', time)
 
         if time == 0 or env.animat_found_reward:
