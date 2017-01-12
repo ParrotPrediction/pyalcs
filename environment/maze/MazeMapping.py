@@ -4,10 +4,14 @@ class MazeMapping:
     """
 
     def __init__(self):
-        self.mapping = {}
-        self.mapping['wall'] = {'symbol': '#', 'value': -1}
-        self.mapping['path'] = {'symbol': '.', 'value': 0}
-        self.mapping['reward'] = {'symbol': '$', 'value': 1}
+        self.mapping = {
+            'wall': {'symbol': '#', 'value': -1},
+            'path': {'symbol': '.', 'value': 0},
+            'reward': {'symbol': '$', 'value': 1}
+        }
+
+    def __getitem__(self, item):
+        return self.mapping[item]
 
     def find_value(self, symbol: str) -> int:
         """

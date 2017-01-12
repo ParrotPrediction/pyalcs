@@ -70,7 +70,7 @@ class Maze(Environment):
             if not self._within_x_range(pos_x) or not self._within_y_range(pos_y):
                 raise ValueError('Values outside allowed range')
 
-            if self.matrix[pos_y][pos_x] != self.mapping.mapping['path']['value']:
+            if self.matrix[pos_y][pos_x] != self.mapping['path']['value']:
                 raise ValueError('Animat must be inserted into path')
 
             self.animat_pos_x = pos_x
@@ -80,7 +80,7 @@ class Maze(Environment):
             possible_coords = []
             for x in range(0, self.max_x):
                 for y in range(0, self.max_y):
-                    if self.matrix[x][y] == self.mapping.mapping['path']['value']:
+                    if self.matrix[x][y] == self.mapping['path']['value']:
                         possible_coords.append((x, y))
 
             starting_position = random.choice(possible_coords)
@@ -188,12 +188,12 @@ class Maze(Environment):
         reward = None
         position_value = self._get_animat_position_value(pos_x, pos_y)
 
-        if position_value == self.mapping.mapping['reward']['value']:
+        if position_value == self.mapping['reward']['value']:
             reward = 2000
             self.animat_found_reward = True
             logger.info('Animat found reward!')
 
-        if position_value == self.mapping.mapping['path']['value']:
+        if position_value == self.mapping['path']['value']:
             reward = 1
 
         logger.debug('Animat [(%d, %d)] received reward for position: [%d]', pos_x, pos_y, reward)
