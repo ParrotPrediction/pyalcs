@@ -1,6 +1,7 @@
 class MazeMapping:
     """
-    Represents possible symbols and corresponding perception values for maze definitions
+    Represents possible symbols and corresponding perception
+    values for maze definitions
     """
 
     def __init__(self):
@@ -15,7 +16,8 @@ class MazeMapping:
 
     def find_value(self, symbol: str) -> int:
         """
-        Returns value for the given maze symbol. The value is used for animat perception
+        Returns value for the given maze symbol.
+        The value is used for animat perception.
 
         :param symbol: symbol from maze definition
         :return: an integer mapping symbol

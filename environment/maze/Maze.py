@@ -21,7 +21,6 @@ class MazeAction(Enum):
 
 
 class Maze(Environment):
-
     def __init__(self, maze_file):
         """
         Initiate a new maze environment
@@ -44,7 +43,8 @@ class Maze(Environment):
 
     def _load_maze_from_file(self, fname):
         """
-        Reads maze definition from text file to create required internal variables
+        Reads maze definition from text file
+        to create required internal variables
 
         :param fname: location of .maze file
         :return: dimension and maze matrix
@@ -62,12 +62,15 @@ class Maze(Environment):
                 for x in range(0, max_x):
                     matrix[y][x] = self.mapping.find_value(row[x])
 
-            logger.debug('Maze (%d x %d) imported successfully from file [%s].', max_x, max_y, fname)
+            logger.debug('Maze (%d x %d) imported successfully from '
+                         'file [%s].', max_x, max_y, fname)
+
             self.max_x, self.max_y, self.matrix = max_x, max_y, matrix
 
     def insert_animat(self, pos_x=None, pos_y=None):
         if pos_x is not None and pos_y is not None:
-            if not self._within_x_range(pos_x) or not self._within_y_range(pos_y):
+            if (not self._within_x_range(pos_x) or
+                    not self._within_y_range(pos_y)):
                 raise ValueError('Values outside allowed range')
 
             if self.matrix[pos_y][pos_x] != self.mapping['path']['value']:
@@ -75,7 +78,9 @@ class Maze(Environment):
 
             self.animat_pos_x = pos_x
             self.animat_pos_y = pos_y
-            logger.info('Animat [(%d, %d)] placed into fixed initial cords', pos_x, pos_y)
+
+            logger.info('Animat [(%d, %d)] placed into fixed initial cords',
+                        pos_x, pos_y)
         else:
             possible_coords = []
             for x in range(0, self.max_x):
@@ -87,7 +92,8 @@ class Maze(Environment):
             self.animat_pos_x = starting_position[1]
             self.animat_pos_y = starting_position[0]
 
-            logger.debug('Animat [(%d, %d)] placed into random initial cords', self.animat_pos_x, self.animat_pos_y)
+            logger.debug('Animat [(%d, %d)] placed into random initial cords',
+                         self.animat_pos_x, self.animat_pos_y)
 
     def get_animat_perception(self, pos_x=None, pos_y=None):
         """
@@ -130,35 +136,50 @@ class Maze(Environment):
 
         perception_symbols = [top, left, bottom, right]
 
-        logger.debug('Animat [(%d, %d)] perception (TLBR): [%s]', self.animat_pos_x, self.animat_pos_y, perception_symbols)
+        logger.debug('Animat [(%d, %d)] perception (TLBR): [%s]',
+                     self.animat_pos_x, self.animat_pos_y, perception_symbols)
 
         return perception_symbols
 
     def execute_action(self, perception: list, action: MazeAction):
         reward = 0
         animat_moved = False
-        logger.debug('Animat [(%d, %d)] ordered to execute action: [%s]', self.animat_pos_x, self.animat_pos_y, action.name)
+        logger.debug('Animat [(%d, %d)] ordered to execute action: [%s]',
+                     self.animat_pos_x, self.animat_pos_y, action.name)
 
-        if action == MazeAction.TOP and self.not_wall(perception[0]) and self._within_y_range():
+        if (action == MazeAction.TOP and
+                self.not_wall(perception[0]) and
+                self._within_y_range()):
+
             self.animat_pos_y += -1
             animat_moved = True
 
-        if action == MazeAction.LEFT and self.not_wall(perception[1]) and self._within_x_range():
+        if (action == MazeAction.LEFT and
+                self.not_wall(perception[1]) and
+                self._within_x_range()):
+
             self.animat_pos_x += -1
             animat_moved = True
 
-        if action == MazeAction.DOWN and self.not_wall(perception[2]) and self._within_y_range():
+        if (action == MazeAction.DOWN and
+                self.not_wall(perception[2]) and
+                self._within_y_range()):
+
             self.animat_pos_y += 1
             animat_moved = True
 
-        if action == MazeAction.RIGHT and self.not_wall(perception[3]) and self._within_x_range():
+        if (action == MazeAction.RIGHT and
+                self.not_wall(perception[3]) and
+                self._within_x_range()):
+
             self.animat_pos_x += 1
             animat_moved = True
 
         if animat_moved:
             reward = self._calculate_reward()
         else:
-            logger.debug('Animat [(%d, %d)] did not move.', self.animat_pos_x, self.animat_pos_y,)
+            logger.debug('Animat [(%d, %d)] did not move.',
+                         self.animat_pos_x, self.animat_pos_y, )
 
         return reward
 
@@ -196,7 +217,9 @@ class Maze(Environment):
         if position_value == self.mapping['path']['value']:
             reward = 1
 
-        logger.debug('Animat [(%d, %d)] received reward for position: [%d]', pos_x, pos_y, reward)
+        logger.debug('Animat [(%d, %d)] received reward for position: [%d]',
+                     pos_x, pos_y, reward)
+
         return reward
 
     @staticmethod

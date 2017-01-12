@@ -5,7 +5,9 @@ from agent.acs2 import Constants as const
 import logging
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(format='[%(asctime)s] [%(levelname)s] [%(name)s]: %(message)s', level=logging.DEBUG)
+logging.basicConfig(
+    format='[%(asctime)s] [%(levelname)s] [%(name)s]: %(message)s',
+    level=logging.DEBUG)
 
 if __name__ == '__main__':
     env = Maze('mazes/m1.maze')
@@ -26,7 +28,7 @@ if __name__ == '__main__':
             env.insert_animat()
 
         if time == 0 or len(classifiers) == 0:
-            classifiers = ACS2.generate_initial_classifiers(const.AGENT_NUMBER_OF_POSSIBLE_ACTIONS)
+            classifiers = ACS2.generate_initial_classifiers()
 
         perception = env.get_animat_perception()
         match_set = ACS2.generate_match_set(classifiers, perception)
@@ -40,4 +42,3 @@ if __name__ == '__main__':
         time += 1
 
     logger.info('Finished')
-

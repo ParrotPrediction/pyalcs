@@ -21,14 +21,19 @@ class Classifier(object):
         self.num = 1  # Numerosity (how many classifiers were subsumed)
 
     def __repr__(self):
-        return 'Classifier{{{}-{}-{} q:{}, r:{}}}'.format(''.join(map(str, self.condition)), self.action, ''.join(map(str, self.effect)), self.q, self.r)
+        return 'Classifier{{{}-{}-{} q:{}, r:{}}}'.format(
+            ''.join(map(str, self.condition)),
+            self.action, ''.join(map(str, self.effect)),
+            self.q,
+            self.r)
 
     def __copy__(self):
         raise NotImplementedError('Not yet implemented')
 
     def __eq__(self, other):
         """
-        Equality check. The other classifier is the same when it has the same condition and action part
+        Equality check. The other classifier is the same when
+        it has the same condition and action part
 
         :param other: the other classifier
         :return: true if classifier is the same, false otherwise
@@ -48,15 +53,19 @@ class Classifier(object):
 
     def is_subsumer(self, cl, theta_exp=None, theta_r=None):
         """
-        Subsume operation - capture another, similar but more general classifier.
+        Subsume operation - capture another, similar but more
+        general classifier.
 
-        In order to subsume another classifier, the subsumer needs to be experienced, reliable
-        and not marked. Moreover the subsumer condition part needs to be syntactically more general
-        and the effect part needs to be identical
+        In order to subsume another classifier, the subsumer needs to be
+        experienced, reliable and not marked. Moreover the subsumer condition
+        part needs to be syntactically more general and the effect part
+        needs to be identical
 
         :param cl: classifier to subsume
-        :param theta_exp: threshold of required classifier experience to subsume another classifier
-        :param theta_r: threshold of required classifier quality to subsume another classifier
+        :param theta_exp: threshold of required classifier experience
+        to subsume another classifier
+        :param theta_r: threshold of required classifier quality to
+        subsume another classifier
         :return: true if classifier cl is subsumed, false otherwise
         """
         if not isinstance(cl, self.__class__):
@@ -87,10 +96,10 @@ class Classifier(object):
 
     def is_more_general(self, cl):
         """
-        Checks if classifier is more general than classifier passed in an argument.
-        It's made sure that classifier is indeed *more* general, as well as that the
-        more specific classifier is completely included in in the more general one
-        (do not specify overlapping regions).
+        Checks if classifier is more general than classifier passed in
+        an argument. It's made sure that classifier is indeed *more* general,
+        as well as that the more specific classifier is completely included
+        in the more general one (do not specify overlapping regions).
 
         :param cl: classifier to compare
         :return: true if a base classifier is more general, false otherwise
@@ -101,7 +110,9 @@ class Classifier(object):
         base_more_general = False
 
         for i in range(const.CLASSIFIER_LENGTH):
-            if self.condition[i] != const.CLASSIFIER_WILDCARD and self.condition[i] != cl.condition[i]:
+            if (self.condition[i] != const.CLASSIFIER_WILDCARD and
+                    self.condition[i] != cl.condition[i]):
+
                 return False
             elif self.condition[i] != cl.condition[i]:
                 base_more_general = True

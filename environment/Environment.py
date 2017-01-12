@@ -30,5 +30,3 @@ class Environment(metaclass=ABCMeta):
         :return: reward
         """
         raise NotImplementedError()
-
-

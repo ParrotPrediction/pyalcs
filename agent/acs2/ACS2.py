@@ -11,9 +11,10 @@ logger = logging.getLogger(__name__)
 class ACS2(Agent):
 
     @staticmethod
-    def generate_match_set(classifiers:list, perception: list):
+    def generate_match_set(classifiers: list, perception: list):
         """
-        Generates a list of classifiers from population that match given perception. A list is then stored
+        Generates a list of classifiers from population that match given
+        perception. A list is then stored
         as agents property.
 
         :param classifiers: list of classifiers
@@ -68,7 +69,9 @@ class ACS2(Agent):
                 if cls.effect != [const.CLASSIFIER_WILDCARD] * const.CLASSIFIER_LENGTH and cls.fitness() > best_classifier.fitness():
                     best_classifier = cls
 
-            logger.debug('Action chosen: [%d] (%s)', best_classifier.action, best_classifier)
+            logger.debug('Action chosen: [%d] (%s)',
+                         best_classifier.action, best_classifier)
+
             return best_classifier.action
 
     @staticmethod
@@ -78,10 +81,12 @@ class ACS2(Agent):
 
         :param cls: classifier object
         :param perception: perception given as list
-        :return: True if classifiers can be applied for given perception, false otherwise
+        :return: True if classifiers can be applied
+        for given perception, false otherwise
         """
         if len(perception) != len(cls.condition):
-            raise ValueError('Perception and classifier condition length is different')
+            raise ValueError('Perception and classifier condition '
+                             'length is different')
 
         for i in range(len(perception)):
             if cls.condition[i] != const.CLASSIFIER_WILDCARD and cls.condition[i] != perception[i]:
@@ -90,13 +95,17 @@ class ACS2(Agent):
         return True
 
     @staticmethod
-    def generate_initial_classifiers(number_of_actions: int) -> list:
+    def generate_initial_classifiers(number_of_actions: int = None) -> list:
         """
-        Generate a list of default, general classifiers for all possible actions
+        Generate a list of default, general classifiers for all
+        possible actions.
 
         :param number_of_actions: number of general classifiers to be generated
         :return: list of classifiers
         """
+        if number_of_actions is None:
+            number_of_actions = const.AGENT_NUMBER_OF_POSSIBLE_ACTIONS
+
         initial_classifiers = []
 
         for i in range(number_of_actions):
