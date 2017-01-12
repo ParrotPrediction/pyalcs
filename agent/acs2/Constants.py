@@ -6,8 +6,8 @@ CLASSIFIER_WILDCARD = '#'
 # Length of condition and effect part of the classifier
 CLASSIFIER_LENGTH = 4
 
-# Defines a number of possible agent actions
-AGENT_NUMBER_OF_POSSIBLE_ACTIONS = 4
+# Defines a number of possible agents actions
+NUMBER_OF_POSSIBLE_ACTIONS = 4
 
 # TODO: Used in choosing best action
 EPSILON = 0.5

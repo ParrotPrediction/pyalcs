@@ -18,7 +18,9 @@ class ALP:
             cls.exp += 1
             __class__._update_application_average(cls, time)
 
-            if __class__._does_anticipate_correctly(cls, perception, previous_perception):
+            if __class__._does_anticipate_correctly(cls,
+                                                    perception,
+                                                    previous_perception):
                 newCls = expected_case(cls, perception)
                 was_expected_case += 1
             else:
@@ -32,7 +34,10 @@ class ALP:
                 add_alp_classifier(newCls, classifiers, action_set)
 
             if was_expected_case == 0:
-                newCls = cover_triple(previous_perception, action, perception, time)
+                newCls = cover_triple(previous_perception,
+                                      action,
+                                      perception,
+                                      time)
                 add_alp_classifier(newCls, classifiers, action_set)
 
     @staticmethod

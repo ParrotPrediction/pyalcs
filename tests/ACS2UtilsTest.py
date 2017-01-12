@@ -1,21 +1,21 @@
 import unittest
-from agent import ACS2
+from agent import ACS2Utils
 from agent.acs2.Classifier import Classifier
 from agent.acs2 import Constants as const
 
 
-class ACS2Test(unittest.TestCase):
+class ACS2UtilsTest(unittest.TestCase):
 
     def test_should_generate_initial_classifier_set(self):
-        n_classifiers = 4
+        n_cls = 4  # Number of classifiers
         general_perception = []
-        for i in range(n_classifiers):
+        for i in range(n_cls):
             general_perception.append(const.CLASSIFIER_WILDCARD)
 
-        initial_classifiers = ACS2.generate_initial_classifiers(n_classifiers)
-        self.assertEqual(n_classifiers, len(initial_classifiers))
+        initial_classifiers = ACS2Utils.generate_initial_classifiers(n_cls)
+        self.assertEqual(n_cls, len(initial_classifiers))
 
-        for i in range(n_classifiers):
+        for i in range(n_cls):
             cls = initial_classifiers[i]
             self.assertListEqual(general_perception, cls.condition)
             self.assertListEqual(general_perception, cls.effect)
@@ -27,8 +27,9 @@ class ACS2Test(unittest.TestCase):
         cls = Classifier()
         cls.condition = ['#', '2', '#', '#', '1']
 
-        self.assertTrue(ACS2._does_match(cls, ['1', '2', '-1', '1', '1']))
+        self.assertTrue(ACS2Utils._does_match(cls, ['1', '2', '-1', '1', '1']))
 
         # second element different
-        self.assertFalse(ACS2._does_match(cls, ['0', '1', '1', '1', '1']))
-        self.assertRaises(ValueError, ACS2._does_match, cls, ['0', '1'])
+        self.assertFalse(ACS2Utils._does_match(cls, ['0', '1', '1', '1', '1']))
+
+        self.assertRaises(ValueError, ACS2Utils._does_match, cls, ['0', '1'])

@@ -18,34 +18,66 @@ class MazeTest(unittest.TestCase):
     def test_animat_perception(self):
         # Edge conditions
         self.assertListEqual(
-            [None, None, self.env.mapping['wall']['value'], self.env.mapping['wall']['value']],
+            [None,
+             None,
+             self.env.mapping['wall']['value'],
+             self.env.mapping['wall']['value']],
             self.env.get_animat_perception(0, 0)
         )
 
         self.assertListEqual(
-            [self.env.mapping['wall']['value'], None, self.env.mapping['wall']['value'], self.env.mapping['wall']['value']],
+            [self.env.mapping['wall']['value'],
+             None,
+             self.env.mapping['wall']['value'],
+             self.env.mapping['wall']['value']],
             self.env.get_animat_perception(0, 3)
         )
 
         self.assertListEqual(
-            [self.env.mapping['wall']['value'], None, None, self.env.mapping['wall']['value']],
+            [self.env.mapping['wall']['value'],
+             None,
+             None,
+             self.env.mapping['wall']['value']],
             self.env.get_animat_perception(0, 7)
         )
 
         self.assertListEqual(
-            [None, self.env.mapping['wall']['value'], self.env.mapping['wall']['value'], None],
+            [None,
+             self.env.mapping['wall']['value'],
+             self.env.mapping['wall']['value'],
+             None],
             self.env.get_animat_perception(7, 0)
         )
 
         self.assertListEqual(
-            [self.env.mapping['path']['value'], self.env.mapping['wall']['value'], None, self.env.mapping['wall']['value']],
+            [self.env.mapping['path']['value'],
+             self.env.mapping['wall']['value'],
+             None,
+             self.env.mapping['wall']['value']],
             self.env.get_animat_perception(4, 7)
         )
 
         # Good cases
-        self.assertListEqual([self.env.mapping['path']['value'], self.env.mapping['wall']['value'], self.env.mapping['wall']['value'], self.env.mapping['wall']['value']], self.env.get_animat_perception(2, 5))
-        self.assertListEqual([self.env.mapping['path']['value'], self.env.mapping['path']['value'], self.env.mapping['wall']['value'], self.env.mapping['path']['value']], self.env.get_animat_perception(5, 6))
-        self.assertListEqual([self.env.mapping['wall']['value'], self.env.mapping['path']['value'], self.env.mapping['wall']['value'], self.env.mapping['path']['value']], self.env.get_animat_perception(3, 4))
+        self.assertListEqual(
+            [self.env.mapping['path']['value'],
+             self.env.mapping['wall']['value'],
+             self.env.mapping['wall']['value'],
+             self.env.mapping['wall']['value']],
+            self.env.get_animat_perception(2, 5))
+
+        self.assertListEqual(
+            [self.env.mapping['path']['value'],
+             self.env.mapping['path']['value'],
+             self.env.mapping['wall']['value'],
+             self.env.mapping['path']['value']],
+            self.env.get_animat_perception(5, 6))
+
+        self.assertListEqual(
+            [self.env.mapping['wall']['value'],
+             self.env.mapping['path']['value'],
+             self.env.mapping['wall']['value'],
+             self.env.mapping['path']['value']],
+            self.env.get_animat_perception(3, 4))
 
         # Wrong input values
         self.assertRaises(ValueError, self.env.get_animat_perception, -2, 4)
@@ -90,12 +122,16 @@ class MazeTest(unittest.TestCase):
     def test_should_insert_animat_randomly(self):
         for i in range(0, 100):
             self.env.insert_animat()
-            self.assertTrue(Maze.not_wall(self.env._get_animat_position_value()))
+            position_value = self.env._get_animat_position_value()
+            self.assertTrue(Maze.not_wall(position_value))
 
     def test_should_insert_animat(self):
         self.env.insert_animat(4, 1)
         self.assertEqual(
-            [self.env.mapping['wall']['value'], self.env.mapping['path']['value'], self.env.mapping['path']['value'], self.env.mapping['path']['value']],
+            [self.env.mapping['wall']['value'],
+             self.env.mapping['path']['value'],
+             self.env.mapping['path']['value'],
+             self.env.mapping['path']['value']],
             self.env.get_animat_perception()
         )
 

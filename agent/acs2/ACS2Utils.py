@@ -1,5 +1,5 @@
-from agent import Agent, Classifier
-from agent.acs2 import Constants as const
+from agent import Classifier
+from agent.acs2 import Constants as c
 
 import logging
 from random import random, choice
@@ -8,7 +8,7 @@ from random import random, choice
 logger = logging.getLogger(__name__)
 
 
-class ACS2(Agent):
+class ACS2Utils:
 
     @staticmethod
     def generate_match_set(classifiers: list, perception: list):
@@ -57,16 +57,19 @@ class ACS2(Agent):
         :return:
         """
         if epsilon is None:
-            epsilon = const.EPSILON
+            epsilon = c.EPSILON
 
         if random() < epsilon:
-            random_action = choice([i for i in range(const.AGENT_NUMBER_OF_POSSIBLE_ACTIONS)])
+            all_actions = [i for i in range(c.NUMBER_OF_POSSIBLE_ACTIONS)]
+            random_action = choice(all_actions)
             logger.debug('Action chosen: [%d] (randomly)', random_action)
             return random_action
         else:
             best_classifier = classifiers[0]
+            dontcare_classifier = [c.CLASSIFIER_WILDCARD] * c.CLASSIFIER_LENGTH
             for cls in classifiers:
-                if cls.effect != [const.CLASSIFIER_WILDCARD] * const.CLASSIFIER_LENGTH and cls.fitness() > best_classifier.fitness():
+                if (cls.effect != dontcare_classifier and
+                        cls.fitness() > best_classifier.fitness()):
                     best_classifier = cls
 
             logger.debug('Action chosen: [%d] (%s)',
@@ -89,7 +92,8 @@ class ACS2(Agent):
                              'length is different')
 
         for i in range(len(perception)):
-            if cls.condition[i] != const.CLASSIFIER_WILDCARD and cls.condition[i] != perception[i]:
+            if (cls.condition[i] != c.CLASSIFIER_WILDCARD and
+                    cls.condition[i] != perception[i]):
                 return False
 
         return True
@@ -104,7 +108,7 @@ class ACS2(Agent):
         :return: list of classifiers
         """
         if number_of_actions is None:
-            number_of_actions = const.AGENT_NUMBER_OF_POSSIBLE_ACTIONS
+            number_of_actions = c.NUMBER_OF_POSSIBLE_ACTIONS
 
         initial_classifiers = []
 
