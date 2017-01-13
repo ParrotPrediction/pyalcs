@@ -1,5 +1,6 @@
 import unittest
 from environment import Maze
+from environment.maze.Maze import MazeAction
 
 
 class MazeTest(unittest.TestCase):
@@ -127,7 +128,7 @@ class MazeTest(unittest.TestCase):
 
     def test_should_insert_animat(self):
         self.env.insert_animat(4, 1)
-        self.assertEqual(
+        self.assertListEqual(
             [self.env.mapping['wall']['value'],
              self.env.mapping['path']['value'],
              self.env.mapping['path']['value'],
@@ -142,14 +143,101 @@ class MazeTest(unittest.TestCase):
         # Try to insert out of range
         self.assertRaises(ValueError, self.env.insert_animat, 9, 2)
 
+    def test_should_execute_chain_of_actions(self):
+        # Put animat in maze
+        self.env.insert_animat(4, 2)
+
+        # Make sure that the searching state is correct
+        self.assertFalse(self.env.animat_found_reward)
+
+        # Check if animat landed in desired position
+        self.assertEqual(
+            self.env.mapping['path']['value'],
+            self.env._get_animat_position_value())
+
+        # Check if perception is ok
+        self.assertListEqual(
+            [self.env.mapping['path']['value'],
+             self.env.mapping['wall']['value'],
+             self.env.mapping['path']['value'],
+             self.env.mapping['wall']['value']],
+            self.env.get_animat_perception())
+
+        # Tell animat to go up (should be ok)
+        reward = self.env.execute_action(MazeAction.TOP)
+
+        # Validate if coordinates changed
+        self.assertEqual(4, self.env.animat_pos_x)
+        self.assertEqual(1, self.env.animat_pos_y)
+
+        # Check if perception also changed
+        self.assertListEqual(
+            [self.env.mapping['wall']['value'],
+             self.env.mapping['path']['value'],
+             self.env.mapping['path']['value'],
+             self.env.mapping['path']['value']],
+            self.env.get_animat_perception())
+
+        # Make sure that the searching state is correct
+        self.assertFalse(self.env.animat_found_reward)
+
+        # Check if proper reward for visiting path was collected
+        self.assertEqual(1, reward)
+
+        # Now try to enter the wall (action - TOP)
+        reward = self.env.execute_action(MazeAction.TOP)
+
+        # Validate if the coordinates did not changed
+        self.assertEqual(4, self.env.animat_pos_x)
+        self.assertEqual(1, self.env.animat_pos_y)
+
+        # Check if no reward was collected
+        self.assertEqual(None, reward)
+
+        # Now let's go left (should be ok)
+        reward = self.env.execute_action(MazeAction.LEFT)
+
+        # Validate if the coordinates changed
+        self.assertEqual(3, self.env.animat_pos_x)
+        self.assertEqual(1, self.env.animat_pos_y)
+
+        # Make sure that the searching state is correct
+        self.assertFalse(self.env.animat_found_reward)
+
+        # Check if proper reward for visiting path was collected
+        self.assertEqual(1, reward)
+
+        # Go left for the second time (should be ok)
+        reward = self.env.execute_action(MazeAction.LEFT)
+
+        # Validate if the coordinates changed
+        self.assertEqual(2, self.env.animat_pos_x)
+        self.assertEqual(1, self.env.animat_pos_y)
+
+        # Check if proper reward for visiting path was collected
+        self.assertEqual(1, reward)
+
+        # Now the animat should see the final reward
+        self.assertListEqual(
+            [self.env.mapping['wall']['value'],
+             self.env.mapping['reward']['value'],
+             self.env.mapping['wall']['value'],
+             self.env.mapping['path']['value']],
+            self.env.get_animat_perception())
+
+        # Lets collect it by moving left for the third time (should be ok)
+        reward = self.env.execute_action(MazeAction.LEFT)
+
+        # Validate if the coordinates changed
+        self.assertEqual(1, self.env.animat_pos_x)
+        self.assertEqual(1, self.env.animat_pos_y)
+
+        # Make sure that the searching state is correct
+        self.assertTrue(self.env.animat_found_reward)
+
+        # Check if proper reward for finding reward was collected
+        self.assertEqual(2000, reward)
+
     @unittest.skip("TODO")
-    def test_should_execute_action(self):
-        # check if coordinates changed
-        # perception changed
-        # reward is correct
-        # illegal action protection
+    def test_should_calculate_reward(self):
         pass
-
-
-if __name__ == '__main__':
-    unittest.main()

@@ -21,7 +21,7 @@ class MazeAction(Enum):
 
 
 class Maze(Environment):
-    def __init__(self, maze_file):
+    def __init__(self, maze_file: str):
         """
         Initiate a new maze environment
         """
@@ -35,19 +35,23 @@ class Maze(Environment):
         self.max_x, self.max_y, self.matrix = None, None, None
         self._load_maze_from_file(maze_file)
 
-    def reset_animat_state(self):
+    def reset_animat_state(self) -> None:
+        """
+        Resets the internal animat state (position x, y).
+        Also stores the information that the reward is still not found
+        """
         logger.debug('Resetting animat state')
         self.animat_pos_x = None
         self.animat_pos_y = None
         self.animat_found_reward = False
 
-    def _load_maze_from_file(self, fname):
+    def _load_maze_from_file(self, fname: str) -> None:
         """
         Reads maze definition from text file
-        to create required internal variables
+        and creates required internal variables (maze dimensions,
+        and it's matrix representation)
 
         :param fname: location of .maze file
-        :return: dimension and maze matrix
         """
         basepath = dirname(__file__)
         filepath = abspath(join(basepath, '..', '..', fname))
@@ -67,7 +71,7 @@ class Maze(Environment):
 
             self.max_x, self.max_y, self.matrix = max_x, max_y, matrix
 
-    def insert_animat(self, pos_x=None, pos_y=None):
+    def insert_animat(self, pos_x: int = None, pos_y: int = None) -> None:
         if pos_x is not None and pos_y is not None:
             if (not self._within_x_range(pos_x) or
                     not self._within_y_range(pos_y)):
@@ -141,8 +145,23 @@ class Maze(Environment):
 
         return perception_symbols
 
-    def execute_action(self, perception: list, action: MazeAction):
-        reward = 0
+    def execute_action(self,
+                       action: MazeAction,
+                       perception: list = None) -> int:
+        """
+        Orders animat to execute the action. The animat is not allowed
+        to move into the wall. If animat didn't moved in this turn he receives
+        no reward.
+
+        :param action: action to execute
+        :param perception: optional perception to test. If not specified
+        current animat perception is used
+        :return: reward for new position or None for illegal move
+        """
+        if perception is None:
+            perception = self.get_animat_perception()
+
+        reward = None
         animat_moved = False
         logger.debug('Animat [(%d, %d)] ordered to execute action: [%s]',
                      self.animat_pos_x, self.animat_pos_y, action.name)
@@ -179,7 +198,7 @@ class Maze(Environment):
             reward = self._calculate_reward()
         else:
             logger.debug('Animat [(%d, %d)] did not move.',
-                         self.animat_pos_x, self.animat_pos_y, )
+                         self.animat_pos_x, self.animat_pos_y)
 
         return reward
 
@@ -196,7 +215,7 @@ class Maze(Environment):
 
         return self.matrix[pos_y][pos_x]
 
-    def _calculate_reward(self, pos_x=None, pos_y=None):
+    def _calculate_reward(self, pos_x: int = None, pos_y: int = None) -> int:
         """
         Calculates reward for given state
 
