@@ -8,7 +8,7 @@ Currently the following agents are implemented: ACS2
 ## Contribution
 If you want to contribute, please execute tests beforehand:
 
-    python3 -m unittest discover
+    python3 -m unittest -v tests
     
 and check PEP8 compliance:
 

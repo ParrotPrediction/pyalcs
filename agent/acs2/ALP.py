@@ -52,7 +52,7 @@ class ALP:
 
         # TGA? Should this be in ALP module?
         # Maybe naming convention should be changed
-            clsf.tga = time
+        clsf.tga = time
 
     @staticmethod
     def _does_anticipate_correctly(classifier: Classifier,
