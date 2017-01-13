@@ -5,7 +5,7 @@ from environment import Maze
 class MazeTest(unittest.TestCase):
 
     def setUp(self):
-        self.env = Maze('tests/test1.maze')
+        self.env = Maze('tests/maze/test1.maze')
 
     def test_should_load_maze_from_file(self):
         self.assertEqual(8, self.env.max_x)

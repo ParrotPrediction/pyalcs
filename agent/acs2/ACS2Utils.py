@@ -16,7 +16,8 @@ class ACS2Utils:
         Generate a list of default, general classifiers for all
         possible actions.
 
-        :param number_of_actions: number of general classifiers to be generated
+        :param number_of_actions: number of general classifiers
+        to be generated
         :return: list of classifiers
         """
         if number_of_actions is None:
@@ -34,8 +35,8 @@ class ACS2Utils:
         logger.debug('Generated initial classifiers: %s', initial_classifiers)
         return initial_classifiers
 
-    @staticmethod
-    def generate_match_set(classifiers: list, perception: list) -> list:
+    @classmethod
+    def generate_match_set(cls, classifiers: list, perception: list) -> list:
         """
         Generates a list of classifiers from population that match given
         perception. A list is then stored
@@ -47,9 +48,9 @@ class ACS2Utils:
         """
         match_set = []
 
-        for cls in classifiers:
-            if __class__._does_match(cls, perception):
-                match_set.append(cls)
+        for classifier in classifiers:
+            if cls._does_match(classifier, perception):
+                match_set.append(classifier)
 
         logger.debug('Generated match set: [%s]', match_set)
         return match_set
@@ -65,9 +66,9 @@ class ACS2Utils:
         """
         action_set = []
 
-        for cls in classifiers:
-            if cls.action == action:
-                action_set.append(cls)
+        for classifier in classifiers:
+            if classifier.action == action:
+                action_set.append(classifier)
 
         logger.debug('Generated action set: [%s]', action_set)
         return action_set
@@ -91,10 +92,10 @@ class ACS2Utils:
         else:
             best_classifier = classifiers[0]
             dontcare_classifier = [c.CLASSIFIER_WILDCARD] * c.CLASSIFIER_LENGTH
-            for cls in classifiers:
-                if (cls.effect != dontcare_classifier and
-                        cls.fitness() > best_classifier.fitness()):
-                    best_classifier = cls
+            for classifier in classifiers:
+                if (classifier.effect != dontcare_classifier and
+                        classifier.fitness() > best_classifier.fitness()):
+                    best_classifier = classifier
 
             logger.debug('Action chosen: [%d] (%s)',
                          best_classifier.action, best_classifier)
@@ -102,22 +103,22 @@ class ACS2Utils:
             return best_classifier.action
 
     @staticmethod
-    def _does_match(cls: Classifier, perception: list) -> bool:
+    def _does_match(classifier: Classifier, perception: list) -> bool:
         """
         Check if classifier condition match given perception
 
-        :param cls: classifier object
+        :param classifier: classifier object
         :param perception: perception given as list
         :return: True if classifiers can be applied
         for given perception, false otherwise
         """
-        if len(perception) != len(cls.condition):
+        if len(perception) != len(classifier.condition):
             raise ValueError('Perception and classifier condition '
                              'length is different')
 
         for i in range(len(perception)):
-            if (cls.condition[i] != c.CLASSIFIER_WILDCARD and
-                    cls.condition[i] != perception[i]):
+            if (classifier.condition[i] != c.CLASSIFIER_WILDCARD and
+                    classifier.condition[i] != perception[i]):
                 return False
 
         return True

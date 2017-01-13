@@ -4,8 +4,9 @@ from agent.acs2 import Constants as c
 
 class ALP:
 
-    @staticmethod
-    def apply(classifiers: list,
+    @classmethod
+    def apply(cls,
+              classifiers: list,
               action: int,
               time: int,
               action_set: list,
@@ -14,20 +15,22 @@ class ALP:
 
         was_expected_case = 0
 
-        for cls in action_set:
-            cls.exp += 1
-            __class__._update_application_average(cls, time)
+        for classifier in action_set:
+            classifier.exp += 1
+            cls._update_application_average(classifier, time)
 
-            if __class__._does_anticipate_correctly(cls,
-                                                    perception,
-                                                    previous_perception):
-                newCls = expected_case(cls, perception)
+            if cls._does_anticipate_correctly(classifier,
+                                              perception,
+                                              previous_perception):
+                newCls = expected_case(classifier, perception)
                 was_expected_case += 1
             else:
-                newCls = unexpected_case(cls, perception, previous_perception)
-                if cls.q < const.THETA_I:
-                    remove(cls, classifiers)
-                    action_set.remove(cls)
+                newCls = unexpected_case(classifier,
+                                         perception,
+                                         previous_perception)
+                if classifier.q < const.THETA_I:
+                    remove(classifier, classifiers)
+                    action_set.remove(classifier)
 
             if newCls is not None:
                 newCls.tga = time
@@ -41,32 +44,32 @@ class ALP:
                 add_alp_classifier(newCls, classifiers, action_set)
 
     @staticmethod
-    def _update_application_average(cls: Classifier, time: int):
-        if cls.exp < 1 / c.BETA:
-            cls.aav += (time - cls.tga - cls.aav) / cls.exp
+    def _update_application_average(clsf: Classifier, time: int):
+        if clsf.exp < 1 / c.BETA:
+            clsf.aav += (time - clsf.tga - clsf.aav) / clsf.exp
         else:
-            cls.aav += c.BETA * (time - cls.tga - cls.aav)
+            clsf.aav += c.BETA * (time - clsf.tga - clsf.aav)
 
         # TGA? Should this be in ALP module?
         # Maybe naming convention should be changed
-        cls.tga = time
+            clsf.tga = time
 
     @staticmethod
-    def _does_anticipate_correctly(cls: Classifier,
+    def _does_anticipate_correctly(classifier: Classifier,
                                    perception: list,
                                    previous_perception: list) -> bool:
         """
-        :param cls: given classifier
+        :param classifier: given classifier
         :param perception: current perception
         :param previous_perception: previous perception
         :return: True if classifier anticipates correctly, False otherwise
         """
         for i in range(c.CLASSIFIER_LENGTH):
-            if cls.effect == c.CLASSIFIER_WILDCARD:
+            if classifier.effect == c.CLASSIFIER_WILDCARD:
                 if previous_perception[i] != perception[i]:
                     return False
             else:
-                if (cls.effect[i] != perception[i] or
+                if (classifier.effect[i] != perception[i] or
                         previous_perception[i] == perception[i]):
                     return False
 
