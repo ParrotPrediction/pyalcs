@@ -1,4 +1,3 @@
-from copy import deepcopy
 import unittest
 
 from agent import Classifier
@@ -75,7 +74,7 @@ class ClassifierTest(unittest.TestCase):
         self.assertEqual(0.25, c2.fitness())
 
     def test_should_copy_classifier(self):
-        copied = deepcopy(self.baseClassifier)
+        copied = Classifier.copy_from(self.baseClassifier)
 
         self.assertListEqual(self.baseClassifier.condition, copied.condition)
         self.assertEqual(self.baseClassifier.action, copied.action)

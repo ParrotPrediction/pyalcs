@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from agent.acs2 import Constants as c
 
 
@@ -19,6 +21,10 @@ class Classifier(object):
         self.aav = 0  # Application average
         self.exp = 0  # Experience
         self.num = 1  # Numerosity (how many classifiers were subsumed)
+
+    @staticmethod
+    def copy_from(old_classifier):
+        return deepcopy(old_classifier)
 
     def __repr__(self):
         return 'Classifier{{{}-{}-{} q:{}, r:{}}}'.format(

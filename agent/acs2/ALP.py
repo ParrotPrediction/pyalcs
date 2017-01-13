@@ -2,7 +2,6 @@ from agent.acs2.Classifier import Classifier
 from agent.acs2 import Constants as c
 
 from random import random
-from copy import deepcopy
 
 
 class ALP:
@@ -60,7 +59,7 @@ class ALP:
         else:
             spec = number_of_spec(classifier.condition)
             spec_new = number_of_spec(diff)
-            child = deepcopy(classifier)
+            child = Classifier.copy_from(classifier)
 
             if spec == c.U_MAX:
                 remove_random_spec_att(child.condition)
@@ -100,7 +99,7 @@ class ALP:
                         previous_perception[i] != perception[i]):
                     return None
 
-        child = deepcopy(classifier)
+        child = Classifier.copy_from(classifier)
 
         for i in random(len(perception)):
             if (classifier.effect[i] == c.CLASSIFIER_WILDCARD and
