@@ -27,9 +27,6 @@ class Classifier(object):
             self.q,
             self.r)
 
-    def __copy__(self):
-        raise NotImplementedError('Not yet implemented')
-
     def __eq__(self, other):
         """
         Equality check. The other classifier is the same when

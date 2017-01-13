@@ -1,4 +1,6 @@
+from copy import deepcopy
 import unittest
+
 from agent import Classifier
 
 
@@ -71,3 +73,23 @@ class ClassifierTest(unittest.TestCase):
         c2.r = 0.5
 
         self.assertEqual(0.25, c2.fitness())
+
+    def test_should_copy_classifier(self):
+        copied = deepcopy(self.baseClassifier)
+
+        self.assertListEqual(self.baseClassifier.condition, copied.condition)
+        self.assertEqual(self.baseClassifier.action, copied.action)
+        self.assertListEqual(self.baseClassifier.effect, copied.effect)
+        self.assertEqual(self.baseClassifier.mark, copied.mark)
+        self.assertEqual(self.baseClassifier.q, copied.q)
+        self.assertEqual(self.baseClassifier.r, copied.r)
+        self.assertEqual(self.baseClassifier.ir, copied.ir)
+        self.assertEqual(self.baseClassifier.t, copied.t)
+        self.assertEqual(self.baseClassifier.tga, copied.tga)
+        self.assertEqual(self.baseClassifier.alp, copied.alp)
+        self.assertEqual(self.baseClassifier.aav, copied.aav)
+        self.assertEqual(self.baseClassifier.exp, copied.exp)
+        self.assertEqual(self.baseClassifier.num, copied.num)
+
+        # Check if a new reference for object is created
+        self.assertFalse(copied.condition is self.baseClassifier.condition)
