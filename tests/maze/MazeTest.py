@@ -23,7 +23,7 @@ class MazeTest(unittest.TestCase):
              None,
              self.env.mapping['wall']['value'],
              self.env.mapping['wall']['value']],
-            self.env.get_animat_perception(0, 0)
+            list(self.env.get_animat_perception(0, 0))
         )
 
         self.assertListEqual(
@@ -31,7 +31,7 @@ class MazeTest(unittest.TestCase):
              None,
              self.env.mapping['wall']['value'],
              self.env.mapping['wall']['value']],
-            self.env.get_animat_perception(0, 3)
+            list(self.env.get_animat_perception(0, 3))
         )
 
         self.assertListEqual(
@@ -39,7 +39,7 @@ class MazeTest(unittest.TestCase):
              None,
              None,
              self.env.mapping['wall']['value']],
-            self.env.get_animat_perception(0, 7)
+            list(self.env.get_animat_perception(0, 7))
         )
 
         self.assertListEqual(
@@ -47,7 +47,7 @@ class MazeTest(unittest.TestCase):
              self.env.mapping['wall']['value'],
              self.env.mapping['wall']['value'],
              None],
-            self.env.get_animat_perception(7, 0)
+            list(self.env.get_animat_perception(7, 0))
         )
 
         self.assertListEqual(
@@ -55,7 +55,7 @@ class MazeTest(unittest.TestCase):
              self.env.mapping['wall']['value'],
              None,
              self.env.mapping['wall']['value']],
-            self.env.get_animat_perception(4, 7)
+            list(self.env.get_animat_perception(4, 7))
         )
 
         # Good cases
@@ -64,21 +64,21 @@ class MazeTest(unittest.TestCase):
              self.env.mapping['wall']['value'],
              self.env.mapping['wall']['value'],
              self.env.mapping['wall']['value']],
-            self.env.get_animat_perception(2, 5))
+            list(self.env.get_animat_perception(2, 5)))
 
         self.assertListEqual(
             [self.env.mapping['path']['value'],
              self.env.mapping['path']['value'],
              self.env.mapping['wall']['value'],
              self.env.mapping['path']['value']],
-            self.env.get_animat_perception(5, 6))
+            list(self.env.get_animat_perception(5, 6)))
 
         self.assertListEqual(
             [self.env.mapping['wall']['value'],
              self.env.mapping['path']['value'],
              self.env.mapping['wall']['value'],
              self.env.mapping['path']['value']],
-            self.env.get_animat_perception(3, 4))
+            list(self.env.get_animat_perception(3, 4)))
 
         # Wrong input values
         self.assertRaises(ValueError, self.env.get_animat_perception, -2, 4)
@@ -133,7 +133,7 @@ class MazeTest(unittest.TestCase):
              self.env.mapping['path']['value'],
              self.env.mapping['path']['value'],
              self.env.mapping['path']['value']],
-            self.env.get_animat_perception()
+            list(self.env.get_animat_perception())
         )
 
         # Wrong input values
@@ -161,7 +161,7 @@ class MazeTest(unittest.TestCase):
              self.env.mapping['wall']['value'],
              self.env.mapping['path']['value'],
              self.env.mapping['wall']['value']],
-            self.env.get_animat_perception())
+            list(self.env.get_animat_perception()))
 
         # Tell animat to go up (should be ok)
         reward = self.env.execute_action(MazeAction.TOP)
@@ -176,7 +176,7 @@ class MazeTest(unittest.TestCase):
              self.env.mapping['path']['value'],
              self.env.mapping['path']['value'],
              self.env.mapping['path']['value']],
-            self.env.get_animat_perception())
+            list(self.env.get_animat_perception()))
 
         # Make sure that the searching state is correct
         self.assertFalse(self.env.animat_found_reward)
@@ -223,7 +223,7 @@ class MazeTest(unittest.TestCase):
              self.env.mapping['reward']['value'],
              self.env.mapping['wall']['value'],
              self.env.mapping['path']['value']],
-            self.env.get_animat_perception())
+            list(self.env.get_animat_perception()))
 
         # Lets collect it by moving left for the third time (should be ok)
         reward = self.env.execute_action(MazeAction.LEFT)

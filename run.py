@@ -32,7 +32,7 @@ if __name__ == '__main__':
         if time == 0 or len(classifiers) == 0:
             classifiers = ACS2Utils.generate_initial_classifiers()
 
-        perception = env.get_animat_perception()
+        perception = list(env.get_animat_perception())
         match_set = ACS2Utils.generate_match_set(classifiers, perception)
 
         # Here do some stuff on previous action set

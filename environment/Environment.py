@@ -16,7 +16,7 @@ class Environment(metaclass=ABCMeta):
         Sets the animat perception of desired directions from given position.
 
         :param position: position of the animat in the environment
-        :return: an array of observable values
+        :return: animat perception (namedtuple)
         """
         raise NotImplementedError()
 
