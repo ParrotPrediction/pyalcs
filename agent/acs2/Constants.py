@@ -32,3 +32,9 @@ U_MAX = 6
 
 # FOR ALP
 SPEC_ATT = 0.3
+
+# For GA
+THETA_GA = 5
+
+# For GA
+X = 0.8

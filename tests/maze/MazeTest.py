@@ -192,7 +192,7 @@ class MazeTest(unittest.TestCase):
         self.assertEqual(1, self.env.animat_pos_y)
 
         # Check if no reward was collected
-        self.assertEqual(None, reward)
+        self.assertEqual(0, reward)
 
         # Now let's go left (should be ok)
         reward = self.env.execute_action(MAZE_ACTIONS['left'])
