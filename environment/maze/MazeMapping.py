@@ -6,9 +6,9 @@ class MazeMapping:
 
     def __init__(self):
         self.mapping = {
-            'wall': {'symbol': '#', 'value': -1},
-            'path': {'symbol': '.', 'value': 0},
-            'reward': {'symbol': '$', 'value': 1}
+            'wall': {'symbol': '#', 'value': 0},
+            'path': {'symbol': '.', 'value': 1},
+            'reward': {'symbol': '$', 'value': 9}
         }
 
     def __getitem__(self, item):

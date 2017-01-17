@@ -26,3 +26,6 @@ BETA = 5
 
 # For ALP
 U_MAX = 0
+
+# FOR ALP
+SPEC_ATT = 0

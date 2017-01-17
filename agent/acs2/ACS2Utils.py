@@ -46,7 +46,7 @@ def generate_match_set(classifiers: list, perception: list) -> list:
     match_set = []
 
     for classifier in classifiers:
-        if does_match(classifier, perception):
+        if _does_match(classifier, perception):
             match_set.append(classifier)
 
     logger.debug('Generated match set: [%s]', match_set)
@@ -74,6 +74,7 @@ def generate_action_set(classifiers: list, action: int) -> list:
 def choose_action(classifiers: list, epsilon=None) -> int:
     """
     TODO: Chooses action from available classifiers.
+    Should return MazeAction
     :param classifiers: a list of classifiers
     :param epsilon:
     :return:
@@ -100,7 +101,7 @@ def choose_action(classifiers: list, epsilon=None) -> int:
         return best_classifier.action
 
 
-def does_match(classifier: Classifier, perception: list) -> bool:
+def _does_match(classifier: Classifier, perception: list) -> bool:
     """
     Check if classifier condition match given perception
 

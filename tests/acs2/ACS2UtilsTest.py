@@ -1,6 +1,6 @@
 import unittest
-from agent.acs2.Classifier import Classifier
 from agent.acs2.ACS2Utils import *
+from agent.acs2.ACS2Utils import _does_match
 from agent.acs2 import Constants as c
 
 
@@ -75,9 +75,9 @@ class ACS2UtilsTest(unittest.TestCase):
         pass
 
     def test_classifer_should_match_perception(self):
-        self.assertTrue(does_match(self.clsf1, ['1', '2', '-1', '1', '1']))
+        self.assertTrue(_does_match(self.clsf1, ['1', '2', '-1', '1', '1']))
 
         # second element different
-        self.assertFalse(does_match(self.clsf1, ['0', '1', '1', '1', '1']))
+        self.assertFalse(_does_match(self.clsf1, ['0', '1', '1', '1', '1']))
 
-        self.assertRaises(ValueError, does_match, self.clsf1, ['0', '1'])
+        self.assertRaises(ValueError, _does_match, self.clsf1, ['0', '1'])

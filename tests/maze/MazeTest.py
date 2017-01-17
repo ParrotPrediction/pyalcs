@@ -1,6 +1,6 @@
 import unittest
-from environment import Maze
-from environment.maze.Maze import MazeAction
+from environment.maze import Maze
+from environment.maze.MazeAction import MAZE_ACTIONS
 
 
 class MazeTest(unittest.TestCase):
@@ -164,7 +164,7 @@ class MazeTest(unittest.TestCase):
             list(self.env.get_animat_perception()))
 
         # Tell animat to go up (should be ok)
-        reward = self.env.execute_action(MazeAction.TOP)
+        reward = self.env.execute_action(MAZE_ACTIONS['top'])
 
         # Validate if coordinates changed
         self.assertEqual(4, self.env.animat_pos_x)
@@ -185,7 +185,7 @@ class MazeTest(unittest.TestCase):
         self.assertEqual(1, reward)
 
         # Now try to enter the wall (action - TOP)
-        reward = self.env.execute_action(MazeAction.TOP)
+        reward = self.env.execute_action(MAZE_ACTIONS['top'])
 
         # Validate if the coordinates did not changed
         self.assertEqual(4, self.env.animat_pos_x)
@@ -195,7 +195,7 @@ class MazeTest(unittest.TestCase):
         self.assertEqual(None, reward)
 
         # Now let's go left (should be ok)
-        reward = self.env.execute_action(MazeAction.LEFT)
+        reward = self.env.execute_action(MAZE_ACTIONS['left'])
 
         # Validate if the coordinates changed
         self.assertEqual(3, self.env.animat_pos_x)
@@ -208,7 +208,7 @@ class MazeTest(unittest.TestCase):
         self.assertEqual(1, reward)
 
         # Go left for the second time (should be ok)
-        reward = self.env.execute_action(MazeAction.LEFT)
+        reward = self.env.execute_action(MAZE_ACTIONS['left'])
 
         # Validate if the coordinates changed
         self.assertEqual(2, self.env.animat_pos_x)
@@ -226,7 +226,7 @@ class MazeTest(unittest.TestCase):
             list(self.env.get_animat_perception()))
 
         # Lets collect it by moving left for the third time (should be ok)
-        reward = self.env.execute_action(MazeAction.LEFT)
+        reward = self.env.execute_action(MAZE_ACTIONS['left'])
 
         # Validate if the coordinates changed
         self.assertEqual(1, self.env.animat_pos_x)

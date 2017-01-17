@@ -1,27 +1,16 @@
 import logging
 import random
 from os.path import dirname, abspath, join
-from enum import Enum, unique
 from collections import namedtuple
 
 from environment.Environment import Environment
 from environment.maze.MazeMapping import MazeMapping
+from environment.maze.MazeAction import MAZE_ACTIONS
 
 logger = logging.getLogger(__name__)
 
 # Default perception
 Perception = namedtuple('Perception', ['top', 'left', 'bottom', 'right'])
-
-
-@unique
-class MazeAction(Enum):
-    """
-    Represents possible animat action. Correlated with perception.
-    """
-    LEFT = 0
-    TOP = 1
-    RIGHT = 2
-    DOWN = 3
 
 
 class Maze(Environment):
@@ -150,7 +139,7 @@ class Maze(Environment):
         return perception
 
     def execute_action(self,
-                       action: MazeAction,
+                       action: int,
                        perception: Perception = None) -> int:
         """
         Orders animat to execute the action. The animat is not allowed
@@ -168,30 +157,30 @@ class Maze(Environment):
         reward = None
         animat_moved = False
         logger.debug('Animat [(%d, %d)] ordered to execute action: [%s]',
-                     self.animat_pos_x, self.animat_pos_y, action.name)
+                     self.animat_pos_x, self.animat_pos_y, action)
 
-        if (action == MazeAction.TOP and
+        if (action == MAZE_ACTIONS['top'] and
                 self.not_wall(perception.top) and
                 self._within_y_range()):
 
             self.animat_pos_y += -1
             animat_moved = True
 
-        if (action == MazeAction.LEFT and
+        if (action == MAZE_ACTIONS['left'] and
                 self.not_wall(perception.left) and
                 self._within_x_range()):
 
             self.animat_pos_x += -1
             animat_moved = True
 
-        if (action == MazeAction.DOWN and
+        if (action == MAZE_ACTIONS['down'] and
                 self.not_wall(perception.bottom) and
                 self._within_y_range()):
 
             self.animat_pos_y += 1
             animat_moved = True
 
-        if (action == MazeAction.RIGHT and
+        if (action == MAZE_ACTIONS['right'] and
                 self.not_wall(perception.right) and
                 self._within_x_range()):
 
