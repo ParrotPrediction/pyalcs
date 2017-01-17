@@ -27,7 +27,7 @@ class Classifier(object):
         return deepcopy(old_classifier)
 
     def __repr__(self):
-        return 'Classifier{{{}-{}-{} q:{}, r:{}}}'.format(
+        return 'Classifier{{{}-{}-{} q:{:.2f}, r:{:.2f}}}'.format(
             ''.join(map(str, self.condition)),
             self.action, ''.join(map(str, self.effect)),
             self.q,

@@ -149,12 +149,12 @@ class Maze(Environment):
         :param action: action to execute
         :param perception: optional perception to test. If not specified
         current animat perception is used
-        :return: reward for new position or None for illegal move
+        :return: reward for new position
         """
         if perception is None:
             perception = self.get_animat_perception()
 
-        reward = None
+        reward = 0
         animat_moved = False
         logger.debug('Animat [(%d, %d)] ordered to execute action: [%s]',
                      self.animat_pos_x, self.animat_pos_y, action)
@@ -218,7 +218,7 @@ class Maze(Environment):
             pos_x = self.animat_pos_x
             pos_y = self.animat_pos_y
 
-        reward = None
+        reward = 0
         position_value = self._get_animat_position_value(pos_x, pos_y)
 
         if position_value == self.mapping['reward']['value']:

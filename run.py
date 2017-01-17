@@ -1,6 +1,7 @@
 from environment.maze import Maze
 from agent.acs2.ACS2Utils import *
 from agent.acs2.ALP import apply_alp
+from agent.acs2.RL import apply_rl
 
 import logging
 
@@ -20,6 +21,7 @@ if __name__ == '__main__':
     action_set = []
 
     action = None
+    reward = None
     previous_action_set = None
     previous_perception = None
 
@@ -51,7 +53,7 @@ if __name__ == '__main__':
                       action_set,
                       perception,
                       previous_perception)
-            # apply_rl
+            apply_rl(match_set, action_set, reward)
             # apply_ga
 
         # Remove previous action set
