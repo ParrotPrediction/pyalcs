@@ -1,6 +1,6 @@
 import unittest
-from agent import ACS2Utils
 from agent.acs2.Classifier import Classifier
+from agent.acs2.ACS2Utils import *
 from agent.acs2 import Constants as c
 
 
@@ -27,7 +27,7 @@ class ACS2UtilsTest(unittest.TestCase):
         for i in range(n_cls):
             general_perception.append(c.CLASSIFIER_WILDCARD)
 
-        initial_classifiers = ACS2Utils.generate_initial_classifiers(n_cls)
+        initial_classifiers = generate_initial_classifiers(n_cls)
         self.assertEqual(n_cls, len(initial_classifiers))
 
         for i in range(n_cls):
@@ -41,37 +41,33 @@ class ACS2UtilsTest(unittest.TestCase):
     def test_should_generate_match_set(self):
         self.assertListEqual(
             [self.clsf1, self.clsf2],
-            ACS2Utils.generate_match_set(
-                self.classifiers, ['3', '2', '1', '3', '1'])
+            generate_match_set(self.classifiers, ['3', '2', '1', '3', '1'])
         )
 
         self.assertListEqual(
             [],
-            ACS2Utils.generate_match_set(
-                self.classifiers, ['1', '2', '1', '3', '3']
-            )
+            generate_match_set(self.classifiers, ['1', '2', '1', '3', '3'])
         )
 
         self.assertListEqual(
             [self.clsf3],
-            ACS2Utils.generate_match_set(
-                self.classifiers, ['1', '2', '1', '1', '2']
-            )
+            generate_match_set(self.classifiers, ['1', '2', '1', '1', '2'])
         )
 
     def test_should_generate_action_set(self):
         self.assertListEqual(
             [],
-            ACS2Utils.generate_action_set(self.classifiers, 3))
+            generate_action_set(self.classifiers, 3)
+        )
 
         self.assertListEqual(
             [self.clsf2, self.clsf3],
-            ACS2Utils.generate_action_set(self.classifiers, 2)
+            generate_action_set(self.classifiers, 2)
         )
 
         self.assertListEqual(
             [self.clsf1],
-            ACS2Utils.generate_action_set(self.classifiers, 1)
+            generate_action_set(self.classifiers, 1)
         )
 
     @unittest.skip("TODO")
@@ -79,14 +75,9 @@ class ACS2UtilsTest(unittest.TestCase):
         pass
 
     def test_classifer_should_match_perception(self):
-        self.assertTrue(ACS2Utils._does_match(self.clsf1,
-                                              ['1', '2', '-1', '1', '1']))
+        self.assertTrue(does_match(self.clsf1, ['1', '2', '-1', '1', '1']))
 
         # second element different
-        self.assertFalse(ACS2Utils._does_match(self.clsf1,
-                                               ['0', '1', '1', '1', '1']))
+        self.assertFalse(does_match(self.clsf1, ['0', '1', '1', '1', '1']))
 
-        self.assertRaises(ValueError,
-                          ACS2Utils._does_match,
-                          self.clsf1,
-                          ['0', '1'])
+        self.assertRaises(ValueError, does_match, self.clsf1, ['0', '1'])

@@ -1,6 +1,5 @@
 from environment import Environment, Maze, MazeAction
-from agent import ACS2Utils, ALP
-from agent.acs2 import Constants as const
+from agent.acs2.ACS2Utils import *
 
 import logging
 
@@ -30,16 +29,16 @@ if __name__ == '__main__':
             env.insert_animat()
 
         if time == 0 or len(classifiers) == 0:
-            classifiers = ACS2Utils.generate_initial_classifiers()
+            classifiers = generate_initial_classifiers()
 
         perception = list(env.get_animat_perception())
-        match_set = ACS2Utils.generate_match_set(classifiers, perception)
+        match_set = generate_match_set(classifiers, perception)
 
         # Here do some stuff on previous action set
         # ALP.apply(classifiers, None, time, action_set, [], [])
 
-        action = ACS2Utils.choose_action(match_set)
-        action_set = ACS2Utils.generate_action_set(match_set, action)
+        action = choose_action(match_set)
+        action_set = generate_action_set(match_set, action)
 
         time += 1
 
