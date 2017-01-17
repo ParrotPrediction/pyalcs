@@ -38,3 +38,6 @@ THETA_GA = 5
 
 # For GA
 X = 0.8
+
+# For GA
+MU = 0.1
