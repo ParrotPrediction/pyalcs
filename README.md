@@ -1,5 +1,5 @@
 # Anticipatory Classifier Systems
-[![Build Status](https://travis-ci.org/khozzy/ACS2.svg?branch=master)](https://travis-ci.org/khozzy/ACS2)
+[![Build Status](https://travis-ci.org/khozzy/ACS.svg?branch=master)](https://travis-ci.org/khozzy/ACS)
 
 Repository containing code implementation for various *Anticipatory Classifier Systems*.
 
