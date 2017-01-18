@@ -1,11 +1,11 @@
 import logging
 import random
-from os.path import dirname, abspath, join
 from collections import namedtuple
+from os.path import dirname, abspath, join
 
-from environment.Environment import Environment
-from environment.maze.MazeMapping import MazeMapping
-from environment.maze.MazeAction import MAZE_ACTIONS
+from acs.environment.Environment import Environment
+from . import MazeMapping
+from . import MAZE_ACTIONS
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ class Maze(Environment):
         :param fname: location of .maze file
         """
         basepath = dirname(__file__)
-        filepath = abspath(join(basepath, '..', '..', fname))
+        filepath = abspath(join(basepath, '..', '..', '..', fname))
 
         with open(filepath) as file:
             max_x = int(file.readline())

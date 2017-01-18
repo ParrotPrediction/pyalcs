@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from agent.acs2 import Constants as c
+from . import Constants as c
 
 
 class Classifier(object):

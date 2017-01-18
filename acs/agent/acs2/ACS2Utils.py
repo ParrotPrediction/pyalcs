@@ -1,9 +1,8 @@
-from agent import Classifier
-from agent.acs2 import Constants as c
-
 import logging
 from random import random, choice
 
+from . import Classifier
+from . import Constants as c
 
 logger = logging.getLogger(__name__)
 

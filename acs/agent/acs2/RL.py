@@ -1,5 +1,6 @@
-from agent.acs2 import Constants as c
 import logging
+
+from . import Constants as c
 
 logger = logging.getLogger(__name__)
 

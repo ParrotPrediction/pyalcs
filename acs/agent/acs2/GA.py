@@ -1,8 +1,8 @@
-from agent.acs2 import Constants as c
-from agent.acs2.Classifier import Classifier
-from agent.acs2.ACS2Utils import remove
-
 from random import random
+
+from . import Classifier
+from . import Constants as c
+from .ACS2Utils import remove
 
 
 def apply_ga(classifiers: list,

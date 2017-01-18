@@ -1,6 +1,6 @@
 import unittest
 
-from agent import Classifier
+from acs.agent.acs2 import Classifier
 
 
 class ClassifierTest(unittest.TestCase):

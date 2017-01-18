@@ -1,10 +1,11 @@
-from environment.maze import Maze
-from agent.acs2.ACS2Utils import *
-from agent.acs2.ALP import apply_alp
-from agent.acs2.RL import apply_rl
-from agent.acs2.GA import apply_ga
-
+import sys
 import logging
+from os.path import abspath, join, dirname
+
+sys.path.insert(0, abspath(join(dirname(__file__), '..')))
+
+from acs.agent.acs2 import *
+from acs.environment.maze import *
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -12,7 +13,7 @@ logging.basicConfig(
     level=logging.DEBUG)
 
 if __name__ == '__main__':
-    GENERATIONS = 50
+    GENERATIONS = 5
 
     env = Maze('mazes/m1.maze')
 

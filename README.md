@@ -8,11 +8,11 @@ Currently the following agents are implemented: ACS2
 ## Contribution
 If you want to contribute, please execute tests beforehand:
 
-    python3 -m unittest -v tests
+    make test
     
 and check PEP8 compliance:
 
-    find . -name \*.py -exec pep8 --ignore=E129 {} +
+    make pep8
 
 ### Dev thoughts
 - `any` method might be nice
