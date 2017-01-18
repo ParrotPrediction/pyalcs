@@ -41,3 +41,8 @@ X = 0.8
 
 # For GA
 MU = 0.1
+
+# For GA
+IN_SIZE = 3
+
+THETA_AS = 0.5

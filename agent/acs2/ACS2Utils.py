@@ -120,3 +120,23 @@ def _does_match(classifier: Classifier, perception: list) -> bool:
             return False
 
     return True
+
+
+def remove(classifier: Classifier, classifiers: list) -> bool:
+    """
+    Removes classifier with the same condition, action
+    and effect part from the classifiers list
+
+    :param classifier classifier to be removed
+    :param classifiers classifiers list
+    :return True is classifier was removed, False otherwise
+    """
+    for i in range(len(classifiers)):
+        # TODO: maybe __eq__ in Classifier could be used ...
+        if (classifier.condition == classifiers[i].condition and
+                classifier.action == classifiers[i].action and
+                classifier.effect == classifiers[i].effect):
+            del classifiers[i]
+            return True
+
+    return False

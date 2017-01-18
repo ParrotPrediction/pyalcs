@@ -1,5 +1,6 @@
 from agent.acs2.Classifier import Classifier
 from agent.acs2 import Constants as c
+from agent.acs2.ACS2Utils import remove
 
 from random import random
 import logging
@@ -31,7 +32,7 @@ def apply_alp(classifiers: list,
                                               perception,
                                               previous_perception)
             if classifier.q < c.THETA_I:
-                _remove(classifier, classifiers)
+                remove(classifier, classifiers)
                 action_set.remove(classifier)
 
         if new_classifier is not None:
@@ -249,24 +250,3 @@ def _does_anticipate_correctly(classifier: Classifier,
                 return False
 
     return True
-
-
-def _remove(classifier: Classifier, classifiers: list) -> bool:
-    """
-    Removes classifier with the same condition, action
-    and effect part from the classifiers list
-
-    :param classifier classifier to be removed
-    :param classifiers classifiers list
-    :return True is classifier was removed, False otherwise
-    """
-    for i in range(len(classifiers)):
-        # TODO: maybe move into ACS2Utils class
-        # TODO: maybe __eq__ in Classifier could be used ...
-        if (classifier.condition == classifiers[i].condition and
-                classifier.action == classifiers[i].action and
-                classifier.effect == classifiers[i].effect):
-            del classifiers[i]
-            return True
-
-    return False
