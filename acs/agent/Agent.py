@@ -1,5 +1,18 @@
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
+from acs.environment import Environment
 
 
 class Agent(metaclass=ABCMeta):
-    pass
+
+    def __init__(self, environment: Environment):
+        self.env = environment
+
+    @abstractmethod
+    def evaluate(self, generations, **kwargs) -> None:
+        """
+        Evaluates selected algorithm.
+
+        :param generations: numer of generations
+        :param kwargs: additional arguments
+        """
+        raise NotImplementedError()

@@ -11,6 +11,10 @@ class Environment(metaclass=ABCMeta):
         raise NotImplementedError()
 
     @abstractmethod
+    def reset_animat_state(self):
+        raise NotImplementedError
+
+    @abstractmethod
     def get_animat_perception(self, **position):
         """
         Sets the animat perception of desired directions from given position.

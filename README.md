@@ -1,18 +1,24 @@
-# Anticipatory Classifier Systems
+# Anticipatory Classifier Systems in Python
 [![Build Status](https://travis-ci.org/khozzy/ACS.svg?branch=master)](https://travis-ci.org/khozzy/ACS)
 
 Repository containing code implementation for various *Anticipatory Classifier Systems*.
 
 Currently the following agents are implemented: ACS2
 
+## Examples
+To run ACS2 algorithm from `examples/` directory type:
+
+    make run_acs2
+
 ## Contribution
-If you want to contribute, please execute tests beforehand:
+Prior to PR please execute:
+
+    make install_deps
+    
+and check if standards are holding:
 
     make test
-    
-and check PEP8 compliance:
-
     make pep8
 
-### Dev thoughts
+#### Dev thoughts
 - `any` method might be nice
