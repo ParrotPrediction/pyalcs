@@ -33,7 +33,7 @@ class ACS2(Agent):
             # Reset the environment and put the animat randomly
             # inside the maze when we are starting the simulation
             # or when he found the reward (next trial)
-            if self.time == 0 or self.env.animat_found_reward:
+            if self.time == 0 or self.env.animat_has_finished():
                 self.env.reset_animat_state()
                 self.env.insert_animat()
 

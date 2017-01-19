@@ -38,6 +38,14 @@ class Maze(Environment):
         self.animat_pos_y = None
         self.animat_found_reward = False
 
+    def animat_has_finished(self) -> bool:
+        """
+        Gives information whether an animat is still searching the reward.
+
+        :return: True if reward is found, false otherwise
+        """
+        return self.animat_found_reward
+
     def _load_maze_from_file(self, fname: str) -> None:
         """
         Reads maze definition from text file

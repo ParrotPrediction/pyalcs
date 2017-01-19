@@ -4,15 +4,28 @@ from abc import ABCMeta, abstractmethod
 class Environment(metaclass=ABCMeta):
 
     @abstractmethod
-    def insert_animat(self):
+    def insert_animat(self) -> None:
         """
         Sets animat coordinates in fixed/random position inside a maze
         """
         raise NotImplementedError()
 
     @abstractmethod
-    def reset_animat_state(self):
+    def reset_animat_state(self) -> None:
+        """
+        Resets the environment properties to initial conditions
+        """
         raise NotImplementedError
+
+    @abstractmethod
+    def animat_has_finished(self) -> bool:
+        """
+        Returns information whether an animat has accomplished his task.
+        Based on this the environment might get reloaded.
+
+        :return: True is animat accomplished task, false otherwise
+        """
+        raise NotImplementedError()
 
     @abstractmethod
     def get_animat_perception(self, **position):
