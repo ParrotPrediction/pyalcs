@@ -3,7 +3,7 @@ import random
 from collections import namedtuple
 from os.path import dirname, abspath, join
 
-from acs.environment.Environment import Environment
+from alcs.environment.Environment import Environment
 from . import MazeMapping
 from . import MAZE_ACTIONS
 

@@ -1,7 +1,7 @@
 import logging
 
-from acs.agent.Agent import Agent
-from acs.environment.Environment import Environment
+from alcs.agent.Agent import Agent
+from alcs.environment.Environment import Environment
 from .ALP import apply_alp
 from .GA import apply_ga
 from .RL import apply_rl

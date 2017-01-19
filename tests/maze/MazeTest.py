@@ -1,7 +1,7 @@
 import unittest
 
-from acs.environment.maze import MAZE_ACTIONS
-from acs.environment.maze import Maze
+from alcs.environment.maze import MAZE_ACTIONS
+from alcs.environment.maze import Maze
 
 
 class MazeTest(unittest.TestCase):

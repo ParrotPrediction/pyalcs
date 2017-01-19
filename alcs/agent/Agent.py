@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from acs.environment import Environment
+from alcs.environment import Environment
 
 
 class Agent(metaclass=ABCMeta):

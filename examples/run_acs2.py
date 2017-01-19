@@ -4,8 +4,8 @@ from os.path import abspath, join, dirname
 
 sys.path.insert(0, abspath(join(dirname(__file__), '..')))
 
-from acs.agent.acs2 import ACS2
-from acs.environment import maze
+from alcs.agent.acs2 import ACS2
+from alcs.environment import maze
 
 
 logger = logging.getLogger(__name__)

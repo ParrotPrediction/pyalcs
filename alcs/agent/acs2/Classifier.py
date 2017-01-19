@@ -4,23 +4,62 @@ from . import Constants as c
 
 
 class Classifier(object):
+    """
+    Represents a condition-action-effect rule that anticipates the model
+    state resulting from the execution of the specified action given the
+    specified condition.
+
+    Always specifies a complete resulting state.
+    """
 
     def __init__(self):
+        # The Condition Part - specifies the set of situations (perceptions)
+        # in which the classifier can be applied
         self.condition = [c.CLASSIFIER_WILDCARD] * c.CLASSIFIER_LENGTH
+
+        # The Action Part - proposes an available action
         self.action = None
+
+        # The Effect Part - anticipates the effects that the classifier
+        # 'believes' to be caused by the specified action
         self.effect = [c.CLASSIFIER_WILDCARD] * c.CLASSIFIER_LENGTH
-        self.mark = None  # All cases were effect was not good
-        self.q = 0.5  # quality
-        self.r = 0  # reward
 
-        self.ir = 0  # Immediate reward
-        self.t = None  # Has been created at this time
-        self.tga = 0  # Last time that self was part of action set within GA
-        self.alp = 0  # Last time that self underwent ALP process
+        # The Mark - records the properties in which the classifier did
+        # not work correctly before
+        self.mark = None
 
-        self.aav = 0  # Application average
-        self.exp = 0  # Experience
-        self.num = 1  # Numerosity (how many classifiers were subsumed)
+        # Quality - measures the accuracy of the anticipations
+        self.q = 0.5
+
+        # The reward prediction - predicts the reward expected after
+        # the execution of action A given condition C
+        self.r = 0
+
+        # The immediate reward prediction - predicts the reinforcement
+        # directly encountered after the execution of action A
+        self.ir = 0
+
+        # In which generation the classifier was created
+        self.t = None
+
+        # The GA timestamp - records the last time the classifier was part
+        # of an action set in which GA was applied
+        self.tga = 0  # TODO: change to t_ga
+
+        # The ALP timestamp - records the time the classifier underwent
+        # the last ALP update
+        self.alp = 0  # TODO: change to t_alp
+
+        # The 'application average' - estimates the ALP update frequency
+        self.aav = 0
+
+        # The 'experience counter' - counts the number of times the classifier
+        # underwent the ALP
+        self.exp = 0  # TODO: check if updated only in ALP
+
+        # The numerosity - specifies the number of actual (micro-) classifier
+        # this macroclassifier represents
+        self.num = 1
 
     @staticmethod
     def copy_from(old_classifier):

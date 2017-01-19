@@ -1,7 +1,7 @@
 import unittest
 
-from acs.agent.acs2.ACS2Utils import *
-from acs.agent.acs2.ACS2Utils import _does_match
+from alcs.agent.acs2.ACS2Utils import *
+from alcs.agent.acs2.ACS2Utils import _does_match
 
 
 class ACS2UtilsTest(unittest.TestCase):

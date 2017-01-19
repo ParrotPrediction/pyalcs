@@ -1,6 +1,6 @@
 import unittest
 
-from acs.environment.maze import MazeMapping
+from alcs.environment.maze import MazeMapping
 
 
 class MazeMappingTest(unittest.TestCase):
