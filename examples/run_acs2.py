@@ -4,8 +4,9 @@ from os.path import abspath, join, dirname
 
 sys.path.insert(0, abspath(join(dirname(__file__), '..')))
 
-from acs.agent.acs2 import *
-from acs.environment.maze import *
+from acs.agent import acs2
+from acs.environment import maze
+
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -15,7 +16,7 @@ logging.basicConfig(
 if __name__ == '__main__':
     GENERATIONS = 5
 
-    env = Maze('mazes/m1.maze')
+    env = maze.Maze('mazes/m1.maze')
 
     time = 0
     classifiers = []
@@ -40,29 +41,29 @@ if __name__ == '__main__':
         # Generate initial (general) classifiers when the simulation
         # Just starts or there is none classifier in the population
         if time == 0 or len(classifiers) == 0:
-            classifiers = generate_initial_classifiers()
+            classifiers = acs2.generate_initial_classifiers()
 
         # Get the animat perception
         perception = list(env.get_animat_perception())
 
         # Select classifiers matching the perception
-        match_set = generate_match_set(classifiers, perception)
+        match_set = acs2.generate_match_set(classifiers, perception)
 
         if previous_action_set is not None:
-            apply_alp(classifiers,
-                      action,
-                      time,
-                      action_set,
-                      perception,
-                      previous_perception)
-            apply_rl(match_set, action_set, reward)
-            apply_ga(classifiers, action_set, time)
+            acs2.apply_alp(classifiers,
+                           action,
+                           time,
+                           action_set,
+                           perception,
+                           previous_perception)
+            acs2.apply_rl(match_set, action_set, reward)
+            acs2.apply_ga(classifiers, action_set, time)
 
         # Remove previous action set
         previous_action_set = None
 
-        action = choose_action(match_set)
-        action_set = generate_action_set(match_set, action)
+        action = acs2.choose_action(match_set)
+        action_set = acs2.generate_action_set(match_set, action)
 
         # Execute action and obtain reward
         reward = env.execute_action(action)
@@ -74,7 +75,7 @@ if __name__ == '__main__':
 
         perception = env.get_animat_perception()
 
-        if time % 100:
+        if time % 100 == 0:
             logger.info('=== 100 ===')
             # Some debug / measurements here
 

@@ -133,7 +133,7 @@ class Maze(Environment):
 
         perception = Perception(top=top, left=left, bottom=bottom, right=right)
 
-        logger.debug('Animat [(%d, %d)] perception (TLBR): [%s]',
+        logger.debug('Animat [(%d, %d)] perception: [%s]',
                      self.animat_pos_x, self.animat_pos_y, perception)
 
         return perception

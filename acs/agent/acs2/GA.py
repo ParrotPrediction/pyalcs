@@ -1,8 +1,11 @@
+import logging
 from random import random
 
 from . import Classifier
 from . import Constants as c
 from .ACS2Utils import remove
+
+logger = logging.getLogger(__name__)
 
 
 def apply_ga(classifiers: list,
@@ -16,6 +19,8 @@ def apply_ga(classifiers: list,
 
     if x is None:
         x = c.X
+
+    logger.debug("Applying GA module")
 
     sumNum = 0
     sumTgaN = 0
