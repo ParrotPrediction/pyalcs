@@ -2,7 +2,7 @@ language: python
 python:
   - "3.5"
 before_install:
-  - pip install pep8
+  - make install_deps
 script:
-  - find . -name \*.py -exec pep8 --ignore=E129 {} +
-  - python3 -m unittest -v tests
+  - make pep8
+  - make test
