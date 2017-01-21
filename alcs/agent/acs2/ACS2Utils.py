@@ -72,11 +72,16 @@ def generate_action_set(classifiers: list, action: int) -> list:
 
 def choose_action(classifiers: list, epsilon=None) -> int:
     """
-    TODO: Chooses action from available classifiers.
-    Should return MazeAction
-    :param classifiers: a list of classifiers
-    :param epsilon:
-    :return:
+    Use epsilon-greedy method for action selection. However, it is not clear
+    which action is actually the best to choose (since once situation-action
+    tuple is mostly represented by several distinct classifiers.
+
+    A random action is selected with epsilon probability. In the other case
+    the best classifier (with greatest fitness score).
+
+    :param classifiers: match set
+    :param epsilon: probability of returning random action
+    :return: an integer representing an action
     """
     if epsilon is None:
         epsilon = c.EPSILON
@@ -89,6 +94,7 @@ def choose_action(classifiers: list, epsilon=None) -> int:
     else:
         best_classifier = classifiers[0]
         dontcare_classifier = [c.CLASSIFIER_WILDCARD] * c.CLASSIFIER_LENGTH
+
         for classifier in classifiers:
             if (classifier.effect != dontcare_classifier and
                     classifier.fitness() > best_classifier.fitness()):

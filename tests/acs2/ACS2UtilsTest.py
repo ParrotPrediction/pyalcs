@@ -7,17 +7,14 @@ from alcs.agent.acs2.ACS2Utils import _does_match
 class ACS2UtilsTest(unittest.TestCase):
 
     def setUp(self):
-        self.clsf1 = Classifier()
-        self.clsf1.condition = ['#', '2', '#', '#', '1']
-        self.clsf1.action = 1
+        self.clsf1 = __class__._create_classifier(['#', '2', '#', '#', '1'],
+                                                  1, 0.5, 0.1)
 
-        self.clsf2 = Classifier()
-        self.clsf2.condition = ['#', '#', '1', '#', '1']
-        self.clsf2.action = 2
+        self.clsf2 = __class__._create_classifier(['#', '#', '1', '#', '1'],
+                                                  2, 0.3, 0.2)
 
-        self.clsf3 = Classifier()
-        self.clsf3.condition = ['1', '#', '#', '1', '2']
-        self.clsf3.action = 2
+        self.clsf3 = __class__._create_classifier(['1', '#', '#', '1', '2'],
+                                                  2, 0.8, 3)
 
         self.classifiers = [self.clsf1, self.clsf2, self.clsf3]
 
@@ -70,9 +67,34 @@ class ACS2UtilsTest(unittest.TestCase):
             generate_action_set(self.classifiers, 1)
         )
 
-    @unittest.skip("TODO")
     def test_should_choose_action(self):
-        pass
+        # all classifiers have general E parts
+        # with epsilon = 0 we should always return action
+        # from the first classifier (not randomly)
+        self.assertEquals(1, choose_action(self.classifiers, epsilon=0))
+
+        # now lets change the effect parts
+        # in this case action from classifier with the best
+        # fitness score is selected (not randomly)
+        self.clsf1.effect = ['1', '2', '#', '1']
+        self.clsf2.effect = ['#', '2', '#', '1']
+        self.clsf3.effect = ['#', '#', '2', '1']
+
+        self.assertEquals(2, choose_action(self.classifiers, epsilon=0))
+
+        # in the last case we can see if we repeat the experiment
+        # multiple times selecting randomly actions the proportions will
+        # be correct (see number of possible actions in constants).
+        trials = 10000
+        ideal_counts = trials / c.NUMBER_OF_POSSIBLE_ACTIONS
+        delta = trials / 100
+
+        random_actions = [choose_action(self.classifiers, 1)
+                          for _ in range(trials)]
+
+        for action in range(c.NUMBER_OF_POSSIBLE_ACTIONS):
+            real_counts = sum(1 for x in random_actions if x == action)
+            self.assertAlmostEqual(ideal_counts, real_counts, delta=delta)
 
     def test_classifer_should_match_perception(self):
         self.assertTrue(_does_match(self.clsf1, ['1', '2', '-1', '1', '1']))
@@ -81,3 +103,16 @@ class ACS2UtilsTest(unittest.TestCase):
         self.assertFalse(_does_match(self.clsf1, ['0', '1', '1', '1', '1']))
 
         self.assertRaises(ValueError, _does_match, self.clsf1, ['0', '1'])
+
+    @staticmethod
+    def _create_classifier(condition: list,
+                           action: int,
+                           q: float,
+                           r: float) -> Classifier:
+        cl = Classifier()
+        cl.condition = condition
+        cl.action = action
+        cl.q = q
+        cl.r = r
+
+        return cl
