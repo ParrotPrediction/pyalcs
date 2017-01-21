@@ -8,6 +8,7 @@ from .ACS2Utils import remove
 logger = logging.getLogger(__name__)
 
 # Genetic Generalization Mechanism
+# TODO: sometimes hangs here
 
 
 def apply_ga(classifiers: list,

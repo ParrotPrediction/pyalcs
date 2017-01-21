@@ -15,70 +15,85 @@ class ACS2(Agent):
 
     def __init__(self, environment: Environment):
         super().__init__(environment)
-
-        self.time = 0
-        self.classifiers = []
-        self.match_set = []
-        self.action_set = []
-        self.perception = None
-        self.action = None
-        self.reward = None
-        self.previous_action_set = None
-        self.previous_perception = None
+        self.classifiers = generate_initial_classifiers()
 
     def evaluate(self, generations, **kwargs) -> None:
+        time = 0
+        perception = None
+        action = None
+        action_set = None
+        reward = None
+        previous_perception = None
+        previous_action_set = None
+
+        self.env.insert_animat()
+
+        # Get the animat initial perception
+        perception = self.env.get_animat_perception()
+
         for _ in range(generations):
-            logger.info('\n\nGeneration [%d]', self.time)
+            logger.info('\n\nGeneration [%d]', time)
+            logger.info('%s', perception)
 
             # Reset the environment and put the animat randomly
-            # inside the maze when we are starting the simulation
-            # or when he found the reward (next trial)
-            if self.time == 0 or self.env.animat_has_finished():
-                self.env.reset_animat_state()
+            # inside the maze when he found the reward (next trial starts)
+            if self.env.animat_has_finished():
                 self.env.insert_animat()
 
-            # Generate initial (general) classifiers when the simulation
-            # Just starts or there is none classifier in the population
-            if self.time == 0 or len(self.classifiers) == 0:
+            # Generate initial (general) classifiers if no classifier
+            # are in the population.
+            if len(self.classifiers) == 0:
                 self.classifiers = generate_initial_classifiers()
 
-            # Get the animat perception
-            self.perception = list(self.env.get_animat_perception())
-
             # Select classifiers matching the perception
-            self.match_set = generate_match_set(self.classifiers,
-                                                self.perception)
+            match_set = generate_match_set(self.classifiers, perception)
 
-            if self.previous_action_set is not None:
+            # If not the beginning of the trial
+            if previous_action_set is not None:  # time != 0
+                logger.info("Triggering learning modules on previous "
+                            "action set")
                 apply_alp(self.classifiers,
-                          self.action,
-                          self.time,
-                          self.action_set,
-                          self.perception,
-                          self.previous_perception)
-                apply_rl(self.match_set,
-                         self.action_set,
-                         self.reward)
+                          action,
+                          time,
+                          previous_action_set,
+                          perception,
+                          previous_perception)
+                apply_rl(match_set,
+                         previous_action_set,
+                         reward)
                 apply_ga(self.classifiers,
-                         self.action_set,
-                         self.time)
+                         previous_action_set,
+                         time)
 
             # Remove previous action set
-            self.previous_action_set = None
+            previous_action_set = None
 
-            self.action = choose_action(self.match_set)
-            self.action_set = generate_action_set(self.match_set, self.action)
+            action = choose_action(match_set)
+            action_set = generate_action_set(match_set, action)
 
             # Execute action and obtain reward
-            self.reward = self.env.execute_action(self.action)
+            reward = self.env.execute_action(action)
 
             # Next time slot
-            self.time += 1
-            self.previous_perception = self.perception
-            self.previous_action_set = self.action_set
+            time += 1
+            previous_perception = perception
+            perception = self.env.get_animat_perception()
 
-            self.perception = self.env.get_animat_perception()
+            # If new state was introduced
+            if self.env.trial_was_successful():
+                logger.info("Trial successful. Triggering learning modules")
+                apply_alp(self.classifiers,
+                          action,
+                          time,
+                          action_set,
+                          perception,
+                          previous_perception)
+                apply_rl(match_set,
+                         action_set,
+                         reward)
+                apply_ga(self.classifiers,
+                         action_set,
+                         time)
 
-            if self.time % 100 == 0:
-                logger.info('=== 100 ===')
-                # Some debug / measurements here
+            # TODO: check this line
+            previous_action_set = action_set

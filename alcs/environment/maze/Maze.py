@@ -24,19 +24,18 @@ class Maze(Environment):
         self.animat_pos_x = None
         self.animat_pos_y = None
         self.animat_found_reward = False
+        self.animat_moved = False
 
         self.max_x, self.max_y, self.matrix = None, None, None
         self._load_maze_from_file(maze_file)
 
-    def reset_animat_state(self) -> None:
+    def trial_was_successful(self) -> bool:
         """
-        Resets the internal animat state (position x, y).
-        Also stores the information that the reward is still not found
+        Checks if animat moved in this turn.
+
+        :return: True is animat moved, false otherwise
         """
-        logger.debug('Resetting animat state')
-        self.animat_pos_x = None
-        self.animat_pos_y = None
-        self.animat_found_reward = False
+        return self.animat_moved
 
     def animat_has_finished(self) -> bool:
         """
@@ -163,7 +162,8 @@ class Maze(Environment):
             perception = self.get_animat_perception()
 
         reward = 0
-        animat_moved = False
+        self.animat_found_reward = False
+        self.animat_moved = False
         logger.debug('Animat [(%d, %d)] ordered to execute action: [%s]',
                      self.animat_pos_x, self.animat_pos_y, action)
 
@@ -172,30 +172,30 @@ class Maze(Environment):
                 self._within_y_range()):
 
             self.animat_pos_y += -1
-            animat_moved = True
+            self.animat_moved = True
 
         if (action == MAZE_ACTIONS['left'] and
                 self.not_wall(perception.left) and
                 self._within_x_range()):
 
             self.animat_pos_x += -1
-            animat_moved = True
+            self.animat_moved = True
 
         if (action == MAZE_ACTIONS['down'] and
                 self.not_wall(perception.bottom) and
                 self._within_y_range()):
 
             self.animat_pos_y += 1
-            animat_moved = True
+            self.animat_moved = True
 
         if (action == MAZE_ACTIONS['right'] and
                 self.not_wall(perception.right) and
                 self._within_x_range()):
 
             self.animat_pos_x += 1
-            animat_moved = True
+            self.animat_moved = True
 
-        if animat_moved:
+        if self.animat_moved:
             reward = self._calculate_reward()
         else:
             logger.debug('Animat [(%d, %d)] did not move.',

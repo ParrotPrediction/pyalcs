@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 def apply_alp(classifiers: list,
-              action: int,
+              action: int,  # Maybe this is redundant
               time: int,
               action_set: list,
               perception: list,

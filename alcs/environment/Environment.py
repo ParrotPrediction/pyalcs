@@ -11,9 +11,10 @@ class Environment(metaclass=ABCMeta):
         raise NotImplementedError()
 
     @abstractmethod
-    def reset_animat_state(self) -> None:
+    def trial_was_successful(self) -> bool:
         """
-        Resets the environment properties to initial conditions
+        Returns information whether the animat has proceeded to another
+        situation (perception).
         """
         raise NotImplementedError
 

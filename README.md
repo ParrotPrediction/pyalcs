@@ -36,4 +36,5 @@ and check if standards are holding:
     make pep8
 
 #### Dev thoughts
-- `any` method might be nice
+- `any` method might be nice,
+- integrate with CodeClimate
