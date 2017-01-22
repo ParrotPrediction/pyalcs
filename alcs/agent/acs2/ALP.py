@@ -26,14 +26,14 @@ def apply_alp(classifiers: list,
                                       perception,
                                       previous_perception):
             new_classifier = _expected_case(classifier, perception)
-            was_expected_case += 1
+            was_expected_case = 1
         else:
             new_classifier = _unexpected_case(classifier,
                                               perception,
                                               previous_perception)
             if classifier.q < c.THETA_I:
                 remove(classifier, classifiers)
-                action_set.remove(classifier)
+                action_set.remove(classifier)  # sprawdzic czy to zadziala
 
         if new_classifier is not None:
             new_classifier.tga = time
@@ -235,13 +235,20 @@ def _does_anticipate_correctly(classifier: Classifier,
                                perception: list,
                                previous_perception: list) -> bool:
     """
+    Checks anticipation. While the pass-through symbols in the effect parąt
+    of a classifier directly anticipate that these attributes stay the same
+    after the execution of an action, the specified attributes anticipate
+    a change to the specified value. Thus, if the perceived value did not
+    change to the anticipated but actually stayed at the value, the classifier
+    anticipates incorrectly.
+
     :param classifier: given classifier
     :param perception: current perception
     :param previous_perception: previous perception
     :return: True if classifier anticipates correctly, False otherwise
     """
     for i in range(c.CLASSIFIER_LENGTH):
-        if classifier.effect == c.CLASSIFIER_WILDCARD:
+        if classifier.effect[i] == c.CLASSIFIER_WILDCARD:
             if previous_perception[i] != perception[i]:
                 return False
         else:
