@@ -18,6 +18,12 @@ class ACS2UtilsTest(unittest.TestCase):
 
         self.classifiers = [self.clsf1, self.clsf2, self.clsf3]
 
+    def test_should_generate_general_perception_string(self):
+        self.assertListEqual(
+            ['#', '#', '#'],
+            get_general_perception(string_length=3)
+        )
+
     def test_should_generate_initial_classifier_set(self):
         n_cls = 4  # Number of classifiers
         general_perception = []
@@ -89,7 +95,7 @@ class ACS2UtilsTest(unittest.TestCase):
         ideal_counts = trials / c.NUMBER_OF_POSSIBLE_ACTIONS
         delta = trials / 100
 
-        random_actions = [choose_action(self.classifiers, 1)
+        random_actions = [choose_action(self.classifiers, epsilon=1)
                           for _ in range(trials)]
 
         for action in range(c.NUMBER_OF_POSSIBLE_ACTIONS):

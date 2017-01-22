@@ -1,26 +1,30 @@
 import logging
 
 from . import Constants as c
+from . import ACS2Utils
 
 logger = logging.getLogger(__name__)
-
-# Reinforcement Learning
 
 
 def apply_rl(match_set: list,
              action_set: list,
              reward: int,
-             beta=None,
-             gamma=None) -> None:
+             beta: float = None,
+             gamma: float = None) -> None:
     """
-    Updates classifiers in the action set with given reward.
+    Updates classifiers reward and intermediate reward in the action set
+    with given obtained reward following the idea of Q-learning.
 
-    :param match_set:
-    :param action_set:
-    :param reward:
-    :param beta:
-    :param gamma:
-    :return:
+    To guarantee that procedure works successfully, it's mandatory that
+    the model is specific enough.
+
+    Function updates properties for *all* classifiers stored in the action set.
+
+    :param match_set: match set (list of classifiers)
+    :param action_set: action set (list of classifiers), will be changed
+    :param reward: intermediate reward obtained from the environment
+    :param beta: learning rate
+    :param gamma: discount factor
     """
 
     if beta is None:
@@ -31,25 +35,21 @@ def apply_rl(match_set: list,
 
     logger.debug("Applying RL module")
 
-    sf = _sum_fitness_in_match_set(match_set)
+    max_p = _calculate_maximum_payoff(match_set)
 
-    for classifier in action_set:
-        classifier.r += beta * (reward + gamma * sf - classifier.r)
-        classifier.ir += beta * (reward - classifier.ir)
+    for cl in action_set:
+        cl.r += beta * (reward + gamma * max_p - cl.r)
+        cl.ir += beta * (reward - cl.ir)
 
 
-def _sum_fitness_in_match_set(match_set: list) -> int:
+def _calculate_maximum_payoff(match_set: list) -> float:
     """
-    Returns the sum of fitness value for all classifiers with no generic
-    condition part.
+    Calculate the maximum payoff predicted in the next time-step
 
-    :param match_set: list of classifiers in the match set
-    :return: sum of fitness value
+    :param match_set: list of classifiers (match set)
+    :return: maximum fitness value found in match_set (maxP)
     """
-    sum_fitness = 0
+    # TODO: what happens when all effects will be general? Zero?
+    wildcards = ACS2Utils.get_general_perception()
+    return max(cl.fitness() for cl in match_set if cl.effect != wildcards)
 
-    for classifier in match_set:
-        if classifier.effect != c.CLASSIFIER_WILDCARD * c.CLASSIFIER_LENGTH:
-            sum_fitness += classifier.fitness()
-
-    return sum_fitness

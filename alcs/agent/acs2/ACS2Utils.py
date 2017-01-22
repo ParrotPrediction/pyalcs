@@ -7,6 +7,25 @@ from . import Constants as c
 logger = logging.getLogger(__name__)
 
 
+def get_general_perception(dont_care_symbol: str = None,
+                           string_length: int = None) -> list:
+    """
+    Generates a list of general (consisting of wildcards percetion string.
+    I.e. ['#', '#', '#']
+
+    :param dont_care_symbol: don't care symbol
+    :param string_length: length of the string
+    :return: list
+    """
+    if dont_care_symbol is None:
+        dont_care_symbol = c.CLASSIFIER_WILDCARD
+
+    if string_length is None:
+        string_length = c.CLASSIFIER_LENGTH
+
+    return [dont_care_symbol] * string_length
+
+
 def generate_initial_classifiers(number_of_actions: int = None) -> list:
     """
     Generate a list of default, general classifiers for all
@@ -56,7 +75,7 @@ def generate_action_set(classifiers: list, action: int) -> list:
     """
     Generates a list of classifiers with matching action.
 
-    :param classifiers: a list of classifiers
+    :param classifiers: a list of classifiers (match set)
     :param action: desired action identifier
     :return: a list of classifiers
     """
@@ -145,3 +164,4 @@ def remove(classifier: Classifier, classifiers: list) -> bool:
             return True
 
     return False
+
