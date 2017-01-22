@@ -29,9 +29,13 @@ class RLTest(unittest.TestCase):
 
     def test_should_calculate_maximum_payoff(self):
         match_set = [self.cl1, self.cl2, self.cl3]
-        desired_max_p = self.cl1.fitness() # classifier with best fitness
+        desired_max_p = self.cl1.fitness()  # classifier with best fitness
 
         self.assertEqual(desired_max_p, _calculate_maximum_payoff(match_set))
+
+    def test_should_calculate_maximum_payoff_with_general_classifiers(self):
+        match_set = [self.cl3]
+        self.assertEqual(0, _calculate_maximum_payoff(match_set))
 
     def test_should_apply_rl_with_default_parameters(self):
         match_set = [self.cl1, self.cl2, self.cl3]  # max_p = 0.6

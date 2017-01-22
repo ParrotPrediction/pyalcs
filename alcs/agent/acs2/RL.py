@@ -49,7 +49,11 @@ def _calculate_maximum_payoff(match_set: list) -> float:
     :param match_set: list of classifiers (match set)
     :return: maximum fitness value found in match_set (maxP)
     """
-    # TODO: what happens when all effects will be general? Zero?
     wildcards = ACS2Utils.get_general_perception()
-    return max(cl.fitness() for cl in match_set if cl.effect != wildcards)
+    applicable_classifiers = [cl for cl in match_set if cl.effect != wildcards]
+
+    if len(applicable_classifiers) > 0:
+        return max(cl.fitness() for cl in applicable_classifiers)
+
+    return 0
 

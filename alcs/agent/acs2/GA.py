@@ -8,13 +8,12 @@ from .ACS2Utils import remove
 logger = logging.getLogger(__name__)
 
 # Genetic Generalization Mechanism
-# TODO: sometimes hangs here
 
 
 def apply_ga(classifiers: list,
              action_set: list,
              time: int,
-             theta_ga=None,
+             theta_ga: int = None,
              x=None):
 
     if theta_ga is None:
@@ -23,16 +22,9 @@ def apply_ga(classifiers: list,
     if x is None:
         x = c.X
 
-    logger.debug("Applying GA module")
+    if _should_fire(action_set, time, theta_ga):
+        logger.debug("Applying GA module")
 
-    sumNum = 0
-    sumTgaN = 0
-
-    for classifier in action_set:
-        sumNum += classifier.num
-        sumTgaN += classifier.tga * classifier.num
-
-    if (time - sumTgaN) / sumNum * theta_ga:
         for classifier in action_set:
             classifier.tga = time
 
@@ -72,6 +64,23 @@ def apply_ga(classifiers: list,
             if child2.condition != \
                     [c.CLASSIFIER_WILDCARD] * c.CLASSIFIER_LENGTH:
                 _add_ga_classifier(classifiers, action_set, child2)
+
+
+def _should_fire(action_set: list, time: int, theta_ga: int) -> bool:
+    """
+    Check if GA should take place by examining t_ga timestamps with current
+    time.
+
+    :param action_set: list of classifiers (action_set)
+    :param time: current time
+    :param theta_ga: GA application threshold
+    :return: True if GA will take place, false otherwise
+    """
+
+    overall_tga = sum(cl.tga * cl.num for cl in action_set)
+    overall_num = sum(cl.num for cl in action_set)
+
+    return (time - overall_tga) / overall_num > theta_ga
 
 
 def _select_offspring(action_set: list) -> Classifier:

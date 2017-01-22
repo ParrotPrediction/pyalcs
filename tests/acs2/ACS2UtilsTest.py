@@ -77,7 +77,7 @@ class ACS2UtilsTest(unittest.TestCase):
         # all classifiers have general E parts
         # with epsilon = 0 we should always return action
         # from the first classifier (not randomly)
-        self.assertEquals(1, choose_action(self.classifiers, epsilon=0))
+        self.assertEqual(1, choose_action(self.classifiers, epsilon=0))
 
         # now lets change the effect parts
         # in this case action from classifier with the best
@@ -86,7 +86,7 @@ class ACS2UtilsTest(unittest.TestCase):
         self.clsf2.effect = ['#', '2', '#', '1']
         self.clsf3.effect = ['#', '#', '2', '1']
 
-        self.assertEquals(2, choose_action(self.classifiers, epsilon=0))
+        self.assertEqual(2, choose_action(self.classifiers, epsilon=0))
 
         # in the last case we can see if we repeat the experiment
         # multiple times selecting randomly actions the proportions will

@@ -235,7 +235,7 @@ class Maze(Environment):
             logger.info('Animat found reward!')
 
         if position_value == self.mapping['path']['value']:
-            reward = 1
+            reward = -1
 
         logger.debug('Animat [(%d, %d)] received reward for position: [%d]',
                      pos_x, pos_y, reward)

@@ -22,4 +22,6 @@ if __name__ == '__main__':
     acs2 = ACS2(env)
 
     # Evaluate simulation
-    acs2.evaluate(5)
+    acs2.evaluate(500)
+
+    print("OK")

@@ -183,7 +183,7 @@ class MazeTest(unittest.TestCase):
         self.assertFalse(self.env.animat_found_reward)
 
         # Check if proper reward for visiting path was collected
-        self.assertEqual(1, reward)
+        self.assertEqual(-1, reward)
 
         # Now try to enter the wall (action - TOP)
         reward = self.env.execute_action(MAZE_ACTIONS['top'])
@@ -206,7 +206,7 @@ class MazeTest(unittest.TestCase):
         self.assertFalse(self.env.animat_found_reward)
 
         # Check if proper reward for visiting path was collected
-        self.assertEqual(1, reward)
+        self.assertEqual(-1, reward)
 
         # Go left for the second time (should be ok)
         reward = self.env.execute_action(MAZE_ACTIONS['left'])
@@ -216,7 +216,7 @@ class MazeTest(unittest.TestCase):
         self.assertEqual(1, self.env.animat_pos_y)
 
         # Check if proper reward for visiting path was collected
-        self.assertEqual(1, reward)
+        self.assertEqual(-1, reward)
 
         # Now the animat should see the final reward
         self.assertListEqual(
