@@ -164,4 +164,3 @@ def remove(classifier: Classifier, classifiers: list) -> bool:
             return True
 
     return False
-

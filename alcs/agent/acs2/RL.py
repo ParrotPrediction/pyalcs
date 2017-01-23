@@ -56,4 +56,3 @@ def _calculate_maximum_payoff(match_set: list) -> float:
         return max(cl.fitness() for cl in applicable_classifiers)
 
     return 0
-
