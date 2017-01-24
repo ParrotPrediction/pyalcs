@@ -1,7 +1,8 @@
 import unittest
 
 from alcs.agent.acs2 import Classifier
-from alcs.agent.acs2.ALP import _does_anticipate_correctly
+from alcs.agent.acs2.ALP import _does_anticipate_correctly,\
+    _cover_triple
 
 
 class ALPTest(unittest.TestCase):
@@ -47,3 +48,22 @@ class ALPTest(unittest.TestCase):
         self.assertTrue(_does_anticipate_correctly(cl,
                                                    perception,
                                                    previous_perception))
+
+    def test_should_cover_triple(self):
+        previous_perception = ['1', '2', '1', '1']
+        perception = ['2', '2', '1', '1']
+        action = 1
+        time = 99
+
+        new_cl = _cover_triple(previous_perception, perception, action, time)
+
+        self.assertEqual(['1', '#', '#', '#'], new_cl.condition)
+        self.assertEqual(['2', '#', '#', '#'], new_cl.effect)
+        self.assertEqual(action, new_cl.action)
+        self.assertEqual(0, new_cl.exp)
+        self.assertEqual(0, new_cl.r)
+        self.assertEqual(0, new_cl.aav)
+        self.assertEqual(time, new_cl.t_alp)
+        self.assertEqual(time, new_cl.t_ga)
+        self.assertEqual(time, new_cl.t)
+        self.assertEqual(1, new_cl.num)

@@ -26,7 +26,7 @@ def apply_ga(classifiers: list,
         logger.debug("Applying GA module")
 
         for classifier in action_set:
-            classifier.tga = time
+            classifier.t_ga = time
 
             parent1 = _select_offspring(action_set)
             parent2 = _select_offspring(action_set)
@@ -77,7 +77,7 @@ def _should_fire(action_set: list, time: int, theta_ga: int) -> bool:
     :return: True if GA will take place, false otherwise
     """
 
-    overall_tga = sum(cl.tga * cl.num for cl in action_set)
+    overall_tga = sum(cl.t_ga * cl.num for cl in action_set)
     overall_num = sum(cl.num for cl in action_set)
 
     return (time - overall_tga) / overall_num > theta_ga

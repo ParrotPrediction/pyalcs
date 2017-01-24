@@ -26,7 +26,7 @@ class Classifier(object):
 
         # The Mark - records the properties in which the classifier did
         # not work correctly before
-        self.mark = None
+        self.mark = [set() for _ in range(c.CLASSIFIER_LENGTH)]
 
         # Quality - measures the accuracy of the anticipations
         self.q = 0.5
@@ -44,11 +44,11 @@ class Classifier(object):
 
         # The GA timestamp - records the last time the classifier was part
         # of an action set in which GA was applied
-        self.tga = 0  # TODO: change to t_ga
+        self.t_ga = 0
 
         # The ALP timestamp - records the time the classifier underwent
         # the last ALP update
-        self.alp = 0  # TODO: change to t_alp
+        self.t_alp = 0
 
         # The 'application average' - estimates the ALP update frequency
         self.aav = 0
@@ -122,7 +122,10 @@ class Classifier(object):
         cp = 0  # number of subsumer wildcards in condition part
         cpt = 0  # number of wildcards in condition part in other classifier
 
-        if self.exp > theta_exp and self.q > theta_r and self.mark is None:
+        if (self.exp > theta_exp and
+                self.q > theta_r and
+                not __class__.is_marked(self.mark)):
+
             for i in range(c.CLASSIFIER_LENGTH):
                 if self.condition[i] == c.CLASSIFIER_WILDCARD:
                     cp += 1
@@ -160,3 +163,26 @@ class Classifier(object):
                 base_more_general = True
 
         return base_more_general
+
+    def set_mark(self, perception: list):
+        """
+        Function sets classifier mark with obtained perception.
+
+        :param perception: obtained perception
+        """
+        for i in range(len(perception)):
+            self.mark[i].add(perception[i])
+
+    @staticmethod
+    def is_marked(mark: list) -> bool:
+        """
+        Returns information whether classifier is marked.
+
+        :param mark: list of sets containing mark
+        :return: True if is marked, false otherwise
+        """
+        for m in mark:
+            if len(m) > 0:
+                return True
+
+        return False

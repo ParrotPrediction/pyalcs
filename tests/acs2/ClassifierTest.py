@@ -84,11 +84,37 @@ class ClassifierTest(unittest.TestCase):
         self.assertEqual(self.baseClassifier.r, copied.r)
         self.assertEqual(self.baseClassifier.ir, copied.ir)
         self.assertEqual(self.baseClassifier.t, copied.t)
-        self.assertEqual(self.baseClassifier.tga, copied.tga)
-        self.assertEqual(self.baseClassifier.alp, copied.alp)
+        self.assertEqual(self.baseClassifier.t_ga, copied.t_ga)
+        self.assertEqual(self.baseClassifier.t_alp, copied.t_alp)
         self.assertEqual(self.baseClassifier.aav, copied.aav)
         self.assertEqual(self.baseClassifier.exp, copied.exp)
         self.assertEqual(self.baseClassifier.num, copied.num)
 
         # Check if a new reference for object is created
         self.assertFalse(copied.condition is self.baseClassifier.condition)
+
+    def test_should_set_mark_on_classifier(self):
+        perception = ['1', '2', '1', '1']
+        self.baseClassifier.set_mark(perception)
+
+        self.assertTrue(len(self.baseClassifier.mark[0]) == 1)
+        self.assertTrue(len(self.baseClassifier.mark[1]) == 1)
+        self.assertTrue(len(self.baseClassifier.mark[2]) == 1)
+        self.assertTrue(len(self.baseClassifier.mark[3]) == 1)
+
+        perception = ['1', '1', '2', '1']
+        self.baseClassifier.set_mark(perception)
+
+        self.assertTrue(len(self.baseClassifier.mark[0]) == 1)
+        self.assertTrue(len(self.baseClassifier.mark[1]) == 2)
+        self.assertTrue(len(self.baseClassifier.mark[2]) == 2)
+        self.assertTrue(len(self.baseClassifier.mark[3]) == 1)
+
+    def test_should_identify_marked_classifier(self):
+        self.assertFalse(Classifier.is_marked(self.baseClassifier.mark))
+
+        perception = ['1', '1', '2', '1']
+        self.baseClassifier.set_mark(perception)
+
+        self.assertTrue(Classifier.is_marked(self.baseClassifier.mark))
+

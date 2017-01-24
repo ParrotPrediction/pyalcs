@@ -3,7 +3,7 @@ from random import random
 
 from . import Classifier
 from . import Constants as c
-from .ACS2Utils import remove
+from .ACS2Utils import remove, get_general_perception
 
 logger = logging.getLogger(__name__)
 
@@ -13,103 +13,134 @@ def apply_alp(classifiers: list,
               time: int,
               action_set: list,
               perception: list,
-              previous_perception: list):
+              previous_perception: list,
+              theta_i: float = None):
+
+    if theta_i is None:
+        theta_i = c.THETA_I
 
     logger.debug('Applying ALP module')
     was_expected_case = 0
 
-    for classifier in action_set:
-        classifier.exp += 1
-        _update_application_average(classifier, time)
+    for cl in action_set:
+        cl.exp += 1
+        _update_application_average(cl, time)
 
-        if _does_anticipate_correctly(classifier,
+        if _does_anticipate_correctly(cl,
                                       perception,
                                       previous_perception):
-            new_classifier = _expected_case(classifier, perception)
+            new_cl = _expected_case(cl, perception)
             was_expected_case = 1
         else:
-            new_classifier = _unexpected_case(classifier,
-                                              perception,
-                                              previous_perception)
-            if classifier.q < c.THETA_I:
-                remove(classifier, classifiers)
-                action_set.remove(classifier)  # sprawdzic czy to zadziala
+            new_cl = _unexpected_case(cl,
+                                      perception,
+                                      previous_perception)
+            if cl.q < theta_i:
+                remove(cl, classifiers)
+                action_set.remove(cl)  # TODO: sprawdzic czy to zadziala
 
-        if new_classifier is not None:
-            new_classifier.tga = time
-            _add_alp_classifier(new_classifier,
+        if new_cl is not None:
+            new_cl.t_ga = time
+            _add_alp_classifier(new_cl,
                                 classifiers,
                                 action_set)
 
     if was_expected_case == 0:
-        new_classifier = _cover_triple(previous_perception,
-                                       perception,
-                                       action,
-                                       time)
-        _add_alp_classifier(new_classifier, classifiers, action_set)
+        new_cl = _cover_triple(previous_perception,
+                               perception,
+                               action,
+                               time)
+        _add_alp_classifier(new_cl, classifiers, action_set)
 
 
-def _expected_case(classifier: Classifier,
-                   perception: list) -> Classifier:
+def _expected_case(cl: Classifier,
+                   perception: list,
+                   beta: float = None,
+                   u_max: int = None) -> Classifier:
 
-    diff = _get_differences(classifier.mark, perception)
+    if beta is None:
+        beta = c.BETA
 
-    if diff == [c.CLASSIFIER_WILDCARD] * c.CLASSIFIER_LENGTH:
-        classifier.q += c.BETA * (1 - classifier.q)
+    if u_max is None:
+        u_max = c.U_MAX
+
+    diff = _get_differences(cl.mark, perception)
+
+    if diff == get_general_perception():
+        cl.q += beta * (1 - cl.q)
         return None
     else:
-        class_spec_num = _number_of_spec(classifier.condition)
-        diff_spec_num = _number_of_spec(diff)
-        child = Classifier.copy_from(classifier)
+        # Count number of non-# symbols in diff and condition part
+        spec = _number_of_spec(cl.condition)
+        spec_new = _number_of_spec(diff)
 
-        if class_spec_num == c.U_MAX:
+        child = Classifier.copy_from(cl)
+
+        if spec == u_max:
             _remove_random_spec_element(child.condition)
-            class_spec_num -= 1
+            spec -= 1
 
-            while class_spec_num + diff_spec_num > c.BETA:
-                if class_spec_num > 0 and random() < 0.5:
+            while spec + spec_new > u_max:
+                if spec > 0 and random() < 0.5:
                     _remove_random_spec_element(child.condition)
-                    class_spec_num -= 1
+                    spec -= 1
                 else:
                     _remove_random_spec_element(diff)
-                    diff_spec_num -= 1
+                    spec_new -= 1
         else:
-            while class_spec_num + diff_spec_num > c.BETA:
+            while spec + spec_new > u_max:
                 _remove_random_spec_element(diff)
-                diff_spec_num -= 1
+                spec_new -= 1
 
         child.condition = diff
-        child.exp = 1
 
         if child.q < 0.5:
             child.q = 0.5
+
+        child.exp = 1
 
         return child
 
 
 def _get_differences(mark: list, perception: list) -> list:
-    diff = [c.CLASSIFIER_WILDCARD] * c.CLASSIFIER_LENGTH
+    """
+    The difference determination needs to distinguish between two cases.
+    1. Clear differences are those where one or more attributes in the mark M
+    do not contain the corresponding attribute in the perception.
+    2. Fuzzy differences are those where there is no clear difference but one
+    or more attributes in the mark M specify more than the one value in
+    perception.
 
-    if mark is not None:
+    In the first case, one random clear difference is specified while in the
+    latter case all differences are specified.
+
+    :param mark: list of sets containing marking states
+    :param perception: perception obtained by the agent
+
+    :return: list of differences
+    """
+    diff = get_general_perception()
+
+    if Classifier.is_marked(mark):
         type1 = 0  # counts when mark is different from perception
         type2 = 0  # counts when mark is applied
 
         for i in range(len(perception)):
-            if mark[i] != perception[i]:
+            if perception[i] not in mark[i]:
                 type1 += 1
-            if int(mark[i]) > 1:
+            if len(mark[i]) > 1:
                 type2 += 1
 
         if type1 > 0:
             type1 = random() * type1
             for i in range(len(perception)):
-                if mark[i] != perception[i]:
+                if perception[i] not in mark[i]:
                     if int(type1) == 0:
                         diff[i] = perception[i]
                     type1 -= 1
         elif type2 > 0:
             for i in range(len(perception)):
-                if mark[i] != perception[i]:
+                if len(mark[i]) > 1:
                     diff[i] = perception[i]
 
     return diff
@@ -148,44 +179,58 @@ def _remove_random_spec_element(condition: list) -> None:
                 searching = False
 
 
-def _unexpected_case(classifier: Classifier,
+def _unexpected_case(cl: Classifier,
                      perception: list,
-                     previous_perception: list) -> Classifier:
+                     previous_perception: list,
+                     beta: float = None) -> Classifier:
 
-    classifier.q = classifier.q - c.BETA * classifier.q
-    classifier.mark = previous_perception
+    if beta is None:
+        beta = c.BETA
+
+    cl.q -= beta * cl.q
+    cl.set_mark(previous_perception)
 
     for i in range(len(perception)):
-        if classifier.effect[i] != c.CLASSIFIER_WILDCARD:
-            if (classifier.effect[i] != previous_perception[i] or
-                    previous_perception[i] != perception[i]):
+        if cl.effect[i] != c.CLASSIFIER_WILDCARD:
+            if (cl.effect[i] != perception[i] or
+                    previous_perception[i] == perception[i]):
                 return None
 
-    child = Classifier.copy_from(classifier)
+    child = Classifier.copy_from(cl)
 
     for i in range(len(perception)):
-        if (classifier.effect[i] == c.CLASSIFIER_WILDCARD and
+        if (cl.effect[i] == c.CLASSIFIER_WILDCARD and
                 previous_perception[i] != perception[i]):
             child.condition[i] = previous_perception[i]
             child.effect[i] = perception[i]
 
-    if classifier.q < 0.5:
-        classifier.q = 0.5
+    if cl.q < 0.5:
+        cl.q = 0.5
 
     child.exp = 1
 
     return child
 
 
-def _update_application_average(cla: Classifier, time: int):
-    if cla.exp < 1 / c.BETA:
-        cla.aav += (time - cla.tga - cla.aav) / cla.exp
-    else:
-        cla.aav += c.BETA * (time - cla.tga - cla.aav)
+def _update_application_average(cl: Classifier, time: int, beta: float = None):
+    """
+    Procedure uses the moyenne adaptive modifee technique to reach
+    an accurate value of the application average as soon as possible.
+    Also the ALP timestamp is set in this procedure.
 
-    # TGA? Should this be in ALP module?
-    # Maybe naming convention should be changed
-    cla.tga = time
+    :param cl: classifier to be updated
+    :param time: current time
+    :param beta: learning rate
+    """
+    if beta is None:
+        beta = c.BETA
+
+    if cl.exp < 1 / beta:
+        cl.aav += (time - cl.t_alp - cl.aav) / cl.exp
+    else:
+        cl.aav += beta * (time - cl.t_alp - cl.aav)
+
+    cl.t_alp = time
 
 
 def _add_alp_classifier(classifier: Classifier,
@@ -215,18 +260,34 @@ def _cover_triple(previous_perception: list,
                   perception: list,
                   action: int,
                   time: int) -> Classifier:
+    """
+    Covering generates a classifier that specifies all changes from the
+    previous to current perception in condition and effect part. The action
+    part of the new classifier is set to the executed action.
+
+    :param previous_perception: previous perception
+    :param perception: current perception
+    :param action: new classifier action
+    :param time:
+    :return:
+    """
 
     child = Classifier()
+    child.action = action
 
     for i in range(len(perception)):
         if previous_perception[i] != perception[i]:
             child.condition[i] = previous_perception[i]
             child.effect[i] = perception[i]
 
-    child.action = action
-    child.alp = time
-    child.tga = time
+    child.exp = 0
+    child.r = 0
+    child.aav = 0
+    child.t_alp = time
+    child.t_ga = time
     child.t = time
+    child.q = 0.5
+    child.num = 1
 
     return child
 
