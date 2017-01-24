@@ -20,8 +20,11 @@ class ACS2(Agent):
     def evaluate(self, generations, **kwargs):
         # Performance metrics
         m_time = []
-        m_quality = []
-        m_numerosity = []
+        m_found_reward = []
+        m_actions = []
+        tot_classifiers = []
+        avg_quality = []
+        avg_fitness = []
 
         time = 0
         perception = None
@@ -39,10 +42,12 @@ class ACS2(Agent):
         for _ in range(generations):
             logger.info('\n\nGeneration [%d]', time)
             logger.info('%s', perception)
+            finished = False
 
             # Reset the environment and put the animat randomly
             # inside the maze when he found the reward (next trial starts)
             if self.env.animat_has_finished():
+                finished = True
                 self.env.insert_animat()
 
             # Generate initial (general) classifiers if no classifier
@@ -100,12 +105,18 @@ class ACS2(Agent):
                          action_set,
                          time)
 
-            # TODO: check this line
             previous_action_set = action_set
 
             # Metrics for calculating performance
-            m_time.append(time)
-            m_quality.append(sum(cl.q for cl in self.classifiers))
-            m_numerosity.append(sum(cl.num for cl in self.classifiers))
+            total_classifiers = len(self.classifiers)
+            sum_quality = sum(cl.q for cl in self.classifiers)
+            sum_fitness = sum(cl.fitness() for cl in self.classifiers)
 
-        return m_time, m_quality, m_numerosity
+            m_time.append(time)
+            m_found_reward.append(finished)
+            m_actions.append(action)
+            tot_classifiers.append(total_classifiers)
+            avg_quality.append(sum_quality / total_classifiers)
+            avg_fitness.append(sum_fitness / total_classifiers)
+
+        return m_time, tot_classifiers, avg_quality, m_found_reward, avg_fitness, m_actions

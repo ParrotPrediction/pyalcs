@@ -12,7 +12,7 @@ NUMBER_OF_POSSIBLE_ACTIONS = 4
 # The 'exploration probability' [0-1]. Specifies the probability of choosing
 # a random action. The fastest model learning is usually achieved by pure
 # random exploration
-EPSILON = 0.5
+EPSILON = 0.4
 
 # The 'experience threshold' (natural number) controls when a classifier
 # is usable as a subsumer. A low threshold might cause the incorrect

@@ -111,18 +111,17 @@ def choose_action(classifiers: list, epsilon=None) -> int:
         logger.debug('Action chosen: [%d] (randomly)', random_action)
         return random_action
     else:
-        best_classifier = classifiers[0]
-        dontcare_classifier = [c.CLASSIFIER_WILDCARD] * c.CLASSIFIER_LENGTH
+        best_cl = classifiers[0]
 
-        for classifier in classifiers:
-            if (classifier.effect != dontcare_classifier and
-                    classifier.fitness() > best_classifier.fitness()):
-                best_classifier = classifier
+        for cl in classifiers:
+            if (cl.effect != get_general_perception() and
+                    cl.fitness() > best_cl.fitness()):
+                best_cl = cl
 
         logger.debug('Action chosen: [%d] (%s)',
-                     best_classifier.action, best_classifier)
+                     best_cl.action, best_cl)
 
-        return best_classifier.action
+        return best_cl.action
 
 
 def generate_random_int_number(max_value: int) -> int:

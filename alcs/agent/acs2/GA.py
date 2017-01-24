@@ -56,7 +56,7 @@ def apply_ga(classifiers: list,
             child1.q /= 2
             child2.q /= 2
 
-            # _delete_classifier(classifiers, action_set)
+            _delete_classifiers(classifiers, action_set)
 
             if child1.condition != get_general_perception():
                 _add_ga_classifier(classifiers, action_set, child1)
@@ -122,26 +122,26 @@ def _apply_ga_mutation(cl: Classifier, mu: float = None) -> None:
 
 def _add_ga_classifier(classifiers: list,
                        action_set: list,
-                       classifier: Classifier) -> None:
+                       cl: Classifier) -> None:
 
-    old_cls = None
+    old_cl = None
 
-    for cls in action_set:
-        if cls.is_subsumer(classifier):
-            if old_cls is None or old_cls.is_more_general(classifier):
-                old_cls = cls
+    for c in action_set:
+        if c.is_subsumer(cl):
+            if old_cl is None or c.is_more_general(old_cl):
+                old_cl = c
 
-    if old_cls is None:
-        for cls in action_set:
-            if cls == classifier:
-                old_cls = cls
+    if old_cl is None:
+        for c in action_set:
+            if c.condition == cl.condition and c.effect == cl.effect:
+                old_cl = c
 
-    if old_cls is None:
-        classifiers.append(classifier)
-        action_set.append(classifier)
+    if old_cl is None:
+        classifiers.append(cl)
+        action_set.append(cl)
     else:
-        if old_cls.mark is None:
-            old_cls.num += 1
+        if not Classifier.is_marked(old_cl.mark):
+            old_cl.num += 1
 
 
 def _apply_crossover(cl1: Classifier, cl2: Classifier):

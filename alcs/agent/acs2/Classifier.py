@@ -55,7 +55,7 @@ class Classifier(object):
 
         # The 'experience counter' - counts the number of times the classifier
         # underwent the ALP
-        self.exp = 0  # TODO: check if updated only in ALP
+        self.exp = 0
 
         # The numerosity - specifies the number of actual (micro-) classifier
         # this macroclassifier represents
