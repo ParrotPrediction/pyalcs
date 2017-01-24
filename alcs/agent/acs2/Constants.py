@@ -74,8 +74,8 @@ X = 0.8
 # amount of over-general classifiers.
 MU = 0.3
 
-# TODO: what is this?
-IN_SIZE = 3
+# Number of children that will be inserted in the GA process
+IN_SIZE = 2
 
 # The 'action set size threshold' (natural number) specifies the maximum
 # number of classifiers in an action set which is controlled by the GA.

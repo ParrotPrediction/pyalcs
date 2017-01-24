@@ -1,6 +1,6 @@
 import unittest
 from alcs.agent.acs2 import Classifier
-from alcs.agent.acs2.GA import _should_fire
+from alcs.agent.acs2.GA import _should_fire, _apply_crossover
 
 
 class GATest(unittest.TestCase):
@@ -20,6 +20,18 @@ class GATest(unittest.TestCase):
     def test_should_fire_ga(self):
         action_set = [self.cl3, self.cl4, self.cl5]
         self.assertTrue(_should_fire(action_set, 200, theta_ga=40))
+
+    def test_should_apply_crossover(self):
+        cl1 = Classifier()
+        cl2 = Classifier()
+
+        for _ in range(1000):
+            cl1.condition = ['1', '1', '1', '1']
+            cl2.condition = ['2', '2', '2', '2']
+
+            _apply_crossover(cl1, cl2)
+
+            self.assertNotEqual(cl1.condition, cl2.condition)
 
     @staticmethod
     def _create_classifier(tga: int, num: int):

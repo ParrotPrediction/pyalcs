@@ -3,13 +3,13 @@ from random import random
 
 from . import Classifier
 from . import Constants as c
-from .ACS2Utils import remove, get_general_perception
+from .ACS2Utils import get_general_perception, remove_classifier
 
 logger = logging.getLogger(__name__)
 
 
 def apply_alp(classifiers: list,
-              action: int,  # Maybe this is redundant
+              action: int,
               time: int,
               action_set: list,
               perception: list,
@@ -36,8 +36,8 @@ def apply_alp(classifiers: list,
                                       perception,
                                       previous_perception)
             if cl.q < theta_i:
-                remove(cl, classifiers)
-                action_set.remove(cl)  # TODO: sprawdzic czy to zadziala
+                remove_classifier(classifiers, cl)
+                remove_classifier(action_set, cl)
 
         if new_cl is not None:
             new_cl.t_ga = time

@@ -125,6 +125,16 @@ def choose_action(classifiers: list, epsilon=None) -> int:
         return best_classifier.action
 
 
+def generate_random_int_number(max_value: int) -> int:
+    """
+    Generates random integer number from 0 to max_value.
+
+    :param max_value: maximum range
+    :return: random number
+    """
+    return int(random() * max_value + 1)
+
+
 def _does_match(classifier: Classifier, perception: list) -> bool:
     """
     Check if classifier condition match given perception
@@ -146,21 +156,13 @@ def _does_match(classifier: Classifier, perception: list) -> bool:
     return True
 
 
-def remove(classifier: Classifier, classifiers: list) -> bool:
+def remove_classifier(classifiers: list, classifier: Classifier) -> None:
     """
-    Removes classifier with the same condition, action
-    and effect part from the classifiers list
+    Removes classifier from collection
 
-    :param classifier classifier to be removed
-    :param classifiers classifiers list
-    :return True is classifier was removed, False otherwise
+    :param classifiers: list of classifiers
+    :param cl: classifier to remove
     """
-    for i in range(len(classifiers)):
-        # TODO: maybe __eq__ in Classifier could be used ...
-        if (classifier.condition == classifiers[i].condition and
-                classifier.action == classifiers[i].action and
-                classifier.effect == classifiers[i].effect):
-            del classifiers[i]
-            return True
-
-    return False
+    for cl in classifiers:
+        if cl == classifier:
+            classifiers.remove(cl)

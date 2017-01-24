@@ -3,7 +3,8 @@ from random import random
 
 from . import Classifier
 from . import Constants as c
-from .ACS2Utils import remove
+from .ACS2Utils import get_general_perception, generate_random_int_number,\
+    remove_classifier
 
 logger = logging.getLogger(__name__)
 
@@ -25,8 +26,8 @@ def apply_ga(classifiers: list,
     if _should_fire(action_set, time, theta_ga):
         logger.debug("Applying GA module")
 
-        for classifier in action_set:
-            classifier.t_ga = time
+        for cl in action_set:
+            cl.t_ga = time
 
             parent1 = _select_offspring(action_set)
             parent2 = _select_offspring(action_set)
@@ -34,11 +35,11 @@ def apply_ga(classifiers: list,
             child1 = Classifier.copy_from(parent1)
             child2 = Classifier.copy_from(parent2)
 
-            child1.num += 1
-            child2.num += 1
+            child1.num = 1
+            child2.num = 1
 
-            child1.exp += 1
-            child2.exp += 1
+            child1.exp = 1
+            child2.exp = 1
 
             _apply_ga_mutation(child1)
             _apply_ga_mutation(child2)
@@ -57,12 +58,10 @@ def apply_ga(classifiers: list,
 
             # _delete_classifier(classifiers, action_set)
 
-            if child1.condition != \
-                    [c.CLASSIFIER_WILDCARD] * c.CLASSIFIER_LENGTH:
+            if child1.condition != get_general_perception():
                 _add_ga_classifier(classifiers, action_set, child1)
 
-            if child2.condition != \
-                    [c.CLASSIFIER_WILDCARD] * c.CLASSIFIER_LENGTH:
+            if child2.condition != get_general_perception():
                 _add_ga_classifier(classifiers, action_set, child2)
 
 
@@ -84,36 +83,41 @@ def _should_fire(action_set: list, time: int, theta_ga: int) -> bool:
 
 
 def _select_offspring(action_set: list) -> Classifier:
+    """
+    The process chooses a classifier fro reproduction in action set
+    proportional to its quality to the power of three. First, the sum of all
+    values in set is computed. Next, the roulette-wheel spun. Finally, the
+    classifier is chosen according to the roulette-wheel result.
+
+    :param action_set: set of classifiers
+    :return: selected classifier
+    """
+    quality_sum = sum(cl.q ** 3 for cl in action_set)
+    choice_point = random() * quality_sum
+
     quality_sum = 0
 
-    for classifier in action_set:
-        quality_sum += classifier.q ** 3
-
-    # quality_sum = sum(cls.q ** 3 for cls in action_set)
-    choice_point = random() * quality_sum
-    partial_quality_sum = 0
-
-    for classifier in action_set:
-        partial_quality_sum += classifier.q ** 3
-        if partial_quality_sum > choice_point:
-            return classifier
+    for cl in action_set:
+        quality_sum += cl.q ** 3
+        if quality_sum > choice_point:
+            return cl
 
 
-def _apply_ga_mutation(classifier: Classifier, mu=None) -> None:
+def _apply_ga_mutation(cl: Classifier, mu: float = None) -> None:
     """
     Looks for classifier condition elements (not generic), and tries to
     generify each one with probability mu
 
-    :param classifier: classifier to apply mutation on
-    :param mu: probability
+    :param cl: classifier to apply mutation on
+    :param mu: mutation rate
     """
     if mu is None:
         mu = c.MU
 
-    for i in range(len(classifier.condition)):
-        if classifier.condition[i] != c.CLASSIFIER_WILDCARD:
+    for i in range(len(cl.condition)):
+        if cl.condition[i] != c.CLASSIFIER_WILDCARD:
             if random() < mu:
-                classifier.condition[i] = c.CLASSIFIER_WILDCARD
+                cl.condition[i] = c.CLASSIFIER_WILDCARD
 
 
 def _add_ga_classifier(classifiers: list,
@@ -144,9 +148,12 @@ def _apply_crossover(cl1: Classifier, cl2: Classifier):
     if cl1.effect != cl2.effect:
         return
 
-    x = random() * (len(cl1.condition) + 1)
+    # Break points
+    x = generate_random_int_number(len(cl1.condition))
+    y = None
+
     while True:
-        y = random() * (len(cl1.condition) + 1)
+        y = generate_random_int_number(len(cl1.condition))
         if x != y:
             break
 
@@ -164,38 +171,48 @@ def _apply_crossover(cl1: Classifier, cl2: Classifier):
             cl2.condition[i] = tp
 
         i += 1
-        if i <= y:
+        if i > y:
             break
 
 
-def _delete_classifier(classifiers: list, action_set: list):
-    summation = 0
-    for cl in action_set:
-        summation += cl.num
+def _delete_classifiers(classifiers: list,
+                        action_set: list,
+                        in_size: int = None,
+                        theta_as: int = None):
 
-    while c.IN_SIZE + summation > c.THETA_AS:
+    if in_size is None:
+        in_size = c.IN_SIZE
+
+    if theta_as is None:
+        theta_as = c.THETA_AS
+
+    action_set_numerosity = sum(cl.num for cl in action_set)
+
+    while in_size + action_set_numerosity > theta_as:
         cl_del = None
+
         for cl in classifiers:
-            if random() < 1 / 3:
+            if random() < (1 / 3):
                 if cl_del is None:
                     cl_del = cl
                 else:
                     if cl.q - cl_del.q < -0.1:
-                        cl_del = classifier
+                        cl_del = cl
                     if abs(cl.q - cl_del.q) <= 0.1:
-                        if __name__ == '__main__':
-                            if cl.mark is not None and cl_del.mark is None:
-                                cl_del = classifier
-                            elif cl.mark is not None or cl_del.mark is None:
-                                if cl.aav > cl_del.aav:
-                                    cl_del = cl
+                        if (Classifier.is_marked(cl) and
+                                not Classifier.is_marked(cl_del.mark)):
+                            cl_del = cl
+                        elif (Classifier.is_marked(cl) or
+                                not Classifier.is_marked(cl_del.mark)):
+                            if cl.aav > cl_del.aav:
+                                cl_del = cl
 
         if cl_del is not None:
             if cl_del.num > 1:
                 cl_del.num -= 1
             else:
-                classifiers.remove(classifier)  # TODO: nie ma tej zmiennej
-                remove(classifier, action_set)
+                remove_classifier(classifiers, cl)
+                remove_classifier(action_set, cl)
 
         summation = 0
 

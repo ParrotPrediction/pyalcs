@@ -75,20 +75,24 @@ class Classifier(object):
     def __eq__(self, other):
         """
         Equality check. The other classifier is the same when
-        it has the same condition and action part
+        it has the same condition, action and effect part
 
         :param other: the other classifier
         :return: true if classifier is the same, false otherwise
         """
         if isinstance(other, self.__class__):
-            if other.condition == self.condition:
-                if other.action == self.action:
-                    return True
+            if (other.condition == self.condition and
+                    other.action == self.action and
+                    other.effect == self.effect):
+                return True
 
         return False
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash((self.condition, self.action, self.effect))
 
     def fitness(self):
         return self.q * self.r

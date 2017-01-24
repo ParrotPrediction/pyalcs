@@ -110,6 +110,15 @@ class ACS2UtilsTest(unittest.TestCase):
 
         self.assertRaises(ValueError, _does_match, self.clsf1, ['0', '1'])
 
+    def test_should_generate_random_int_number(self):
+        max_val = 20
+
+        for i in range(1000):
+            rand_int = generate_random_int_number(max_val)
+            self.assertTrue(0 <= rand_int <= max_val)
+            self.assertFalse(rand_int > max_val)
+            self.assertFalse(rand_int < 0)
+
     @staticmethod
     def _create_classifier(condition: list,
                            action: int,

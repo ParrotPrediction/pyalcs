@@ -17,7 +17,12 @@ class ACS2(Agent):
         super().__init__(environment)
         self.classifiers = generate_initial_classifiers()
 
-    def evaluate(self, generations, **kwargs) -> None:
+    def evaluate(self, generations, **kwargs):
+        # Performance metrics
+        m_time = []
+        m_quality = []
+        m_numerosity = []
+
         time = 0
         perception = None
         action = None
@@ -97,3 +102,10 @@ class ACS2(Agent):
 
             # TODO: check this line
             previous_action_set = action_set
+
+            # Metrics for calculating performance
+            m_time.append(time)
+            m_quality.append(sum(cl.q for cl in self.classifiers))
+            m_numerosity.append(sum(cl.num for cl in self.classifiers))
+
+        return m_time, m_quality, m_numerosity
