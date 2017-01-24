@@ -233,27 +233,31 @@ def _update_application_average(cl: Classifier, time: int, beta: float = None):
     cl.t_alp = time
 
 
-def _add_alp_classifier(classifier: Classifier,
+def _add_alp_classifier(cl: Classifier,
                         classifiers: list,
-                        action_set: list) -> None:
+                        action_set: list,
+                        beta: float = None) -> None:
 
-    old_classifier = None
+    if beta is None:
+        beta = c.BETA
+
+    old_cl = None
 
     for cla in action_set:
-        if cla.is_subsumer(classifier):
-            if old_classifier is None or cla.is_more_general(classifier):
-                old_classifier = cla
+        if cla.is_subsumer(cl):
+            if old_cl is None or cla.is_more_general(cl):
+                old_cl = cla
 
-    if old_classifier is None:
+    if old_cl is None:
         for cla in action_set:
-            if cla == classifier:
-                old_classifier = cla
+            if cla.condition == cl.condition and cla.effect == cl.effect:
+                old_cl = cla
 
-    if old_classifier is None:
-        classifiers.append(classifier)
-        action_set.append(classifier)
+    if old_cl is None:
+        classifiers.append(cl)
+        action_set.append(cl)
     else:
-        old_classifier.q += c.BETA * (1 - old_classifier.q)
+        old_cl.q += beta * (1 - old_cl.q)
 
 
 def _cover_triple(previous_perception: list,
