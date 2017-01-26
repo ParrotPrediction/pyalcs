@@ -13,7 +13,7 @@ from helpers.visualization import plot_performance
 logger = logging.getLogger(__name__)
 logging.basicConfig(
     format='[%(asctime)s] [%(levelname)s] [%(name)s]: %(message)s',
-    level=logging.INFO)
+    level=logging.WARN)
 
 
 if __name__ == '__main__':
@@ -25,7 +25,7 @@ if __name__ == '__main__':
     acs2 = ACS2(env)
 
     # Evaluate simulation
-    metrics = acs2.evaluate(50)
+    metrics = acs2.evaluate(100)
 
     # Plot results
     plot_performance(**metrics)

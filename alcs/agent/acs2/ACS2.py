@@ -35,8 +35,7 @@ class ACS2(Agent):
         perception = self.env.get_animat_perception()
 
         for _ in range(generations):
-            logger.info('\n\nGeneration [%d]', time)
-            logger.info('%s', perception)
+            logger.info('\n\nGeneration [%d]\t\t%s', time, perception)
             finished = False
 
             # Reset the environment and put the animat randomly

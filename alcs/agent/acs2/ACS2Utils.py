@@ -160,8 +160,9 @@ def remove_classifier(classifiers: list, classifier: Classifier) -> None:
     Removes classifier from collection
 
     :param classifiers: list of classifiers
-    :param cl: classifier to remove
+    :param classifier: classifier to remove
     """
     for cl in classifiers:
         if cl == classifier:
+            logger.debug("Removing %s", cl)
             classifiers.remove(cl)

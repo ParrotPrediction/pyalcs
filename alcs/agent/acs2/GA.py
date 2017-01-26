@@ -32,6 +32,9 @@ def apply_ga(classifiers: list,
             parent1 = _select_offspring(action_set)
             parent2 = _select_offspring(action_set)
 
+            logger.debug("Parents selected for reproduction %s, %s", parent1,
+                         parent2)
+
             child1 = Classifier.copy_from(parent1)
             child2 = Classifier.copy_from(parent2)
 
@@ -137,6 +140,7 @@ def _add_ga_classifier(classifiers: list,
                 old_cl = c
 
     if old_cl is None:
+        logger.debug("Adding classifier: %s", cl)
         classifiers.append(cl)
         action_set.append(cl)
     else:

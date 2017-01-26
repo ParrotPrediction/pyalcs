@@ -33,13 +33,14 @@ def apply_rl(match_set: list,
     if gamma is None:
         gamma = c.GAMMA
 
-    logger.debug("Applying RL module")
+    logger.debug("Applying RL module, distributing reward: [%d]", reward)
 
     max_p = _calculate_maximum_payoff(match_set)
 
     for cl in action_set:
         cl.r += beta * (reward + gamma * max_p - cl.r)
         cl.ir += beta * (reward - cl.ir)
+        logger.debug(cl)
 
 
 def _calculate_maximum_payoff(match_set: list) -> float:

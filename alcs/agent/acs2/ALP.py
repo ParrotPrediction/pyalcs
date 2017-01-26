@@ -46,6 +46,8 @@ def apply_alp(classifiers: list,
                                 action_set)
 
     if was_expected_case == 0:
+        logger.debug("No expected case, generating classifier by covering"
+                     "mechanism")
         new_cl = _cover_triple(previous_perception,
                                perception,
                                action,
@@ -254,6 +256,7 @@ def _add_alp_classifier(cl: Classifier,
                 old_cl = cla
 
     if old_cl is None:
+        logger.debug("Adding classifier: %s", cl)
         classifiers.append(cl)
         action_set.append(cl)
     else:
