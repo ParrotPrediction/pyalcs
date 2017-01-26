@@ -1,4 +1,5 @@
 import logging
+from collections import defaultdict
 
 from alcs.agent.Agent import Agent
 from alcs.environment.Environment import Environment
@@ -17,14 +18,8 @@ class ACS2(Agent):
         super().__init__(environment)
         self.classifiers = generate_initial_classifiers()
 
-    def evaluate(self, generations, **kwargs):
-        # Performance metrics
-        m_time = []
-        m_found_reward = []
-        m_actions = []
-        tot_classifiers = []
-        avg_quality = []
-        avg_fitness = []
+    def evaluate(self, generations, **kwargs) -> dict:
+        performance_metrics = defaultdict(list)
 
         time = 0
         perception = None
@@ -108,15 +103,14 @@ class ACS2(Agent):
             previous_action_set = action_set
 
             # Metrics for calculating performance
-            total_classifiers = len(self.classifiers)
-            sum_quality = sum(cl.q for cl in self.classifiers)
-            sum_fitness = sum(cl.fitness() for cl in self.classifiers)
+            cls_num = len(self.classifiers)
+            s_quality = sum(cl.q for cl in self.classifiers)
+            s_fitness = sum(cl.fitness() for cl in self.classifiers)
 
-            m_time.append(time)
-            m_found_reward.append(finished)
-            m_actions.append(action)
-            tot_classifiers.append(total_classifiers)
-            avg_quality.append(sum_quality / total_classifiers)
-            avg_fitness.append(sum_fitness / total_classifiers)
+            performance_metrics['time'].append(time)
+            performance_metrics['found_reward'].append(finished)
+            performance_metrics['total_classifiers'].append(cls_num)
+            performance_metrics['average_quality'].append(s_quality / cls_num)
+            performance_metrics['average_fitness'].append(s_fitness / cls_num)
 
-        return m_time, tot_classifiers, avg_quality, m_found_reward, avg_fitness, m_actions
+        return performance_metrics

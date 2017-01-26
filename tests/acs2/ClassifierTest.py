@@ -117,4 +117,3 @@ class ClassifierTest(unittest.TestCase):
         self.baseClassifier.set_mark(perception)
 
         self.assertTrue(Classifier.is_marked(self.baseClassifier.mark))
-
