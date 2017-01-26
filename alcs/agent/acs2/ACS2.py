@@ -18,7 +18,16 @@ class ACS2(Agent):
         super().__init__(environment)
         self.classifiers = generate_initial_classifiers()
 
-    def evaluate(self, generations, **kwargs) -> dict:
+    def evaluate(self, generations, **kwargs):
+        """
+        Evaluates ACS2 algorithm on given environment for certain number
+        of generations
+
+        :param generations: number of generations
+        :param kwargs: additonal parameters (none at the moment)
+
+        :return: final classifier list and metrics
+        """
         performance_metrics = defaultdict(list)
 
         time = 0
@@ -112,4 +121,4 @@ class ACS2(Agent):
             performance_metrics['average_quality'].append(s_quality / cls_num)
             performance_metrics['average_fitness'].append(s_fitness / cls_num)
 
-        return performance_metrics
+        return self.classifiers, performance_metrics

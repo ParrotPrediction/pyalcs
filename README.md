@@ -23,7 +23,7 @@ At this moment it is possible to put an agent into a maze defined in an external
 ## Examples
 To run ACS2 algorithm from `examples/` directory type:
 
-    make example_acs2
+    python3 examples/run_acs2.py
 
 ## Contribution
 Prior to PR please execute:
@@ -37,4 +37,5 @@ and check if standards are holding:
 
 #### Improvements
 - more intelligent exploration/exploitation,
-- kill animat after certain time of wandering
+- kill animat after certain time of wandering,
+- better choice of reward values

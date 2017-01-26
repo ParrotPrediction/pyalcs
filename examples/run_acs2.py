@@ -5,7 +5,7 @@ from os.path import abspath, join, dirname
 sys.path.insert(0, abspath(join(dirname(__file__), '..')))
 
 from alcs.agent.acs2 import ACS2
-from alcs.environment import maze
+from alcs.environment.maze import Maze
 
 from helpers.visualization import plot_performance
 
@@ -19,13 +19,13 @@ logging.basicConfig(
 if __name__ == '__main__':
 
     # Load environment
-    env = maze.Maze('mazes/MazeF1.maze')
+    env = Maze('mazes/MazeF1.maze')
 
     # Initialize agent
-    acs2 = ACS2(env)
+    agent = ACS2(env)
 
     # Evaluate simulation
-    metrics = acs2.evaluate(500)
+    classifiers, metrics = agent.evaluate(50)
 
     # Plot results
     plot_performance(**metrics)
