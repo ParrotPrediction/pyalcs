@@ -35,6 +35,6 @@ and check if standards are holding:
     make test
     make pep8
 
-#### Dev thoughts
-- `any` method might be nice,
-- integrate with CodeClimate
+#### Improvements
+- more intelligent exploration/exploitation,
+- kill animat after certain time of wandering

@@ -25,7 +25,7 @@ if __name__ == '__main__':
     acs2 = ACS2(env)
 
     # Evaluate simulation
-    metrics = acs2.evaluate(100)
+    metrics = acs2.evaluate(500)
 
     # Plot results
     plot_performance(**metrics)
