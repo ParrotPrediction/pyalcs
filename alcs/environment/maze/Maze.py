@@ -89,8 +89,8 @@ class Maze(Environment):
             possible_coords = []
             for x in range(0, self.max_x):
                 for y in range(0, self.max_y):
-                    if self.matrix[x][y] == self.mapping['path']['value']:
-                        possible_coords.append((x, y))
+                    if self.matrix[y][x] == self.mapping['path']['value']:
+                        possible_coords.append((y, x))
 
             starting_position = random.choice(possible_coords)
             self.animat_pos_x = starting_position[1]

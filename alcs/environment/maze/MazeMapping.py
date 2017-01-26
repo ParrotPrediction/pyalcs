@@ -26,4 +26,4 @@ class MazeMapping:
             if v['symbol'] == symbol:
                 return v['value']
 
-        raise ValueError('No mapping for symbol ' + symbol)
+        raise ValueError('No mapping for symbol [{}]'.format(symbol))

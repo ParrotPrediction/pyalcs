@@ -19,13 +19,13 @@ logging.basicConfig(
 if __name__ == '__main__':
 
     # Load environment
-    env = maze.Maze('mazes/m1.maze')
+    env = maze.Maze('mazes/MazeF1.maze')
 
     # Initialize agent
     acs2 = ACS2(env)
 
     # Evaluate simulation
-    metrics = acs2.evaluate(500)
+    metrics = acs2.evaluate(50)
 
     # Plot results
     plot_performance(**metrics)
