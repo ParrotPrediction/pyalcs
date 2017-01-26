@@ -1,7 +1,7 @@
 # Anticipatory Learning Classifier Systems in Python
 Repository containing code implementation for various *Anticipatory Learning Classifier Systems* (ALCS).
 
-[![Build Status](https://travis-ci.org/khozzy/ACS.svg?branch=master)](https://travis-ci.org/khozzy/ACS)
+[![Build Status](https://travis-ci.org/khozzy/pyalcs.svg?branch=master)](https://travis-ci.org/khozzy/pyalcs)
 
 
 ALCS are is an extension to basic LCS compromising the notation of anticipations. Doing that the systems predominantly are able to **anticipate perceptual consequences of actions** independent of a reinforcement predictions.
