@@ -37,5 +37,9 @@ and check if standards are holding:
 
 #### Improvements
 - more intelligent exploration/exploitation,
-- kill animat after certain time of wandering,
-- better choice of reward values
+- kill animat after certain time of wandering (`MaxSteps`),
+- better choice of reward values,
+- perception of 8 cells (not just 4),
+- 8 possible actions (not just 4),
+- method for calculating `achieved knowledge` (p. 182),
+
