@@ -4,9 +4,11 @@ from os.path import abspath, join, dirname
 
 sys.path.insert(0, abspath(join(dirname(__file__), '..')))
 
+# ALCS
 from alcs.agent.acs2 import ACS2
 from alcs.environment.maze import Maze
 
+# Helpers
 from helpers.visualization import plot_performance
 
 

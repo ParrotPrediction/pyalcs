@@ -23,7 +23,7 @@ class ACS2(Agent):
         Evaluates ACS2 algorithm on given environment for certain number
         of generations
 
-        :param generations: number of generations
+        :param generations: number of generations to run
         :param kwargs: additonal parameters (none at the moment)
 
         :return: final classifier list and metrics
@@ -31,6 +31,7 @@ class ACS2(Agent):
         performance_metrics = defaultdict(list)
 
         time = 0
+        trial = 0
         perception = None
         action = None
         action_set = None
@@ -43,14 +44,17 @@ class ACS2(Agent):
         # Get the animat initial perception
         perception = self.env.get_animat_perception()
 
-        for _ in range(generations):
-            logger.info('\n\nGeneration [%d]\t\t%s', time, perception)
+        while time < generations:
+            logger.info('\n\nTrial/time [%d/%d]\t\t%s',
+                        trial, time, perception)
+
             finished = False
 
             # Reset the environment and put the animat randomly
             # inside the maze when he found the reward (next trial starts)
             if self.env.animat_has_finished():
                 finished = True
+                trial += 1
                 self.env.insert_animat()
 
             # Generate initial (general) classifiers if no classifier
@@ -112,13 +116,11 @@ class ACS2(Agent):
 
             # Metrics for calculating performance
             cls_num = len(self.classifiers)
-            s_quality = sum(cl.q for cl in self.classifiers)
             s_fitness = sum(cl.fitness() for cl in self.classifiers)
 
             performance_metrics['time'].append(time)
             performance_metrics['found_reward'].append(finished)
             performance_metrics['total_classifiers'].append(cls_num)
-            performance_metrics['average_quality'].append(s_quality / cls_num)
             performance_metrics['average_fitness'].append(s_fitness / cls_num)
 
         return self.classifiers, performance_metrics

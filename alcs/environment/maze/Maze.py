@@ -230,12 +230,12 @@ class Maze(Environment):
         position_value = self._get_animat_position_value(pos_x, pos_y)
 
         if position_value == self.mapping['reward']['value']:
-            reward = 2000
+            reward = 1000
             self.animat_found_reward = True
             logger.info('*** ANIMAT FOUND REWARD! ***')
 
         if position_value == self.mapping['path']['value']:
-            reward = 1
+            reward = 0
 
         logger.debug('Animat [(%d, %d)] received reward for position: [%d]',
                      pos_x, pos_y, reward)
