@@ -90,3 +90,5 @@ ENV/
 
 .idea
 /examples/learning_progress.png
+
+.DS_Store
