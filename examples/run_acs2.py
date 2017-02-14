@@ -4,18 +4,14 @@ from os.path import abspath, join, dirname
 
 sys.path.insert(0, abspath(join(dirname(__file__), '..')))
 
-# ALCS
 from alcs.agent.acs2 import ACS2
 from alcs.environment.maze import Maze
-
-# Helpers
-from helpers.visualization import plot_performance
 
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
     format='[%(asctime)s] [%(levelname)s] [%(name)s]: %(message)s',
-    level=logging.WARN)
+    level=logging.DEBUG)
 
 
 if __name__ == '__main__':
@@ -27,7 +23,10 @@ if __name__ == '__main__':
     agent = ACS2(env)
 
     # Evaluate simulation
-    classifiers, metrics = agent.evaluate(50)
+    classifiers, metrics = agent.evaluate(1500)
 
-    # Plot results
-    plot_performance(**metrics)
+    print("Classifiers population: {}".format(len(classifiers)))
+
+    numerous = [c for c in classifiers if c.num > 1]
+    print(numerous)
+

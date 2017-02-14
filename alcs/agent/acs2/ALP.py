@@ -22,7 +22,7 @@ def apply_alp(classifiers: list,
     logger.debug('Applying ALP module')
     was_expected_case = 0
 
-    for cl in action_set:
+    for cl in action_set:  # TODO .copy()
         cl.exp += 1
         _update_application_average(cl, time)
 
@@ -45,8 +45,10 @@ def apply_alp(classifiers: list,
                                 classifiers,
                                 action_set)
 
+    # If there wasn't any classifier in the action set that anticipated
+    # correctly generate one with proper cover triple.
     if was_expected_case == 0:
-        logger.debug("No expected case, generating classifier by covering"
+        logger.debug("No expected case, generating classifier by covering "
                      "mechanism")
         new_cl = _cover_triple(previous_perception,
                                perception,
@@ -185,6 +187,22 @@ def _unexpected_case(cl: Classifier,
                      perception: list,
                      previous_perception: list,
                      beta: float = None) -> Classifier:
+    """
+    Handles a situation when classifier does not predict correctly next state.
+
+    A new classifier is generated only if the effect part of the to be
+    investigated classifier cl can be modified to anticipate the change
+    from previous perception to perception by only *specializing* attributes.
+
+    If this is the case, a new classifier that is specialized in condition
+    and effect where necessary is generated. It's experience is set to one.
+
+    :param cl: classifier making predictions
+    :param perception: current perception
+    :param previous_perception: previous perception
+    :param beta: learning rate
+    :return: a new specialized classifier or None
+    """
 
     if beta is None:
         beta = c.BETA
@@ -272,11 +290,14 @@ def _cover_triple(previous_perception: list,
     previous to current perception in condition and effect part. The action
     part of the new classifier is set to the executed action.
 
+    Triggered if a triple (situation-action-effect) is not represented by any
+    classifier in the action set.
+
     :param previous_perception: previous perception
     :param perception: current perception
     :param action: new classifier action
-    :param time:
-    :return:
+    :param time: current step
+    :return: new classifier covering desired triple
     """
 
     child = Classifier()

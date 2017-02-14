@@ -111,7 +111,7 @@ def choose_action(classifiers: list, epsilon=None) -> int:
         logger.debug('Action chosen: [%d] (randomly)', random_action)
         return random_action
     else:
-        best_cl = classifiers[0]
+        best_cl = classifiers[0]  # TODO: I would use `choice` here
 
         for cl in classifiers:
             if (cl.effect != get_general_perception() and
