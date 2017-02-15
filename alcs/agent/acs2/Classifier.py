@@ -97,6 +97,15 @@ class Classifier(object):
     def fitness(self):
         return self.q * self.r
 
+    def get_condition_specificity(self) -> float:
+        """
+        Return information what percentage of condition elements are
+        specific.
+        :return: number from [0,1]
+        """
+        specific = sum(1 for e in self.condition if e != c.CLASSIFIER_WILDCARD)
+        return specific / c.CLASSIFIER_LENGTH
+
     def is_subsumer(self, cl, theta_exp=None, theta_r=None):
         """
         Subsume operation - capture another, similar but more

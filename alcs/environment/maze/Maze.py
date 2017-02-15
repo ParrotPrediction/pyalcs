@@ -77,7 +77,7 @@ class Maze(Environment):
                     not self._within_y_range(pos_y)):
                 raise ValueError('Values outside allowed range')
 
-            if self.matrix[pos_y][pos_x] != self.mapping['path']['value']:
+            if not self.is_path(pos_x, pos_y):
                 raise ValueError('Animat must be inserted into path')
 
             self.animat_pos_x = pos_x
@@ -86,15 +86,11 @@ class Maze(Environment):
             logger.info('Animat [(%d, %d)] placed into fixed initial cords',
                         pos_x, pos_y)
         else:
-            possible_coords = []
-            for x in range(0, self.max_x):
-                for y in range(0, self.max_y):
-                    if self.matrix[y][x] == self.mapping['path']['value']:
-                        possible_coords.append((y, x))
+            possible_coords = self.get_possible_agent_insertion_coordinates()
 
             starting_position = random.choice(possible_coords)
-            self.animat_pos_x = starting_position[1]
-            self.animat_pos_y = starting_position[0]
+            self.animat_pos_x = starting_position[0]
+            self.animat_pos_y = starting_position[1]
 
             logger.debug('Animat [(%d, %d)] placed into random initial cords',
                          self.animat_pos_x, self.animat_pos_y)
@@ -241,6 +237,43 @@ class Maze(Environment):
                      pos_x, pos_y, reward)
 
         return reward
+
+    def get_possible_agent_insertion_coordinates(self):
+        """
+        Returns a list with coordinates in the environment where
+        an agent can be placed (only on the path).
+
+        :return: list of tuples containing coordinates
+        """
+        possible_cords = []
+        for x in range(0, self.max_x):
+            for y in range(0, self.max_y):
+                if self.is_path(x, y):
+                    possible_cords.append((x, y))
+
+        return possible_cords
+
+    @staticmethod
+    def get_possible_neighbour_cords(pos_x, pos_y):
+        """
+        Returns coordinates for N, W, S, E cells
+        """
+        return (pos_x, pos_y - 1),\
+               (pos_x - 1, pos_y),\
+               (pos_x, pos_y + 1),\
+               (pos_x + 1, pos_y)
+
+    def is_wall(self, pos_x, pos_y):
+        return self.matrix[pos_y][pos_x] == \
+               MazeMapping().mapping['wall']['value']
+
+    def is_path(self, pos_x, pos_y):
+        return self.matrix[pos_y][pos_x] == \
+               MazeMapping().mapping['path']['value']
+
+    def is_reward(self, pos_x, pos_y):
+        return self.matrix[pos_y][pos_x] == \
+               MazeMapping().mapping['reward']['value']
 
     @staticmethod
     def not_wall(perceptron):

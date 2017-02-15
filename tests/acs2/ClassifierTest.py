@@ -117,3 +117,15 @@ class ClassifierTest(unittest.TestCase):
         self.baseClassifier.set_mark(perception)
 
         self.assertTrue(Classifier.is_marked(self.baseClassifier.mark))
+
+    def test_should_calculate_specificity_measure(self):
+        cl = Classifier()
+
+        cl.condition = ['1', '2', '1', '0']
+        self.assertEqual(1, cl.get_condition_specificity())
+
+        cl.condition = ['#', '#', '#', '#']
+        self.assertEqual(0, cl.get_condition_specificity())
+
+        cl.condition = ['1', '#', '1', '#']
+        self.assertEqual(0.5, cl.get_condition_specificity())

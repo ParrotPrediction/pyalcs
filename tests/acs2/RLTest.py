@@ -64,7 +64,8 @@ class RLTest(unittest.TestCase):
         apply_rl(match_set,
                  action_set,
                  obtained_reward,
-                 beta=0)
+                 beta=0,
+                 gamma=0.95)
 
         # No changes
         self.assertAlmostEqual(self.cl1.r, 1, places=3)

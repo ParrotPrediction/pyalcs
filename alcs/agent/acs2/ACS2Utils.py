@@ -152,6 +152,34 @@ def _does_match(classifier: Classifier, perception: list) -> bool:
     return True
 
 
+def does_anticipate_correctly(classifier: Classifier,
+                              perception: list,
+                              previous_perception: list) -> bool:
+    """
+    Checks anticipation. While the pass-through symbols in the effect part
+    of a classifier directly anticipate that these attributes stay the same
+    after the execution of an action, the specified attributes anticipate
+    a change to the specified value. Thus, if the perceived value did not
+    change to the anticipated but actually stayed at the value, the classifier
+    anticipates incorrectly.
+
+    :param classifier: given classifier
+    :param perception: current perception
+    :param previous_perception: previous perception
+    :return: True if classifier anticipates correctly, False otherwise
+    """
+    for i in range(c.CLASSIFIER_LENGTH):
+        if classifier.effect[i] == c.CLASSIFIER_WILDCARD:
+            if previous_perception[i] != perception[i]:
+                return False
+        else:
+            if (classifier.effect[i] != perception[i] or
+                    previous_perception[i] == perception[i]):
+                return False
+
+    return True
+
+
 def remove_classifier(classifiers: list, classifier: Classifier) -> None:
     """
     Removes classifier from collection

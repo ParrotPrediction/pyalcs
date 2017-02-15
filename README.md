@@ -42,4 +42,4 @@ and check if standards are holding:
 - perception of 8 cells (not just 4),
 - 8 possible actions (not just 4),
 - method for calculating `achieved knowledge` (p. 182),
-
+- use decorators for measuring performance

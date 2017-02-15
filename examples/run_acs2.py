@@ -11,7 +11,7 @@ from alcs.environment.maze import Maze
 logger = logging.getLogger(__name__)
 logging.basicConfig(
     format='[%(asctime)s] [%(levelname)s] [%(name)s]: %(message)s',
-    level=logging.WARN)
+    level=logging.DEBUG)
 
 
 if __name__ == '__main__':
@@ -23,12 +23,8 @@ if __name__ == '__main__':
     agent = ACS2(env)
 
     # Evaluate simulation
-    classifiers, metrics = agent.evaluate(1500)
-
-    print("Classifiers population: {}".format(len(classifiers)))
-
-    numerous = [c for c in classifiers if c.num > 1]
-    print(numerous)
+    classifiers, metrics = agent.evaluate(500)
 
     reliable = [c for c in classifiers if c.q > 0.9]
-    print(reliable)
+
+    print("Reliable classifiers: {}".format(len(reliable)))

@@ -3,6 +3,7 @@ from collections import defaultdict
 
 from alcs.agent.Agent import Agent
 from alcs.environment.Environment import Environment
+from alcs.helpers.metrics import calculate_achieved_knowledge
 from .ALP import apply_alp
 from .GA import apply_ga
 from .RL import apply_rl
@@ -145,10 +146,16 @@ class ACS2(Agent):
             # Metrics for calculating performance
             cls_num = len(self.classifiers)
             s_fitness = sum(cl.fitness() for cl in self.classifiers)
+            s_spec_pop = sum(cl.get_condition_specificity()
+                             for cl in self.classifiers)
+            knowledge = calculate_achieved_knowledge(
+                self.env, self.classifiers)
 
             performance_metrics['time'].append(time)
             performance_metrics['found_reward'].append(finished)
             performance_metrics['total_classifiers'].append(cls_num)
+            performance_metrics['spec_pop'].append(s_spec_pop / cls_num)
+            performance_metrics['achieved_knowledge'].append(knowledge)
             performance_metrics['average_fitness'].append(s_fitness / cls_num)
 
         return self.classifiers, performance_metrics

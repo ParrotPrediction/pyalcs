@@ -203,10 +203,10 @@ def _delete_classifiers(classifiers: list,
                     if cl.q - cl_del.q < -0.1:
                         cl_del = cl
                     if abs(cl.q - cl_del.q) <= 0.1:
-                        if (Classifier.is_marked(cl) and
+                        if (Classifier.is_marked(cl.mark) and
                                 not Classifier.is_marked(cl_del.mark)):
                             cl_del = cl
-                        elif (Classifier.is_marked(cl) or
+                        elif (Classifier.is_marked(cl.mark) or
                                 not Classifier.is_marked(cl_del.mark)):
                             if cl.aav > cl_del.aav:
                                 cl_del = cl
