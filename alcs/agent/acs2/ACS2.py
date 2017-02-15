@@ -14,16 +14,38 @@ logger = logging.getLogger(__name__)
 
 class ACS2(Agent):
 
-    def __init__(self, environment: Environment):
+    def __init__(self, environment: Environment,
+                 epsilon: float = 0.4,
+                 beta: float = 0.2,
+                 gamma: float = 0.95):
+        """
+        :param environment: the environment in which agent will operate.
+        :param epsilon: The 'exploration probability' [0-1]. Specifies the
+        probability of choosing a random action. The fastest model learning is
+        usually achieved by pure random exploration.
+        :param beta: The 'learning rate' - used in ALP and RL. Updates
+        affecting q, r, ir, aav. parameters approach an approximation of
+        their actual value but the more noisy the approximation is.
+        :param gamma: The 'discount factor' [0-1] determines the reward
+        distribution over the environmental model. It essentially specifies
+        to what extend future reinforcement influences current behaviour.
+        The closer to 1, the more influence delayed reward has on current
+        behaviour.
+        """
         super().__init__(environment)
         self.classifiers = generate_initial_classifiers()
 
-    def evaluate(self, generations, **kwargs):
+        # Algorithm constants
+        self.epsilon = epsilon
+        self.beta = beta
+        self.gamma = gamma
+
+    def evaluate(self, steps, **kwargs):
         """
         Evaluates ACS2 algorithm on given environment for certain number
         of generations
 
-        :param generations: number of generations to run
+        :param steps: number of generations to run
         :param kwargs: additonal parameters (none at the moment)
 
         :return: final classifier list and metrics
@@ -44,8 +66,8 @@ class ACS2(Agent):
         # Get the animat initial perception
         perception = self.env.get_animat_perception()
 
-        while time < generations:
-            logger.info('\n\nTrial/time [%d/%d]\t\t%s',
+        while time < steps:
+            logger.info('\n\nTrial/step [%d/%d]\t\t%s',
                         trial, time, perception)
 
             finished = False
@@ -74,10 +96,13 @@ class ACS2(Agent):
                           time,
                           previous_action_set,
                           perception,
-                          previous_perception)
+                          previous_perception,
+                          self.beta)
                 apply_rl(match_set,
                          previous_action_set,
-                         reward)
+                         reward,
+                         self.beta,
+                         self.gamma)
                 apply_ga(self.classifiers,
                          previous_action_set,
                          time)
@@ -85,7 +110,7 @@ class ACS2(Agent):
             # Remove previous action set
             previous_action_set = None
 
-            action = choose_action(match_set)
+            action = choose_action(match_set, self.epsilon)
             action_set = generate_action_set(match_set, action)
 
             # Execute action and obtain reward
@@ -97,17 +122,20 @@ class ACS2(Agent):
             perception = self.env.get_animat_perception()
 
             # If new state was introduced
-            if self.env.trial_was_successful():
-                logger.info("Trial successful. Triggering learning modules")
+            if self.env.move_was_successful():
+                logger.info("Move successful. Triggering learning modules")
                 apply_alp(self.classifiers,
                           action,
                           time,
                           action_set,
                           perception,
-                          previous_perception)
+                          previous_perception,
+                          self.beta)
                 apply_rl(match_set,
                          action_set,
-                         reward)
+                         reward,
+                         self.beta,
+                         self.gamma)
                 apply_ga(self.classifiers,
                          action_set,
                          time)

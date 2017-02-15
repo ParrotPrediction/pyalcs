@@ -1,5 +1,6 @@
 import logging
 from random import random
+from copy import deepcopy, copy
 
 from . import Classifier
 from . import Constants as c
@@ -14,6 +15,7 @@ def apply_alp(classifiers: list,
               action_set: list,
               perception: list,
               previous_perception: list,
+              beta: float,
               theta_i: float = None):
 
     if theta_i is None:
@@ -22,19 +24,25 @@ def apply_alp(classifiers: list,
     logger.debug('Applying ALP module')
     was_expected_case = 0
 
-    for cl in action_set:  # TODO .copy()
+    # ALP is delicate process. We need to make sure that adding and removing
+    # classifiers from and to action set is not reconsidered in the current
+    # loop.
+    original_action_set = copy(action_set)
+
+    for cl in original_action_set:
         cl.exp += 1
-        _update_application_average(cl, time)
+        _update_application_average(cl, time, beta)
 
         if _does_anticipate_correctly(cl,
                                       perception,
                                       previous_perception):
-            new_cl = _expected_case(cl, perception)
+            new_cl = _expected_case(cl, perception, beta)
             was_expected_case = 1
         else:
             new_cl = _unexpected_case(cl,
                                       perception,
-                                      previous_perception)
+                                      previous_perception,
+                                      beta)
             if cl.q < theta_i:
                 remove_classifier(classifiers, cl)
                 remove_classifier(action_set, cl)
@@ -43,27 +51,27 @@ def apply_alp(classifiers: list,
             new_cl.t_ga = time
             _add_alp_classifier(new_cl,
                                 classifiers,
-                                action_set)
+                                action_set,
+                                beta)
 
     # If there wasn't any classifier in the action set that anticipated
     # correctly generate one with proper cover triple.
     if was_expected_case == 0:
-        logger.debug("No expected case, generating classifier by covering "
-                     "mechanism")
+        logger.debug("No expected case in the action set, generating "
+                     "classifier by covering mechanism")
         new_cl = _cover_triple(previous_perception,
                                perception,
                                action,
                                time)
-        _add_alp_classifier(new_cl, classifiers, action_set)
+        _add_alp_classifier(new_cl, classifiers, action_set, beta)
 
 
 def _expected_case(cl: Classifier,
                    perception: list,
-                   beta: float = None,
+                   beta: float,
                    u_max: int = None) -> Classifier:
 
-    if beta is None:
-        beta = c.BETA
+    logger.debug('Expected case')
 
     if u_max is None:
         u_max = c.U_MAX
@@ -186,7 +194,7 @@ def _remove_random_spec_element(condition: list) -> None:
 def _unexpected_case(cl: Classifier,
                      perception: list,
                      previous_perception: list,
-                     beta: float = None) -> Classifier:
+                     beta: float) -> Classifier:
     """
     Handles a situation when classifier does not predict correctly next state.
 
@@ -204,8 +212,7 @@ def _unexpected_case(cl: Classifier,
     :return: a new specialized classifier or None
     """
 
-    if beta is None:
-        beta = c.BETA
+    logger.debug('Unexpected case')
 
     cl.q -= beta * cl.q
     cl.set_mark(previous_perception)
@@ -232,7 +239,7 @@ def _unexpected_case(cl: Classifier,
     return child
 
 
-def _update_application_average(cl: Classifier, time: int, beta: float = None):
+def _update_application_average(cl: Classifier, time: int, beta: float):
     """
     Procedure uses the moyenne adaptive modifee technique to reach
     an accurate value of the application average as soon as possible.
@@ -242,9 +249,6 @@ def _update_application_average(cl: Classifier, time: int, beta: float = None):
     :param time: current time
     :param beta: learning rate
     """
-    if beta is None:
-        beta = c.BETA
-
     if cl.exp < 1 / beta:
         cl.aav += (time - cl.t_alp - cl.aav) / cl.exp
     else:
@@ -256,10 +260,7 @@ def _update_application_average(cl: Classifier, time: int, beta: float = None):
 def _add_alp_classifier(cl: Classifier,
                         classifiers: list,
                         action_set: list,
-                        beta: float = None) -> None:
-
-    if beta is None:
-        beta = c.BETA
+                        beta: float) -> None:
 
     old_cl = None
 

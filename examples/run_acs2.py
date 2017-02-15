@@ -11,7 +11,7 @@ from alcs.environment.maze import Maze
 logger = logging.getLogger(__name__)
 logging.basicConfig(
     format='[%(asctime)s] [%(levelname)s] [%(name)s]: %(message)s',
-    level=logging.DEBUG)
+    level=logging.WARN)
 
 
 if __name__ == '__main__':
@@ -30,3 +30,5 @@ if __name__ == '__main__':
     numerous = [c for c in classifiers if c.num > 1]
     print(numerous)
 
+    reliable = [c for c in classifiers if c.q > 0.9]
+    print(reliable)

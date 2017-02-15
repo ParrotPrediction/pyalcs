@@ -9,11 +9,6 @@ CLASSIFIER_LENGTH = 4
 # Defines a number of possible agents actions
 NUMBER_OF_POSSIBLE_ACTIONS = 4
 
-# The 'exploration probability' [0-1]. Specifies the probability of choosing
-# a random action. The fastest model learning is usually achieved by pure
-# random exploration
-EPSILON = 0.4
-
 # The 'experience threshold' (natural number) controls when a classifier
 # is usable as a subsumer. A low threshold might cause the incorrect
 # propagation of an over-general classifier. However, no negative effects
@@ -29,12 +24,6 @@ THETA_R = 0.9
 # as inadequate (and later removed) determined by its quality q.
 THETA_I = 0.1
 
-# The 'learning rate' - used in ALP and RL. Updates affecting q, r, ir, aav.
-# The usual value (0.05, which is passive). The higher, the faster
-# parameters approach an approximation of their actual value but the
-# more noisy the approximation is.
-BETA = 0.2
-
 # The 'specificity threshold' (natural number) - specifies the maximum
 # number of specified attributes in C that are anticipated to stay the same
 # in E. Used as specialization mechanism ALP. A safe value is always
@@ -43,12 +32,6 @@ U_MAX = CLASSIFIER_LENGTH
 
 # FOR ALP
 SPEC_ATT = 0.3
-
-# The 'discount factor' [0-1] determines the reward distribution over
-# the environmental model. It essentially specifies to what extend future
-# reinforcement influences current behaviour. The closer to 1, the more
-# influence delayed reward has on current behaviour.
-GAMMA = 0.95
 
 # The 'GA application threshold' controls GA frequency (natural number).
 # A GA is applied in an action set if the average delay of the last GA

@@ -11,7 +11,7 @@ class Environment(metaclass=ABCMeta):
         raise NotImplementedError()
 
     @abstractmethod
-    def trial_was_successful(self) -> bool:
+    def move_was_successful(self) -> bool:
         """
         Returns information whether the animat has proceeded to another
         situation (perception).

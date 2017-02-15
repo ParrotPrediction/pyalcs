@@ -29,7 +29,7 @@ class Maze(Environment):
         self.max_x, self.max_y, self.matrix = None, None, None
         self._load_maze_from_file(maze_file)
 
-    def trial_was_successful(self) -> bool:
+    def move_was_successful(self) -> bool:
         """
         Checks if animat moved in this turn.
 

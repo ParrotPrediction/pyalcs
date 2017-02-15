@@ -89,7 +89,7 @@ def generate_action_set(classifiers: list, action: int) -> list:
     return action_set
 
 
-def choose_action(classifiers: list, epsilon=None) -> int:
+def choose_action(classifiers: list, epsilon: float) -> int:
     """
     Use epsilon-greedy method for action selection. However, it is not clear
     which action is actually the best to choose (since once situation-action
@@ -102,9 +102,6 @@ def choose_action(classifiers: list, epsilon=None) -> int:
     :param epsilon: probability of returning random action
     :return: an integer representing an action
     """
-    if epsilon is None:
-        epsilon = c.EPSILON
-
     if random() < epsilon:
         all_actions = [i for i in range(c.NUMBER_OF_POSSIBLE_ACTIONS)]
         random_action = choice(all_actions)
