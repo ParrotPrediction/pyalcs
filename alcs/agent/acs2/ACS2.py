@@ -1,9 +1,7 @@
 import logging
-from collections import defaultdict
 
 from alcs.agent.Agent import Agent
 from alcs.environment.Environment import Environment
-from alcs.helpers.metrics import calculate_achieved_knowledge
 from .ALP import apply_alp
 from .GA import apply_ga
 from .RL import apply_rl
@@ -15,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 class ACS2(Agent):
 
-    def __init__(self, environment: Environment,
+    def __init__(self,
                  epsilon: float = 0.4,
                  beta: float = 0.2,
                  gamma: float = 0.95):
@@ -33,25 +31,26 @@ class ACS2(Agent):
         The closer to 1, the more influence delayed reward has on current
         behaviour.
         """
-        super().__init__(environment)
-        self.classifiers = generate_initial_classifiers()
+        super().__init__()
 
         # Algorithm constants
         self.epsilon = epsilon
         self.beta = beta
         self.gamma = gamma
 
-    def evaluate(self, steps, **kwargs):
+    def evaluate(self, environment: Environment, steps: int):
         """
         Evaluates ACS2 algorithm on given environment for certain number
         of generations
 
+        :param environment: environment to operate on
         :param steps: number of generations to run
-        :param kwargs: additonal parameters (none at the moment)
 
         :return: final classifier list and metrics
         """
-        performance_metrics = defaultdict(list)
+        self.metrics.clear()
+
+        classifiers = []
 
         time = 0
         trial = 0
@@ -62,10 +61,10 @@ class ACS2(Agent):
         previous_perception = None
         previous_action_set = None
 
-        self.env.insert_animat()
+        environment.insert_animat()
 
         # Get the animat initial perception
-        perception = self.env.get_animat_perception()
+        perception = environment.get_animat_perception()
 
         while time < steps:
             logger.info('\n\nTrial/step [%d/%d]\t\t%s',
@@ -75,24 +74,24 @@ class ACS2(Agent):
 
             # Reset the environment and put the animat randomly
             # inside the maze when he found the reward (next trial starts)
-            if self.env.animat_has_finished():
+            if environment.animat_has_finished():
                 finished = True
                 trial += 1
-                self.env.insert_animat()
+                environment.insert_animat()
 
             # Generate initial (general) classifiers if no classifier
             # are in the population.
-            if len(self.classifiers) == 0:
-                self.classifiers = generate_initial_classifiers()
+            if len(classifiers) == 0:
+                classifiers = generate_initial_classifiers()
 
             # Select classifiers matching the perception
-            match_set = generate_match_set(self.classifiers, perception)
+            match_set = generate_match_set(classifiers, perception)
 
             # If not the beginning of the trial
             if previous_action_set is not None:  # time != 0
                 logger.info("Triggering learning modules on previous "
                             "action set")
-                apply_alp(self.classifiers,
+                apply_alp(classifiers,
                           action,
                           time,
                           previous_action_set,
@@ -104,7 +103,7 @@ class ACS2(Agent):
                          reward,
                          self.beta,
                          self.gamma)
-                apply_ga(self.classifiers,
+                apply_ga(classifiers,
                          previous_action_set,
                          time)
 
@@ -115,17 +114,17 @@ class ACS2(Agent):
             action_set = generate_action_set(match_set, action)
 
             # Execute action and obtain reward
-            reward = self.env.execute_action(action)
+            reward = environment.execute_action(action)
 
             # Next time slot
             time += 1
             previous_perception = perception
-            perception = self.env.get_animat_perception()
+            perception = environment.get_animat_perception()
 
             # If new state was introduced
-            if self.env.move_was_successful():
+            if environment.move_was_successful():
                 logger.info("Move successful. Triggering learning modules")
-                apply_alp(self.classifiers,
+                apply_alp(classifiers,
                           action,
                           time,
                           action_set,
@@ -137,25 +136,18 @@ class ACS2(Agent):
                          reward,
                          self.beta,
                          self.gamma)
-                apply_ga(self.classifiers,
+                apply_ga(classifiers,
                          action_set,
                          time)
 
             previous_action_set = action_set
 
-            # Metrics for calculating performance
-            cls_num = len(self.classifiers)
-            s_fitness = sum(cl.fitness() for cl in self.classifiers)
-            s_spec_pop = sum(cl.get_condition_specificity()
-                             for cl in self.classifiers)
-            knowledge = calculate_achieved_knowledge(
-                self.env, self.classifiers)
+            # Define variables for collecting metrics
+            self.acquire_metrics(
+                step=time,
+                maze=environment,
+                classifiers=classifiers,
+                was_successful=finished
+            )
 
-            performance_metrics['time'].append(time)
-            performance_metrics['found_reward'].append(finished)
-            performance_metrics['total_classifiers'].append(cls_num)
-            performance_metrics['spec_pop'].append(s_spec_pop / cls_num)
-            performance_metrics['achieved_knowledge'].append(knowledge)
-            performance_metrics['average_fitness'].append(s_fitness / cls_num)
-
-        return self.classifiers, performance_metrics
+        return classifiers, self.metrics

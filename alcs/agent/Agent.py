@@ -1,22 +1,44 @@
 from abc import ABCMeta, abstractmethod
+from collections import defaultdict
+
 from alcs.environment import Environment
+from alcs.helpers.metrics import Metric
 
 
 class Agent(metaclass=ABCMeta):
 
-    def __init__(self, environment: Environment):
+    def __init__(self):
+        self.metrics = defaultdict(list)
+        self.metrics_handlers = []
+
+    def add_metrics_handlers(self, metrics_handlers: list):
         """
-        Initialize the environment
-        :param environment: environment in which an animat is placed.
+        Add metrics that will be captured at the algorithm execution
+
+        :param metrics_handlers: list of metrics
         """
-        self.env = environment
+        self.metrics_handlers = metrics_handlers
+
+    def acquire_metrics(self, *args, **kwargs) -> None:
+        """
+        Function evaluates all handlers for calculating metrics
+        """
+        for handler in self.metrics_handlers:
+            if not isinstance(handler, Metric):
+                raise ValueError('Incorrect metric handler passed')
+
+            name, metric = handler.get(*args, **kwargs)
+
+            self.metrics[name].append(metric)
 
     @abstractmethod
-    def evaluate(self, generations, **kwargs) -> None:
+    def evaluate(self,
+                 environment: Environment,
+                 generations: int) -> None:
         """
         Evaluates selected algorithm.
 
-        :param generations: numer of generations
-        :param kwargs: additional arguments
+        :param environment: environment to operate on
+        :param generations: number of generations
         """
         raise NotImplementedError()
