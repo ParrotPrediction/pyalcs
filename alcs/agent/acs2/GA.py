@@ -8,20 +8,16 @@ from .ACS2Utils import get_general_perception, generate_random_int_number,\
 
 logger = logging.getLogger(__name__)
 
-# Genetic Generalization Mechanism
-
 
 def apply_ga(classifiers: list,
              action_set: list,
              time: int,
-             theta_ga: int = None,
-             x=None):
+             mutation_rate: float,
+             crossover_probability: float,
+             theta_ga: int = None):
 
     if theta_ga is None:
         theta_ga = c.THETA_GA
-
-    if x is None:
-        x = c.X
 
     if _should_fire(action_set, time, theta_ga):
         logger.debug("Applying GA module")
@@ -44,10 +40,10 @@ def apply_ga(classifiers: list,
             child1.exp = 1
             child2.exp = 1
 
-            _apply_ga_mutation(child1)
-            _apply_ga_mutation(child2)
+            _apply_ga_mutation(child1, mutation_rate)
+            _apply_ga_mutation(child2, mutation_rate)
 
-            if random() < x:
+            if random() < crossover_probability:
                 _apply_crossover(child1, child2)
 
                 child1.r = (parent1.r + parent2.r) / 2
@@ -106,7 +102,7 @@ def _select_offspring(action_set: list) -> Classifier:
             return cl
 
 
-def _apply_ga_mutation(cl: Classifier, mu: float = None) -> None:
+def _apply_ga_mutation(cl: Classifier, mu: float) -> None:
     """
     Looks for classifier condition elements (not generic), and tries to
     generify each one with probability mu
@@ -114,9 +110,6 @@ def _apply_ga_mutation(cl: Classifier, mu: float = None) -> None:
     :param cl: classifier to apply mutation on
     :param mu: mutation rate
     """
-    if mu is None:
-        mu = c.MU
-
     for i in range(len(cl.condition)):
         if cl.condition[i] != c.CLASSIFIER_WILDCARD:
             if random() < mu:

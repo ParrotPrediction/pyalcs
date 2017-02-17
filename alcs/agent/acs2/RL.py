@@ -9,8 +9,8 @@ logger = logging.getLogger(__name__)
 def apply_rl(match_set: list,
              action_set: list,
              reward: int,
-             beta: float,
-             gamma: float) -> None:
+             learning_rate: float,
+             discount_factor: float) -> None:
     """
     Updates classifiers reward and intermediate reward in the action set
     with given obtained reward following the idea of Q-learning.
@@ -23,16 +23,16 @@ def apply_rl(match_set: list,
     :param match_set: match set (list of classifiers)
     :param action_set: action set (list of classifiers), will be changed
     :param reward: intermediate reward obtained from the environment
-    :param beta: learning rate
-    :param gamma: discount factor
+    :param learning_rate:
+    :param discount_factor:
     """
     logger.debug("Applying RL module, distributing reward: [%d]", reward)
 
     max_p = _calculate_maximum_payoff(match_set)
 
     for cl in action_set:
-        cl.r += beta * (reward + gamma * max_p - cl.r)
-        cl.ir += beta * (reward - cl.ir)
+        cl.r += learning_rate * (reward + discount_factor * max_p - cl.r)
+        cl.ir += learning_rate * (reward - cl.ir)
         logger.debug(cl)
 
 

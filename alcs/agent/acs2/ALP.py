@@ -321,4 +321,3 @@ def _cover_triple(previous_perception: list,
     child.num = 1
 
     return child
-

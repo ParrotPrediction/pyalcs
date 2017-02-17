@@ -42,20 +42,6 @@ SPEC_ATT = 0.3
 # of a run.
 THETA_GA = 100
 
-# The 'crossover probability' [0-1] specifies the probability of applying
-# crossover in the conditions of the offspring when a GA is applied.
-# Default to 0.8. It seems to influence the process only slightly. No
-# problem was found so far in which crossover actually has a significant
-# effect.
-X = 0.8
-
-# The 'mutation rate' [0-1] specifies the probability of changing a specified
-# attribute in the conditions of an offspring to a #-symbol in a GA.
-# Default to 0.3. Lower values decrease the generalization pressure and
-# consequently decrease the speed of conversion in the population. Higher
-# values on the other hand can also decrease conversion because of the higher
-# amount of over-general classifiers.
-MU = 0.3
 
 # Number of children that will be inserted in the GA process
 IN_SIZE = 2

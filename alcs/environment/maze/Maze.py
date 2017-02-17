@@ -264,16 +264,16 @@ class Maze(Environment):
                (pos_x + 1, pos_y)
 
     def is_wall(self, pos_x, pos_y):
-        return self.matrix[pos_y][pos_x] == \
-               MazeMapping().mapping['wall']['value']
+        return (self.matrix[pos_y][pos_x] ==
+                MazeMapping().mapping['wall']['value'])
 
     def is_path(self, pos_x, pos_y):
-        return self.matrix[pos_y][pos_x] == \
-               MazeMapping().mapping['path']['value']
+        return (self.matrix[pos_y][pos_x] ==
+                MazeMapping().mapping['path']['value'])
 
     def is_reward(self, pos_x, pos_y):
-        return self.matrix[pos_y][pos_x] == \
-               MazeMapping().mapping['reward']['value']
+        return (self.matrix[pos_y][pos_x] ==
+                MazeMapping().mapping['reward']['value'])
 
     @staticmethod
     def not_wall(perceptron):
