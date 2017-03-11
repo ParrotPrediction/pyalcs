@@ -78,7 +78,7 @@ def _should_fire(action_set: list, time: int, theta_ga: int) -> bool:
     overall_tga = sum(cl.t_ga * cl.num for cl in action_set)
     overall_num = sum(cl.num for cl in action_set)
 
-    return (time - overall_tga) / overall_num > theta_ga
+    return time - overall_tga / overall_num > theta_ga
 
 
 def _select_offspring(action_set: list) -> Classifier:

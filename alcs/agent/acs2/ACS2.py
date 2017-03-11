@@ -52,13 +52,18 @@ class ACS2(Agent):
         self.mutation_rate = mu
         self.crossover_probability = x
 
-    def evaluate(self, environment: Environment, steps: int):
+    def evaluate(self,
+                 environment: Environment,
+                 steps: int,
+                 max_steps: int = None):
         """
         Evaluates ACS2 algorithm on given environment for certain number
         of generations
 
         :param environment: environment to operate on
         :param steps: number of generations to run
+        :param max_steps: maximum number of steps in trial (before resetting
+        the agent)
 
         :return: final classifier list and metrics
         """
@@ -66,7 +71,8 @@ class ACS2(Agent):
 
         classifiers = []
 
-        time = 0
+        step = 0
+        steps_in_trial = 0
         trial = 0
         perception = None
         action = None
@@ -80,23 +86,35 @@ class ACS2(Agent):
         # Get the animat initial perception
         perception = environment.get_animat_perception()
 
-        while time < steps:
+        while step < steps:
             logger.info('\n\nTrial/step [%d/%d]\t\t%s',
-                        trial, time, perception)
+                        trial, step, perception)
 
             finished = False
+
+            # Generate initial (general) classifiers if no classifier
+            # are in the population.
+            if len(classifiers) == 0:
+                classifiers = generate_initial_classifiers()
 
             # Reset the environment and put the animat randomly
             # inside the maze when he found the reward (next trial starts)
             if environment.animat_has_finished():
                 finished = True
                 trial += 1
+                steps_in_trial = 0
                 environment.insert_animat()
+                perception = environment.get_animat_perception()
+                previous_action_set = None
 
-            # Generate initial (general) classifiers if no classifier
-            # are in the population.
-            if len(classifiers) == 0:
-                classifiers = generate_initial_classifiers()
+            # If the animat will make more than `max_steps` in a single
+            # trial put animal randomly somewhere else.
+            if max_steps is not None and steps_in_trial == max_steps:
+                logger.debug('Max steps in trial reached')
+                steps_in_trial = 0
+                environment.insert_animat()
+                perception = environment.get_animat_perception()
+                previous_action_set = None
 
             # Select classifiers matching the perception
             match_set = generate_match_set(classifiers, perception)
@@ -107,7 +125,7 @@ class ACS2(Agent):
                             "action set")
                 apply_alp(classifiers,
                           action,
-                          time,
+                          step,
                           previous_action_set,
                           perception,
                           previous_perception,
@@ -119,7 +137,7 @@ class ACS2(Agent):
                          self.discount_factor)
                 apply_ga(classifiers,
                          previous_action_set,
-                         time,
+                         step,
                          self.mutation_rate,
                          self.crossover_probability)
 
@@ -133,7 +151,9 @@ class ACS2(Agent):
             reward = environment.execute_action(action)
 
             # Next time slot
-            time += 1
+            step += 1
+            steps_in_trial += 1
+
             previous_perception = perception
             perception = environment.get_animat_perception()
 
@@ -142,7 +162,7 @@ class ACS2(Agent):
                 logger.info("Move successful. Triggering learning modules")
                 apply_alp(classifiers,
                           action,
-                          time,
+                          step,
                           action_set,
                           perception,
                           previous_perception,
@@ -154,7 +174,7 @@ class ACS2(Agent):
                          self.discount_factor)
                 apply_ga(classifiers,
                          action_set,
-                         time,
+                         step,
                          self.mutation_rate,
                          self.crossover_probability)
 
@@ -162,7 +182,7 @@ class ACS2(Agent):
 
             # Define variables for collecting metrics
             self.acquire_metrics(
-                step=time,
+                step=step,
                 maze=environment,
                 classifiers=classifiers,
                 was_successful=finished

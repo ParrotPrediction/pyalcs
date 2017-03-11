@@ -17,7 +17,7 @@ from alcs.helpers.metrics import \
 logger = logging.getLogger(__name__)
 logging.basicConfig(
     format='[%(asctime)s] [%(levelname)s] [%(name)s]: %(message)s',
-    level=logging.WARN)
+    level=logging.DEBUG)
 
 
 if __name__ == '__main__':
@@ -39,7 +39,7 @@ if __name__ == '__main__':
     ])
 
     # Evaluate simulation
-    classifiers, metrics = agent.evaluate(env, 500)
+    classifiers, metrics = agent.evaluate(env, 500, 5)
 
     reliable = [c for c in classifiers if c.q > 0.9]
 
