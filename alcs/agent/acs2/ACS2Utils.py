@@ -1,6 +1,7 @@
 import logging
-from random import random, choice
+from random import random
 
+from alcs.strategies.ActionSelection import ActionSelection, BestAction
 from . import Classifier
 from . import Constants as c
 
@@ -10,7 +11,7 @@ logger = logging.getLogger(__name__)
 def get_general_perception(dont_care_symbol: str = None,
                            string_length: int = None) -> list:
     """
-    Generates a list of general (consisting of wildcards percetion string.
+    Generates a list of general (consisting of wildcards perception string.
     I.e. ['#', '#', '#']
 
     :param dont_care_symbol: don't care symbol
@@ -89,36 +90,24 @@ def generate_action_set(classifiers: list, action: int) -> list:
     return action_set
 
 
-def choose_action(classifiers: list, epsilon: float) -> int:
+def choose_action(classifiers: list,
+                  epsilon: float,
+                  strategy: ActionSelection) -> int:
     """
-    Use epsilon-greedy method for action selection. However, it is not clear
-    which action is actually the best to choose (since once situation-action
-    tuple is mostly represented by several distinct classifiers.
-
-    A random action is selected with epsilon probability. In the other case
-    the best classifier (with greatest fitness score).
+    Model exploration/exploitation mechanism. For exploration
+    phase a custom strategy is evaluated with given probability.
 
     :param classifiers: match set
-    :param epsilon: probability of returning random action
+    :param epsilon: probability of executing exploration path
+    :param strategy: custom strategy used for exploration
     :return: an integer representing an action
     """
     if random() < epsilon:
-        all_actions = [i for i in range(c.NUMBER_OF_POSSIBLE_ACTIONS)]
-        random_action = choice(all_actions)
-        logger.debug('Action chosen: [%d] (randomly)', random_action)
-        return random_action
+        # Exploration phase
+        return strategy.select_action(classifiers)
     else:
-        best_cl = classifiers[0]  # TODO: I would use `choice` here
-
-        for cl in classifiers:
-            if (cl.effect != get_general_perception() and
-                    cl.fitness() > best_cl.fitness()):
-                best_cl = cl
-
-        logger.debug('Action chosen: [%d] (%s)',
-                     best_cl.action, best_cl)
-
-        return best_cl.action
+        # Exploitation phase - take the best possible classifier
+        return BestAction().select_action(classifiers)
 
 
 def generate_random_int_number(max_value: int) -> int:
@@ -189,5 +178,5 @@ def remove_classifier(classifiers: list, classifier: Classifier) -> None:
     """
     for cl in classifiers:
         if cl == classifier:
-            logger.debug("Removing %s", cl)
+            logger.info("Removing %s", cl)
             classifiers.remove(cl)

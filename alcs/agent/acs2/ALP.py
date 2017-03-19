@@ -26,7 +26,7 @@ def apply_alp(classifiers: list,
     logger.debug('Applying ALP module')
     was_expected_case = 0
 
-    # ALP is delicate process. We need to make sure that adding and removing
+    # We need to make sure that adding and removing
     # classifiers from and to action set is not reconsidered in the current
     # loop.
     original_action_set = copy(action_set)
@@ -50,7 +50,7 @@ def apply_alp(classifiers: list,
                 remove_classifier(action_set, cl)
 
         if new_cl is not None:
-            new_cl.t_ga = time
+            new_cl.t = time
             _add_alp_classifier(new_cl,
                                 classifiers,
                                 action_set,
@@ -217,7 +217,7 @@ def _unexpected_case(cl: Classifier,
     logger.debug('Unexpected case')
 
     cl.q -= beta * cl.q
-    cl.set_mark(previous_perception)
+    cl.set_mark(previous_perception, perception)
 
     for i in range(len(perception)):
         if cl.effect[i] != c.CLASSIFIER_WILDCARD:
@@ -237,6 +237,7 @@ def _unexpected_case(cl: Classifier,
         cl.q = 0.5
 
     child.exp = 1
+    child.mark = Classifier.empty_mark() # TODO: added by me
 
     return child
 
@@ -267,7 +268,7 @@ def _add_alp_classifier(cl: Classifier,
     old_cl = None
 
     for cla in action_set:
-        if cla.is_subsumer(cl):
+        if cla.can_subsume(cl):
             if old_cl is None or cla.is_more_general(cl):
                 old_cl = cla
 

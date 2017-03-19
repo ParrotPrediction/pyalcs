@@ -38,21 +38,21 @@ class ClassifierTest(unittest.TestCase):
         c2.condition = ['#', '#', '#', '#']  # more general condition part
         c2.effect = ['#', '#', '1', '1']  # the same effect part
 
-        self.assertTrue(self.baseClassifier.is_subsumer(c2, -1, -1))
+        self.assertTrue(self.baseClassifier.can_subsume(c2, -1, -1))
 
     def test_should_not_subsume_another_less_general_classifier(self):
         c2 = Classifier()
         c2.condition = ['#', '1', '1', '#']  # less general part
         c2.effect = ['#', '#', '1', '1']  # the same effect part
 
-        self.assertFalse(self.baseClassifier.is_subsumer(c2, -1, -1))
+        self.assertFalse(self.baseClassifier.can_subsume(c2, -1, -1))
 
     def test_should_not_subsume_another_classifier_with_different_effect(self):
         c2 = Classifier()
         c2.condition = ['#', '1', '#', '#']
         c2.effect = ['#', '#', '#', '1']
 
-        self.assertFalse(self.baseClassifier.is_subsumer(c2, -1, -1))
+        self.assertFalse(self.baseClassifier.can_subsume(c2, -1, -1))
 
     def test_base_classifier_should_be_more_general(self):
         c2 = Classifier()
@@ -94,27 +94,22 @@ class ClassifierTest(unittest.TestCase):
         self.assertFalse(copied.condition is self.baseClassifier.condition)
 
     def test_should_set_mark_on_classifier(self):
+        previous_perception = ['1', '1', '2', '1']
         perception = ['1', '2', '1', '1']
-        self.baseClassifier.set_mark(perception)
 
-        self.assertTrue(len(self.baseClassifier.mark[0]) == 1)
-        self.assertTrue(len(self.baseClassifier.mark[1]) == 1)
-        self.assertTrue(len(self.baseClassifier.mark[2]) == 1)
-        self.assertTrue(len(self.baseClassifier.mark[3]) == 1)
+        self.baseClassifier.set_mark(previous_perception, perception)
 
-        perception = ['1', '1', '2', '1']
-        self.baseClassifier.set_mark(perception)
-
-        self.assertTrue(len(self.baseClassifier.mark[0]) == 1)
-        self.assertTrue(len(self.baseClassifier.mark[1]) == 2)
-        self.assertTrue(len(self.baseClassifier.mark[2]) == 2)
-        self.assertTrue(len(self.baseClassifier.mark[3]) == 1)
+        self.assertTrue(self.baseClassifier.mark[0] == set())
+        self.assertTrue(self.baseClassifier.mark[1] == {'2'})
+        self.assertTrue(self.baseClassifier.mark[2] == {'1'})
+        self.assertTrue(self.baseClassifier.mark[3] == {'1'})
 
     def test_should_identify_marked_classifier(self):
         self.assertFalse(Classifier.is_marked(self.baseClassifier.mark))
 
+        previous_perception = ['1', '1', '2', '1']
         perception = ['1', '1', '2', '1']
-        self.baseClassifier.set_mark(perception)
+        self.baseClassifier.set_mark(previous_perception, perception)
 
         self.assertTrue(Classifier.is_marked(self.baseClassifier.mark))
 

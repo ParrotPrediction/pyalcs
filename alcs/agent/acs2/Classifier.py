@@ -26,7 +26,7 @@ class Classifier(object):
 
         # The Mark - records the properties in which the classifier did
         # not work correctly before
-        self.mark = [set() for _ in range(c.CLASSIFIER_LENGTH)]
+        self.mark = Classifier.empty_mark()
 
         # Quality - measures the accuracy of the anticipations
         self.q = 0.5
@@ -66,11 +66,13 @@ class Classifier(object):
         return deepcopy(old_classifier)
 
     def __repr__(self):
-        return 'Classifier{{{}-{}-{} q:{:.2f}, r:{:.2f}}}'.format(
+        return 'Classifier{{{}-{}-{} q:{:.2f}, r:{:.2f}, ir:{:.2f}}}'.format(
             ''.join(map(str, self.condition)),
             self.action, ''.join(map(str, self.effect)),
             self.q,
-            self.r)
+            self.r,
+            self.ir
+        )
 
     def __eq__(self, other):
         """
@@ -106,7 +108,7 @@ class Classifier(object):
         specific = sum(1 for e in self.condition if e != c.CLASSIFIER_WILDCARD)
         return specific / c.CLASSIFIER_LENGTH
 
-    def is_subsumer(self, cl, theta_exp=None, theta_r=None):
+    def can_subsume(self, cl_tos, theta_exp=None, theta_r=None):
         """
         Subsume operation - capture another, similar but more
         general classifier.
@@ -116,14 +118,14 @@ class Classifier(object):
         part needs to be syntactically more general and the effect part
         needs to be identical
 
-        :param cl: classifier to subsume
+        :param cl_tos: classifier to subsume
         :param theta_exp: threshold of required classifier experience
         to subsume another classifier
         :param theta_r: threshold of required classifier quality to
         subsume another classifier
         :return: true if classifier cl is subsumed, false otherwise
         """
-        if not isinstance(cl, self.__class__):
+        if not isinstance(cl_tos, self.__class__):
             raise TypeError('Illegal type of classifier passed')
 
         if theta_exp is None:
@@ -143,11 +145,11 @@ class Classifier(object):
                 if self.condition[i] == c.CLASSIFIER_WILDCARD:
                     cp += 1
 
-                if cl.condition[i] == c.CLASSIFIER_WILDCARD:
+                if cl_tos.condition[i] == c.CLASSIFIER_WILDCARD:
                     cpt += 1
 
             if cp <= cpt:
-                if self.effect == cl.effect:
+                if self.effect == cl_tos.effect:
                     return True
 
         return False
@@ -177,14 +179,32 @@ class Classifier(object):
 
         return base_more_general
 
-    def set_mark(self, perception: list):
+    def set_mark(self, previous_perception: list, perception: list):
         """
-        Function sets classifier mark with obtained perception.
+        Function sets compares previous and current perception with
+        classifier anticipations and sets mark accordingly.
 
+        :param previous_perception: perception in previous trial
         :param perception: obtained perception
         """
-        for i in range(len(perception)):
-            self.mark[i].add(perception[i])
+        for i, (condition, anticipation, perception, previous_perception)\
+            in enumerate(zip(self.condition, self.effect, previous_perception,
+                             perception)):
+
+            # print("PP: [{}] => P: [{}] | E: [{}] ".format(previous_perception,
+            #                                               perception,
+            #                                               anticipation))
+
+            if previous_perception == perception:
+                # classifier predicted correctly
+                if anticipation == c.CLASSIFIER_WILDCARD:
+                    pass
+                else:
+                    # Effect part required a change
+                    self.mark[i].add(previous_perception)
+            else:
+                # classifier did not predict correctly
+                self.mark[i].add(previous_perception)
 
     @staticmethod
     def is_marked(mark: list) -> bool:
@@ -199,3 +219,10 @@ class Classifier(object):
                 return True
 
         return False
+
+    @staticmethod
+    def empty_mark():
+        """
+        Return a collection of empty marks
+        """
+        return [set() for _ in range(c.CLASSIFIER_LENGTH)]

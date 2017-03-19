@@ -1,5 +1,7 @@
 import logging
 from random import random
+from copy import deepcopy, copy
+
 
 from . import Classifier
 from . import Constants as c
@@ -19,10 +21,15 @@ def apply_ga(classifiers: list,
     if theta_ga is None:
         theta_ga = c.THETA_GA
 
-    if _should_fire(action_set, time, theta_ga):
+    # We need to make sure that adding and removing
+    # classifiers from and to action set is not reconsidered
+    # in the current loop.
+    original_action_set = copy(action_set)
+
+    if _should_fire(original_action_set, time, theta_ga):
         logger.debug("Applying GA module")
 
-        for cl in action_set:
+        for cl in original_action_set:
             cl.t_ga = time
 
             parent1 = _select_offspring(action_set)
@@ -39,6 +46,9 @@ def apply_ga(classifiers: list,
 
             child1.exp = 1
             child2.exp = 1
+
+            child1.mark = Classifier.empty_mark()
+            child2.mark = Classifier.empty_mark()
 
             _apply_ga_mutation(child1, mutation_rate)
             _apply_ga_mutation(child2, mutation_rate)
@@ -123,7 +133,7 @@ def _add_ga_classifier(classifiers: list,
     old_cl = None
 
     for c in action_set:
-        if c.is_subsumer(cl):
+        if c.can_subsume(cl):
             if old_cl is None or c.is_more_general(old_cl):
                 old_cl = c
 
@@ -183,9 +193,7 @@ def _delete_classifiers(classifiers: list,
     if theta_as is None:
         theta_as = c.THETA_AS
 
-    action_set_numerosity = sum(cl.num for cl in action_set)
-
-    while in_size + action_set_numerosity > theta_as:
+    while in_size + sum(cl.num for cl in action_set) > theta_as:
         cl_del = None
 
         for cl in classifiers:
@@ -210,8 +218,3 @@ def _delete_classifiers(classifiers: list,
             else:
                 remove_classifier(classifiers, cl)
                 remove_classifier(action_set, cl)
-
-        summation = 0
-
-        for classifier in action_set:
-            summation += classifier.num

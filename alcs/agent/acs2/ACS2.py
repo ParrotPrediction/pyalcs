@@ -2,6 +2,7 @@ import logging
 
 from alcs.agent.Agent import Agent
 from alcs.environment.Environment import Environment
+from alcs.strategies.ActionSelection import ActionSelection, Greedy
 from .ALP import apply_alp
 from .GA import apply_ga
 from .RL import apply_rl
@@ -13,11 +14,12 @@ logger = logging.getLogger(__name__)
 
 class ACS2(Agent):
     def __init__(self,
-                 epsilon: float = 0.4,
-                 beta: float = 0.2,
+                 epsilon: float = 0.5,
+                 beta: float = 0.05,
                  gamma: float = 0.95,
                  mu: float = 0.3,
-                 x: float = 0.8):
+                 x: float = 0.8,
+                 strategy: ActionSelection = Greedy()):
         """
         :param epsilon: The 'exploration probability' [0-1]. Specifies the
         probability of choosing a random action. The fastest model learning is
@@ -42,6 +44,7 @@ class ACS2(Agent):
         when a GA is applied. Default to 0.8. It seems to influence the
         process only slightly. No problem was found so far in which crossover
         actually has a significant effect.
+        :param strategy: Exploration strategy. Default - random action
         """
         super().__init__()
 
@@ -51,6 +54,7 @@ class ACS2(Agent):
         self.discount_factor = gamma
         self.mutation_rate = mu
         self.crossover_probability = x
+        self.exploration_strategy = strategy
 
     def evaluate(self,
                  environment: Environment,
@@ -121,7 +125,7 @@ class ACS2(Agent):
 
             # If not the beginning of the trial
             if previous_action_set is not None:  # time != 0
-                logger.info("Triggering learning modules on previous "
+                logger.debug("Triggering learning modules on previous "
                             "action set")
                 apply_alp(classifiers,
                           action,
@@ -144,7 +148,10 @@ class ACS2(Agent):
             # Remove previous action set
             previous_action_set = None
 
-            action = choose_action(match_set, self.exploration_probability)
+            action = choose_action(
+                match_set,
+                self.exploration_probability,
+                self.exploration_strategy)
             action_set = generate_action_set(match_set, action)
 
             # Execute action and obtain reward
@@ -153,6 +160,8 @@ class ACS2(Agent):
             # Next time slot
             step += 1
             steps_in_trial += 1
+
+            logger.debug("Next trial started...")
 
             previous_perception = perception
             perception = environment.get_animat_perception()
@@ -181,6 +190,7 @@ class ACS2(Agent):
             previous_action_set = action_set
 
             # Define variables for collecting metrics
+            logger.debug("Collecting metrics...")
             self.acquire_metrics(
                 step=step,
                 maze=environment,
