@@ -61,7 +61,7 @@ def perform_experiment(experiment):
     metrics['experiment_id'] = [experiment] * len(metrics['time'])
 
     # Print classifiers
-    reliable = [cls for cls in classifiers if cls.fitness() > 0.9]
+    reliable = [cls for cls in classifiers if cls.is_reliable()]
     for cls in reliable:
         print(cls)
 

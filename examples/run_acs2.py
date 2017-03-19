@@ -41,6 +41,6 @@ if __name__ == '__main__':
     # Evaluate simulation
     classifiers, metrics = agent.evaluate(env, 500, 5)
 
-    reliable = [c for c in classifiers if c.q > 0.9]
+    reliable = [c for c in classifiers if c.is_reliable()]
 
     print("Reliable classifiers: {}".format(len(reliable)))

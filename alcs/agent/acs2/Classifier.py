@@ -99,6 +99,12 @@ class Classifier(object):
     def fitness(self):
         return self.q * self.r
 
+    def is_reliable(self) -> bool:
+        """
+        Returns information whether a classifier can be considered as reliable
+        """
+        return self.q > c.THETA_R
+
     def get_condition_specificity(self) -> float:
         """
         Return information what percentage of condition elements are

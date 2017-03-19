@@ -87,7 +87,7 @@ class AchievedKnowledge(Metric):
         env = kwargs.get('maze')
         classifiers = kwargs.get('classifiers')
 
-        reliable_classifiers = [c for c in classifiers if c.q > 0.9]
+        reliable_classifiers = [c for c in classifiers if c.is_reliable()]
 
         # Filter classifiers for each possible action
         north_classifiers = [c for c in reliable_classifiers if c.action == 1]
