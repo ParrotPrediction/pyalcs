@@ -14,15 +14,15 @@ class ActionSelection(metaclass=ABCMeta):
         raise NotImplementedError
 
 
-class Greedy(ActionSelection):
+class Random(ActionSelection):
     """
-    Randomly selects an action from given classifiers.
+    Randomly selects an action.
     """
     def select_action(self, classifiers: list) -> int:
-        matchset_actions = {cl.action for cl in classifiers}
-        random_action = choice(list(matchset_actions))
+        possible_actions = {a for a in range(c.NUMBER_OF_POSSIBLE_ACTIONS)}
+        random_action = choice(list(possible_actions))
 
-        logger.debug('Action chosen: [%d] (greedy)', random_action)
+        logger.debug('Action chosen: [%d] (randomly)', random_action)
 
         return random_action
 

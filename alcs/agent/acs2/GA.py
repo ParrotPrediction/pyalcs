@@ -47,6 +47,7 @@ def apply_ga(classifiers: list,
             child1.exp = 1
             child2.exp = 1
 
+            # TODO: added by me
             child1.mark = Classifier.empty_mark()
             child2.mark = Classifier.empty_mark()
 

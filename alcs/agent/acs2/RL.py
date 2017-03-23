@@ -26,16 +26,17 @@ def apply_rl(match_set: list,
     :param learning_rate:
     :param discount_factor:
     """
-    logger.debug("Applying RL module, distributing reward: [%d]", reward)
+    logger.info("Applying RL module, distributing reward: [%d]", reward)
 
     max_p = _calculate_maximum_payoff(match_set)
 
     for cl in action_set:
         cl.r += learning_rate * (reward + discount_factor * max_p - cl.r)
         cl.ir += learning_rate * (reward - cl.ir)
-        logger.debug(cl)
+        logger.info("\t\t[RL] Classifier: %s", cl)
 
 
+# TODO: I'm not sure about this part
 def _calculate_maximum_payoff(match_set: list) -> float:
     """
     Calculate the maximum payoff predicted in the next time-step

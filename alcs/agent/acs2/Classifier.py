@@ -101,9 +101,17 @@ class Classifier(object):
 
     def is_reliable(self) -> bool:
         """
-        Returns information whether a classifier can be considered as reliable
+        Returns information whether a classifier
+        can be considered as reliable
         """
         return self.q > c.THETA_R
+
+    def is_inadequate(self) -> bool:
+        """
+        Returns information whether a classifier
+        can be considered as inadequate.
+        """
+        return self.q < c.THETA_I
 
     def get_condition_specificity(self) -> float:
         """

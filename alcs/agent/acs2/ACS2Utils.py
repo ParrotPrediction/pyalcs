@@ -1,7 +1,8 @@
 import logging
 from random import random
 
-from alcs.strategies.ActionSelection import ActionSelection, BestAction
+from alcs.strategies.ActionSelection import ActionSelection,\
+    BestAction, Random, KnowledgeArrayBias
 from . import Classifier
 from . import Constants as c
 
@@ -92,7 +93,8 @@ def generate_action_set(classifiers: list, action: int) -> list:
 
 def choose_action(classifiers: list,
                   epsilon: float,
-                  strategy: ActionSelection) -> int:
+                  strategy: ActionSelection = KnowledgeArrayBias(),
+                  pb: float = 0.5) -> int:
     """
     Model exploration/exploitation mechanism. For exploration
     phase a custom strategy is evaluated with given probability.
@@ -100,11 +102,16 @@ def choose_action(classifiers: list,
     :param classifiers: match set
     :param epsilon: probability of executing exploration path
     :param strategy: custom strategy used for exploration
+    :param pb: probability of biased exploration
     :return: an integer representing an action
     """
     if random() < epsilon:
         # Exploration phase
-        return strategy.select_action(classifiers)
+        if random() < pb:
+            # Custom exploration strategy
+            return strategy.select_action(classifiers)
+
+        return Random().select_action(classifiers)
     else:
         # Exploitation phase - take the best possible classifier
         return BestAction().select_action(classifiers)
@@ -141,7 +148,7 @@ def _does_match(classifier: Classifier, perception: list) -> bool:
     return True
 
 
-def does_anticipate_correctly(classifier: Classifier,
+def does_anticipate_correctly(cl: Classifier,
                               perception: list,
                               previous_perception: list) -> bool:
     """
@@ -152,17 +159,17 @@ def does_anticipate_correctly(classifier: Classifier,
     change to the anticipated but actually stayed at the value, the classifier
     anticipates incorrectly.
 
-    :param classifier: given classifier
+    :param cl: given classifier
     :param perception: current perception
     :param previous_perception: previous perception
     :return: True if classifier anticipates correctly, False otherwise
     """
     for i in range(c.CLASSIFIER_LENGTH):
-        if classifier.effect[i] == c.CLASSIFIER_WILDCARD:
+        if cl.effect[i] == c.CLASSIFIER_WILDCARD:
             if previous_perception[i] != perception[i]:
                 return False
         else:
-            if (classifier.effect[i] != perception[i] or
+            if (cl.effect[i] != perception[i] or
                     previous_perception[i] == perception[i]):
                 return False
 

@@ -2,7 +2,7 @@ import logging
 
 from alcs.agent.Agent import Agent
 from alcs.environment.Environment import Environment
-from alcs.strategies.ActionSelection import ActionSelection, Greedy
+from alcs.strategies.ActionSelection import ActionSelection, Random
 from .ALP import apply_alp
 from .GA import apply_ga
 from .RL import apply_rl
@@ -15,11 +15,11 @@ logger = logging.getLogger(__name__)
 class ACS2(Agent):
     def __init__(self,
                  epsilon: float = 0.5,
-                 beta: float = 0.05,
+                 beta: float = 0.2,
                  gamma: float = 0.95,
                  mu: float = 0.3,
                  x: float = 0.8,
-                 strategy: ActionSelection = Greedy()):
+                 strategy: ActionSelection = Random()):
         """
         :param epsilon: The 'exploration probability' [0-1]. Specifies the
         probability of choosing a random action. The fastest model learning is
@@ -125,8 +125,9 @@ class ACS2(Agent):
 
             # If not the beginning of the trial
             if previous_action_set is not None:  # time != 0
-                logger.debug("Triggering learning modules on previous "
-                            "action set")
+                logger.info("")
+                logger.info("== Triggering learning modules on previous "
+                            "action set ==")
                 apply_alp(classifiers,
                           action,
                           step,
@@ -155,7 +156,9 @@ class ACS2(Agent):
             action_set = generate_action_set(match_set, action)
 
             # Execute action and obtain reward
+            logger.info("")
             reward = environment.execute_action(action)
+            logger.info("Reward to distribute: %d", reward)
 
             # Next time slot
             step += 1
@@ -167,8 +170,10 @@ class ACS2(Agent):
             perception = environment.get_animat_perception()
 
             # If new state was introduced
-            if environment.move_was_successful():
-                logger.info("Move successful. Triggering learning modules")
+            if environment.animat_has_finished():
+                logger.info("")
+                logger.info("== Move successful."
+                            "Triggering learning modules ==")
                 apply_alp(classifiers,
                           action,
                           step,

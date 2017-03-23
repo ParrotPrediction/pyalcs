@@ -17,13 +17,8 @@ def apply_alp(classifiers: list,
               action_set: list,
               perception: list,
               previous_perception: list,
-              beta: float,
-              theta_i: float = None):
+              beta: float):
 
-    if theta_i is None:
-        theta_i = c.THETA_I
-
-    logger.debug('Applying ALP module')
     was_expected_case = 0
 
     # We need to make sure that adding and removing
@@ -32,6 +27,7 @@ def apply_alp(classifiers: list,
     original_action_set = copy(action_set)
 
     for cl in original_action_set:
+        logger.info("[ALP] Running for %s", cl)
         cl.exp += 1
         _update_application_average(cl, time, beta)
 
@@ -45,7 +41,7 @@ def apply_alp(classifiers: list,
                                       perception,
                                       previous_perception,
                                       beta)
-            if cl.q < theta_i:
+            if cl.is_inadequate():
                 remove_classifier(classifiers, cl)
                 remove_classifier(action_set, cl)
 
@@ -59,8 +55,9 @@ def apply_alp(classifiers: list,
     # If there wasn't any classifier in the action set that anticipated
     # correctly generate one with proper cover triple.
     if was_expected_case == 0:
-        logger.debug("No expected case in the action set, generating "
-                     "classifier by covering mechanism")
+        logger.info("\tNo classifier in the action set that"
+                    "anticipated correctly, generating using"
+                    "the covering mechanism")
         new_cl = _cover_triple(previous_perception,
                                perception,
                                action,
@@ -73,7 +70,7 @@ def _expected_case(cl: Classifier,
                    beta: float,
                    u_max: int = None) -> Classifier:
 
-    logger.debug('Expected case')
+    logger.info('\t\tExpected case occurred')
 
     if u_max is None:
         u_max = c.U_MAX
@@ -81,9 +78,11 @@ def _expected_case(cl: Classifier,
     diff = _get_differences(cl.mark, perception)
 
     if diff == get_general_perception():
+        logger.info("\t\t\tIncreasing quality")
         cl.q += beta * (1 - cl.q)
         return None
     else:
+        logger.info("\t\t\tGenerating new classifier")
         # Count number of non-# symbols in diff and condition part
         spec = _number_of_spec(cl.condition)
         spec_new = _number_of_spec(diff)
@@ -94,7 +93,7 @@ def _expected_case(cl: Classifier,
             _remove_random_spec_element(child.condition)
             spec -= 1
 
-            while spec + spec_new > u_max:
+            while (spec + spec_new) > u_max:
                 if spec > 0 and random() < 0.5:
                     _remove_random_spec_element(child.condition)
                     spec -= 1
@@ -102,7 +101,7 @@ def _expected_case(cl: Classifier,
                     _remove_random_spec_element(diff)
                     spec_new -= 1
         else:
-            while spec + spec_new > u_max:
+            while (spec + spec_new) > u_max:
                 _remove_random_spec_element(diff)
                 spec_new -= 1
 
@@ -111,8 +110,12 @@ def _expected_case(cl: Classifier,
         if child.q < 0.5:
             child.q = 0.5
 
+        # TODO: added by me
+        cl.mark = Classifier.empty_mark()
+
         child.exp = 1
 
+        logger.info("\t\t\tChild classifier: %s", child)
         return child
 
 
@@ -137,7 +140,7 @@ def _get_differences(mark: list, perception: list) -> list:
 
     if Classifier.is_marked(mark):
         type1 = 0  # counts when mark is different from perception
-        type2 = 0  # counts when mark is applied
+        type2 = 0  # counts when there are multiple marks in attribute
 
         for i in range(len(perception)):
             if perception[i] not in mark[i]:
@@ -214,7 +217,7 @@ def _unexpected_case(cl: Classifier,
     :return: a new specialized classifier or None
     """
 
-    logger.debug('Unexpected case')
+    logger.info('\t\tUnexpected case occurred')
 
     cl.q -= beta * cl.q
     cl.set_mark(previous_perception, perception)
@@ -237,8 +240,11 @@ def _unexpected_case(cl: Classifier,
         cl.q = 0.5
 
     child.exp = 1
-    child.mark = Classifier.empty_mark() # TODO: added by me
 
+    # TODO: added be me
+    child.mark = Classifier.empty_mark()
+
+    logger.info("\t\t\tChild classifier: %s", child)
     return child
 
 
@@ -265,6 +271,8 @@ def _add_alp_classifier(cl: Classifier,
                         action_set: list,
                         beta: float) -> None:
 
+    logger.info("\t\tTrying to insert %s", cl)
+
     old_cl = None
 
     for cla in action_set:
@@ -278,10 +286,11 @@ def _add_alp_classifier(cl: Classifier,
                 old_cl = cla
 
     if old_cl is None:
-        logger.debug("Adding classifier: %s", cl)
+        logger.info("\t\t\tNo more general classifier found - adding: %s", cl)
         classifiers.append(cl)
         action_set.append(cl)
     else:
+        logger.info("\t\t\tIncreasing existing classifiers quality: %s", old_cl)
         old_cl.q += beta * (1 - old_cl.q)
 
 
