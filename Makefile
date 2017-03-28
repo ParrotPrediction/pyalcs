@@ -1,5 +1,5 @@
 install_deps:
-	pip install pep8
+	pip install pep8 jupyter
 test:
 	python3 -m unittest -v tests
 pep8:
