@@ -43,9 +43,6 @@ SPEC_ATT = 0.3
 THETA_GA = 100
 
 
-# Number of children that will be inserted in the GA process
-IN_SIZE = 2
-
 # The 'action set size threshold' (natural number) specifies the maximum
 # number of classifiers in an action set which is controlled by the GA.
 # Default to 20. If it is set too low, the GA might cause the deletion

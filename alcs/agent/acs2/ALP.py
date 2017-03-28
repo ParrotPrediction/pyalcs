@@ -42,6 +42,7 @@ def apply_alp(classifiers: list,
                                       previous_perception,
                                       beta)
             if cl.is_inadequate():
+                logger.info("[ALP] Removing %s", cl)
                 remove_classifier(classifiers, cl)
                 remove_classifier(action_set, cl)
 

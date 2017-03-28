@@ -170,7 +170,7 @@ class ACS2(Agent):
             perception = environment.get_animat_perception()
 
             # If new state was introduced
-            if environment.animat_has_finished():
+            if environment.move_was_successful():
                 logger.info("")
                 logger.info("== Move successful."
                             "Triggering learning modules ==")

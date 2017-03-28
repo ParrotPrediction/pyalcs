@@ -185,5 +185,4 @@ def remove_classifier(classifiers: list, classifier: Classifier) -> None:
     """
     for cl in classifiers:
         if cl == classifier:
-            logger.info("Removing %s", cl)
             classifiers.remove(cl)

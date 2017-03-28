@@ -2,11 +2,13 @@ import logging
 from random import random
 from copy import deepcopy, copy
 
+from ...helpers.lcs_utils import unwind_micro_classifiers
 
 from . import Classifier
 from . import Constants as c
 from .ACS2Utils import get_general_perception, generate_random_int_number,\
     remove_classifier
+
 
 logger = logging.getLogger(__name__)
 
@@ -185,11 +187,21 @@ def _apply_crossover(cl1: Classifier, cl2: Classifier):
 
 def _delete_classifiers(classifiers: list,
                         action_set: list,
-                        in_size: int = None,
-                        theta_as: int = None):
+                        in_size: int = 2,
+                        theta_as: int = None) -> None:
+    """
+    Method applies a modified tournament selection process in which
+    classifiers with the significant lowest quality or those with
+    high specificity are deleted.
 
-    if in_size is None:
-        in_size = c.IN_SIZE
+    The tournament is held amongst micro-classifiers!
+
+    :param classifiers: population set of classifiers
+    :param action_set: set of classifiers
+    :param in_size: Number of children that will be inserted
+    into in GA process.
+    :param theta_as: action set size threshold
+    """
 
     if theta_as is None:
         theta_as = c.THETA_AS
@@ -197,17 +209,27 @@ def _delete_classifiers(classifiers: list,
     while in_size + sum(cl.num for cl in action_set) > theta_as:
         cl_del = None
 
-        for cl in classifiers:
+        micro_classifiers = unwind_micro_classifiers(action_set)
+
+        for cl in micro_classifiers:
             if random() < (1 / 3):
                 if cl_del is None:
                     cl_del = cl
                 else:
+                    # Check if new classifiers is much worse than previous
                     if cl.q - cl_del.q < -0.1:
                         cl_del = cl
+
+                    # If quality is similar
                     if abs(cl.q - cl_del.q) <= 0.1:
+
+                        # Marked classifiers are preferred more before unmarked
                         if (Classifier.is_marked(cl.mark) and
                                 not Classifier.is_marked(cl_del.mark)):
                             cl_del = cl
+
+                        # Least applied classifier is preferred among only
+                        # marked or only unmarked classifiers
                         elif (Classifier.is_marked(cl.mark) or
                                 not Classifier.is_marked(cl_del.mark)):
                             if cl.aav > cl_del.aav:
@@ -217,5 +239,6 @@ def _delete_classifiers(classifiers: list,
             if cl_del.num > 1:
                 cl_del.num -= 1
             else:
+                logger.info("[GA] Removing %s", cl)
                 remove_classifier(classifiers, cl)
                 remove_classifier(action_set, cl)

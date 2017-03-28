@@ -122,6 +122,20 @@ class Classifier(object):
         specific = sum(1 for e in self.condition if e != c.CLASSIFIER_WILDCARD)
         return specific / c.CLASSIFIER_LENGTH
 
+    def get_micro_classifiers(self) -> []:
+        """
+        Returns an array of self-contained micro-classifiers (according
+        to numerosity).
+
+        :return: array of classifiers
+        """
+        micros = []
+
+        for micro_cl in range(0, self.num):
+            micros.append(self)
+
+        return micros
+
     def can_subsume(self, cl_tos, theta_exp=None, theta_r=None):
         """
         Subsume operation - capture another, similar but more
