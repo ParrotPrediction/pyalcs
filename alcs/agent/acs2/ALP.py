@@ -291,7 +291,8 @@ def _add_alp_classifier(cl: Classifier,
         classifiers.append(cl)
         action_set.append(cl)
     else:
-        logger.info("\t\t\tIncreasing existing classifiers quality: %s", old_cl)
+        logger.info("\t\t\tIncreasing existing classifiers quality: %s",
+                    old_cl)
         old_cl.q += beta * (1 - old_cl.q)
 
 

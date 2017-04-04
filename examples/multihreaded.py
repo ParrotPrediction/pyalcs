@@ -26,7 +26,7 @@ logging.basicConfig(
 
 PROCESSES = 1
 EXPERIMENTS = 1
-STEPS = 100000  # 10
+STEPS = 1000  # 10
 MAX_STEPS_IN_TRIAL = None
 MAZE_LOCATION = 'mazes/MazeF2.maze'
 
@@ -61,7 +61,7 @@ def perform_experiment(experiment):
           .format(sum(1 for cl in classifiers
                       if Classifier.is_marked(cl.mark))))
     print("Achieved knowledge: {:.2f}%"
-          .format(metrics["achieved_knowledge"][-1]*100))
+          .format(metrics["achieved_knowledge"][-1] * 100))
 
     # Add information about the experiment into metrics
     metrics['experiment_id'] = [experiment] * len(metrics['time'])
@@ -95,4 +95,4 @@ if __name__ == '__main__':
 
     end = time.time()
 
-    print("\nTook {:.2f}s using {} processes".format(end-start, PROCESSES))
+    print("\nTook {:.2f}s using {} processes".format(end - start, PROCESSES))

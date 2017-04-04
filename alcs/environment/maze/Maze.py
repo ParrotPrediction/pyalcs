@@ -93,7 +93,7 @@ class Maze(Environment):
             self.animat_pos_y = starting_position[1]
 
             logger.info('Animat [(%d, %d)] placed into random initial cords',
-                         self.animat_pos_x, self.animat_pos_y)
+                        self.animat_pos_x, self.animat_pos_y)
 
     def get_animat_perception(self, pos_x=None, pos_y=None) -> Perception:
         """

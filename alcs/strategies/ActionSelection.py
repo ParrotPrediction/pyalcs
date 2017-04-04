@@ -38,7 +38,7 @@ class BestAction(ActionSelection):
 
         for cl in classifiers:
             if (cl.effect != get_general_perception() and
-                        cl.fitness() > best_cl.fitness()):
+                    cl.fitness() > best_cl.fitness()):
                 best_cl = cl
 
         action = best_cl.action

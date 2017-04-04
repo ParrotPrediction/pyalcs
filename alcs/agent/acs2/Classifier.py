@@ -215,13 +215,9 @@ class Classifier(object):
         :param previous_perception: perception in previous trial
         :param perception: obtained perception
         """
-        for i, (condition, anticipation, perception, previous_perception)\
+        for i, (condition, anticipation, perception, previous_perception) \
             in enumerate(zip(self.condition, self.effect, previous_perception,
                              perception)):
-
-            # print("PP: [{}] => P: [{}] | E: [{}] ".format(previous_perception,
-            #                                               perception,
-            #                                               anticipation))
 
             if previous_perception == perception:
                 # classifier predicted correctly
