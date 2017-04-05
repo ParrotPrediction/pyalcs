@@ -90,10 +90,10 @@ class AchievedKnowledge(Metric):
         reliable_classifiers = [c for c in classifiers if c.is_reliable()]
 
         # Filter classifiers for each possible action
-        north_classifiers = [c for c in reliable_classifiers if c.action == 1]
-        south_classifiers = [c for c in reliable_classifiers if c.action == 3]
-        west_classifiers = [c for c in reliable_classifiers if c.action == 0]
-        east_classifiers = [c for c in reliable_classifiers if c.action == 2]
+        n_classifiers = [c for c in reliable_classifiers if c.action == 0]
+        s_classifiers = [c for c in reliable_classifiers if c.action == 4]
+        w_classifiers = [c for c in reliable_classifiers if c.action == 6]
+        e_classifiers = [c for c in reliable_classifiers if c.action == 2]
 
         possible_moves = 0
         reliable_moves = 0
@@ -122,28 +122,28 @@ class AchievedKnowledge(Metric):
                 if destination[1] + 1 == start[1]:
                     if any(does_anticipate_correctly(cl, perception,
                                                      previous_perception)
-                           for cl in north_classifiers):
+                           for cl in n_classifiers):
                         reliable_moves += 1
 
                 # West transition (x+1)
                 if destination[0] + 1 == start[0]:
                     if any(does_anticipate_correctly(cl, perception,
                                                      previous_perception)
-                           for cl in west_classifiers):
+                           for cl in w_classifiers):
                         reliable_moves += 1
 
                 # East transition (x-1)
                 if destination[0] - 1 == start[0]:
                     if any(does_anticipate_correctly(cl, perception,
                                                      previous_perception)
-                           for cl in east_classifiers):
+                           for cl in e_classifiers):
                         reliable_moves += 1
 
                 # South transition (y-1)
                 if destination[1] - 1 == start[1]:
                     if any(does_anticipate_correctly(cl, perception,
                                                      previous_perception)
-                           for cl in south_classifiers):
+                           for cl in s_classifiers):
                         reliable_moves += 1
 
         return reliable_moves / possible_moves

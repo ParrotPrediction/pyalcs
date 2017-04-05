@@ -7,10 +7,14 @@ class MazeAction:
 
     def __init__(self):
         self.actions = {
-            'N': {'value': 1, 'symbol': '↑'},
-            'W': {'value': 2, 'symbol': '→'},
-            'S': {'value': 3, 'symbol': '↓'},
-            'E': {'value': 0, 'symbol': '←'},
+            'N': {'value': 0, 'symbol': '↑'},
+            'NE': {'value': 1, 'symbol': '↗'},
+            'E': {'value': 2, 'symbol': '→'},
+            'SE': {'value': 3, 'symbol': '↘'},
+            'S': {'value': 4, 'symbol': '↓'},
+            'SW': {'value': 5, 'symbol': '↙'},
+            'W': {'value': 6, 'symbol': '←'},
+            'NW': {'value': 7, 'symbol': '↖'},
         }
 
     def __getitem__(self, item):

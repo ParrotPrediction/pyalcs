@@ -28,7 +28,7 @@ class ACS2UtilsTest(unittest.TestCase):
         general_perception = [c.CLASSIFIER_WILDCARD] * c.CLASSIFIER_LENGTH
 
         initial_classifiers = generate_initial_classifiers()
-        self.assertEqual(4, len(initial_classifiers))
+        self.assertEqual(8, len(initial_classifiers))
 
         all_actions = MazeAction().get_all_values()
         available_actions = [cl.action for cl in initial_classifiers]

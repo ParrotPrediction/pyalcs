@@ -198,7 +198,17 @@ class Maze(Environment):
                 self.not_wall(perception.N) and
                 self._within_y_range()):
 
-            self.animat_pos_y += -1
+            self.animat_pos_y -= 1
+            self.animat_moved = True
+
+        if (action == 'NE' and
+                self.not_wall(perception.N) and
+                self.not_wall(perception.E) and
+                self._within_x_range() and
+                self._within_y_range()):
+
+            self.animat_pos_x += 1
+            self.animat_pos_y -= 1
             self.animat_moved = True
 
         if (action == "E" and
@@ -208,10 +218,30 @@ class Maze(Environment):
             self.animat_pos_x += 1
             self.animat_moved = True
 
+        if (action == 'SE' and
+                self.not_wall(perception.S) and
+                self.not_wall(perception.E) and
+                self._within_x_range() and
+                self._within_y_range()):
+
+            self.animat_pos_x += 1
+            self.animat_pos_y += 1
+            self.animat_moved = True
+
         if (action == "S" and
                 self.not_wall(perception.S) and
                 self._within_y_range()):
 
+            self.animat_pos_y += 1
+            self.animat_moved = True
+
+        if (action == 'SW' and
+                self.not_wall(perception.S) and
+                self.not_wall(perception.W) and
+                self._within_x_range() and
+                self._within_y_range()):
+
+            self.animat_pos_x -= 1
             self.animat_pos_y += 1
             self.animat_moved = True
 
@@ -220,6 +250,16 @@ class Maze(Environment):
                 self._within_x_range()):
 
             self.animat_pos_x -= 1
+            self.animat_moved = True
+
+        if (action == 'NW' and
+                self.not_wall(perception.N) and
+                self.not_wall(perception.W) and
+                self._within_x_range() and
+                self._within_y_range()):
+
+            self.animat_pos_x -= 1
+            self.animat_pos_y -= 1
             self.animat_moved = True
 
         if self.animat_moved:

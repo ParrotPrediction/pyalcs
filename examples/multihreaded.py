@@ -26,9 +26,9 @@ logging.basicConfig(
 
 PROCESSES = 1
 EXPERIMENTS = 1
-STEPS = 5000  # 10
+STEPS = 15000  # 10
 MAX_STEPS_IN_TRIAL = None
-MAZE_LOCATION = 'mazes/MazeF4.maze'
+MAZE_LOCATION = 'mazes/MazeF2.maze'
 
 
 def perform_experiment(experiment):
