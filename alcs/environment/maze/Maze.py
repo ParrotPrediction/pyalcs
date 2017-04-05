@@ -10,7 +10,8 @@ from . import MAZE_ACTIONS
 logger = logging.getLogger(__name__)
 
 # Default perception
-Perception = namedtuple('Perception', ['top', 'left', 'bottom', 'right'])
+Perception = namedtuple('Perception',
+                        ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'])
 
 
 class Maze(Environment):
@@ -114,27 +115,55 @@ class Maze(Environment):
         if not self._within_y_range(pos_y):
             raise ValueError('Y position not within allowed range')
 
+        # Position N
         if pos_y == 0:
-            top = None
+            n = None
         else:
-            top = self.matrix[pos_y - 1][pos_x]
+            n = self.matrix[pos_y - 1][pos_x]
 
-        if pos_x == 0:
-            left = None
+        # Position NE
+        if pos_x == self.max_x - 1 and pos_y == 0:
+            ne = None
         else:
-            left = self.matrix[pos_y][pos_x - 1]
+            ne = self.matrix[pos_y - 1][pos_x + 1]
 
-        if pos_y == self.max_y - 1:
-            bottom = None
-        else:
-            bottom = self.matrix[pos_y + 1][pos_x]
-
+        # Position E
         if pos_x == self.max_x - 1:
-            right = None
+            e = None
         else:
-            right = self.matrix[pos_y][pos_x + 1]
+            e = self.matrix[pos_y][pos_x + 1]
 
-        perception = Perception(top=top, left=left, bottom=bottom, right=right)
+        # Position SE
+        if pos_x == self.max_x - 1 and pos_y == self.max_y - 1:
+            se = None
+        else:
+            se = self.matrix[pos_y + 1][pos_x + 1]
+
+        # Position S
+        if pos_y == self.max_y - 1:
+            s = None
+        else:
+            s = self.matrix[pos_y + 1][pos_x]
+
+        # Position SW
+        if pos_x == 0 and pos_y == self.max_y - 1:
+            sw = None
+        else:
+            sw = self.matrix[pos_y + 1][pos_x - 1]
+
+        # Position W
+        if pos_x == 0:
+            w = None
+        else:
+            w = self.matrix[pos_y][pos_x - 1]
+
+        # Position NW
+        if pos_x == 0 and pos_y == 0:
+            nw = None
+        else:
+            nw = self.matrix[pos_y - 1][pos_x - 1]
+
+        perception = Perception(N=n, NE=ne, E=e, SE=se, S=s, SW=sw, W=w, NW=nw)
 
         logger.debug('Animat [(%d, %d)] perception: [%s]',
                      pos_x, pos_y, perception)
@@ -164,28 +193,28 @@ class Maze(Environment):
                      self.animat_pos_x, self.animat_pos_y, action)
 
         if (action == MAZE_ACTIONS['top'] and
-                self.not_wall(perception.top) and
+                self.not_wall(perception.N) and
                 self._within_y_range()):
 
             self.animat_pos_y += -1
             self.animat_moved = True
 
         if (action == MAZE_ACTIONS['left'] and
-                self.not_wall(perception.left) and
+                self.not_wall(perception.W) and
                 self._within_x_range()):
 
             self.animat_pos_x += -1
             self.animat_moved = True
 
         if (action == MAZE_ACTIONS['down'] and
-                self.not_wall(perception.bottom) and
+                self.not_wall(perception.S) and
                 self._within_y_range()):
 
             self.animat_pos_y += 1
             self.animat_moved = True
 
         if (action == MAZE_ACTIONS['right'] and
-                self.not_wall(perception.right) and
+                self.not_wall(perception.E) and
                 self._within_x_range()):
 
             self.animat_pos_x += 1

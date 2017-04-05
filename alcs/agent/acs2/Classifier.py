@@ -1,7 +1,7 @@
 from copy import deepcopy
 
 from . import Constants as c
-
+from alcs.environment.maze import MazeActionC
 
 class Classifier(object):
     """
@@ -66,9 +66,10 @@ class Classifier(object):
         return deepcopy(old_classifier)
 
     def __repr__(self):
-        return 'Classifier{{{}-{}-{} q:{:.2f}, r:{:.2f}, ir:{:.2f}}}'.format(
+        return 'Classifier{{{} {} {} q:{:.2f}, r:{:.2f}, ir:{:.2f}}}'.format(
             ''.join(map(str, self.condition)),
-            self.action, ''.join(map(str, self.effect)),
+            MazeActionC().find_symbol(self.action),
+            ''.join(map(str, self.effect)),
             self.q,
             self.r,
             self.ir

@@ -3,6 +3,7 @@ from random import random
 
 from alcs.strategies.ActionSelection import ActionSelection,\
     BestAction, Random, KnowledgeArrayBias
+from alcs.environment.maze import MazeActionC
 from . import Classifier
 from . import Constants as c
 
@@ -37,14 +38,11 @@ def generate_initial_classifiers(number_of_actions: int = None) -> list:
     to be generated
     :return: list of classifiers
     """
-    if number_of_actions is None:
-        number_of_actions = c.NUMBER_OF_POSSIBLE_ACTIONS
-
     initial_classifiers = []
 
-    for i in range(number_of_actions):
+    for action in MazeActionC().get_all_values():
         cl = Classifier()
-        cl.action = i
+        cl.action = action
         cl.t = 0
 
         initial_classifiers.append(cl)

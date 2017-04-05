@@ -4,7 +4,7 @@
 CLASSIFIER_WILDCARD = '#'
 
 # Length of condition and effect part of the classifier (perceptual string).
-CLASSIFIER_LENGTH = 4
+CLASSIFIER_LENGTH = 8
 
 # Defines a number of possible agents actions
 NUMBER_OF_POSSIBLE_ACTIONS = 4
