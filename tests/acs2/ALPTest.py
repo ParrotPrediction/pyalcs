@@ -78,15 +78,19 @@ class ALPTest(unittest.TestCase):
         self.assertEqual(1, new_cl.exp)
 
     def test_should_cover_triple(self):
-        previous_perception = ['1', '2', '1', '1']
-        perception = ['2', '2', '1', '1']
+        previous_perception = ['1', '2', '1', '1', '2', '1', '1', '1']
+        perception = ['2', '2', '1', '1', '2', '1', '2', '1']
         action = 1
         time = 99
 
         new_cl = _cover_triple(previous_perception, perception, action, time)
 
-        self.assertEqual(['1', '#', '#', '#'], new_cl.condition)
-        self.assertEqual(['2', '#', '#', '#'], new_cl.effect)
+        self.assertEqual(
+            ['1', '#', '#', '#', '#', '#', '1', '#'],
+            new_cl.condition)
+        self.assertEqual(
+            ['2', '#', '#', '#', '#', '#', '2', '#'],
+            new_cl.effect)
         self.assertEqual(action, new_cl.action)
         self.assertEqual(0, new_cl.exp)
         self.assertEqual(0, new_cl.r)

@@ -25,19 +25,18 @@ class ACS2UtilsTest(unittest.TestCase):
         )
 
     def test_should_generate_initial_classifier_set(self):
-        n_cls = 4  # Number of classifiers
-        general_perception = []
-        for i in range(n_cls):
-            general_perception.append(c.CLASSIFIER_WILDCARD)
+        general_perception = [c.CLASSIFIER_WILDCARD] * c.CLASSIFIER_LENGTH
 
-        initial_classifiers = generate_initial_classifiers(n_cls)
-        self.assertEqual(n_cls, len(initial_classifiers))
+        initial_classifiers = generate_initial_classifiers()
+        self.assertEqual(4, len(initial_classifiers))
 
-        for i in range(n_cls):
-            cls = initial_classifiers[i]
+        all_actions = MazeAction().get_all_values()
+        available_actions = [cl.action for cl in initial_classifiers]
+        self.assertListEqual(all_actions, available_actions)
+
+        for cls in initial_classifiers:
             self.assertListEqual(general_perception, cls.condition)
             self.assertListEqual(general_perception, cls.effect)
-            self.assertEqual(i, cls.action)
             self.assertEqual(0.5, cls.q)
             self.assertEqual(0, cls.r)
 
@@ -125,11 +124,12 @@ class ACS2UtilsTest(unittest.TestCase):
     def test_should_anticipate_correctly(self):
         cl = Classifier()
 
-        # In this case classifier should be ['#', '#', '#', '#],
+        # In this case classifier should be
+        # ['#', '#', '#', '#', '#', '#', '#', '#'],
         # because the perception values pass-through
-        previous_perception = ['1', '2', '1', '1']
-        perception = ['1', '2', '1', '1']
-        cl.effect = ['1', '#', '1', '1']
+        previous_perception = ['1', '2', '1', '1', '1', '1', '2', '1']
+        perception = ['1', '2', '1', '1', '1', '1', '1', '2']
+        cl.effect = ['1', '#', '1', '1', '#', '#', '#', '1']
 
         self.assertFalse(does_anticipate_correctly(cl,
                                                    perception,
@@ -137,9 +137,9 @@ class ACS2UtilsTest(unittest.TestCase):
 
         # In this case classifier wrongly predicts the effect of
         # the first input - '2' instead of '1'
-        previous_perception = ['1', '2', '1', '1']
-        perception = ['1', '2', '1', '1']
-        cl.effect = ['2', '#', '#', '#']
+        previous_perception = ['1', '2', '1', '1', '1', '1', '1', '2']
+        perception = ['1', '2', '1', '1', '1', '1', '1', '2']
+        cl.effect = ['2', '#', '#', '#', '#', '#', '#', '#']
 
         self.assertFalse(does_anticipate_correctly(cl,
                                                    perception,
@@ -147,18 +147,27 @@ class ACS2UtilsTest(unittest.TestCase):
 
         # In this case classifier says that all values are pass-through,
         # but that is not true
-        previous_perception = ['1', '2', '2', '1']
-        perception = ['1', '2', '1', '1']
-        cl.effect = ['#', '#', '#']
+        previous_perception = ['1', '2', '2', '1', '1', '1', '1', '2']
+        perception = ['1', '2', '1', '1', '1', '1', '1', '2']
+        cl.effect = ['#', '#', '#', '#', '#', '#', '#', '#']
 
         self.assertFalse(does_anticipate_correctly(cl,
                                                    perception,
                                                    previous_perception))
 
         # In this case the classifier anticipates correctly
-        previous_perception = ['1', '2', '1', '1']
-        perception = ['1', '2', '2', '1']
-        cl.effect = ['#', '#', '2', '#']
+        previous_perception = ['1', '2', '1', '1', '1', '1', '1', '2']
+        perception = ['1', '2', '2', '1', '1', '1', '1', '2']
+        cl.effect = ['#', '#', '2', '#', '#', '#', '#', '#']
+
+        self.assertTrue(does_anticipate_correctly(cl,
+                                                  perception,
+                                                  previous_perception))
+
+        # In this case the classifier anticipates correctly also
+        previous_perception = ['1', '2', '1', '1', '1', '1', '1', '2']
+        perception = ['1', '2', '2', '1', '1', '2', '1', '1']
+        cl.effect = ['#', '#', '2', '#', '#', '2', '#', '1']
 
         self.assertTrue(does_anticipate_correctly(cl,
                                                   perception,

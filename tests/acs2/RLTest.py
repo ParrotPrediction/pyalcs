@@ -8,17 +8,17 @@ class RLTest(unittest.TestCase):
 
     def setUp(self):
         self.cl1 = __class__._create_classifier(
-            ['1', '#', '1', '#'],
+            ['1', '#', '1', '#', '#', '#', '#', '#'],
             q=0.6, r=1, ir=2
         )
 
         self.cl2 = __class__._create_classifier(
-            ['1', '1', '1', '#'],
+            ['1', '1', '1', '#', '#', '#', '#', '#'],
             q=0.3, r=0.5, ir=0.8
         )
 
         self.cl3 = __class__._create_classifier(
-            ['#', '#', '#', '#'],
+            ['#', '#', '#', '#', '#', '#', '#', '#'],
             q=1, r=10, ir=0.4
         )
 

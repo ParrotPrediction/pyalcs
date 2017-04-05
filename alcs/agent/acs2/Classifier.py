@@ -1,7 +1,8 @@
 from copy import deepcopy
 
 from . import Constants as c
-from alcs.environment.maze import MazeActionC
+from alcs.environment.maze import MazeAction
+
 
 class Classifier(object):
     """
@@ -68,7 +69,7 @@ class Classifier(object):
     def __repr__(self):
         return 'Classifier{{{} {} {} q:{:.2f}, r:{:.2f}, ir:{:.2f}}}'.format(
             ''.join(map(str, self.condition)),
-            MazeActionC().find_symbol(self.action),
+            MazeAction().find_symbol(self.action),
             ''.join(map(str, self.effect)),
             self.q,
             self.r,
@@ -248,6 +249,6 @@ class Classifier(object):
     @staticmethod
     def empty_mark():
         """
-        Return a collection of empty marks
+        Returns a collection of empty marks
         """
         return [set() for _ in range(c.CLASSIFIER_LENGTH)]

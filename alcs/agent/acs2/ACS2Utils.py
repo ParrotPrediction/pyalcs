@@ -3,7 +3,7 @@ from random import random
 
 from alcs.strategies.ActionSelection import ActionSelection,\
     BestAction, Random, KnowledgeArrayBias
-from alcs.environment.maze import MazeActionC
+from alcs.environment.maze import MazeAction
 from . import Classifier
 from . import Constants as c
 
@@ -29,18 +29,16 @@ def get_general_perception(dont_care_symbol: str = None,
     return [dont_care_symbol] * string_length
 
 
-def generate_initial_classifiers(number_of_actions: int = None) -> list:
+def generate_initial_classifiers() -> list:
     """
     Generate a list of default, general classifiers for all
     possible actions.
 
-    :param number_of_actions: number of general classifiers
-    to be generated
     :return: list of classifiers
     """
     initial_classifiers = []
 
-    for action in MazeActionC().get_all_values():
+    for action in MazeAction().get_all_values():
         cl = Classifier()
         cl.action = action
         cl.t = 0

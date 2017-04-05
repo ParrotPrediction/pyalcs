@@ -1,4 +1,3 @@
 from .MazeMapping import MazeMapping
-from .MazeActionC import MazeActionC
-from .MazeAction import MAZE_ACTIONS
+from .MazeAction import MazeAction
 from .Maze import Maze

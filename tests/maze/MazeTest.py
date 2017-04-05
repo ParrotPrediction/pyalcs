@@ -1,6 +1,6 @@
 import unittest
 
-from alcs.environment.maze import MAZE_ACTIONS
+from alcs.environment.maze import MazeAction
 from alcs.environment.maze import Maze
 
 
@@ -8,6 +8,7 @@ class MazeTest(unittest.TestCase):
 
     def setUp(self):
         self.env = Maze('tests/maze/test1.maze')
+        self.MA = MazeAction()
 
     def test_should_load_maze_from_file(self):
         self.assertEqual(8, self.env.max_x)
@@ -24,7 +25,7 @@ class MazeTest(unittest.TestCase):
              None,  # NE
              self.env.mapping['wall']['value'],  # E
              self.env.mapping['reward']['value'],  # SE
-             self.env.mapping['wall']['value'],  #S
+             self.env.mapping['wall']['value'],  # S
              None,  # SW
              None,  # W
              None],  # NW
@@ -162,10 +163,14 @@ class MazeTest(unittest.TestCase):
     def test_should_insert_animat(self):
         self.env.insert_animat(4, 1)
         self.assertListEqual(
-            [self.env.mapping['wall']['value'],
-             self.env.mapping['path']['value'],
-             self.env.mapping['path']['value'],
-             self.env.mapping['path']['value']],
+            [self.env.mapping['wall']['value'],  # N
+             self.env.mapping['wall']['value'],  # NE
+             self.env.mapping['path']['value'],  # E
+             self.env.mapping['wall']['value'],  # SE
+             self.env.mapping['path']['value'],  # S
+             self.env.mapping['wall']['value'],  # SW
+             self.env.mapping['path']['value'],  # W
+             self.env.mapping['wall']['value']],  # NW
             list(self.env.get_animat_perception())
         )
 
@@ -190,14 +195,18 @@ class MazeTest(unittest.TestCase):
 
         # Check if perception is ok
         self.assertListEqual(
-            [self.env.mapping['path']['value'],
-             self.env.mapping['wall']['value'],
-             self.env.mapping['path']['value'],
-             self.env.mapping['wall']['value']],
+            [self.env.mapping['path']['value'],  # N
+             self.env.mapping['path']['value'],  # NE
+             self.env.mapping['wall']['value'],  # E
+             self.env.mapping['wall']['value'],  # SE
+             self.env.mapping['path']['value'],  # S
+             self.env.mapping['wall']['value'],  # SW
+             self.env.mapping['wall']['value'],  # W
+             self.env.mapping['path']['value']],  # NW
             list(self.env.get_animat_perception()))
 
         # Tell animat to go up (should be ok)
-        reward = self.env.execute_action(MAZE_ACTIONS['top'])
+        reward = self.env.execute_action(self.MA['N']['value'])
 
         # Validate if coordinates changed
         self.assertEqual(4, self.env.animat_pos_x)
@@ -205,10 +214,14 @@ class MazeTest(unittest.TestCase):
 
         # Check if perception also changed
         self.assertListEqual(
-            [self.env.mapping['wall']['value'],
-             self.env.mapping['path']['value'],
-             self.env.mapping['path']['value'],
-             self.env.mapping['path']['value']],
+            [self.env.mapping['wall']['value'],  # N
+             self.env.mapping['wall']['value'],  # NE
+             self.env.mapping['path']['value'],  # E
+             self.env.mapping['wall']['value'],  # SE
+             self.env.mapping['path']['value'],  # S
+             self.env.mapping['wall']['value'],  # SW
+             self.env.mapping['path']['value'],  # W
+             self.env.mapping['wall']['value']],  # NW
             list(self.env.get_animat_perception()))
 
         # Make sure that the searching state is correct
@@ -217,8 +230,8 @@ class MazeTest(unittest.TestCase):
         # Check if proper reward for visiting path was collected
         self.assertEqual(0, reward)
 
-        # Now try to enter the wall (action - TOP)
-        reward = self.env.execute_action(MAZE_ACTIONS['top'])
+        # Now try to enter the wall (action - north)
+        reward = self.env.execute_action(self.MA['N']['value'])
 
         # Validate if the coordinates did not changed
         self.assertEqual(4, self.env.animat_pos_x)
@@ -227,8 +240,8 @@ class MazeTest(unittest.TestCase):
         # Check if no reward was collected
         self.assertEqual(0, reward)
 
-        # Now let's go left (should be ok)
-        reward = self.env.execute_action(MAZE_ACTIONS['left'])
+        # Now let's go left / west (should be ok)
+        reward = self.env.execute_action(self.MA['W']['value'])
 
         # Validate if the coordinates changed
         self.assertEqual(3, self.env.animat_pos_x)
@@ -241,7 +254,7 @@ class MazeTest(unittest.TestCase):
         self.assertEqual(0, reward)
 
         # Go left for the second time (should be ok)
-        reward = self.env.execute_action(MAZE_ACTIONS['left'])
+        reward = self.env.execute_action(self.MA['W']['value'])
 
         # Validate if the coordinates changed
         self.assertEqual(2, self.env.animat_pos_x)
@@ -252,14 +265,18 @@ class MazeTest(unittest.TestCase):
 
         # Now the animat should see the final reward
         self.assertListEqual(
-            [self.env.mapping['wall']['value'],
-             self.env.mapping['reward']['value'],
-             self.env.mapping['wall']['value'],
-             self.env.mapping['path']['value']],
+            [self.env.mapping['wall']['value'],  # N
+             self.env.mapping['wall']['value'],  # NE
+             self.env.mapping['path']['value'],  # E
+             self.env.mapping['wall']['value'],  # SE
+             self.env.mapping['wall']['value'],  # S
+             self.env.mapping['wall']['value'],  # SW
+             self.env.mapping['reward']['value'],  # W
+             self.env.mapping['wall']['value']],  # NW
             list(self.env.get_animat_perception()))
 
         # Lets collect it by moving left for the third time (should be ok)
-        reward = self.env.execute_action(MAZE_ACTIONS['left'])
+        reward = self.env.execute_action(self.MA['W']['value'])
 
         # Validate if the coordinates changed
         self.assertEqual(1, self.env.animat_pos_x)
