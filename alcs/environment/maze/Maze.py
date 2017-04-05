@@ -6,6 +6,7 @@ from os.path import dirname, abspath, join
 from alcs.environment.Environment import Environment
 from . import MazeMapping
 from . import MAZE_ACTIONS
+from . import MazeActionC
 
 logger = logging.getLogger(__name__)
 
@@ -122,7 +123,7 @@ class Maze(Environment):
             n = self.matrix[pos_y - 1][pos_x]
 
         # Position NE
-        if pos_x == self.max_x - 1 and pos_y == 0:
+        if pos_x == self.max_x - 1 or pos_y == 0:
             ne = None
         else:
             ne = self.matrix[pos_y - 1][pos_x + 1]
@@ -134,19 +135,19 @@ class Maze(Environment):
             e = self.matrix[pos_y][pos_x + 1]
 
         # Position SE
-        if pos_x == self.max_x - 1 and pos_y == self.max_y - 1:
+        if pos_x == self.max_x - 1 or pos_y == self.max_y - 1:
             se = None
         else:
             se = self.matrix[pos_y + 1][pos_x + 1]
 
         # Position S
-        if pos_y == self.max_y - 1:
+        if pos_y == (self.max_y - 1):
             s = None
         else:
             s = self.matrix[pos_y + 1][pos_x]
 
         # Position SW
-        if pos_x == 0 and pos_y == self.max_y - 1:
+        if pos_x == 0 or pos_y == self.max_y - 1:
             sw = None
         else:
             sw = self.matrix[pos_y + 1][pos_x - 1]
@@ -158,7 +159,7 @@ class Maze(Environment):
             w = self.matrix[pos_y][pos_x - 1]
 
         # Position NW
-        if pos_x == 0 and pos_y == 0:
+        if pos_x == 0 or pos_y == 0:
             nw = None
         else:
             nw = self.matrix[pos_y - 1][pos_x - 1]
@@ -171,14 +172,14 @@ class Maze(Environment):
         return perception
 
     def execute_action(self,
-                       action: int,
+                       actionValue: int,
                        perception: Perception = None) -> int:
         """
         Orders animat to execute the action. The animat is not allowed
         to move into the wall. If animat didn't moved in this turn he receives
         no reward.
 
-        :param action: action to execute
+        :param actionValue: value of action to execute
         :param perception: optional perception to test. If not specified
         current animat perception is used
         :return: reward for new position
@@ -186,35 +187,37 @@ class Maze(Environment):
         if perception is None:
             perception = self.get_animat_perception()
 
+        action = MazeActionC().find_name(actionValue)
+
         reward = 0
         self.animat_found_reward = False
         self.animat_moved = False
         logger.debug('Animat [(%d, %d)] ordered to execute action: [%s]',
                      self.animat_pos_x, self.animat_pos_y, action)
 
-        if (action == MAZE_ACTIONS['top'] and
+        if (action == "N" and
                 self.not_wall(perception.N) and
                 self._within_y_range()):
 
             self.animat_pos_y += -1
             self.animat_moved = True
 
-        if (action == MAZE_ACTIONS['left'] and
-                self.not_wall(perception.W) and
+        if (action == "E" and
+                self.not_wall(perception.E) and
                 self._within_x_range()):
 
             self.animat_pos_x += -1
             self.animat_moved = True
 
-        if (action == MAZE_ACTIONS['down'] and
+        if (action == "S" and
                 self.not_wall(perception.S) and
                 self._within_y_range()):
 
             self.animat_pos_y += 1
             self.animat_moved = True
 
-        if (action == MAZE_ACTIONS['right'] and
-                self.not_wall(perception.E) and
+        if (action == "W" and
+                self.not_wall(perception.W) and
                 self._within_x_range()):
 
             self.animat_pos_x += 1

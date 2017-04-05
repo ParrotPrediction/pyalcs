@@ -20,65 +20,97 @@ class MazeTest(unittest.TestCase):
     def test_animat_perception(self):
         # Edge conditions
         self.assertListEqual(
-            [None,
-             None,
-             self.env.mapping['wall']['value'],
-             self.env.mapping['wall']['value']],
+            [None,  # N
+             None,  # NE
+             self.env.mapping['wall']['value'],  # E
+             self.env.mapping['reward']['value'],  # SE
+             self.env.mapping['wall']['value'],  #S
+             None,  # SW
+             None,  # W
+             None],  # NW
             list(self.env.get_animat_perception(0, 0))
         )
 
         self.assertListEqual(
-            [self.env.mapping['wall']['value'],
-             None,
-             self.env.mapping['wall']['value'],
-             self.env.mapping['wall']['value']],
+            [self.env.mapping['wall']['value'],  # N
+             self.env.mapping['wall']['value'],  # NE
+             self.env.mapping['wall']['value'],  # E
+             self.env.mapping['wall']['value'],  # SE
+             self.env.mapping['wall']['value'],  # S
+             None,  # SW
+             None,  # W
+             None],  # NW
             list(self.env.get_animat_perception(0, 3))
         )
 
         self.assertListEqual(
-            [self.env.mapping['wall']['value'],
-             None,
-             None,
-             self.env.mapping['wall']['value']],
+            [self.env.mapping['wall']['value'],  # N
+             self.env.mapping['wall']['value'],  # NE
+             self.env.mapping['wall']['value'],  # E
+             None,  # SE
+             None,  # S
+             None,  # SW
+             None,  # W
+             None],  # NW
             list(self.env.get_animat_perception(0, 7))
         )
 
         self.assertListEqual(
-            [None,
-             self.env.mapping['wall']['value'],
-             self.env.mapping['wall']['value'],
-             None],
+            [None,  # N
+             None,  # NE
+             None,  # E
+             None,  # SE
+             self.env.mapping['wall']['value'],  # S
+             self.env.mapping['wall']['value'],  # SW
+             self.env.mapping['wall']['value'],  # W
+             None],  # NW
             list(self.env.get_animat_perception(7, 0))
         )
 
         self.assertListEqual(
-            [self.env.mapping['path']['value'],
-             self.env.mapping['wall']['value'],
-             None,
-             self.env.mapping['wall']['value']],
+            [self.env.mapping['path']['value'],  # N
+             self.env.mapping['path']['value'],  # NE
+             self.env.mapping['wall']['value'],  # E
+             None,  # SE
+             None,  # S
+             None,  # SW
+             self.env.mapping['wall']['value'],  # W
+             self.env.mapping['path']['value']],  # NW
             list(self.env.get_animat_perception(4, 7))
         )
 
         # Good cases
         self.assertListEqual(
-            [self.env.mapping['path']['value'],
-             self.env.mapping['wall']['value'],
-             self.env.mapping['wall']['value'],
-             self.env.mapping['wall']['value']],
+            [self.env.mapping['path']['value'],  # N
+             self.env.mapping['path']['value'],  # NE
+             self.env.mapping['wall']['value'],  # E
+             self.env.mapping['path']['value'],  # SE
+             self.env.mapping['wall']['value'],  # S
+             self.env.mapping['wall']['value'],  # SW
+             self.env.mapping['wall']['value'],  # W
+             self.env.mapping['wall']['value']],  # NW
             list(self.env.get_animat_perception(2, 5)))
 
         self.assertListEqual(
-            [self.env.mapping['path']['value'],
-             self.env.mapping['path']['value'],
-             self.env.mapping['wall']['value'],
-             self.env.mapping['path']['value']],
+            [self.env.mapping['path']['value'],  # N
+             self.env.mapping['wall']['value'],  # NE
+             self.env.mapping['path']['value'],  # E
+             self.env.mapping['wall']['value'],  # SE
+             self.env.mapping['wall']['value'],  # S
+             self.env.mapping['wall']['value'],  # SW
+             self.env.mapping['path']['value'],  # W
+             self.env.mapping['wall']['value']],  # NW
             list(self.env.get_animat_perception(5, 6)))
 
         self.assertListEqual(
-            [self.env.mapping['wall']['value'],
-             self.env.mapping['path']['value'],
-             self.env.mapping['wall']['value'],
-             self.env.mapping['path']['value']],
+            [self.env.mapping['wall']['value'],  # N
+             self.env.mapping['path']['value'],  # NE
+             self.env.mapping['path']['value'],  # E
+             self.env.mapping['wall']['value'],  # SE
+             self.env.mapping['wall']['value'],  # S
+             self.env.mapping['path']['value'],  # SW
+             self.env.mapping['path']['value'],  # W
+             self.env.mapping['wall']['value']],  # NW
             list(self.env.get_animat_perception(3, 4)))
 
         # Wrong input values

@@ -22,13 +22,13 @@ from alcs.helpers.metrics import \
 logger = logging.getLogger(__name__)
 logging.basicConfig(
     format='[%(asctime)s] [%(levelname)s] [%(threadName)s]: %(message)s',
-    level=logging.WARN)
+    level=logging.INFO)
 
 PROCESSES = 1
 EXPERIMENTS = 1
-STEPS = 1000  # 10
+STEPS = 50  # 10
 MAX_STEPS_IN_TRIAL = None
-MAZE_LOCATION = 'mazes/MazeF2.maze'
+MAZE_LOCATION = 'mazes/MazeF4.maze'
 
 
 def perform_experiment(experiment):
