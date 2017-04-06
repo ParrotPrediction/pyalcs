@@ -1,3 +1,3 @@
-from tests.maze.MazeActionTest import MazeActionTest
-from tests.maze.MazeMappingTest import MazeMappingTest
-from tests.maze.MazeTest import MazeTest
+from .MazeActionTest import MazeActionTest
+from .MazeMappingTest import MazeMappingTest
+from .MazeTest import MazeTest

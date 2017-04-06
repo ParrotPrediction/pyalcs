@@ -33,7 +33,7 @@ class LCSUtilsTest(unittest.TestCase):
 
         micro_classifiers = unwind_micro_classifiers(macro_classifiers)
 
-        self.assertEquals(4, len(micro_classifiers))
+        self.assertEqual(4, len(micro_classifiers))
 
     @staticmethod
     def _create_classifier(num: int):
