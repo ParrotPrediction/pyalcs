@@ -309,12 +309,12 @@ class Maze(Environment):
 
         return reward
 
-    def get_possible_agent_insertion_coordinates(self):
+    def get_possible_agent_insertion_coordinates(self) -> list:
         """
         Returns a list with coordinates in the environment where
         an agent can be placed (only on the path).
 
-        :return: list of tuples containing coordinates
+        :return: list of tuples (X,Y) containing coordinates
         """
         possible_cords = []
         for x in range(0, self.max_x):
@@ -325,14 +325,21 @@ class Maze(Environment):
         return possible_cords
 
     @staticmethod
-    def get_possible_neighbour_cords(pos_x, pos_y):
+    def get_possible_neighbour_cords(pos_x, pos_y) -> list:
         """
-        Returns coordinates for N, W, S, E cells
+        Returns list of tuples with coordinates for
+        N, NE, E, SE, S, SW, W, NW neighbouring cells.
         """
-        return (pos_x, pos_y - 1),\
-               (pos_x - 1, pos_y),\
-               (pos_x, pos_y + 1),\
-               (pos_x + 1, pos_y)
+        n = (pos_x, pos_y - 1)
+        ne = (pos_x + 1, pos_y - 1)
+        e = (pos_x + 1, pos_y)
+        se = (pos_x + 1, pos_y + 1)
+        s = (pos_x, pos_y + 1)
+        sw = (pos_x - 1, pos_y + 1)
+        w = (pos_x - 1, pos_y)
+        nw = (pos_x - 1, pos_y - 1)
+
+        return n, ne, e, se, s, sw, w, nw
 
     def is_wall(self, pos_x, pos_y):
         return (self.matrix[pos_y][pos_x] ==
@@ -349,6 +356,42 @@ class Maze(Environment):
     @staticmethod
     def not_wall(perceptron):
         return perceptron != MazeMapping().mapping['wall']['value']
+
+    @staticmethod
+    def moved_north(start, destination) -> bool:
+        """
+        :param start: start (X, Y) coordinates tuple
+        :param destination: destination (X, Y) coordinates tuple
+        :return: true if it was north move
+        """
+        return destination[1] + 1 == start[1]
+
+    @staticmethod
+    def moved_east(start, destination) -> bool:
+        """
+        :param start: start (X, Y) coordinates tuple
+        :param destination: destination (X, Y) coordinates tuple
+        :return: true if it was east move
+        """
+        return destination[0] - 1 == start[0]
+
+    @staticmethod
+    def moved_south(start, destination) -> bool:
+        """
+        :param start: start (X, Y) coordinates tuple
+        :param destination: destination (X, Y) coordinates tuple
+        :return: true if it was south move
+        """
+        return destination[1] - 1 == start[1]
+
+    @staticmethod
+    def moved_west(start, destination) -> bool:
+        """
+        :param start: start (X, Y) coordinates tuple
+        :param destination: destination (X, Y) coordinates tuple
+        :return: true if it was west move
+        """
+        return destination[0] + 1 == start[0]
 
     def _within_x_range(self, pos_x=None):
         if pos_x is None:

@@ -288,6 +288,32 @@ class MazeTest(unittest.TestCase):
         # Check if proper reward for finding reward was collected
         self.assertEqual(1000, reward)
 
-    @unittest.skip("TODO")
-    def test_should_calculate_reward(self):
-        pass
+    def test_should_get_all_possible_insertion_coordinates(self):
+        insertion_points = self.env.get_possible_agent_insertion_coordinates()
+        self.assertEqual(16, len(insertion_points))
+
+        # Check some paths randomly
+        self.assertIn((2, 1), insertion_points)
+
+        # These points are not "insertable"
+        self.assertNotIn((1, 1), insertion_points)  # reward
+        self.assertNotIn((2, 3), insertion_points)  # wall
+
+    def test_should_return_neighbours_coordinates(self):
+        neighbours = Maze.get_possible_neighbour_cords(5, 5)
+
+        self.assertEqual(8, len(neighbours))
+        self.assertEqual((5, 4), neighbours[0])  # N
+        self.assertEqual((6, 4), neighbours[1])  # NE
+        self.assertEqual((6, 5), neighbours[2])  # E
+        self.assertEqual((6, 6), neighbours[3])  # SE
+        self.assertEqual((5, 6), neighbours[4])  # S
+        self.assertEqual((4, 6), neighbours[5])  # SW
+        self.assertEqual((4, 5), neighbours[6])  # W
+        self.assertEqual((4, 4), neighbours[7])  # NW
+
+    def test_should_detect_movement_directions(self):
+        self.assertTrue(Maze.moved_north((5, 5), (5, 4)))
+        self.assertTrue(Maze.moved_east((5, 5), (6, 5)))
+        self.assertTrue(Maze.moved_south((5, 5), (5, 6)))
+        self.assertTrue(Maze.moved_west((5, 5), (4, 5)))

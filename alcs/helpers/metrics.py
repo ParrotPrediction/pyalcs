@@ -2,6 +2,7 @@ from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 
 from alcs.agent.acs2.ACS2Utils import does_anticipate_correctly
+from alcs.environment.maze import Maze
 
 
 class Metric(metaclass=ABCMeta):
@@ -91,9 +92,13 @@ class AchievedKnowledge(Metric):
 
         # Filter classifiers for each possible action
         n_classifiers = [c for c in reliable_classifiers if c.action == 0]
-        s_classifiers = [c for c in reliable_classifiers if c.action == 4]
-        w_classifiers = [c for c in reliable_classifiers if c.action == 6]
+        ne_classifiers = [c for c in reliable_classifiers if c.action == 1]
         e_classifiers = [c for c in reliable_classifiers if c.action == 2]
+        se_classifiers = [c for c in reliable_classifiers if c.action == 3]
+        s_classifiers = [c for c in reliable_classifiers if c.action == 4]
+        sw_classifiers = [c for c in reliable_classifiers if c.action == 5]
+        w_classifiers = [c for c in reliable_classifiers if c.action == 6]
+        nw_classifiers = [c for c in reliable_classifiers if c.action == 7]
 
         possible_moves = 0
         reliable_moves = 0
@@ -118,32 +123,64 @@ class AchievedKnowledge(Metric):
                 perception = env.get_animat_perception(destination[0],
                                                        destination[1])
 
-                # North transition (y+1)
-                if destination[1] + 1 == start[1]:
+                # North transition
+                if Maze.moved_north(start, destination):
                     if any(does_anticipate_correctly(cl, perception,
                                                      previous_perception)
                            for cl in n_classifiers):
                         reliable_moves += 1
 
-                # West transition (x+1)
-                if destination[0] + 1 == start[0]:
+                # North-East transition
+                if Maze.moved_north(start, destination) \
+                        and Maze.moved_east(start, destination):
                     if any(does_anticipate_correctly(cl, perception,
                                                      previous_perception)
-                           for cl in w_classifiers):
+                           for cl in ne_classifiers):
                         reliable_moves += 1
 
-                # East transition (x-1)
-                if destination[0] - 1 == start[0]:
+                # East transition
+                if Maze.moved_east(start, destination):
                     if any(does_anticipate_correctly(cl, perception,
                                                      previous_perception)
                            for cl in e_classifiers):
                         reliable_moves += 1
 
-                # South transition (y-1)
-                if destination[1] - 1 == start[1]:
+                # South-East transition
+                if Maze.moved_south(start, destination) \
+                        and Maze.moved_east(start, destination):
+                    if any(does_anticipate_correctly(cl, perception,
+                                                     previous_perception)
+                           for cl in se_classifiers):
+                        reliable_moves += 1
+
+                # South transition
+                if Maze.moved_south(start, destination):
                     if any(does_anticipate_correctly(cl, perception,
                                                      previous_perception)
                            for cl in s_classifiers):
+                        reliable_moves += 1
+
+                # South-West transition
+                if Maze.moved_south(start, destination) \
+                        and Maze.moved_west(start, destination):
+                    if any(does_anticipate_correctly(cl, perception,
+                                                     previous_perception)
+                           for cl in sw_classifiers):
+                        reliable_moves += 1
+
+                # West transition
+                if Maze.moved_west(start, destination):
+                    if any(does_anticipate_correctly(cl, perception,
+                                                     previous_perception)
+                           for cl in w_classifiers):
+                        reliable_moves += 1
+
+                # North-West transition
+                if Maze.moved_north(start, destination) \
+                        and Maze.moved_west(start, destination):
+                    if any(does_anticipate_correctly(cl, perception,
+                                                     previous_perception)
+                           for cl in nw_classifiers):
                         reliable_moves += 1
 
         return reliable_moves / possible_moves

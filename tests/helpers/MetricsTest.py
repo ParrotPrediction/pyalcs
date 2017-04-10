@@ -1,7 +1,10 @@
 import unittest
 
 from alcs.agent.acs2 import Classifier
-from alcs.helpers.metrics import ActualStep, ClassifierPopulationSize
+from alcs.environment.maze import Maze
+from alcs.helpers.metrics import ActualStep, \
+    ClassifierPopulationSize, \
+    AchievedKnowledge
 
 
 class MetricsTest(unittest.TestCase):
@@ -28,3 +31,9 @@ class MetricsTest(unittest.TestCase):
         res = metric_handler.get(classifiers=classifiers)
 
         self.assertEqual(("classifier_population_size", 2), res)
+
+    def test_should_calculate_knowledge(self):
+        maze = Maze('tests/maze/test1.maze')
+
+        metric_handler = AchievedKnowledge("achieved_knowledge")
+        res = metric_handler.get(classifiers=[], maze=maze)

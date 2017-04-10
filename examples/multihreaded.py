@@ -26,7 +26,7 @@ logging.basicConfig(
 
 PROCESSES = 1
 EXPERIMENTS = 1
-STEPS = 15000  # 10
+STEPS = 50000  # 10
 MAX_STEPS_IN_TRIAL = None
 MAZE_LOCATION = 'mazes/MazeF2.maze'
 
