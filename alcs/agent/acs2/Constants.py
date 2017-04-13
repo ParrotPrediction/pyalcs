@@ -18,7 +18,7 @@ THETA_EXP = 20
 # The 'reliability threshold' [0-1] specifies then a classifier is regarded
 # as reliable determined by q. The higher the value is set, the longer it
 # takes to form a complete model but the more reliable the model actually is.
-THETA_R = 0.85
+THETA_R = 0.9
 
 # The 'inadequacy threshold' [0-1]  specifies when a classifier is regarded
 # as inadequate (and later removed) determined by its quality q.
