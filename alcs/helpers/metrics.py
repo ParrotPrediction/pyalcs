@@ -50,7 +50,17 @@ class ClassifierPopulationSize(Metric):
 
     def calculate(self, *args, **kwargs):
         classifiers = kwargs.get('classifiers')
-        return len(classifiers)
+        return sum(cl.num for cl in classifiers)
+
+
+class ReliableClassifierPopulationSize(Metric):
+    def requirements(self):
+        return ['classifiers']
+
+    def calculate(self, *args, **kwargs):
+        classifiers = kwargs.get('classifiers')
+        reliable = [cls for cls in classifiers if cls.is_reliable()]
+        return sum(cl.num for cl in reliable)
 
 
 class AveragedFitnessScore(Metric):

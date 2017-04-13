@@ -13,6 +13,7 @@ from alcs.environment.maze import Maze
 from alcs.helpers.metrics import \
     ActualStep,\
     ClassifierPopulationSize,\
+    ReliableClassifierPopulationSize,\
     AveragedFitnessScore,\
     SuccessfulTrial,\
     AveragedConditionSpecificity,\
@@ -25,7 +26,7 @@ logging.basicConfig(
 
 PROCESSES = 1
 EXPERIMENTS = 1
-STEPS = 10000  # 10
+STEPS = 1000  # 10
 MAZE_LOCATION = 'mazes/MazeF2.maze'
 
 
@@ -38,6 +39,7 @@ def perform_experiment(experiment):
         ActualStep('time'),
         SuccessfulTrial('found_reward'),
         ClassifierPopulationSize('total_classifiers'),
+        ReliableClassifierPopulationSize('reliable_classifiers'),
         AveragedFitnessScore('average_fitness'),
         AveragedConditionSpecificity('average_specificity'),
         AchievedKnowledge('achieved_knowledge')
