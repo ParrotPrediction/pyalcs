@@ -1,8 +1,8 @@
 import logging
-from random import random
+from random import random, choice
 
 from alcs.strategies.ActionSelection import ActionSelection,\
-    BestAction, Random, KnowledgeArrayBias
+    BestAction, Random, KnowledgeArrayBias, ActionDelayBias
 from alcs.environment.maze import MazeAction
 from . import Classifier
 from . import Constants as c
@@ -89,7 +89,6 @@ def generate_action_set(classifiers: list, action: int) -> list:
 
 def choose_action(classifiers: list,
                   epsilon: float,
-                  strategy: ActionSelection = KnowledgeArrayBias(),
                   pb: float = 0.5) -> int:
     """
     Model exploration/exploitation mechanism. For exploration
@@ -97,14 +96,18 @@ def choose_action(classifiers: list,
 
     :param classifiers: match set
     :param epsilon: probability of executing exploration path
-    :param strategy: custom strategy used for exploration
     :param pb: probability of biased exploration
     :return: an integer representing an action
     """
     if random() < epsilon:
         # Exploration phase
         if random() < pb:
-            # Custom exploration strategy
+            exploration_strategies = [
+                ActionDelayBias(),
+                KnowledgeArrayBias()
+            ]
+
+            strategy = choice(exploration_strategies)
             return strategy.select_action(classifiers)
 
         return Random().select_action(classifiers)

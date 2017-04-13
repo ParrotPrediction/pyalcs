@@ -9,7 +9,6 @@ from os.path import abspath, join, dirname
 sys.path.insert(0, abspath(join(dirname(__file__), '..')))
 
 from alcs.agent.acs2 import ACS2, Classifier
-from alcs.strategies.ActionSelection import KnowledgeArrayBias
 from alcs.environment.maze import Maze
 from alcs.helpers.metrics import \
     ActualStep,\
@@ -34,9 +33,7 @@ MAZE_LOCATION = 'mazes/MazeF2.maze'
 def perform_experiment(experiment):
     print('Performing experiment [{}]'.format(experiment))
 
-    agent = ACS2(
-        strategy=KnowledgeArrayBias()
-    )
+    agent = ACS2()
 
     agent.add_metrics_handlers([
         ActualStep('time'),

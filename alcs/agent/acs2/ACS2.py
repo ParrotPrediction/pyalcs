@@ -44,7 +44,6 @@ class ACS2(Agent):
         when a GA is applied. Default to 0.8. It seems to influence the
         process only slightly. No problem was found so far in which crossover
         actually has a significant effect.
-        :param strategy: Exploration strategy. Default - random action
         """
         super().__init__()
 
@@ -54,7 +53,6 @@ class ACS2(Agent):
         self.discount_factor = gamma
         self.mutation_rate = mu
         self.crossover_probability = x
-        self.exploration_strategy = strategy
 
     def evaluate(self,
                  environment: Environment,
@@ -149,10 +147,7 @@ class ACS2(Agent):
             # Remove previous action set
             previous_action_set = None
 
-            action = choose_action(
-                match_set,
-                self.exploration_probability,
-                self.exploration_strategy)
+            action = choose_action(match_set, self.exploration_probability)
             action_set = generate_action_set(match_set, action)
 
             # Execute action and obtain reward
