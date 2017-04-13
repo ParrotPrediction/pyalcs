@@ -1,6 +1,5 @@
 import logging
 import random
-from collections import defaultdict
 from collections import namedtuple
 from os.path import dirname, abspath, join
 
@@ -24,7 +23,6 @@ class Maze(Environment):
         # Animat settings
         self.animat_pos_x = None
         self.animat_pos_y = None
-        self.animat_found_reward = False
         self.animat_moved = False
 
         self.max_x, self.max_y, self.matrix = None, None, None
@@ -38,7 +36,7 @@ class Maze(Environment):
         """
         return self.animat_moved
 
-    def animat_has_finished(self) -> bool:
+    def trial_finished(self) -> bool:
         """
         Gives information whether an animat is still searching the reward.
 
@@ -73,6 +71,8 @@ class Maze(Environment):
             self.max_x, self.max_y, self.matrix = max_x, max_y, matrix
 
     def insert_animat(self, pos_x: int = None, pos_y: int = None) -> None:
+        self.animat_found_reward = False
+
         if pos_x is not None and pos_y is not None:
             if (not self._within_x_range(pos_x) or
                     not self._within_y_range(pos_y)):

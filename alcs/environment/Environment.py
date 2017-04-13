@@ -19,7 +19,7 @@ class Environment(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def animat_has_finished(self) -> bool:
+    def trial_finished(self) -> bool:
         """
         Returns information whether an animat has accomplished his task.
         Based on this the environment might get reloaded.

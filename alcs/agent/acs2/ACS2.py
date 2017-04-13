@@ -54,149 +54,112 @@ class ACS2(Agent):
         self.mutation_rate = mu
         self.crossover_probability = x
 
-    def evaluate(self,
-                 environment: Environment,
-                 steps: int,
-                 max_steps: int = None):
+    def evaluate(self, environment: Environment, steps: int):
         """
         Evaluates ACS2 algorithm on given environment for certain number
         of generations
 
         :param environment: environment to operate on
-        :param steps: number of generations to run
-        :param max_steps: maximum number of steps in trial (before resetting
-        the agent)
+        :param steps: number of steps to take
 
-        :return: final classifier list and metrics
+        :return: a tuple of final classifier list and obtained metrics
         """
         self.metrics.clear()
 
+        step = 0
+        trial = 0
+
         classifiers = []
 
-        step = 0
-        steps_in_trial = 0
-        trial = 0
-        perception = None
-        action = None
-        action_set = None
-        reward = None
-        previous_perception = None
-        previous_action_set = None
-
-        environment.insert_animat()
-
-        # Get the animat initial perception
-        perception = environment.get_animat_perception()
-
         while step < steps:
+
+            # Trial counters
+            trial += 1
+            steps_in_trial = 0
+
+            # Initially place animat into environment
+            environment.insert_animat()
+            perception = environment.get_animat_perception()
+
+            action = None
+            reward = None
+            previous_perception = None
+            previous_action_set = None
+
             logger.info('\n\nTrial/step [%d/%d]\t\t%s',
                         trial, step, perception)
 
-            finished = False
+            # Each trial
+            while not environment.trial_finished():
+                # Generate initial (general) classifiers if no classifier
+                # are in the current population.
+                if len(classifiers) == 0:
+                    classifiers = generate_initial_classifiers()
 
-            # Generate initial (general) classifiers if no classifier
-            # are in the population.
-            if len(classifiers) == 0:
-                classifiers = generate_initial_classifiers()
+                # Select classifiers matching the perception
+                match_set = generate_match_set(classifiers, perception)
 
-            # Reset the environment and put the animat randomly
-            # inside the maze when he found the reward (next trial starts)
-            if environment.animat_has_finished():
-                finished = True
-                trial += 1
-                steps_in_trial = 0
-                environment.insert_animat()
+                # If not the beginning of the experiment
+                if steps_in_trial != 0:
+                    apply_alp(classifiers,
+                              action,
+                              step,
+                              previous_action_set,
+                              perception,
+                              previous_perception,
+                              self.learning_rate)
+                    apply_rl(match_set,
+                             previous_action_set,
+                             reward,
+                             self.learning_rate,
+                             self.discount_factor)
+                    apply_ga(classifiers,
+                             previous_action_set,
+                             step,
+                             self.mutation_rate,
+                             self.crossover_probability)
+
+                action = choose_action(match_set, self.exploration_probability)
+                action_set = generate_action_set(match_set, action)
+
+                # Execute action and obtain reward
+                reward = environment.execute_action(action)
+
+                step += 1
+                steps_in_trial += 1
+
+                previous_perception = perception
                 perception = environment.get_animat_perception()
-                previous_action_set = None
 
-            # If the animat will make more than `max_steps` in a single
-            # trial put animal randomly somewhere else.
-            if max_steps is not None and steps_in_trial == max_steps:
-                logger.debug('Max steps in trial reached')
-                steps_in_trial = 0
-                environment.insert_animat()
-                perception = environment.get_animat_perception()
-                previous_action_set = None
+                # If animat has found the reward
+                if environment.trial_finished():
+                    apply_alp(classifiers,
+                              action,
+                              step,
+                              action_set,
+                              perception,
+                              previous_perception,
+                              self.learning_rate)
+                    apply_rl(match_set,
+                             action_set,
+                             reward,
+                             self.learning_rate,
+                             self.discount_factor)
+                    apply_ga(classifiers,
+                             action_set,
+                             step,
+                             self.mutation_rate,
+                             self.crossover_probability)
 
-            # Select classifiers matching the perception
-            match_set = generate_match_set(classifiers, perception)
+                previous_action_set = action_set
 
-            # If not the beginning of the trial
-            if previous_action_set is not None:  # time != 0
-                logger.info("")
-                logger.info("== Triggering learning modules on previous "
-                            "action set ==")
-                apply_alp(classifiers,
-                          action,
-                          step,
-                          previous_action_set,
-                          perception,
-                          previous_perception,
-                          self.learning_rate)
-                apply_rl(match_set,
-                         previous_action_set,
-                         reward,
-                         self.learning_rate,
-                         self.discount_factor)
-                apply_ga(classifiers,
-                         previous_action_set,
-                         step,
-                         self.mutation_rate,
-                         self.crossover_probability)
-
-            # Remove previous action set
-            previous_action_set = None
-
-            action = choose_action(match_set, self.exploration_probability)
-            action_set = generate_action_set(match_set, action)
-
-            # Execute action and obtain reward
-            logger.info("")
-            reward = environment.execute_action(action)
-            logger.info("Reward to distribute: %d", reward)
-
-            # Next time slot
-            step += 1
-            steps_in_trial += 1
-
-            logger.debug("Next trial started...")
-
-            previous_perception = perception
-            perception = environment.get_animat_perception()
-
-            # If animat has found the reward
-            if environment.animat_has_finished():
-                logger.info("")
-                logger.info("== Move successful."
-                            "Triggering learning modules ==")
-                apply_alp(classifiers,
-                          action,
-                          step,
-                          action_set,
-                          perception,
-                          previous_perception,
-                          self.learning_rate)
-                apply_rl(match_set,
-                         action_set,
-                         reward,
-                         self.learning_rate,
-                         self.discount_factor)
-                apply_ga(classifiers,
-                         action_set,
-                         step,
-                         self.mutation_rate,
-                         self.crossover_probability)
-
-            previous_action_set = action_set
-
-            # Define variables for collecting metrics each 10 steps
-            if step % 10 == 0:
+                # Define variables for collecting metrics each 10 steps
                 logger.debug("Collecting metrics...")
                 self.acquire_metrics(
                     step=step,
                     maze=environment,
                     classifiers=classifiers,
-                    was_successful=finished
+                    was_successful=environment.trial_finished()
                 )
 
         return classifiers, self.metrics

@@ -25,8 +25,7 @@ logging.basicConfig(
 
 PROCESSES = 1
 EXPERIMENTS = 1
-STEPS = 5000  # 10
-MAX_STEPS_IN_TRIAL = None
+STEPS = 10000  # 10
 MAZE_LOCATION = 'mazes/MazeF2.maze'
 
 
@@ -48,7 +47,7 @@ def perform_experiment(experiment):
     env = Maze(MAZE_LOCATION)
 
     # Evaluate algorithm
-    classifiers, metrics = agent.evaluate(env, STEPS, MAX_STEPS_IN_TRIAL)
+    classifiers, metrics = agent.evaluate(env, STEPS)
 
     print("Total number of macro-classifiers: {}"
           .format(len(classifiers)))
@@ -65,6 +64,8 @@ def perform_experiment(experiment):
 
     # Print classifiers
     reliable = [cls for cls in classifiers if cls.is_reliable()]
+    reliable.sort(key=lambda cls: cls.action)
+
     for cls in reliable:
         print(cls)
 
