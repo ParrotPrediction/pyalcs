@@ -169,8 +169,8 @@ class ACS2(Agent):
             previous_perception = perception
             perception = environment.get_animat_perception()
 
-            # If new state was introduced
-            if environment.move_was_successful():
+            # If animat has found the reward
+            if environment.animat_has_finished():
                 logger.info("")
                 logger.info("== Move successful."
                             "Triggering learning modules ==")
@@ -194,13 +194,14 @@ class ACS2(Agent):
 
             previous_action_set = action_set
 
-            # Define variables for collecting metrics
-            logger.debug("Collecting metrics...")
-            self.acquire_metrics(
-                step=step,
-                maze=environment,
-                classifiers=classifiers,
-                was_successful=finished
-            )
+            # Define variables for collecting metrics each 10 steps
+            if step % 10 == 0:
+                logger.debug("Collecting metrics...")
+                self.acquire_metrics(
+                    step=step,
+                    maze=environment,
+                    classifiers=classifiers,
+                    was_successful=finished
+                )
 
         return classifiers, self.metrics

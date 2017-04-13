@@ -1,11 +1,11 @@
 import logging
 import random
+from collections import defaultdict
 from collections import namedtuple
 from os.path import dirname, abspath, join
 
 from alcs.environment.Environment import Environment
-from . import MazeMapping
-from . import MazeAction
+from alcs.environment.maze import MazeMapping, MazeAction
 
 logger = logging.getLogger(__name__)
 
@@ -325,9 +325,9 @@ class Maze(Environment):
         return possible_cords
 
     @staticmethod
-    def get_possible_neighbour_cords(pos_x, pos_y) -> list:
+    def get_possible_neighbour_cords(pos_x, pos_y) -> tuple:
         """
-        Returns list of tuples with coordinates for
+        Returns a tuple with coordinates for
         N, NE, E, SE, S, SW, W, NW neighbouring cells.
         """
         n = (pos_x, pos_y - 1)
