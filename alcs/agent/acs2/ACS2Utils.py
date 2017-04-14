@@ -113,7 +113,17 @@ def choose_action(classifiers: list,
         return Random().select_action(classifiers)
     else:
         # Exploitation phase - take the best possible classifier
-        return BestAction().select_action(classifiers)
+        return choose_best_action(classifiers)
+
+
+def choose_best_action(classifiers: list) -> int:
+    """
+    Chooses best action amongst given classifiers
+
+    :param classifiers: a list of classifiers
+    :return: an integer representing an action
+    """
+    return BestAction().select_action(classifiers)
 
 
 def generate_random_int_number(max_value: int) -> int:

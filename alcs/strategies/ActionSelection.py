@@ -34,7 +34,8 @@ class BestAction(ActionSelection):
     def select_action(self, classifiers: list) -> int:
         from alcs.agent.acs2.ACS2Utils import get_general_perception
 
-        best_cl = classifiers[0]
+        # Randomly select best classifier as a baseline
+        best_cl = choice(classifiers)
 
         for cl in classifiers:
             if (cl.effect != get_general_perception() and

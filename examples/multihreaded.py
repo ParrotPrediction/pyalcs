@@ -22,18 +22,19 @@ from alcs.helpers.metrics import \
 logger = logging.getLogger(__name__)
 logging.basicConfig(
     format='[%(asctime)s] [%(levelname)s] [%(threadName)s]: %(message)s',
-    level=logging.WARN)
+    level=logging.INFO)
 
 PROCESSES = 1
 EXPERIMENTS = 1
-STEPS = 1000  # 10
-MAZE_LOCATION = 'mazes/MazeF2.maze'
+STEPS = 10000  # 10
+MAZE_LOCATION = 'mazes/MazeF3.maze'
+EXPLOITATION_MODE = False
 
 
 def perform_experiment(experiment):
     print('Performing experiment [{}]'.format(experiment))
 
-    agent = ACS2()
+    agent = ACS2(exploitation_mode=EXPLOITATION_MODE)
 
     agent.add_metrics_handlers([
         ActualStep('time'),

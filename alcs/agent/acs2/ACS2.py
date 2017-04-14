@@ -2,12 +2,11 @@ import logging
 
 from alcs.agent.Agent import Agent
 from alcs.environment.Environment import Environment
-from alcs.strategies.ActionSelection import ActionSelection, Random
 from .ALP import apply_alp
 from .GA import apply_ga
 from .RL import apply_rl
 from .ACS2Utils import generate_initial_classifiers,\
-    generate_match_set, generate_action_set, choose_action
+    generate_match_set, generate_action_set, choose_action, choose_best_action
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +18,7 @@ class ACS2(Agent):
                  gamma: float = 0.95,
                  mu: float = 0.3,
                  x: float = 0.8,
-                 strategy: ActionSelection = Random()):
+                 exploitation_mode=False):
         """
         :param epsilon: The 'exploration probability' [0-1]. Specifies the
         probability of choosing a random action. The fastest model learning is
@@ -44,6 +43,8 @@ class ACS2(Agent):
         when a GA is applied. Default to 0.8. It seems to influence the
         process only slightly. No problem was found so far in which crossover
         actually has a significant effect.
+        :param exploitation_mode: last half of steps will be used for
+        exploitation only (selecting best action and no learning)
         """
         super().__init__()
 
@@ -53,6 +54,7 @@ class ACS2(Agent):
         self.discount_factor = gamma
         self.mutation_rate = mu
         self.crossover_probability = x
+        self.exploration_mode = exploitation_mode
 
     def evaluate(self, environment: Environment, steps: int):
         """
@@ -91,67 +93,85 @@ class ACS2(Agent):
 
             # Each trial
             while not environment.trial_finished():
-                # Generate initial (general) classifiers if no classifier
-                # are in the current population.
-                if len(classifiers) == 0:
-                    classifiers = generate_initial_classifiers()
 
-                # Select classifiers matching the perception
-                match_set = generate_match_set(classifiers, perception)
+                if self.exploration_mode and step > steps / 2:
+                    # Pure exploration
+                    perception = environment.get_animat_perception()
+                    match_set = generate_match_set(classifiers, perception)
+                    action = choose_best_action(match_set)
+                    environment.execute_action(action)
 
-                # If not the beginning of the experiment
-                if steps_in_trial != 0:
-                    apply_alp(classifiers,
-                              action,
-                              step,
-                              previous_action_set,
-                              perception,
-                              previous_perception,
-                              self.learning_rate)
-                    apply_rl(match_set,
-                             previous_action_set,
-                             reward,
-                             self.learning_rate,
-                             self.discount_factor)
-                    apply_ga(classifiers,
-                             previous_action_set,
-                             step,
-                             self.mutation_rate,
-                             self.crossover_probability)
+                    step += 1
+                    steps_in_trial += 1
 
-                action = choose_action(match_set, self.exploration_probability)
-                action_set = generate_action_set(match_set, action)
+                    if steps_in_trial == 100:
+                        # Infinite loop - not enough knowledge
+                        exit(1)
+                else:
+                    # Normal learning mode
 
-                # Execute action and obtain reward
-                reward = environment.execute_action(action)
+                    # Generate initial (general) classifiers if there are none
+                    # in the current population.
+                    if len(classifiers) == 0:
+                        classifiers = generate_initial_classifiers()
 
-                step += 1
-                steps_in_trial += 1
+                    # Select classifiers matching the perception
+                    match_set = generate_match_set(classifiers, perception)
 
-                previous_perception = perception
-                perception = environment.get_animat_perception()
+                    # If not the beginning of the experiment
+                    if steps_in_trial != 0:
+                        apply_alp(classifiers,
+                                  action,
+                                  step,
+                                  previous_action_set,
+                                  perception,
+                                  previous_perception,
+                                  self.learning_rate)
+                        apply_rl(match_set,
+                                 previous_action_set,
+                                 reward,
+                                 self.learning_rate,
+                                 self.discount_factor)
+                        apply_ga(classifiers,
+                                 previous_action_set,
+                                 step,
+                                 self.mutation_rate,
+                                 self.crossover_probability)
 
-                # If animat has found the reward
-                if environment.trial_finished():
-                    apply_alp(classifiers,
-                              action,
-                              step,
-                              action_set,
-                              perception,
-                              previous_perception,
-                              self.learning_rate)
-                    apply_rl(match_set,
-                             action_set,
-                             reward,
-                             self.learning_rate,
-                             self.discount_factor)
-                    apply_ga(classifiers,
-                             action_set,
-                             step,
-                             self.mutation_rate,
-                             self.crossover_probability)
+                    action = choose_action(match_set,
+                                           self.exploration_probability)
+                    action_set = generate_action_set(match_set, action)
 
-                previous_action_set = action_set
+                    # Execute action and obtain reward
+                    reward = environment.execute_action(action)
+
+                    step += 1
+                    steps_in_trial += 1
+
+                    previous_perception = perception
+                    perception = environment.get_animat_perception()
+
+                    # If animat has found the reward
+                    if environment.trial_finished():
+                        apply_alp(classifiers,
+                                  action,
+                                  step,
+                                  action_set,
+                                  perception,
+                                  previous_perception,
+                                  self.learning_rate)
+                        apply_rl(match_set,
+                                 action_set,
+                                 reward,
+                                 self.learning_rate,
+                                 self.discount_factor)
+                        apply_ga(classifiers,
+                                 action_set,
+                                 step,
+                                 self.mutation_rate,
+                                 self.crossover_probability)
+
+                    previous_action_set = action_set
 
                 # Define variables for collecting metrics each 10 steps
                 logger.debug("Collecting metrics...")

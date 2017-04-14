@@ -24,9 +24,9 @@ def apply_alp(classifiers: list,
     # We need to make sure that adding and removing
     # classifiers from and to action set is not reconsidered in the current
     # loop.
-    original_action_set = copy(action_set)
+    copied_action_set = copy(action_set)
 
-    for cl in original_action_set:
+    for cl in copied_action_set:
         logger.info("[ALP] Running for %s", cl)
         cl.exp += 1
         _update_application_average(cl, time, beta)
@@ -41,6 +41,9 @@ def apply_alp(classifiers: list,
                                       perception,
                                       previous_perception,
                                       beta)
+
+            # If classifier's quality decreased below certain threshold
+            # remove it.
             if cl.is_inadequate():
                 logger.info("[ALP] Removing %s", cl)
                 remove_classifier(classifiers, cl)
@@ -54,7 +57,7 @@ def apply_alp(classifiers: list,
                                 beta)
 
     # If there wasn't any classifier in the action set that anticipated
-    # correctly generate one with proper cover triple.
+    # new perception correctly generate one with proper cover triple.
     if was_expected_case == 0:
         logger.info("\tNo classifier in the action set that"
                     "anticipated correctly, generating using"
@@ -259,7 +262,7 @@ def _update_application_average(cl: Classifier, time: int, beta: float):
     :param time: current time
     :param beta: learning rate
     """
-    if cl.exp < 1 / beta:
+    if cl.exp < (1 / beta):
         cl.aav += (time - cl.t_alp - cl.aav) / cl.exp
     else:
         cl.aav += beta * (time - cl.t_alp - cl.aav)
