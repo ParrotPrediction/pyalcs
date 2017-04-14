@@ -1,14 +1,45 @@
 import unittest
 
 from alcs.agent.acs2 import Classifier
+from alcs.environment.maze.Maze import Perception
+from alcs.agent.acs2.ACS2Utils import get_general_perception
 from alcs.agent.acs2.ALP import _cover_triple, \
-    _unexpected_case
+    _unexpected_case, _get_differences
 
 
 class ALPTest(unittest.TestCase):
 
     def setUp(self):
         self.beta = 0.2
+
+    @unittest.skip
+    def test_should_determine_differences(self):
+        # TODO i need to understand the purpose of this first
+
+        # Classifier has no mark - no differences should be detected
+        cl = Classifier()
+        perception = Perception(0, 0, 0, 0, 0, 0, 0, 0)
+        self.assertListEqual(get_general_perception(),
+                             _get_differences(cl.mark, perception))
+
+        # Classifier is marked but it is not important for given perception
+        # no difference should be detected
+        cl = Classifier()
+        cl.mark[0].add(1)
+        perception = Perception(0, 1, 1, 1, 1, 1, 1, 1)
+        diff = _get_differences(cl.mark, perception)
+        print("a")
+
+        # Clear difference
+
+        # Classifier works bad when N perception is 'path'
+        cl = Classifier()
+        cl.mark[0].add(1)
+        perception = Perception(1, 1, 1, 1, 1, 1, 1, 1)
+        diff = _get_differences(cl.mark, perception)
+        print("b")
+
+        pass
 
     def test_should_handle_unexpected_case_no_specialization_possible(self):
         cl = Classifier()

@@ -22,12 +22,12 @@ from alcs.helpers.metrics import \
 logger = logging.getLogger(__name__)
 logging.basicConfig(
     format='[%(asctime)s] [%(levelname)s] [%(threadName)s]: %(message)s',
-    level=logging.INFO)
+    level=logging.WARN)
 
 PROCESSES = 1
 EXPERIMENTS = 1
 STEPS = 10000  # 10
-MAZE_LOCATION = 'mazes/MazeF3.maze'
+MAZE_LOCATION = 'mazes/MazeF2.maze'
 EXPLOITATION_MODE = False
 
 

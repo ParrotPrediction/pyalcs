@@ -1,6 +1,6 @@
 import logging
 from random import random
-from copy import deepcopy, copy
+from copy import copy
 
 from . import Classifier
 from . import Constants as c
@@ -24,9 +24,9 @@ def apply_alp(classifiers: list,
     # We need to make sure that adding and removing
     # classifiers from and to action set is not reconsidered in the current
     # loop.
-    copied_action_set = copy(action_set)
+    old_action_set = copy(action_set)
 
-    for cl in copied_action_set:
+    for cl in old_action_set:
         logger.info("[ALP] Running for %s", cl)
         cl.exp += 1
         _update_application_average(cl, time, beta)
@@ -34,7 +34,7 @@ def apply_alp(classifiers: list,
         if does_anticipate_correctly(cl,
                                      perception,
                                      previous_perception):
-            new_cl = _expected_case(cl, perception, beta)
+            new_cl = _expected_case(cl, previous_perception, beta)
             was_expected_case = 1
         else:
             new_cl = _unexpected_case(cl,
@@ -73,6 +73,24 @@ def _expected_case(cl: Classifier,
                    perception: list,
                    beta: float,
                    u_max: int = None) -> Classifier:
+    """
+    Classifier predicted correctly (it's effect part was OK). We can generate
+    a new classifier or not.
+
+    No new classifier is generated when:
+    - mark is empty or,
+    - there is no difference between mark and perception
+    In this case just increase it's quality.
+
+    On the other hand when differences are detected between mark and
+    perception - an offspring will be generated.
+
+    :param cl:
+    :param perception:
+    :param beta:
+    :param u_max:
+    :return:
+    """
 
     logger.info('\t\tExpected case occurred')
 
@@ -88,7 +106,7 @@ def _expected_case(cl: Classifier,
     else:
         logger.info("\t\t\tGenerating new classifier")
         # Count number of non-# symbols in diff and condition part
-        spec = _number_of_spec(cl.condition)
+        spec = cl.condition.number_of_specified_elements()
         spec_new = _number_of_spec(diff)
 
         child = Classifier.copy_from(cl)
@@ -126,14 +144,14 @@ def _expected_case(cl: Classifier,
 def _get_differences(mark: list, perception: list) -> list:
     """
     The difference determination needs to distinguish between two cases.
-    1. Clear differences are those where one or more attributes in the mark M
+    1. Clear differences: are those where one or more attributes in the mark M
     do not contain the corresponding attribute in the perception.
-    2. Fuzzy differences are those where there is no clear difference but one
+    2. Fuzzy differences: are those where there is no clear difference but one
     or more attributes in the mark M specify more than the one value in
     perception.
 
-    In the first case, one random clear difference is specified while in the
-    latter case all differences are specified.
+    In the first case, one random clear difference is specified.
+    In the latter case all differences are specified.
 
     :param mark: list of sets containing marking states
     :param perception: perception obtained by the agent
@@ -146,40 +164,27 @@ def _get_differences(mark: list, perception: list) -> list:
         type1 = 0  # counts when mark is different from perception
         type2 = 0  # counts when there are multiple marks in attribute
 
-        for i in range(len(perception)):
-            if perception[i] not in mark[i]:
+        for i, perceptron in enumerate(perception):
+            if perceptron not in mark[i]:
                 type1 += 1
             if len(mark[i]) > 1:
                 type2 += 1
 
         if type1 > 0:
-            type1 = random() * type1
-            for i in range(len(perception)):
-                if perception[i] not in mark[i]:
-                    if int(type1) == 0:
-                        diff[i] = perception[i]
+            # Clear differences - one or more absolute differences detected ->
+            # specialize randomly chosen one
+            type1 = int(random() * type1)
+            for i, perceptron in enumerate(perception):
+                if perceptron not in mark[i]:
+                    if type1 == 0:
+                        diff[i] = perceptron
                     type1 -= 1
         elif type2 > 0:
-            for i in range(len(perception)):
+            for i, perceptron in enumerate(perception):
                 if len(mark[i]) > 1:
-                    diff[i] = perception[i]
+                    diff[i] = perceptron
 
     return diff
-
-
-def _number_of_spec(condition: list) -> int:
-    """
-    Returns the number of non-#
-    :param condition: a classifier condition or difference list
-    :return: number of non-general elements
-    """
-    n = 0
-
-    for i in range(len(condition)):
-        if condition[i] != c.CLASSIFIER_WILDCARD:
-            n += 1
-
-    return n
 
 
 def _remove_random_spec_element(condition: list) -> None:
@@ -237,7 +242,7 @@ def _unexpected_case(cl: Classifier,
     for i in range(len(perception)):
         if (cl.effect[i] == c.CLASSIFIER_WILDCARD and
                 previous_perception[i] != perception[i]):
-            child.condition[i] = previous_perception[i]
+            child.condition.specialize(i, previous_perception[i])
             child.effect[i] = perception[i]
 
     if cl.q < 0.5:
@@ -323,7 +328,7 @@ def _cover_triple(previous_perception: list,
 
     for i in range(len(perception)):
         if previous_perception[i] != perception[i]:
-            child.condition[i] = previous_perception[i]
+            child.condition.specialize(i, previous_perception[i])
             child.effect[i] = perception[i]
 
     child.exp = 0

@@ -1,7 +1,10 @@
 from copy import deepcopy
 
-from . import Constants as c
+from alcs.agent.acs2 import Constants as c
 from alcs.environment.maze import MazeAction
+
+from . import Mark, Action, Condition, Effect
+from ..Perception import Perception
 
 
 class Classifier(object):
@@ -14,20 +17,10 @@ class Classifier(object):
     """
 
     def __init__(self):
-        # The Condition Part - specifies the set of situations (perceptions)
-        # in which the classifier can be applied
-        self.condition = [c.CLASSIFIER_WILDCARD] * c.CLASSIFIER_LENGTH
-
-        # The Action Part - proposes an available action
-        self.action = None
-
-        # The Effect Part - anticipates the effects that the classifier
-        # 'believes' to be caused by the specified action
-        self.effect = [c.CLASSIFIER_WILDCARD] * c.CLASSIFIER_LENGTH
-
-        # The Mark - records the properties in which the classifier did
-        # not work correctly before
-        self.mark = Classifier.empty_mark()
+        self.condition = Condition()
+        self.action = Action()
+        self.effect = Effect()
+        self.mark = Mark()
 
         # Quality - measures the accuracy of the anticipations
         self.q = 0.5
@@ -98,6 +91,45 @@ class Classifier(object):
     def __hash__(self):
         return hash((self.condition, self.action, self.effect))
 
+
+    #####
+    def expected_case(self, percept: Perception, time: int):
+        pass
+
+    def unexpected_case(self, p0: Perception, p1: Perception, time: int):
+        pass
+
+    def is_similar(self, cls):
+        pass
+
+    def does_match(self, percept: Perception) -> bool:
+        pass
+
+    def does_match_backwards(self, percept: Perception) -> bool:
+        pass
+
+    def does_link(self, cls) -> bool:
+        pass
+
+    def has_action(self, action: int) -> bool:
+        pass
+
+    def does_anticipate_correct(self, p0: Perception, p1: Perception) -> bool:
+        pass
+
+    def does_subsume(self, cls) -> bool:
+        pass
+
+    def mutate(self):
+        pass
+
+    def crossover(self, cls):
+        pass
+
+
+
+    #####
+
     def fitness(self):
         return self.q * self.r
 
@@ -114,15 +146,6 @@ class Classifier(object):
         can be considered as inadequate.
         """
         return self.q < c.THETA_I
-
-    def get_condition_specificity(self) -> float:
-        """
-        Return information what percentage of condition elements are
-        specific.
-        :return: number from [0,1]
-        """
-        specific = sum(1 for e in self.condition if e != c.CLASSIFIER_WILDCARD)
-        return specific / c.CLASSIFIER_LENGTH
 
     def get_micro_classifiers(self) -> []:
         """
@@ -208,47 +231,3 @@ class Classifier(object):
                 base_more_general = True
 
         return base_more_general
-
-    def set_mark(self, previous_perception: list, perception: list):
-        """
-        Function sets compares previous and current perception with
-        classifier anticipations and sets mark accordingly.
-
-        :param previous_perception: perception in previous trial
-        :param perception: obtained perception
-        """
-        for i, (condition, anticipation, perception, previous_perception) \
-            in enumerate(zip(self.condition, self.effect, previous_perception,
-                             perception)):
-
-            if previous_perception == perception:
-                # classifier predicted correctly
-                if anticipation == c.CLASSIFIER_WILDCARD:
-                    pass
-                else:
-                    # Effect part required a change
-                    self.mark[i].add(previous_perception)
-            else:
-                # classifier did not predict correctly
-                self.mark[i].add(previous_perception)
-
-    @staticmethod
-    def is_marked(mark: list) -> bool:
-        """
-        Returns information whether classifier is marked.
-
-        :param mark: list of sets containing mark
-        :return: True if is marked, false otherwise
-        """
-        for m in mark:
-            if len(m) > 0:
-                return True
-
-        return False
-
-    @staticmethod
-    def empty_mark():
-        """
-        Returns a collection of empty marks
-        """
-        return [set() for _ in range(c.CLASSIFIER_LENGTH)]

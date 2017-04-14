@@ -83,7 +83,7 @@ class AveragedConditionSpecificity(Metric):
     def calculate(self, *args, **kwargs):
         classifiers = kwargs.get('classifiers')
 
-        sum_specificity = sum(cl.get_condition_specificity()
+        sum_specificity = sum(cl.condition.get_specificity()
                               for cl in classifiers)
         total_classifiers = len(classifiers)
 

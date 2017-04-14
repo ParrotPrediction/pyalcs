@@ -61,9 +61,9 @@ def generate_match_set(classifiers: list, perception: list) -> list:
     """
     match_set = []
 
-    for classifier in classifiers:
-        if _does_match(classifier, perception):
-            match_set.append(classifier)
+    for cls in classifiers:
+        if cls.condition.does_match(perception):
+            match_set.append(cls)
 
     logger.debug('Generated match set: [%s]', match_set)
     return match_set
@@ -136,25 +136,7 @@ def generate_random_int_number(max_value: int) -> int:
     return int(random() * max_value + 1)
 
 
-def _does_match(classifier: Classifier, perception: list) -> bool:
-    """
-    Check if classifier condition match given perception
 
-    :param classifier: classifier object
-    :param perception: perception given as list
-    :return: True if classifiers can be applied
-    for given perception, false otherwise
-    """
-    if len(perception) != len(classifier.condition):
-        raise ValueError('Perception and classifier condition '
-                         'length is different')
-
-    for i in range(len(perception)):
-        if (classifier.condition[i] != c.CLASSIFIER_WILDCARD and
-                classifier.condition[i] != perception[i]):
-            return False
-
-    return True
 
 
 def does_anticipate_correctly(cl: Classifier,

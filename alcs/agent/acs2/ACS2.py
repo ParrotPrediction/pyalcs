@@ -104,8 +104,8 @@ class ACS2(Agent):
                     step += 1
                     steps_in_trial += 1
 
-                    if steps_in_trial == 100:
-                        # Infinite loop - not enough knowledge
+                    if steps_in_trial == 1000:
+                        # Not enough knowledge (infinite loop) - fail app
                         exit(1)
                 else:
                     # Normal learning mode
