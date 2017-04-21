@@ -1,0 +1,7 @@
+CLASSIFIER_WILDCARD = '#'
+NUMBER_OF_EXPERIMENTS = 1
+
+MAX_STEPS = 30000
+MAX_TRIAL_STEPS = 50
+
+REWARD_TEST_ITERATION = 50  # Trial steps of printing the performance in a trial
