@@ -1,18 +1,28 @@
+from alcs.agent import Perception
+from alcs.agent.acs3.Classifier import Classifier
 
-class ClassifiersList(object):
+
+class ClassifiersList(list):
     """
     Represents overall population, match/action sets
     """
 
-    def __init__(self):
-        self.list = []
+    def __init__(self, *args):
+        list.__init__(self, *args)
 
-    def form_match_set(self, situation: list):
-        match_set = []
+    def append(self, item):
+        if not isinstance(item, Classifier):
+            raise TypeError("Item should be a Classifier object")
 
-        for cls in self.list:
-            if cls.condition.does_match(situation):
-                match_set.append(cls)
+        super(ClassifiersList, self).append(item)
+
+    @classmethod
+    def form_match_set(cls, population, situation: Perception):
+        match_set = cls()
+
+        for cl in population:
+            if cl.condition.does_match(situation):
+                match_set.append(cl)
 
         return match_set
 
@@ -23,8 +33,7 @@ class ClassifiersList(object):
 
         :return: fitness value
         """
-
-        anticipated_change_cls = [cl for cl in self.list if cl.does_anticipate_change()]
+        anticipated_change_cls = [cl for cl in self if cl.does_anticipate_change()]
 
         if len(anticipated_change_cls) > 0:
             best_cl = max(anticipated_change_cls, key=lambda cl: cl.fitness)
@@ -40,5 +49,3 @@ class ClassifiersList(object):
 
     def apply_ga(self, time, population, match_set, situation) -> None:
         pass
-
-

@@ -3,3 +3,5 @@
 # do_ga: 1 theta_ga: 100 mu: 0.3 X.type: 2 chi: 0.8 theta_as: 20 theta_exp: 20 do_subsumption: 1
 # max_steps: 30000 max_trial_steps: 50 anz_experiments: 20 reward_test: 0 model_test_iteration: 200 reward_test_iteration: 50
 Next Experiment
+0 0 0 0 0 -nan
+200 0 144 148 0 0.413851

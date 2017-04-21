@@ -4,13 +4,14 @@ from collections import namedtuple
 from os.path import dirname, abspath, join
 
 from alcs.environment.Environment import Environment
+from alcs.agent.Perception import Perception
 from alcs.environment.maze import MazeMapping, MazeAction
 
 logger = logging.getLogger(__name__)
 
 # Default perception
-Perception = namedtuple('Perception',
-                        ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'])
+MazePerception = namedtuple('MazePerception',
+                            ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'])
 
 
 class Maze(Environment):
@@ -163,12 +164,13 @@ class Maze(Environment):
         else:
             nw = self.matrix[pos_y - 1][pos_x - 1]
 
-        perception = Perception(N=n, NE=ne, E=e, SE=se, S=s, SW=sw, W=w, NW=nw)
+        maze_perception = MazePerception(
+            N=n, NE=ne, E=e, SE=se, S=s, SW=sw, W=w, NW=nw)
 
         logger.debug('Animat [(%d, %d)] perception: [%s]',
-                     pos_x, pos_y, perception)
+                     pos_x, pos_y, maze_perception)
 
-        return perception
+        return Perception(maze_perception)
 
     def execute_action(self,
                        action_value: int,
@@ -188,6 +190,8 @@ class Maze(Environment):
 
         action = MazeAction().find_name(action_value)
 
+        m_perception = MazePerception(perception)
+
         reward = 0
         self.animat_found_reward = False
         self.animat_moved = False
@@ -195,15 +199,15 @@ class Maze(Environment):
                      self.animat_pos_x, self.animat_pos_y, action)
 
         if (action == "N" and
-                self.not_wall(perception.N) and
+                self.not_wall(m_perception.N) and
                 self._within_y_range()):
 
             self.animat_pos_y -= 1
             self.animat_moved = True
 
         if (action == 'NE' and
-                self.not_wall(perception.N) and
-                self.not_wall(perception.E) and
+                self.not_wall(m_perception.N) and
+                self.not_wall(m_perception.E) and
                 self._within_x_range() and
                 self._within_y_range()):
 
@@ -212,15 +216,15 @@ class Maze(Environment):
             self.animat_moved = True
 
         if (action == "E" and
-                self.not_wall(perception.E) and
+                self.not_wall(m_perception.E) and
                 self._within_x_range()):
 
             self.animat_pos_x += 1
             self.animat_moved = True
 
         if (action == 'SE' and
-                self.not_wall(perception.S) and
-                self.not_wall(perception.E) and
+                self.not_wall(m_perception.S) and
+                self.not_wall(m_perception.E) and
                 self._within_x_range() and
                 self._within_y_range()):
 
@@ -229,15 +233,15 @@ class Maze(Environment):
             self.animat_moved = True
 
         if (action == "S" and
-                self.not_wall(perception.S) and
+                self.not_wall(m_perception.S) and
                 self._within_y_range()):
 
             self.animat_pos_y += 1
             self.animat_moved = True
 
         if (action == 'SW' and
-                self.not_wall(perception.S) and
-                self.not_wall(perception.W) and
+                self.not_wall(m_perception.S) and
+                self.not_wall(m_perception.W) and
                 self._within_x_range() and
                 self._within_y_range()):
 
@@ -246,15 +250,15 @@ class Maze(Environment):
             self.animat_moved = True
 
         if (action == "W" and
-                self.not_wall(perception.W) and
+                self.not_wall(m_perception.W) and
                 self._within_x_range()):
 
             self.animat_pos_x -= 1
             self.animat_moved = True
 
         if (action == 'NW' and
-                self.not_wall(perception.N) and
-                self.not_wall(perception.W) and
+                self.not_wall(m_perception.N) and
+                self.not_wall(m_perception.W) and
                 self._within_x_range() and
                 self._within_y_range()):
 

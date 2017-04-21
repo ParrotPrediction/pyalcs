@@ -1,10 +1,9 @@
 from copy import deepcopy
 
+from alcs.agent.Perception import Perception
 from alcs.agent.acs2 import Constants as c
 from alcs.environment.maze import MazeAction
-
-from . import Mark, Action, Condition, Effect
-from ..Perception import Perception
+from . import Mark, Action
 
 
 class Classifier(object):

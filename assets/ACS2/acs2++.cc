@@ -15,6 +15,7 @@
 #include<fstream>
 
 #include <unistd.h>
+#include <sys/resource.h>
 
 #include"Perception.h"
 #include"Action.h"

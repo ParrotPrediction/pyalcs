@@ -1,7 +1,7 @@
 from alcs.environment.maze.Maze import Maze
 
 from alcs.agent.acs3 import Constants as c
-from alcs.agent.acs3.ClassifiersList import ClassifiersList
+from alcs.agent.acs3 import ClassifiersList
 
 
 env = Maze('mazes/MazeF1.maze')

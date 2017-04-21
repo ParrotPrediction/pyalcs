@@ -1,5 +1,4 @@
-from alcs.agent.acs3.Condition import Condition
-from alcs.agent.acs3.Effect import Effect
+from alcs.agent.acs3 import Condition, Effect
 
 
 class Classifier(object):
@@ -20,5 +19,8 @@ class Classifier(object):
         return self.q * self.r
 
     def does_anticipate_change(self):
-        return self.effect.get_specificity()
+        """
+        :return: true if the effect part contains any specified attributes
+        """
+        return self.effect.number_of_specified_elements > 0
 

@@ -1,6 +1,5 @@
+from alcs.agent.Perception import Perception
 from alcs.agent.acs2 import Constants as c
-from alcs.agent.acs2.Perception import Perception
-from .Condition import Condition
 
 
 class Mark(object):
@@ -33,7 +32,7 @@ class Mark(object):
         for idx, m in enumerate(self.list):
             m.add(perception[idx])
 
-    def set_mark(self, condition: Condition, perception: Perception):
+    def set_mark(self, condition, perception: Perception):
         """
         Specializes the mark in all attributes which are not specified
         in the conditions, yet.
