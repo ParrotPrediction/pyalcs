@@ -1,0 +1,5 @@
+# beta: 0.05 gamma: 0.95 theta_i: 0.1 theta_e: 0.9 r_ini: 0.5 q_ini:0.5 avt_ini: 0 q_alp_min: 0.5 q_ga_decrease: 0.5
+# umax: 100000 doPees: 0 epsilon: 1 prob_exploration_bias: 0.5 exploration bias method: 2 do_action_planning: 0 action_planning_frequency: 50
+# do_ga: 1 theta_ga: 100 mu: 0.3 X.type: 2 chi: 0.8 theta_as: 20 theta_exp: 20 do_subsumption: 1
+# max_steps: 30000 max_trial_steps: 50 anz_experiments: 20 reward_test: 0 model_test_iteration: 200 reward_test_iteration: 50
+Next Experiment
