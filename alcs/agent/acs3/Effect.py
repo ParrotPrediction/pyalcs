@@ -1,3 +1,4 @@
+from alcs.agent import Perception
 from alcs.agent.acs2 import Constants as c
 
 
@@ -27,3 +28,19 @@ class Effect(list):
         :return: number of specific components
         """
         return sum(1 for comp in self if comp != c.CLASSIFIER_WILDCARD)
+
+    def does_anticipate_correctly(self,
+                                  previous_situation: Perception,
+                                  situation: Perception) -> bool:
+        """
+        Returns if the effect part anticipates correctly.
+        This is the case if all changes from p0 to p1 are specified and no
+        unchanging attributes are specified. In case of a PEE attribute that
+        contains an unchanging attribute, it is still considered to be correct.
+
+        :param previous_situation:
+        :param situation:
+        :return:
+        """
+        for item in self:
+            

@@ -191,7 +191,7 @@ class Maze(Environment):
 
         action = MazeAction().find_name(action.action)
 
-        m_perception = MazePerception(perception)
+        m_perception = MazePerception._make(perception)
 
         reward = 0
         self.animat_found_reward = False

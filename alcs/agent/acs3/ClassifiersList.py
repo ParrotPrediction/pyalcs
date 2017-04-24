@@ -46,7 +46,7 @@ class ClassifiersList(list):
         :param pb: probability of biased exploration
         :return: action to be executed
         """
-        if random < pb:
+        if random() < pb:
             # We are in the biased exploration
             if random() < 0.5:
                 return self.choose_latest_action()
@@ -144,8 +144,41 @@ class ClassifiersList(list):
 
         return 0.0
 
-    def apply_alp(self, previous_situation, action, situation, time, population, match_set) -> None:
-        pass
+    def set_alp_timestamps(self, time: int) -> None:
+        """
+        Sets the ALP time stamp to monitor the frequency of application
+        and the last application. This method also sets the application
+        average parameter.
+
+        :param time: current step
+        """
+        for cl in self:
+            cl.set_alp_timestamp(time)
+
+    def apply_alp(self, previous_situation: Perception, action, situation: Perception, time, population, match_set) -> None:
+        """
+        The Anticipatory Learning Process. Handles all updates by the ALP,
+        insertion of new classifiers in pop and possibly matchSet, and
+        deletion of inadequate classifiers in pop and possibly matchSet.
+
+        :param previous_situation:
+        :param action:
+        :param situation:
+        :param time:
+        :param population:
+        :param match_set:
+        :return:
+        """
+        self.set_alp_timestamps(time)
+        new_cl = None
+
+        for cl in self:
+            cl.increase_experience()
+
+            if cl.does_anticipate_correctly(previous_situation, situation):
+                pass
+            else:
+                pass
 
     def apply_reinforcement_learning(self, rho, p) -> None:
         """

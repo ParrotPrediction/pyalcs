@@ -1,7 +1,14 @@
+import logging
+
 from alcs.environment.maze.Maze import Maze
 
 from alcs.agent.acs3 import Constants as c
 from alcs.agent.acs3 import ClassifiersList
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(
+    format='[%(asctime)s] [%(levelname)s] [%(name)s]: %(message)s',
+    level=logging.INFO)
 
 
 env = Maze('mazes/MazeF1.maze')
@@ -19,14 +26,14 @@ def start_experiments():
 
 
 def start_experiment():
-    print("Running experiment")
-    all_steps = 0
     trial = 0
+    all_steps = 0
     knowledge = 0
 
     population = ClassifiersList()
 
     while all_steps < c.MAX_STEPS:
+        logger.info("Running experiment/trial {}".format(trial))
         all_steps += start_one_trial_explore(population, env, all_steps)
         trial += 1
 
@@ -41,6 +48,7 @@ def start_one_trial_explore(population: ClassifiersList, env: Maze, time: int):
     action_set = ClassifiersList()
 
     while not env.animat_found_reward and time + steps < c.MAX_STEPS and steps < c.MAX_TRIAL_STEPS:
+        logger.debug("Executing step: {}".format(steps))
         situation = env.get_animat_perception()
         match_set = ClassifiersList.form_match_set(population, situation)
 
