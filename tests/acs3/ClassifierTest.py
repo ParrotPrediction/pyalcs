@@ -18,3 +18,11 @@ class ClassifierTest(unittest.TestCase):
 
         self.cls.effect[1] = '1'
         self.assertTrue(self.cls.does_anticipate_change())
+
+    def test_should_update_reward(self):
+        self.cls.update_reward(1000)
+        self.assertEqual(50.0, self.cls.r)
+
+    def test_should_update_intermediate_reward(self):
+        self.cls.update_intermediate_reward(1000)
+        self.assertEqual(50.0, self.cls.ir)

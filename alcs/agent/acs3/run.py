@@ -42,7 +42,7 @@ def start_one_trial_explore(population: ClassifiersList, env: Maze, time: int):
 
     while not env.animat_found_reward and time + steps < c.MAX_STEPS and steps < c.MAX_TRIAL_STEPS:
         situation = env.get_animat_perception()
-        match_set = population.form_match_set(situation)
+        match_set = ClassifiersList.form_match_set(population, situation)
 
         if steps > 0:
             # Apply learning in the last action set
@@ -50,7 +50,19 @@ def start_one_trial_explore(population: ClassifiersList, env: Maze, time: int):
             action_set.apply_reinforcement_learning(reward, match_set.get_maximum_fitness())
             action_set.apply_ga(time+steps, population, match_set, situation)
 
-        # ...
+        action = match_set.choose_action(epsilon=c.EPSILON)
+        action_set = ClassifiersList.form_action_set(match_set, action)
+
+        reward = env.execute_action(action)
+
+        previous_situation = situation
+        situation = env.get_animat_perception()
+
+        if env.animat_found_reward:
+            action_set.apply_alp(previous_situation, action, situation, time+steps, population, 0)
+            action_set.apply_reinforcement_learning(reward, 0)
+            action_set.apply_ga(time+steps, population, 0, situation)
+
         steps += 1
 
     return steps

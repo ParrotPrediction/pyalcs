@@ -179,15 +179,15 @@ int startOneTrialExplore(ClassifierList *population, Environment *env, int time,
 
     matchSet = new ClassifierList(population, situation);
 
-    if(steps>0){
-      //Learning in the last action set.
-      actionSet->applyALP(previousSituation, act, situation, time+steps, population, matchSet);
-      
-      actionSet->applyReinforcementLearning(rho0, matchSet->getMaximumQR() );
-      if(DO_GA){
-	actionSet->applyGA(time+steps, population, matchSet, situation);
-      }
-      delete actionSet;
+    if (steps>0) {
+        //Learning in the last action set.
+        actionSet->applyALP(previousSituation, act, situation, time+steps, population, matchSet);
+        actionSet->applyReinforcementLearning(rho0, matchSet->getMaximumQR() );
+        if(DO_GA){
+            actionSet->applyGA(time+steps, population, matchSet, situation);
+        }
+
+        delete actionSet;
     }
 
     matchSet->chooseAction(act, population, situation);

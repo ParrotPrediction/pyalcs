@@ -321,24 +321,27 @@ void ClassifierList::chooseLatestAction(Action *act)
     noValues[i]=0;
   
   PureClassifierList *listp = list;
-  if(listp!=0){
+  if (listp!=0){
     lAction=listp->cl->getAction()->getNr();
     lValue=listp->cl->getALPTimeStamp();
     noValues[lAction] += listp->cl->getNumerosity();
     
-    for(listp = list->next; listp!=0; listp=listp->next){
+    for (listp = list->next; listp!=0; listp=listp->next) {
       noValues[listp->cl->getAction()->getNr()] += listp->cl->getNumerosity();
-      if(listp->cl->getALPTimeStamp() < lValue){
-	lAction = listp->cl->getAction()->getNr();
-	lValue = listp->cl->getALPTimeStamp();
+
+      if (listp->cl->getALPTimeStamp() < lValue) {
+        lAction = listp->cl->getAction()->getNr();
+        lValue = listp->cl->getALPTimeStamp();
       }
     }
   }
+
   /* If no classifier represents an action, choose it for execution! */
-  for(i=0; i<noActions; i++){
+  for (i=0; i<noActions; i++) {
     if(noValues[i]==0)
       lAction=i;
   }
+
   act->setAction(lAction);
   delete[] noValues;
 }

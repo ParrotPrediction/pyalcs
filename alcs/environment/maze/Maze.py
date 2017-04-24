@@ -5,6 +5,7 @@ from os.path import dirname, abspath, join
 
 from alcs.environment.Environment import Environment
 from alcs.agent.Perception import Perception
+from alcs.agent.acs3 import Action
 from alcs.environment.maze import MazeMapping, MazeAction
 
 logger = logging.getLogger(__name__)
@@ -173,14 +174,14 @@ class Maze(Environment):
         return Perception(maze_perception)
 
     def execute_action(self,
-                       action_value: int,
+                       action: Action,
                        perception: Perception = None) -> int:
         """
         Orders animat to execute the action. The animat is not allowed
         to move into the wall. If animat didn't moved in this turn he receives
         no reward.
 
-        :param action_value: value of action to execute
+        :param action: value of action to execute
         :param perception: optional perception to test. If not specified
         current animat perception is used
         :return: reward for new position
@@ -188,7 +189,7 @@ class Maze(Environment):
         if perception is None:
             perception = self.get_animat_perception()
 
-        action = MazeAction().find_name(action_value)
+        action = MazeAction().find_name(action.action)
 
         m_perception = MazePerception(perception)
 

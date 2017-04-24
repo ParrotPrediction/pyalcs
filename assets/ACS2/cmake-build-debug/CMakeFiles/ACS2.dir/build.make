@@ -34,19 +34,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /opt/clion-2017.1.1/bin/cmake/bin/cmake
+CMAKE_COMMAND = /Applications/CLion.app/Contents/bin/cmake/bin/cmake
 
 # The command to remove a file.
-RM = /opt/clion-2017.1.1/bin/cmake/bin/cmake -E remove -f
+RM = /Applications/CLion.app/Contents/bin/cmake/bin/cmake -E remove -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/norbert/Projects/pyalcs/assets/ACS2
+CMAKE_SOURCE_DIR = /Users/khozzy/Projects/pyalcs/assets/ACS2
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/norbert/Projects/pyalcs/assets/ACS2/cmake-build-debug
+CMAKE_BINARY_DIR = /Users/khozzy/Projects/pyalcs/assets/ACS2/cmake-build-debug
 
 # Include any dependencies generated for this target.
 include CMakeFiles/ACS2.dir/depend.make
@@ -59,16 +59,16 @@ include CMakeFiles/ACS2.dir/flags.make
 
 CMakeFiles/ACS2.dir/acs2++.cc.o: CMakeFiles/ACS2.dir/flags.make
 CMakeFiles/ACS2.dir/acs2++.cc.o: ../acs2++.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/norbert/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/ACS2.dir/acs2++.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/acs2++.cc.o -c /home/norbert/Projects/pyalcs/assets/ACS2/acs2++.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/khozzy/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/ACS2.dir/acs2++.cc.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/acs2++.cc.o -c /Users/khozzy/Projects/pyalcs/assets/ACS2/acs2++.cc
 
 CMakeFiles/ACS2.dir/acs2++.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ACS2.dir/acs2++.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/norbert/Projects/pyalcs/assets/ACS2/acs2++.cc > CMakeFiles/ACS2.dir/acs2++.cc.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/khozzy/Projects/pyalcs/assets/ACS2/acs2++.cc > CMakeFiles/ACS2.dir/acs2++.cc.i
 
 CMakeFiles/ACS2.dir/acs2++.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ACS2.dir/acs2++.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/norbert/Projects/pyalcs/assets/ACS2/acs2++.cc -o CMakeFiles/ACS2.dir/acs2++.cc.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/khozzy/Projects/pyalcs/assets/ACS2/acs2++.cc -o CMakeFiles/ACS2.dir/acs2++.cc.s
 
 CMakeFiles/ACS2.dir/acs2++.cc.o.requires:
 
@@ -83,16 +83,16 @@ CMakeFiles/ACS2.dir/acs2++.cc.o.provides.build: CMakeFiles/ACS2.dir/acs2++.cc.o
 
 CMakeFiles/ACS2.dir/Action.cc.o: CMakeFiles/ACS2.dir/flags.make
 CMakeFiles/ACS2.dir/Action.cc.o: ../Action.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/norbert/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/ACS2.dir/Action.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/Action.cc.o -c /home/norbert/Projects/pyalcs/assets/ACS2/Action.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/khozzy/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/ACS2.dir/Action.cc.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/Action.cc.o -c /Users/khozzy/Projects/pyalcs/assets/ACS2/Action.cc
 
 CMakeFiles/ACS2.dir/Action.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ACS2.dir/Action.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/norbert/Projects/pyalcs/assets/ACS2/Action.cc > CMakeFiles/ACS2.dir/Action.cc.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/khozzy/Projects/pyalcs/assets/ACS2/Action.cc > CMakeFiles/ACS2.dir/Action.cc.i
 
 CMakeFiles/ACS2.dir/Action.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ACS2.dir/Action.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/norbert/Projects/pyalcs/assets/ACS2/Action.cc -o CMakeFiles/ACS2.dir/Action.cc.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/khozzy/Projects/pyalcs/assets/ACS2/Action.cc -o CMakeFiles/ACS2.dir/Action.cc.s
 
 CMakeFiles/ACS2.dir/Action.cc.o.requires:
 
@@ -107,16 +107,16 @@ CMakeFiles/ACS2.dir/Action.cc.o.provides.build: CMakeFiles/ACS2.dir/Action.cc.o
 
 CMakeFiles/ACS2.dir/BWEnvironment.cc.o: CMakeFiles/ACS2.dir/flags.make
 CMakeFiles/ACS2.dir/BWEnvironment.cc.o: ../BWEnvironment.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/norbert/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/ACS2.dir/BWEnvironment.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/BWEnvironment.cc.o -c /home/norbert/Projects/pyalcs/assets/ACS2/BWEnvironment.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/khozzy/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/ACS2.dir/BWEnvironment.cc.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/BWEnvironment.cc.o -c /Users/khozzy/Projects/pyalcs/assets/ACS2/BWEnvironment.cc
 
 CMakeFiles/ACS2.dir/BWEnvironment.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ACS2.dir/BWEnvironment.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/norbert/Projects/pyalcs/assets/ACS2/BWEnvironment.cc > CMakeFiles/ACS2.dir/BWEnvironment.cc.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/khozzy/Projects/pyalcs/assets/ACS2/BWEnvironment.cc > CMakeFiles/ACS2.dir/BWEnvironment.cc.i
 
 CMakeFiles/ACS2.dir/BWEnvironment.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ACS2.dir/BWEnvironment.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/norbert/Projects/pyalcs/assets/ACS2/BWEnvironment.cc -o CMakeFiles/ACS2.dir/BWEnvironment.cc.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/khozzy/Projects/pyalcs/assets/ACS2/BWEnvironment.cc -o CMakeFiles/ACS2.dir/BWEnvironment.cc.s
 
 CMakeFiles/ACS2.dir/BWEnvironment.cc.o.requires:
 
@@ -131,16 +131,16 @@ CMakeFiles/ACS2.dir/BWEnvironment.cc.o.provides.build: CMakeFiles/ACS2.dir/BWEnv
 
 CMakeFiles/ACS2.dir/CharCharPosList.cc.o: CMakeFiles/ACS2.dir/flags.make
 CMakeFiles/ACS2.dir/CharCharPosList.cc.o: ../CharCharPosList.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/norbert/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/ACS2.dir/CharCharPosList.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/CharCharPosList.cc.o -c /home/norbert/Projects/pyalcs/assets/ACS2/CharCharPosList.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/khozzy/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/ACS2.dir/CharCharPosList.cc.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/CharCharPosList.cc.o -c /Users/khozzy/Projects/pyalcs/assets/ACS2/CharCharPosList.cc
 
 CMakeFiles/ACS2.dir/CharCharPosList.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ACS2.dir/CharCharPosList.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/norbert/Projects/pyalcs/assets/ACS2/CharCharPosList.cc > CMakeFiles/ACS2.dir/CharCharPosList.cc.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/khozzy/Projects/pyalcs/assets/ACS2/CharCharPosList.cc > CMakeFiles/ACS2.dir/CharCharPosList.cc.i
 
 CMakeFiles/ACS2.dir/CharCharPosList.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ACS2.dir/CharCharPosList.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/norbert/Projects/pyalcs/assets/ACS2/CharCharPosList.cc -o CMakeFiles/ACS2.dir/CharCharPosList.cc.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/khozzy/Projects/pyalcs/assets/ACS2/CharCharPosList.cc -o CMakeFiles/ACS2.dir/CharCharPosList.cc.s
 
 CMakeFiles/ACS2.dir/CharCharPosList.cc.o.requires:
 
@@ -155,16 +155,16 @@ CMakeFiles/ACS2.dir/CharCharPosList.cc.o.provides.build: CMakeFiles/ACS2.dir/Cha
 
 CMakeFiles/ACS2.dir/CharList.cc.o: CMakeFiles/ACS2.dir/flags.make
 CMakeFiles/ACS2.dir/CharList.cc.o: ../CharList.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/norbert/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/ACS2.dir/CharList.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/CharList.cc.o -c /home/norbert/Projects/pyalcs/assets/ACS2/CharList.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/khozzy/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/ACS2.dir/CharList.cc.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/CharList.cc.o -c /Users/khozzy/Projects/pyalcs/assets/ACS2/CharList.cc
 
 CMakeFiles/ACS2.dir/CharList.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ACS2.dir/CharList.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/norbert/Projects/pyalcs/assets/ACS2/CharList.cc > CMakeFiles/ACS2.dir/CharList.cc.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/khozzy/Projects/pyalcs/assets/ACS2/CharList.cc > CMakeFiles/ACS2.dir/CharList.cc.i
 
 CMakeFiles/ACS2.dir/CharList.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ACS2.dir/CharList.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/norbert/Projects/pyalcs/assets/ACS2/CharList.cc -o CMakeFiles/ACS2.dir/CharList.cc.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/khozzy/Projects/pyalcs/assets/ACS2/CharList.cc -o CMakeFiles/ACS2.dir/CharList.cc.s
 
 CMakeFiles/ACS2.dir/CharList.cc.o.requires:
 
@@ -179,16 +179,16 @@ CMakeFiles/ACS2.dir/CharList.cc.o.provides.build: CMakeFiles/ACS2.dir/CharList.c
 
 CMakeFiles/ACS2.dir/CharPosList.cc.o: CMakeFiles/ACS2.dir/flags.make
 CMakeFiles/ACS2.dir/CharPosList.cc.o: ../CharPosList.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/norbert/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/ACS2.dir/CharPosList.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/CharPosList.cc.o -c /home/norbert/Projects/pyalcs/assets/ACS2/CharPosList.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/khozzy/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/ACS2.dir/CharPosList.cc.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/CharPosList.cc.o -c /Users/khozzy/Projects/pyalcs/assets/ACS2/CharPosList.cc
 
 CMakeFiles/ACS2.dir/CharPosList.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ACS2.dir/CharPosList.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/norbert/Projects/pyalcs/assets/ACS2/CharPosList.cc > CMakeFiles/ACS2.dir/CharPosList.cc.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/khozzy/Projects/pyalcs/assets/ACS2/CharPosList.cc > CMakeFiles/ACS2.dir/CharPosList.cc.i
 
 CMakeFiles/ACS2.dir/CharPosList.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ACS2.dir/CharPosList.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/norbert/Projects/pyalcs/assets/ACS2/CharPosList.cc -o CMakeFiles/ACS2.dir/CharPosList.cc.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/khozzy/Projects/pyalcs/assets/ACS2/CharPosList.cc -o CMakeFiles/ACS2.dir/CharPosList.cc.s
 
 CMakeFiles/ACS2.dir/CharPosList.cc.o.requires:
 
@@ -203,16 +203,16 @@ CMakeFiles/ACS2.dir/CharPosList.cc.o.provides.build: CMakeFiles/ACS2.dir/CharPos
 
 CMakeFiles/ACS2.dir/Classifier.cc.o: CMakeFiles/ACS2.dir/flags.make
 CMakeFiles/ACS2.dir/Classifier.cc.o: ../Classifier.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/norbert/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/ACS2.dir/Classifier.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/Classifier.cc.o -c /home/norbert/Projects/pyalcs/assets/ACS2/Classifier.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/khozzy/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/ACS2.dir/Classifier.cc.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/Classifier.cc.o -c /Users/khozzy/Projects/pyalcs/assets/ACS2/Classifier.cc
 
 CMakeFiles/ACS2.dir/Classifier.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ACS2.dir/Classifier.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/norbert/Projects/pyalcs/assets/ACS2/Classifier.cc > CMakeFiles/ACS2.dir/Classifier.cc.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/khozzy/Projects/pyalcs/assets/ACS2/Classifier.cc > CMakeFiles/ACS2.dir/Classifier.cc.i
 
 CMakeFiles/ACS2.dir/Classifier.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ACS2.dir/Classifier.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/norbert/Projects/pyalcs/assets/ACS2/Classifier.cc -o CMakeFiles/ACS2.dir/Classifier.cc.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/khozzy/Projects/pyalcs/assets/ACS2/Classifier.cc -o CMakeFiles/ACS2.dir/Classifier.cc.s
 
 CMakeFiles/ACS2.dir/Classifier.cc.o.requires:
 
@@ -227,16 +227,16 @@ CMakeFiles/ACS2.dir/Classifier.cc.o.provides.build: CMakeFiles/ACS2.dir/Classifi
 
 CMakeFiles/ACS2.dir/ClassifierList.cc.o: CMakeFiles/ACS2.dir/flags.make
 CMakeFiles/ACS2.dir/ClassifierList.cc.o: ../ClassifierList.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/norbert/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/ACS2.dir/ClassifierList.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/ClassifierList.cc.o -c /home/norbert/Projects/pyalcs/assets/ACS2/ClassifierList.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/khozzy/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/ACS2.dir/ClassifierList.cc.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/ClassifierList.cc.o -c /Users/khozzy/Projects/pyalcs/assets/ACS2/ClassifierList.cc
 
 CMakeFiles/ACS2.dir/ClassifierList.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ACS2.dir/ClassifierList.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/norbert/Projects/pyalcs/assets/ACS2/ClassifierList.cc > CMakeFiles/ACS2.dir/ClassifierList.cc.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/khozzy/Projects/pyalcs/assets/ACS2/ClassifierList.cc > CMakeFiles/ACS2.dir/ClassifierList.cc.i
 
 CMakeFiles/ACS2.dir/ClassifierList.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ACS2.dir/ClassifierList.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/norbert/Projects/pyalcs/assets/ACS2/ClassifierList.cc -o CMakeFiles/ACS2.dir/ClassifierList.cc.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/khozzy/Projects/pyalcs/assets/ACS2/ClassifierList.cc -o CMakeFiles/ACS2.dir/ClassifierList.cc.s
 
 CMakeFiles/ACS2.dir/ClassifierList.cc.o.requires:
 
@@ -251,16 +251,16 @@ CMakeFiles/ACS2.dir/ClassifierList.cc.o.provides.build: CMakeFiles/ACS2.dir/Clas
 
 CMakeFiles/ACS2.dir/Condition.cc.o: CMakeFiles/ACS2.dir/flags.make
 CMakeFiles/ACS2.dir/Condition.cc.o: ../Condition.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/norbert/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/ACS2.dir/Condition.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/Condition.cc.o -c /home/norbert/Projects/pyalcs/assets/ACS2/Condition.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/khozzy/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/ACS2.dir/Condition.cc.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/Condition.cc.o -c /Users/khozzy/Projects/pyalcs/assets/ACS2/Condition.cc
 
 CMakeFiles/ACS2.dir/Condition.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ACS2.dir/Condition.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/norbert/Projects/pyalcs/assets/ACS2/Condition.cc > CMakeFiles/ACS2.dir/Condition.cc.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/khozzy/Projects/pyalcs/assets/ACS2/Condition.cc > CMakeFiles/ACS2.dir/Condition.cc.i
 
 CMakeFiles/ACS2.dir/Condition.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ACS2.dir/Condition.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/norbert/Projects/pyalcs/assets/ACS2/Condition.cc -o CMakeFiles/ACS2.dir/Condition.cc.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/khozzy/Projects/pyalcs/assets/ACS2/Condition.cc -o CMakeFiles/ACS2.dir/Condition.cc.s
 
 CMakeFiles/ACS2.dir/Condition.cc.o.requires:
 
@@ -275,16 +275,16 @@ CMakeFiles/ACS2.dir/Condition.cc.o.provides.build: CMakeFiles/ACS2.dir/Condition
 
 CMakeFiles/ACS2.dir/CRRatEnvironment.cc.o: CMakeFiles/ACS2.dir/flags.make
 CMakeFiles/ACS2.dir/CRRatEnvironment.cc.o: ../CRRatEnvironment.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/norbert/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/ACS2.dir/CRRatEnvironment.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/CRRatEnvironment.cc.o -c /home/norbert/Projects/pyalcs/assets/ACS2/CRRatEnvironment.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/khozzy/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/ACS2.dir/CRRatEnvironment.cc.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/CRRatEnvironment.cc.o -c /Users/khozzy/Projects/pyalcs/assets/ACS2/CRRatEnvironment.cc
 
 CMakeFiles/ACS2.dir/CRRatEnvironment.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ACS2.dir/CRRatEnvironment.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/norbert/Projects/pyalcs/assets/ACS2/CRRatEnvironment.cc > CMakeFiles/ACS2.dir/CRRatEnvironment.cc.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/khozzy/Projects/pyalcs/assets/ACS2/CRRatEnvironment.cc > CMakeFiles/ACS2.dir/CRRatEnvironment.cc.i
 
 CMakeFiles/ACS2.dir/CRRatEnvironment.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ACS2.dir/CRRatEnvironment.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/norbert/Projects/pyalcs/assets/ACS2/CRRatEnvironment.cc -o CMakeFiles/ACS2.dir/CRRatEnvironment.cc.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/khozzy/Projects/pyalcs/assets/ACS2/CRRatEnvironment.cc -o CMakeFiles/ACS2.dir/CRRatEnvironment.cc.s
 
 CMakeFiles/ACS2.dir/CRRatEnvironment.cc.o.requires:
 
@@ -299,16 +299,16 @@ CMakeFiles/ACS2.dir/CRRatEnvironment.cc.o.provides.build: CMakeFiles/ACS2.dir/CR
 
 CMakeFiles/ACS2.dir/Effect.cc.o: CMakeFiles/ACS2.dir/flags.make
 CMakeFiles/ACS2.dir/Effect.cc.o: ../Effect.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/norbert/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/ACS2.dir/Effect.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/Effect.cc.o -c /home/norbert/Projects/pyalcs/assets/ACS2/Effect.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/khozzy/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/ACS2.dir/Effect.cc.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/Effect.cc.o -c /Users/khozzy/Projects/pyalcs/assets/ACS2/Effect.cc
 
 CMakeFiles/ACS2.dir/Effect.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ACS2.dir/Effect.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/norbert/Projects/pyalcs/assets/ACS2/Effect.cc > CMakeFiles/ACS2.dir/Effect.cc.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/khozzy/Projects/pyalcs/assets/ACS2/Effect.cc > CMakeFiles/ACS2.dir/Effect.cc.i
 
 CMakeFiles/ACS2.dir/Effect.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ACS2.dir/Effect.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/norbert/Projects/pyalcs/assets/ACS2/Effect.cc -o CMakeFiles/ACS2.dir/Effect.cc.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/khozzy/Projects/pyalcs/assets/ACS2/Effect.cc -o CMakeFiles/ACS2.dir/Effect.cc.s
 
 CMakeFiles/ACS2.dir/Effect.cc.o.requires:
 
@@ -323,16 +323,16 @@ CMakeFiles/ACS2.dir/Effect.cc.o.provides.build: CMakeFiles/ACS2.dir/Effect.cc.o
 
 CMakeFiles/ACS2.dir/Environment.cc.o: CMakeFiles/ACS2.dir/flags.make
 CMakeFiles/ACS2.dir/Environment.cc.o: ../Environment.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/norbert/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/ACS2.dir/Environment.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/Environment.cc.o -c /home/norbert/Projects/pyalcs/assets/ACS2/Environment.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/khozzy/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/ACS2.dir/Environment.cc.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/Environment.cc.o -c /Users/khozzy/Projects/pyalcs/assets/ACS2/Environment.cc
 
 CMakeFiles/ACS2.dir/Environment.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ACS2.dir/Environment.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/norbert/Projects/pyalcs/assets/ACS2/Environment.cc > CMakeFiles/ACS2.dir/Environment.cc.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/khozzy/Projects/pyalcs/assets/ACS2/Environment.cc > CMakeFiles/ACS2.dir/Environment.cc.i
 
 CMakeFiles/ACS2.dir/Environment.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ACS2.dir/Environment.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/norbert/Projects/pyalcs/assets/ACS2/Environment.cc -o CMakeFiles/ACS2.dir/Environment.cc.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/khozzy/Projects/pyalcs/assets/ACS2/Environment.cc -o CMakeFiles/ACS2.dir/Environment.cc.s
 
 CMakeFiles/ACS2.dir/Environment.cc.o.requires:
 
@@ -347,16 +347,16 @@ CMakeFiles/ACS2.dir/Environment.cc.o.provides.build: CMakeFiles/ACS2.dir/Environ
 
 CMakeFiles/ACS2.dir/GripperEnvironment.cc.o: CMakeFiles/ACS2.dir/flags.make
 CMakeFiles/ACS2.dir/GripperEnvironment.cc.o: ../GripperEnvironment.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/norbert/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/ACS2.dir/GripperEnvironment.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/GripperEnvironment.cc.o -c /home/norbert/Projects/pyalcs/assets/ACS2/GripperEnvironment.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/khozzy/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/ACS2.dir/GripperEnvironment.cc.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/GripperEnvironment.cc.o -c /Users/khozzy/Projects/pyalcs/assets/ACS2/GripperEnvironment.cc
 
 CMakeFiles/ACS2.dir/GripperEnvironment.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ACS2.dir/GripperEnvironment.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/norbert/Projects/pyalcs/assets/ACS2/GripperEnvironment.cc > CMakeFiles/ACS2.dir/GripperEnvironment.cc.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/khozzy/Projects/pyalcs/assets/ACS2/GripperEnvironment.cc > CMakeFiles/ACS2.dir/GripperEnvironment.cc.i
 
 CMakeFiles/ACS2.dir/GripperEnvironment.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ACS2.dir/GripperEnvironment.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/norbert/Projects/pyalcs/assets/ACS2/GripperEnvironment.cc -o CMakeFiles/ACS2.dir/GripperEnvironment.cc.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/khozzy/Projects/pyalcs/assets/ACS2/GripperEnvironment.cc -o CMakeFiles/ACS2.dir/GripperEnvironment.cc.s
 
 CMakeFiles/ACS2.dir/GripperEnvironment.cc.o.requires:
 
@@ -371,16 +371,16 @@ CMakeFiles/ACS2.dir/GripperEnvironment.cc.o.provides.build: CMakeFiles/ACS2.dir/
 
 CMakeFiles/ACS2.dir/HandEyeEnvironment.cc.o: CMakeFiles/ACS2.dir/flags.make
 CMakeFiles/ACS2.dir/HandEyeEnvironment.cc.o: ../HandEyeEnvironment.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/norbert/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/ACS2.dir/HandEyeEnvironment.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/HandEyeEnvironment.cc.o -c /home/norbert/Projects/pyalcs/assets/ACS2/HandEyeEnvironment.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/khozzy/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/ACS2.dir/HandEyeEnvironment.cc.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/HandEyeEnvironment.cc.o -c /Users/khozzy/Projects/pyalcs/assets/ACS2/HandEyeEnvironment.cc
 
 CMakeFiles/ACS2.dir/HandEyeEnvironment.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ACS2.dir/HandEyeEnvironment.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/norbert/Projects/pyalcs/assets/ACS2/HandEyeEnvironment.cc > CMakeFiles/ACS2.dir/HandEyeEnvironment.cc.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/khozzy/Projects/pyalcs/assets/ACS2/HandEyeEnvironment.cc > CMakeFiles/ACS2.dir/HandEyeEnvironment.cc.i
 
 CMakeFiles/ACS2.dir/HandEyeEnvironment.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ACS2.dir/HandEyeEnvironment.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/norbert/Projects/pyalcs/assets/ACS2/HandEyeEnvironment.cc -o CMakeFiles/ACS2.dir/HandEyeEnvironment.cc.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/khozzy/Projects/pyalcs/assets/ACS2/HandEyeEnvironment.cc -o CMakeFiles/ACS2.dir/HandEyeEnvironment.cc.s
 
 CMakeFiles/ACS2.dir/HandEyeEnvironment.cc.o.requires:
 
@@ -395,16 +395,16 @@ CMakeFiles/ACS2.dir/HandEyeEnvironment.cc.o.provides.build: CMakeFiles/ACS2.dir/
 
 CMakeFiles/ACS2.dir/MazeEnvironment.cc.o: CMakeFiles/ACS2.dir/flags.make
 CMakeFiles/ACS2.dir/MazeEnvironment.cc.o: ../MazeEnvironment.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/norbert/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/ACS2.dir/MazeEnvironment.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/MazeEnvironment.cc.o -c /home/norbert/Projects/pyalcs/assets/ACS2/MazeEnvironment.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/khozzy/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/ACS2.dir/MazeEnvironment.cc.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/MazeEnvironment.cc.o -c /Users/khozzy/Projects/pyalcs/assets/ACS2/MazeEnvironment.cc
 
 CMakeFiles/ACS2.dir/MazeEnvironment.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ACS2.dir/MazeEnvironment.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/norbert/Projects/pyalcs/assets/ACS2/MazeEnvironment.cc > CMakeFiles/ACS2.dir/MazeEnvironment.cc.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/khozzy/Projects/pyalcs/assets/ACS2/MazeEnvironment.cc > CMakeFiles/ACS2.dir/MazeEnvironment.cc.i
 
 CMakeFiles/ACS2.dir/MazeEnvironment.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ACS2.dir/MazeEnvironment.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/norbert/Projects/pyalcs/assets/ACS2/MazeEnvironment.cc -o CMakeFiles/ACS2.dir/MazeEnvironment.cc.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/khozzy/Projects/pyalcs/assets/ACS2/MazeEnvironment.cc -o CMakeFiles/ACS2.dir/MazeEnvironment.cc.s
 
 CMakeFiles/ACS2.dir/MazeEnvironment.cc.o.requires:
 
@@ -419,16 +419,16 @@ CMakeFiles/ACS2.dir/MazeEnvironment.cc.o.provides.build: CMakeFiles/ACS2.dir/Maz
 
 CMakeFiles/ACS2.dir/MPEnvironment.cc.o: CMakeFiles/ACS2.dir/flags.make
 CMakeFiles/ACS2.dir/MPEnvironment.cc.o: ../MPEnvironment.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/norbert/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/ACS2.dir/MPEnvironment.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/MPEnvironment.cc.o -c /home/norbert/Projects/pyalcs/assets/ACS2/MPEnvironment.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/khozzy/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/ACS2.dir/MPEnvironment.cc.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/MPEnvironment.cc.o -c /Users/khozzy/Projects/pyalcs/assets/ACS2/MPEnvironment.cc
 
 CMakeFiles/ACS2.dir/MPEnvironment.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ACS2.dir/MPEnvironment.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/norbert/Projects/pyalcs/assets/ACS2/MPEnvironment.cc > CMakeFiles/ACS2.dir/MPEnvironment.cc.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/khozzy/Projects/pyalcs/assets/ACS2/MPEnvironment.cc > CMakeFiles/ACS2.dir/MPEnvironment.cc.i
 
 CMakeFiles/ACS2.dir/MPEnvironment.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ACS2.dir/MPEnvironment.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/norbert/Projects/pyalcs/assets/ACS2/MPEnvironment.cc -o CMakeFiles/ACS2.dir/MPEnvironment.cc.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/khozzy/Projects/pyalcs/assets/ACS2/MPEnvironment.cc -o CMakeFiles/ACS2.dir/MPEnvironment.cc.s
 
 CMakeFiles/ACS2.dir/MPEnvironment.cc.o.requires:
 
@@ -443,16 +443,16 @@ CMakeFiles/ACS2.dir/MPEnvironment.cc.o.provides.build: CMakeFiles/ACS2.dir/MPEnv
 
 CMakeFiles/ACS2.dir/Perception.cc.o: CMakeFiles/ACS2.dir/flags.make
 CMakeFiles/ACS2.dir/Perception.cc.o: ../Perception.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/norbert/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/ACS2.dir/Perception.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/Perception.cc.o -c /home/norbert/Projects/pyalcs/assets/ACS2/Perception.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/khozzy/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/ACS2.dir/Perception.cc.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/Perception.cc.o -c /Users/khozzy/Projects/pyalcs/assets/ACS2/Perception.cc
 
 CMakeFiles/ACS2.dir/Perception.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ACS2.dir/Perception.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/norbert/Projects/pyalcs/assets/ACS2/Perception.cc > CMakeFiles/ACS2.dir/Perception.cc.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/khozzy/Projects/pyalcs/assets/ACS2/Perception.cc > CMakeFiles/ACS2.dir/Perception.cc.i
 
 CMakeFiles/ACS2.dir/Perception.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ACS2.dir/Perception.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/norbert/Projects/pyalcs/assets/ACS2/Perception.cc -o CMakeFiles/ACS2.dir/Perception.cc.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/khozzy/Projects/pyalcs/assets/ACS2/Perception.cc -o CMakeFiles/ACS2.dir/Perception.cc.s
 
 CMakeFiles/ACS2.dir/Perception.cc.o.requires:
 
@@ -467,16 +467,16 @@ CMakeFiles/ACS2.dir/Perception.cc.o.provides.build: CMakeFiles/ACS2.dir/Percepti
 
 CMakeFiles/ACS2.dir/PMark.cc.o: CMakeFiles/ACS2.dir/flags.make
 CMakeFiles/ACS2.dir/PMark.cc.o: ../PMark.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/norbert/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object CMakeFiles/ACS2.dir/PMark.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/PMark.cc.o -c /home/norbert/Projects/pyalcs/assets/ACS2/PMark.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/khozzy/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object CMakeFiles/ACS2.dir/PMark.cc.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/PMark.cc.o -c /Users/khozzy/Projects/pyalcs/assets/ACS2/PMark.cc
 
 CMakeFiles/ACS2.dir/PMark.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ACS2.dir/PMark.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/norbert/Projects/pyalcs/assets/ACS2/PMark.cc > CMakeFiles/ACS2.dir/PMark.cc.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/khozzy/Projects/pyalcs/assets/ACS2/PMark.cc > CMakeFiles/ACS2.dir/PMark.cc.i
 
 CMakeFiles/ACS2.dir/PMark.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ACS2.dir/PMark.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/norbert/Projects/pyalcs/assets/ACS2/PMark.cc -o CMakeFiles/ACS2.dir/PMark.cc.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/khozzy/Projects/pyalcs/assets/ACS2/PMark.cc -o CMakeFiles/ACS2.dir/PMark.cc.s
 
 CMakeFiles/ACS2.dir/PMark.cc.o.requires:
 
@@ -491,16 +491,16 @@ CMakeFiles/ACS2.dir/PMark.cc.o.provides.build: CMakeFiles/ACS2.dir/PMark.cc.o
 
 CMakeFiles/ACS2.dir/ProbCharList.cc.o: CMakeFiles/ACS2.dir/flags.make
 CMakeFiles/ACS2.dir/ProbCharList.cc.o: ../ProbCharList.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/norbert/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/ACS2.dir/ProbCharList.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/ProbCharList.cc.o -c /home/norbert/Projects/pyalcs/assets/ACS2/ProbCharList.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/khozzy/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/ACS2.dir/ProbCharList.cc.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/ProbCharList.cc.o -c /Users/khozzy/Projects/pyalcs/assets/ACS2/ProbCharList.cc
 
 CMakeFiles/ACS2.dir/ProbCharList.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ACS2.dir/ProbCharList.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/norbert/Projects/pyalcs/assets/ACS2/ProbCharList.cc > CMakeFiles/ACS2.dir/ProbCharList.cc.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/khozzy/Projects/pyalcs/assets/ACS2/ProbCharList.cc > CMakeFiles/ACS2.dir/ProbCharList.cc.i
 
 CMakeFiles/ACS2.dir/ProbCharList.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ACS2.dir/ProbCharList.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/norbert/Projects/pyalcs/assets/ACS2/ProbCharList.cc -o CMakeFiles/ACS2.dir/ProbCharList.cc.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/khozzy/Projects/pyalcs/assets/ACS2/ProbCharList.cc -o CMakeFiles/ACS2.dir/ProbCharList.cc.s
 
 CMakeFiles/ACS2.dir/ProbCharList.cc.o.requires:
 
@@ -515,16 +515,16 @@ CMakeFiles/ACS2.dir/ProbCharList.cc.o.provides.build: CMakeFiles/ACS2.dir/ProbCh
 
 CMakeFiles/ACS2.dir/ProbCharPosList.cc.o: CMakeFiles/ACS2.dir/flags.make
 CMakeFiles/ACS2.dir/ProbCharPosList.cc.o: ../ProbCharPosList.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/norbert/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object CMakeFiles/ACS2.dir/ProbCharPosList.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/ProbCharPosList.cc.o -c /home/norbert/Projects/pyalcs/assets/ACS2/ProbCharPosList.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/khozzy/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object CMakeFiles/ACS2.dir/ProbCharPosList.cc.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ACS2.dir/ProbCharPosList.cc.o -c /Users/khozzy/Projects/pyalcs/assets/ACS2/ProbCharPosList.cc
 
 CMakeFiles/ACS2.dir/ProbCharPosList.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ACS2.dir/ProbCharPosList.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/norbert/Projects/pyalcs/assets/ACS2/ProbCharPosList.cc > CMakeFiles/ACS2.dir/ProbCharPosList.cc.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/khozzy/Projects/pyalcs/assets/ACS2/ProbCharPosList.cc > CMakeFiles/ACS2.dir/ProbCharPosList.cc.i
 
 CMakeFiles/ACS2.dir/ProbCharPosList.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ACS2.dir/ProbCharPosList.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/norbert/Projects/pyalcs/assets/ACS2/ProbCharPosList.cc -o CMakeFiles/ACS2.dir/ProbCharPosList.cc.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/khozzy/Projects/pyalcs/assets/ACS2/ProbCharPosList.cc -o CMakeFiles/ACS2.dir/ProbCharPosList.cc.s
 
 CMakeFiles/ACS2.dir/ProbCharPosList.cc.o.requires:
 
@@ -585,7 +585,7 @@ ACS2: CMakeFiles/ACS2.dir/ProbCharList.cc.o
 ACS2: CMakeFiles/ACS2.dir/ProbCharPosList.cc.o
 ACS2: CMakeFiles/ACS2.dir/build.make
 ACS2: CMakeFiles/ACS2.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/norbert/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Linking CXX executable ACS2"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/khozzy/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Linking CXX executable ACS2"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/ACS2.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -621,6 +621,6 @@ CMakeFiles/ACS2.dir/clean:
 .PHONY : CMakeFiles/ACS2.dir/clean
 
 CMakeFiles/ACS2.dir/depend:
-	cd /home/norbert/Projects/pyalcs/assets/ACS2/cmake-build-debug && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/norbert/Projects/pyalcs/assets/ACS2 /home/norbert/Projects/pyalcs/assets/ACS2 /home/norbert/Projects/pyalcs/assets/ACS2/cmake-build-debug /home/norbert/Projects/pyalcs/assets/ACS2/cmake-build-debug /home/norbert/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles/ACS2.dir/DependInfo.cmake --color=$(COLOR)
+	cd /Users/khozzy/Projects/pyalcs/assets/ACS2/cmake-build-debug && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/khozzy/Projects/pyalcs/assets/ACS2 /Users/khozzy/Projects/pyalcs/assets/ACS2 /Users/khozzy/Projects/pyalcs/assets/ACS2/cmake-build-debug /Users/khozzy/Projects/pyalcs/assets/ACS2/cmake-build-debug /Users/khozzy/Projects/pyalcs/assets/ACS2/cmake-build-debug/CMakeFiles/ACS2.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/ACS2.dir/depend
 
