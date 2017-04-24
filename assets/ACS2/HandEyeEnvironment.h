@@ -29,61 +29,74 @@
 #define HE_TEST_NO 100 /* number of tests during testing mode */
 #define HE_TEST_ONLY_CHANGES 0 /* defines if only changes, non changes, or all possibilities should be tested */
 
-class HandEyeEnvironment: public Environment
-{
- public:
-  HandEyeEnvironment(char *nothing);
-  ~HandEyeEnvironment();
+class HandEyeEnvironment : public Environment {
+public:
+    HandEyeEnvironment(char *nothing);
 
-  void getSituation(Perception *perception);
-  int getPerceptionLength() {return envSize;}
-  double executeAction(Action *act);
-  int isReset();
-  int reset();
-  
-  int getNoActions();
-  Action** getActions();
-  char *getActionString(Action *act);
+    ~HandEyeEnvironment();
 
-  void doTesting();//Used for testing purposes
-  int getNextTest(Perception *p0, Action *act, Perception *p1);
-  void endTesting();//Used for testing purposes
-  int getGoalState(Perception *perception);
-  
-  char* getID(){char *id=new char[8]; strcpy(id,"HandEye"); return id;}
+    void getSituation(Perception *perception);
 
-  friend ostream&
-    operator<<(ostream& out, HandEyeEnvironment *env);
+    int getPerceptionLength() { return envSize; }
 
- private:
-  double moveGripper(int xstart, int ystart, int xend, int yend);
-  double gripBlock(int x, int y);
-  double releaseBlock(int x, int y);
+    double executeAction(Action *act);
 
-  int envSize;
+    int isReset();
 
-  char *env;
-  char *originalEnv;
+    int reset();
 
-  int gPosX;
-  int gPosY;
-  int originalGPosX;
-  int originalGPosY;
-  
-  int blockInHand;
-  int originalBlockInHand;
-  
-  int *blockPositions;
-  int *originalBlockPositions;
+    int getNoActions();
 
-  int testCounter;
+    Action **getActions();
 
-  int goalGeneratorState;
+    char *getActionString(Action *act);
+
+    void doTesting();//Used for testing purposes
+    int getNextTest(Perception *p0, Action *act, Perception *p1);
+
+    void endTesting();//Used for testing purposes
+    int getGoalState(Perception *perception);
+
+    char *getID() {
+        char *id = new char[8];
+        strcpy(id, "HandEye");
+        return id;
+    }
+
+    friend ostream &
+    operator<<(ostream &out, HandEyeEnvironment *env);
+
+private:
+    double moveGripper(int xstart, int ystart, int xend, int yend);
+
+    double gripBlock(int x, int y);
+
+    double releaseBlock(int x, int y);
+
+    int envSize;
+
+    char *env;
+    char *originalEnv;
+
+    int gPosX;
+    int gPosY;
+    int originalGPosX;
+    int originalGPosY;
+
+    int blockInHand;
+    int originalBlockInHand;
+
+    int *blockPositions;
+    int *originalBlockPositions;
+
+    int testCounter;
+
+    int goalGeneratorState;
 };
 
 #ifndef _frand_
 #define _frand_
-#define frand() ((double) rand() / (RAND_MAX+1.0)) 
+#define frand() ((double) rand() / (RAND_MAX+1.0))
 #endif
 
 #endif

@@ -24,29 +24,38 @@
 
 using namespace std;
 
-class PMark
-{
- public:
-  PMark(){list=new CharCharPosList();empty=1;}
-  PMark(PMark *mark);
-  ~PMark() {delete list;}
+class PMark {
+public:
+    PMark() {
+        list = new CharCharPosList();
+        empty = 1;
+    }
 
-  int setMark(Condition *con, Perception *percept);
+    PMark(PMark *mark);
 
-  Condition *getDifferences(Perception *percept);
-  
-  int isEmpty();
-  int isEnhanced();
-  int isEqual(PMark *m2, Perception *p0);
-  int doesMatch(PMark *m2);
-  int doesMatch(Perception *p0);
+    ~PMark() { delete list; }
 
-  friend ostream& operator<<(ostream& out, PMark *pm);
+    int setMark(Condition *con, Perception *percept);
 
- private:
-  int setMark(Perception *percept);
-  CharCharPosList *list;
-  int empty;
+    Condition *getDifferences(Perception *percept);
+
+    int isEmpty();
+
+    int isEnhanced();
+
+    int isEqual(PMark *m2, Perception *p0);
+
+    int doesMatch(PMark *m2);
+
+    int doesMatch(Perception *p0);
+
+    friend ostream &operator<<(ostream &out, PMark *pm);
+
+private:
+    int setMark(Perception *percept);
+
+    CharCharPosList *list;
+    int empty;
 };
 
 #endif

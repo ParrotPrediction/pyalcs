@@ -35,44 +35,55 @@
 #define CR90_PHASE3TIME 100
 #define CR90_PHASE4TIME 80
 
-class CRRatEnvironment: public Environment
-{
- public:
-  CRRatEnvironment(char *fileName);
-  ~CRRatEnvironment();
+class CRRatEnvironment : public Environment {
+public:
+    CRRatEnvironment(char *fileName);
 
-  void getSituation(Perception *perception);
-  double executeAction(Action *act);
-  int isReset();
-  int reset();
-  
-  int getNoActions();
-  Action** getActions();
-  char *getActionString(Action *act);
+    ~CRRatEnvironment();
 
-  void doTesting();//Used for testing purposes
-  int getNextTest(Perception *p0, Action *act, Perception *p1);
-  void endTesting();//Used for testing purposes
+    void getSituation(Perception *perception);
 
-  int getGoalState(Perception *perception){return 0;}
-  int getPerceptionLength() {return length;}
+    double executeAction(Action *act);
 
-  char* getID(){char *id=new char[6]; strcpy(id,"CRRat"); return id;}
-  
-  friend ostream&
-    operator<<(ostream& out, CRRatEnvironment *env);
+    int isReset();
 
- private:
-  int timer;
-  int phase;
-  int length;
-  int doReset;
-  char *situation;
+    int reset();
+
+    int getNoActions();
+
+    Action **getActions();
+
+    char *getActionString(Action *act);
+
+    void doTesting();//Used for testing purposes
+    int getNextTest(Perception *p0, Action *act, Perception *p1);
+
+    void endTesting();//Used for testing purposes
+
+    int getGoalState(Perception *perception) { return 0; }
+
+    int getPerceptionLength() { return length; }
+
+    char *getID() {
+        char *id = new char[6];
+        strcpy(id, "CRRat");
+        return id;
+    }
+
+    friend ostream &
+    operator<<(ostream &out, CRRatEnvironment *env);
+
+private:
+    int timer;
+    int phase;
+    int length;
+    int doReset;
+    char *situation;
 };
 
 #ifndef _frand_
 #define _frand_
-#define frand() ((double) rand() / (RAND_MAX+1.0)) 
+#define frand() ((double) rand() / (RAND_MAX+1.0))
 #endif
 
 #endif

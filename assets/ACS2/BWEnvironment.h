@@ -31,44 +31,55 @@
 #define BW_TEST_ONLY_CHANGES 0 /* defines if only changes or all possibilities should be tested (-1 = only non-changes)*/
 #define BW_TEST_ALL_POSSIBILITIES_UNIFORMLY 0 /*defines if all possibilities should be tested uniformly randomly during testing */
 
-class BWEnvironment: public Environment
-{
- public:
-  BWEnvironment(char *nothing);
-  ~BWEnvironment();
+class BWEnvironment : public Environment {
+public:
+    BWEnvironment(char *nothing);
 
-  void getSituation(Perception *perception);
-  int getPerceptionLength() {return envSize;}
-  double executeAction(Action *act);
-  int isReset();
-  int reset();
+    ~BWEnvironment();
 
-  int getNoActions();
-  Action** getActions();
-  char *getActionString(Action *act);
+    void getSituation(Perception *perception);
 
-  void doTesting();//Used for testing purposes
-  int getNextTest(Perception *p0, Action *act, Perception *p1);
-  void endTesting();//Used for testing purposes
-  int getGoalState(Perception *perception){return 0;}
-  
-  char* getID(){char *id=new char[3]; strcpy(id,"BW"); return id;}
+    int getPerceptionLength() { return envSize; }
 
-  friend ostream&
-    operator<<(ostream& out, BWEnvironment *env);
+    double executeAction(Action *act);
 
- private:
-  void resetUniform();
-  
-  char *env;
-  char *originalEnv;
-  int envSize;
-  int testCounter;
+    int isReset();
+
+    int reset();
+
+    int getNoActions();
+
+    Action **getActions();
+
+    char *getActionString(Action *act);
+
+    void doTesting();//Used for testing purposes
+    int getNextTest(Perception *p0, Action *act, Perception *p1);
+
+    void endTesting();//Used for testing purposes
+    int getGoalState(Perception *perception) { return 0; }
+
+    char *getID() {
+        char *id = new char[3];
+        strcpy(id, "BW");
+        return id;
+    }
+
+    friend ostream &
+    operator<<(ostream &out, BWEnvironment *env);
+
+private:
+    void resetUniform();
+
+    char *env;
+    char *originalEnv;
+    int envSize;
+    int testCounter;
 };
 
 #ifndef _frand_
 #define _frand_
-#define frand() ((double) rand() / (RAND_MAX+1.0)) 
+#define frand() ((double) rand() / (RAND_MAX+1.0))
 #endif
 
 #endif

@@ -23,35 +23,44 @@
 
 using namespace std;
 
-class Effect
-{
- public:
-  Effect() {list=new ProbCharPosList();}
-  Effect(Effect *eff);
-  Effect(Effect *ef1, Effect *ef2, double q1, double q2, Perception *percept);
+class Effect {
+public:
+    Effect() { list = new ProbCharPosList(); }
 
-  ~Effect() {delete list;} 
+    Effect(Effect *eff);
 
-  Perception* getBestAnticipation(Perception *percept);
-  Condition *getBestAnticipation(Condition *con);
-  int doesAnticipateCorrectly(Perception *p0, Perception *p1);
-  int isEnhanced();
-  void updateEnhancedEffectProbs(Perception *percept, double updateRate);
-  int doesMatch(Perception *percept, Perception *condPercept);
-  int doesSpecifyOnlyChangesBackwards(Perception *backAnt, Perception *situation);
-  int isEqual(Effect *e2);
+    Effect(Effect *ef1, Effect *ef2, double q1, double q2, Perception *percept);
 
-  Condition *getAndSpecialize(Perception *p0, Perception *p1);
+    ~Effect() { delete list; }
 
-  int isSpecializable(Perception *p0, Perception *p1);
+    Perception *getBestAnticipation(Perception *percept);
 
-  int getSpecificity() {return list->getSize();}
+    Condition *getBestAnticipation(Condition *con);
 
-  ProbCharPosList *getList() {return list;}
-  friend ostream& operator<<(ostream& out, Effect *e);
+    int doesAnticipateCorrectly(Perception *p0, Perception *p1);
 
- private:
-  ProbCharPosList *list;
+    int isEnhanced();
+
+    void updateEnhancedEffectProbs(Perception *percept, double updateRate);
+
+    int doesMatch(Perception *percept, Perception *condPercept);
+
+    int doesSpecifyOnlyChangesBackwards(Perception *backAnt, Perception *situation);
+
+    int isEqual(Effect *e2);
+
+    Condition *getAndSpecialize(Perception *p0, Perception *p1);
+
+    int isSpecializable(Perception *p0, Perception *p1);
+
+    int getSpecificity() { return list->getSize(); }
+
+    ProbCharPosList *getList() { return list; }
+
+    friend ostream &operator<<(ostream &out, Effect *e);
+
+private:
+    ProbCharPosList *list;
 };
 
 #endif

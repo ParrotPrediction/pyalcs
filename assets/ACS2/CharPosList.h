@@ -21,53 +21,83 @@
 #include"Perception.h"
 
 
-class CharPosItem
-{
-  friend class CharPosList;
+class CharPosItem {
+    friend class CharPosList;
+
 public:
-  int getPos() {return p;}
-  char getChar() {return c;}
+    int getPos() { return p; }
+
+    char getChar() { return c; }
+
 private:
-  CharPosItem(char chr, int pos) {p=pos; c=chr; next=0;}
-  ~CharPosItem() { delete next;}
-  int p;
-  char c;
-  CharPosItem *next;
+    CharPosItem(char chr, int pos) {
+        p = pos;
+        c = chr;
+        next = 0;
+    }
+
+    ~CharPosItem() { delete next; }
+
+    int p;
+    char c;
+    CharPosItem *next;
 };
 
 
-class CharPosList
-{
- public:
-  CharPosList() {first=0; act=0; size=0;}
-  CharPosList(char ch, int pos);
-  CharPosList(CharPosList *oldList);
-  ~CharPosList() { delete first;}
+class CharPosList {
+public:
+    CharPosList() {
+        first = 0;
+        act = 0;
+        size = 0;
+    }
 
-  char getChar(int pos);
-  int insert(char chr, int pos);
-  int insertAt(char chr, int epos);
-  int insert(CharPosList *list);
-  int remove(int pos);
-  int removeAt(int nr);
-  int removeItem(CharPosItem *item);
-  int getSize() {return size;}
-  void reset() {act=first;}
-  void uniformCrossover(CharPosList *cpl);
-  void onePointCrossover(CharPosList *cpl, int len);
-  void twoPointCrossover(CharPosList *cpl, int len);
-  CharPosItem *getNextItem();
- private:
-  void remove(CharPosItem *cpip, CharPosItem *cpipl);
-  void switchPointer(CharPosItem *cplp, CharPosItem *cplpl, CharPosList *cpl2, CharPosItem *cplp2, CharPosItem *cplpl2);
-  CharPosItem *first; 
-  CharPosItem *act;
-  int size;
+    CharPosList(char ch, int pos);
+
+    CharPosList(CharPosList *oldList);
+
+    ~CharPosList() { delete first; }
+
+    char getChar(int pos);
+
+    int insert(char chr, int pos);
+
+    int insertAt(char chr, int epos);
+
+    int insert(CharPosList *list);
+
+    int remove(int pos);
+
+    int removeAt(int nr);
+
+    int removeItem(CharPosItem *item);
+
+    int getSize() { return size; }
+
+    void reset() { act = first; }
+
+    void uniformCrossover(CharPosList *cpl);
+
+    void onePointCrossover(CharPosList *cpl, int len);
+
+    void twoPointCrossover(CharPosList *cpl, int len);
+
+    CharPosItem *getNextItem();
+
+private:
+    void remove(CharPosItem *cpip, CharPosItem *cpipl);
+
+    void
+    switchPointer(CharPosItem *cplp, CharPosItem *cplpl, CharPosList *cpl2, CharPosItem *cplp2, CharPosItem *cplpl2);
+
+    CharPosItem *first;
+    CharPosItem *act;
+    int size;
 };
 
 #ifndef _frand_
 #define _frand_
-#define frand() ((double) rand() / (RAND_MAX+1.0)) 
+#define frand() ((double) rand() / (RAND_MAX+1.0))
 #endif
 
 #endif

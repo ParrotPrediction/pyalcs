@@ -22,24 +22,30 @@ using namespace std;
 
 class Environment;
 
-class Action
-{
- public:
-  static Environment *env;
+class Action {
+public:
+    static Environment *env;
 
-  Action() {act=0;}
-  Action(Action *a) {act = a->act;}
-  Action(int a) {act =a;}
-  ~Action() {;}
-  
-  void setAction(Action *a) {act = a->act;}
-  void setAction(int action) {act = action;}
-  int isEqual(Action *a2) {if(act == a2->act) return 1; else return 0;}
-  int getNr() {return act;}
+    Action() { act = 0; }
 
-  friend ostream& operator<<(ostream& out, Action *a);
- private:
-  int act;
+    Action(Action *a) { act = a->act; }
+
+    Action(int a) { act = a; }
+
+    ~Action() { ; }
+
+    void setAction(Action *a) { act = a->act; }
+
+    void setAction(int action) { act = action; }
+
+    int isEqual(Action *a2) { if (act == a2->act) return 1; else return 0; }
+
+    int getNr() { return act; }
+
+    friend ostream &operator<<(ostream &out, Action *a);
+
+private:
+    int act;
 };
 
 #endif

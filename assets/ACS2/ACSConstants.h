@@ -61,7 +61,7 @@
 
 #define MAX_STEPS 30000
 #define MAX_TRIAL_STEPS 50
-#define ANZ_EXPERIMENTS 20 
+#define ANZ_EXPERIMENTS 20
 
 #define REWARD_TEST 0
 #define MODEL_TEST_TYPE 0 /* 0 = test all reliable classifiers, 1 = test highest quality classifier */
@@ -73,7 +73,7 @@
 
 #ifndef _frand_
 #define _frand_
-#define frand() ((double) rand() / (RAND_MAX+1.0)) 
+#define frand() ((double) rand() / (RAND_MAX+1.0))
 #endif
 
 #endif

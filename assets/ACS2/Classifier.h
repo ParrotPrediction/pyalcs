@@ -27,88 +27,153 @@
 
 using namespace std;
 
-class Classifier
-{
- public:
-  Classifier(Action *action);
-  Classifier(Classifier *cl, int time);
-  Classifier(Perception *p0, Action *act, Perception *p1, int time);
-  ~Classifier() {delete C; delete A; delete E; delete M;}
+class Classifier {
+public:
+    Classifier(Action *action);
 
-  Classifier *expectedCase(Perception *percept, int time);
-  Classifier *unexpectedCase(Perception *p0, Perception *p1, int time);
-  int isSimilar(Classifier *cl);
-  int doesMatch(Perception *percept);
-  int doesMatchBackwards(Perception *percept);
-  int doesLink(Classifier *cl);
-  int hasAction(Action *act){return act->isEqual(A);}
-  int doesAnticipateCorrect(Perception *p0, Perception *p1);
-  int doesSubsume(Classifier *cl);
+    Classifier(Classifier *cl, int time);
 
-  void mutate();
-  void crossover(Classifier *cl);
+    Classifier(Perception *p0, Action *act, Perception *p1, int time);
 
-  Classifier* mergeClassifiers(Classifier *cl2, Perception *percept, int time);
+    ~Classifier() {
+        delete C;
+        delete A;
+        delete E;
+        delete M;
+    }
 
-  Perception *getBestAnticipation(Perception *percept);
-  Perception *getBackwardsAnticipation(Perception *percept);
-  void mark(Perception *p0) {if( M->setMark(C, p0)) ee=0;}
+    Classifier *expectedCase(Perception *percept, int time);
 
-  double getSpecificity() {return ((double)C->getSpecificity())/Perception::length;}
-  int getUnchangeSpec();
-  int doesAnticipateChange();
+    Classifier *unexpectedCase(Perception *p0, Perception *p1, int time);
 
-  void halfQuality() {q /= 2.;}
-  void setGATimeStamp(int time) {if(time > tga) tga = time;}
-  double setALPTimeStamp(int time);
-  double increaseQuality(){return q += BETA * (1.-q);}
-  double reverseIncreaseQuality() { return q = (q - BETA) / (1.-BETA);}
-  double decreaseQuality(){return q -= BETA * q;}
-  double updateReward(double P){return r += BETA * (P-r);}
-  double updateImmediateReward(double rho){return i += BETA * (rho-i);}
-  int increaseNumerosity(){return ++num;}
-  int decreaseNumerosity(){return --num;}
-  int increaseExperience(){return ++exp;}
+    int isSimilar(Classifier *cl);
 
-  friend ostream&
-    operator<<(ostream& out, Classifier *cl);
+    int doesMatch(Perception *percept);
 
-  Condition *getCondition() {return C;}
-  Action *getAction() {return A;}
-  Effect *getEffect() {return E;}
-  PMark  *getPMark() {return M;}
-  double getQuality() {return q;}
-  double getRewardPrediction() {return r;}
-  double getImmediateRewardPrediction() {return i;}
-  int getNumerosity() {return num;}
-  int getGATimeStamp() {return tga;}
-  int getALPTimeStamp() {return talp;}
-  double getApplicationAverage() {return tav;}
-  int getExperience() {return exp;}
-  int isMoreGeneral(Classifier *cl);  
-  int isSubsumer();
-  int isMarked();
-  int isEnhanceable() {return ee;}
+    int doesMatchBackwards(Perception *percept);
 
- private:
-  Classifier() {C=0;A=0;E=0;M=0;q=0.;r=0.;num=1;tga=0;exp=1;ee=0;}
-  Classifier(Condition *con, Action *act, Effect *eff);
-  Classifier(Condition *con, Action *act, Effect *eff, int time);
-  Classifier(Condition *con, Action *act, Effect *eff, int time, double quality, double rewardPrediction, double imRewPrediction);
+    int doesLink(Classifier *cl);
 
-  int generalizeRandomUnchangeCond(int noSpec);
-  int doesLink(char chr, int pos, CharPosList *cpl2, CharPosItem **cpi2, ProbCharPosList *pcpl2, ProbCharPosItem **pcpi2);
-  int doesTightLink(char chr, int pos, CharPosList *cpl2, CharPosItem **cpi2);
+    int hasAction(Action *act) { return act->isEqual(A); }
 
-  Condition *C;
-  Action *A;
-  Effect *E;
-  PMark *M;
-  double q, r, i, tav;
-  int num, tga, exp, talp;
-  int ee;
+    int doesAnticipateCorrect(Perception *p0, Perception *p1);
 
-  void initialize(Condition *con, Action *act, Effect *eff, PMark *mark, int time, double qual, double rew, double iRew, double avTime);
+    int doesSubsume(Classifier *cl);
+
+    void mutate();
+
+    void crossover(Classifier *cl);
+
+    Classifier *mergeClassifiers(Classifier *cl2, Perception *percept, int time);
+
+    Perception *getBestAnticipation(Perception *percept);
+
+    Perception *getBackwardsAnticipation(Perception *percept);
+
+    void mark(Perception *p0) { if (M->setMark(C, p0)) ee = 0; }
+
+    double getSpecificity() { return ((double) C->getSpecificity()) / Perception::length; }
+
+    int getUnchangeSpec();
+
+    int doesAnticipateChange();
+
+    void halfQuality() { q /= 2.; }
+
+    void setGATimeStamp(int time) { if (time > tga) tga = time; }
+
+    double setALPTimeStamp(int time);
+
+    double increaseQuality() { return q += BETA * (1. - q); }
+
+    double reverseIncreaseQuality() { return q = (q - BETA) / (1. - BETA); }
+
+    double decreaseQuality() { return q -= BETA * q; }
+
+    double updateReward(double P) { return r += BETA * (P - r); }
+
+    double updateImmediateReward(double rho) { return i += BETA * (rho - i); }
+
+    int increaseNumerosity() { return ++num; }
+
+    int decreaseNumerosity() { return --num; }
+
+    int increaseExperience() { return ++exp; }
+
+    friend ostream &
+    operator<<(ostream &out, Classifier *cl);
+
+    Condition *getCondition() { return C; }
+
+    Action *getAction() { return A; }
+
+    Effect *getEffect() { return E; }
+
+    PMark *getPMark() { return M; }
+
+    double getQuality() { return q; }
+
+    double getRewardPrediction() { return r; }
+
+    double getImmediateRewardPrediction() { return i; }
+
+    int getNumerosity() { return num; }
+
+    int getGATimeStamp() { return tga; }
+
+    int getALPTimeStamp() { return talp; }
+
+    double getApplicationAverage() { return tav; }
+
+    int getExperience() { return exp; }
+
+    int isMoreGeneral(Classifier *cl);
+
+    int isSubsumer();
+
+    int isMarked();
+
+    int isEnhanceable() { return ee; }
+
+private:
+    Classifier() {
+        C = 0;
+        A = 0;
+        E = 0;
+        M = 0;
+        q = 0.;
+        r = 0.;
+        num = 1;
+        tga = 0;
+        exp = 1;
+        ee = 0;
+    }
+
+    Classifier(Condition *con, Action *act, Effect *eff);
+
+    Classifier(Condition *con, Action *act, Effect *eff, int time);
+
+    Classifier(Condition *con, Action *act, Effect *eff, int time, double quality, double rewardPrediction,
+               double imRewPrediction);
+
+    int generalizeRandomUnchangeCond(int noSpec);
+
+    int
+    doesLink(char chr, int pos, CharPosList *cpl2, CharPosItem **cpi2, ProbCharPosList *pcpl2, ProbCharPosItem **pcpi2);
+
+    int doesTightLink(char chr, int pos, CharPosList *cpl2, CharPosItem **cpi2);
+
+    Condition *C;
+    Action *A;
+    Effect *E;
+    PMark *M;
+    double q, r, i, tav;
+    int num, tga, exp, talp;
+    int ee;
+
+    void
+    initialize(Condition *con, Action *act, Effect *eff, PMark *mark, int time, double qual, double rew, double iRew,
+               double avTime);
 };
 
 #endif

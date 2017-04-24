@@ -19,46 +19,71 @@
 
 #include"ProbCharList.h"
 
-class ProbCharPosItem
-{
-  friend class ProbCharPosList;
- public:
-  int getPos() {return p;}
-  ProbCharList* getItem() {return item;}
- private:
-  ProbCharPosItem(ProbCharList *pcl, int pos) {p=pos; item=pcl; next=0;}
-  ~ProbCharPosItem() { delete item; delete next;}
-  
-  int p;
-  ProbCharList *item;
-  
-  ProbCharPosItem *next;
+class ProbCharPosItem {
+    friend class ProbCharPosList;
+
+public:
+    int getPos() { return p; }
+
+    ProbCharList *getItem() { return item; }
+
+private:
+    ProbCharPosItem(ProbCharList *pcl, int pos) {
+        p = pos;
+        item = pcl;
+        next = 0;
+    }
+
+    ~ProbCharPosItem() {
+        delete item;
+        delete next;
+    }
+
+    int p;
+    ProbCharList *item;
+
+    ProbCharPosItem *next;
 };
 
 
-class ProbCharPosList
-{
-  friend class Effect;
- public:
-  void reset() {act=first;}
-  ProbCharPosItem *getNextItem();
- private:
-  ProbCharPosList() {first=0; act=0; size=0;}
-  ProbCharPosList(char ch, int pos);
-  ProbCharPosList(ProbCharPosList *oldList);
-  ~ProbCharPosList() { delete first;}
+class ProbCharPosList {
+    friend class Effect;
 
-  int insert(char chr, int pos);
-  int insertAt(char chr, int epos);
-  int remove(int pos);
-  int removeAt(int nr);
-  int getSize() {return size;}
-  ProbCharPosItem *getItem(int pos);
+public:
+    void reset() { act = first; }
 
-  void remove(ProbCharPosItem *cpip, ProbCharPosItem *cpipl);
-  ProbCharPosItem *first; 
-  ProbCharPosItem *act;
-  int size;
+    ProbCharPosItem *getNextItem();
+
+private:
+    ProbCharPosList() {
+        first = 0;
+        act = 0;
+        size = 0;
+    }
+
+    ProbCharPosList(char ch, int pos);
+
+    ProbCharPosList(ProbCharPosList *oldList);
+
+    ~ProbCharPosList() { delete first; }
+
+    int insert(char chr, int pos);
+
+    int insertAt(char chr, int epos);
+
+    int remove(int pos);
+
+    int removeAt(int nr);
+
+    int getSize() { return size; }
+
+    ProbCharPosItem *getItem(int pos);
+
+    void remove(ProbCharPosItem *cpip, ProbCharPosItem *cpipl);
+
+    ProbCharPosItem *first;
+    ProbCharPosItem *act;
+    int size;
 };
 
 #endif

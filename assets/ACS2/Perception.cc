@@ -12,50 +12,43 @@
 */
 
 #include<iostream>
-#include<fstream>
-#include<string.h>
 #include<assert.h>
 #include"Perception.h"
 
 /**
  * Creates a copy of the old perception 'old'.
  */
-Perception::Perception(Perception *old)
-{
-  percept=new char[strlen(old->percept)+1]; 
-  strcpy(percept, old->percept);
+Perception::Perception(Perception *old) {
+    percept = new char[strlen(old->percept) + 1];
+    strcpy(percept, old->percept);
 }
 
 /**
  * Sets the perception to the string 'in'.
  */
-void Perception::setPerception(char *in)
-{
-  assert((signed int)strlen(in) == length);
-  strcpy(percept, in);
+void Perception::setPerception(char *in) {
+    assert((signed int) strlen(in) == length);
+    strcpy(percept, in);
 }
 
 /**
  * Copies the perception 'percept' to this perception.
  */
-void Perception::setPerception(Perception *percept)
-{
-  strcpy(this->percept, percept->percept);
+void Perception::setPerception(Perception *percept) {
+    strcpy(this->percept, percept->percept);
 }
 
 /**
  * Returns if the two perceptions are equal.
  */
-int Perception::isEqual(Perception *perception)
-{
-  if(strcmp(percept, perception->percept)==0) 
-    return 1; 
-  else 
-    return 0;
+int Perception::isEqual(Perception *perception) {
+    if (strcmp(percept, perception->percept) == 0)
+        return 1;
+    else
+        return 0;
 }
 
-ostream& operator<<(ostream& out, Perception *p)
-{
-  out <<p->percept;
-  return out;
+ostream &operator<<(ostream &out, Perception *p) {
+    out << p->percept;
+    return out;
 }

@@ -20,23 +20,32 @@
 
 using namespace std;
 
-class CharList
-{
- public:
-  CharList(char c) {this->c=c; next=0;}
-  CharList(CharList *oldList);
-  ~CharList() {delete next;}
+class CharList {
+public:
+    CharList(char c) {
+        this->c = c;
+        next = 0;
+    }
 
-  int insert(char c);
-  int remove(char c);
-  int doesContain(char c);
-  int isIdentical(CharList *list);
-  int isEnhanced(){if(next!=0) return 1; else return 0;}
+    CharList(CharList *oldList);
 
-  friend ostream& operator<<(ostream& out, CharList *cl);
- private:
-  CharList *next;
-  char c;
+    ~CharList() { delete next; }
+
+    int insert(char c);
+
+    int remove(char c);
+
+    int doesContain(char c);
+
+    int isIdentical(CharList *list);
+
+    int isEnhanced() { if (next != 0) return 1; else return 0; }
+
+    friend ostream &operator<<(ostream &out, CharList *cl);
+
+private:
+    CharList *next;
+    char c;
 };
 
 #endif

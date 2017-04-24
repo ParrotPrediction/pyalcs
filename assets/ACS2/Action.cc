@@ -17,10 +17,9 @@
 
 using namespace std;
 
-ostream& operator<<(ostream& out, Action *a)
-{
-  char *action = a->env->getActionString(a);
-  out <<action;
-  delete[] action;
-  return out;
+ostream &operator<<(ostream &out, Action *a) {
+    char *action = a->env->getActionString(a);
+    out << action;
+    delete[] action;
+    return out;
 }

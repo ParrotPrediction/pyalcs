@@ -26,40 +26,53 @@
 #define GRIPPER_REWARD 1000
 #define GRIPPER_MAX_WEIGHT 2
 
-class GripperEnvironment: public Environment
-{
- public:
-  GripperEnvironment(char *nothing);
-  ~GripperEnvironment();
+class GripperEnvironment : public Environment {
+public:
+    GripperEnvironment(char *nothing);
 
-  void getSituation(Perception *perception);
-  int getPerceptionLength() {return 5;}
-  double executeAction(Action *act);
-  int isReset();
-  int reset();
+    ~GripperEnvironment();
 
-  int getNoActions();
-  Action** getActions();
-  char *getActionString(Action *act);
+    void getSituation(Perception *perception);
 
-  void doTesting();
-  int getNextTest(Perception *p0, Action *act, Perception *p1);
-  void endTesting();
-  int getGoalState(Perception *perception){return 0;}
-  
-  char* getID(){char *id=new char[8]; strcpy(id,"Gripper"); return id;}
+    int getPerceptionLength() { return 5; }
 
-  friend ostream&
-    operator<<(ostream& out, GripperEnvironment *env);
+    double executeAction(Action *act);
 
- private:
-  char *env;
-  int doReset;
+    int isReset();
+
+    int reset();
+
+    int getNoActions();
+
+    Action **getActions();
+
+    char *getActionString(Action *act);
+
+    void doTesting();
+
+    int getNextTest(Perception *p0, Action *act, Perception *p1);
+
+    void endTesting();
+
+    int getGoalState(Perception *perception) { return 0; }
+
+    char *getID() {
+        char *id = new char[8];
+        strcpy(id, "Gripper");
+        return id;
+    }
+
+    friend ostream &
+    operator<<(ostream &out, GripperEnvironment *env);
+
+private:
+    char *env;
+    int doReset;
 };
 
 #ifndef _frand_
 #define _frand_
-#define frand() ((double) rand() / (RAND_MAX+1.0)) 
+#define frand() ((double) rand() / (RAND_MAX+1.0))
 #endif
 
 #endif

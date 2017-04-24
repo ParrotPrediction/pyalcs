@@ -18,44 +18,66 @@
 
 #include"CharList.h"
 
-class CharCharPosItem
-{
-  friend class CharCharPosList;
+class CharCharPosItem {
+    friend class CharCharPosList;
+
 public:
-  int getPos() {return p;}
-  CharList* getItem() {return item;}
- private:
-  CharCharPosItem(CharList *pcl, int pos) {p=pos; item=pcl; next=0;}
-  ~CharCharPosItem() { delete item; delete next;}
-  
-  int p;
-  CharList *item;  
-  CharCharPosItem *next;
+    int getPos() { return p; }
+
+    CharList *getItem() { return item; }
+
+private:
+    CharCharPosItem(CharList *pcl, int pos) {
+        p = pos;
+        item = pcl;
+        next = 0;
+    }
+
+    ~CharCharPosItem() {
+        delete item;
+        delete next;
+    }
+
+    int p;
+    CharList *item;
+    CharCharPosItem *next;
 };
 
 
-class CharCharPosList
-{
-  friend class PMark;
- public:
-  void reset() {act=first;}
-  CharCharPosItem *getNextItem();
-  CharCharPosItem *getItem(int pos);
+class CharCharPosList {
+    friend class PMark;
 
- private:
-  CharCharPosList() {first=0; act=0; size=0;}
-  CharCharPosList(char ch, int pos);
-  CharCharPosList(CharCharPosList *oldList);
-  ~CharCharPosList() {delete first;}
+public:
+    void reset() { act = first; }
 
-  int insert(char chr, int pos);
-  int insertAt(char chr, int epos);
-  int getSize() {return size;}
+    CharCharPosItem *getNextItem();
 
-  void remove(CharCharPosItem *cpip, CharCharPosItem *cpipl);
-  CharCharPosItem *first; 
-  CharCharPosItem *act;
-  int size;
+    CharCharPosItem *getItem(int pos);
+
+private:
+    CharCharPosList() {
+        first = 0;
+        act = 0;
+        size = 0;
+    }
+
+    CharCharPosList(char ch, int pos);
+
+    CharCharPosList(CharCharPosList *oldList);
+
+    ~CharCharPosList() { delete first; }
+
+    int insert(char chr, int pos);
+
+    int insertAt(char chr, int epos);
+
+    int getSize() { return size; }
+
+    void remove(CharCharPosItem *cpip, CharCharPosItem *cpipl);
+
+    CharCharPosItem *first;
+    CharCharPosItem *act;
+    int size;
 };
 
 #endif

@@ -12,13 +12,12 @@
 */
 
 #include"Action.h"
-#include"Perception.h"
 #include"Environment.h"
 
 /**
  * Default constructor.
  */
-Environment::Environment()
-{;
+Environment::Environment() {
+    ;
 }
 
