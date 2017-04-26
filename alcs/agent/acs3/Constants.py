@@ -13,3 +13,4 @@ BETA = 0.05
 GAMMA = 0.95
 EPSILON = 0.5  # Probability of exploration
 THETA_I = 0.1  # Removal in ALP
+U_MAX = 100000  # Maximum number of specified elements

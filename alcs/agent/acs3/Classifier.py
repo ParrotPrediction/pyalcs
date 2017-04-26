@@ -1,5 +1,5 @@
 from alcs.agent import Perception
-from alcs.agent.acs3 import Condition, Action, Effect
+from alcs.agent.acs3 import Condition, Action, Effect, PMark
 from alcs.agent.acs3 import Constants as c
 
 
@@ -18,6 +18,7 @@ class Classifier(object):
         self.condition = Condition(condition) if condition is not None else Condition()
         self.action = Action(action) if action is not None else None
         self.effect = Effect(effect) if effect is not None else Effect()
+        self.mark = PMark()
 
         # Quality - measures the accuracy of the anticipations
         self.q = quality
@@ -42,6 +43,30 @@ class Classifier(object):
 
         # Application average
         self.tav = None
+
+    @classmethod
+    def copy_from(cls, old_cls, time):
+        """
+        Copies old classifier with given time.
+        New classifier has no mark.
+
+        :param old_cls: classifier to copy from
+        :param time:
+        :return: new classifier
+        """
+        new_cls = cls(
+            condition=old_cls.condition,
+            action=old_cls.action,
+            effect=old_cls.effect,
+            quality=old_cls.q,
+            reward=old_cls.ir,
+            intermediate_reward=old_cls.ir)
+
+        new_cls.tga = time
+        new_cls.talp = time
+        new_cls.tav = old_cls.tav
+
+        return new_cls
 
     @classmethod
     def cover_triple(cls,
@@ -79,6 +104,23 @@ class Classifier(object):
     def fitness(self):
         return self.q * self.r
 
+    @property
+    def specified_unchanging_attributes(self):
+        """
+        Determines the number of specified unchanging attributes in
+        the classifier. An unchanging attribute is one that is anticipated
+        not to change in the effect part.
+
+        :return: number of specified unchanging attributes
+        """
+        spec = 0
+
+        for cpi, epi in zip(self.condition, self.effect):
+            if cpi != c.CLASSIFIER_WILDCARD and epi == c.CLASSIFIER_WILDCARD:
+                spec += 1
+
+        return spec
+
     def does_anticipate_change(self):
         """
         :return: true if the effect part contains any specified attributes
@@ -113,7 +155,27 @@ class Classifier(object):
         self.exp += 1
         return self.exp
 
+    def increase_quality(self) -> float:
+        self.q += c.BETA * (1 - self.q)
+        return self.q
+
     def expected_case(self, previous_perception: Perception, time: int):
+        """
+        Controls the expected case of a classifier
+        :param previous_perception:
+        :param time:
+        :return: new classifier or None
+        """
+        diff = self.mark.get_differences(previous_perception)
+
+        if diff is None:
+            self.increase_quality()
+            return
+
+        cl = self.copy_from(self, time)
+        no_spec = self.specified_unchanging_attributes
+        no_spec_new = diff.number_of_specified_elements
+
         # TODO: NYI
         pass
 

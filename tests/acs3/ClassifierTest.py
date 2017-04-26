@@ -35,6 +35,10 @@ class ClassifierTest(unittest.TestCase):
         self.cls.update_intermediate_reward(1000)
         self.assertEqual(50.0, self.cls.ir)
 
+    def test_should_increase_quality(self):
+        self.cls.increase_quality()
+        self.assertEqual(0.525, self.cls.q)
+
     def test_should_cover_triple(self):
         action_no = 2
         time = 123
@@ -54,3 +58,38 @@ class ClassifierTest(unittest.TestCase):
         self.assertEqual(time, new_cl.talp)
         self.assertEqual(1, new_cl.num)
         self.assertEqual(1, new_cl.exp)
+
+    def test_should_count_specified_unchanging_attributes(self):
+        cl1 = Classifier(
+            condition=Condition(['#', '#', '#', '#', '#', '#', '0', '#']),
+            effect=Effect(      ['#', '#', '#', '#', '#', '#', '#', '#'])
+        )
+        self.assertEqual(1, cl1.specified_unchanging_attributes)
+
+        cl2 = Classifier(
+            condition=Condition(['#', '#', '#', '#', '#', '0', '#', '0']),
+            effect=Effect(      ['#', '#', '#', '#', '#', '#', '#', '#'])
+        )
+        self.assertEqual(2, cl2.specified_unchanging_attributes)
+
+        cl3 = Classifier(
+            condition=Condition(['1', '0', '0', '0', '0', '0', '0', '1']),
+            effect=Effect(      ['#', '#', '#', '#', '1', '#', '1', '#'])
+        )
+        self.assertEqual(6, cl3.specified_unchanging_attributes)
+
+        cl4 = Classifier(
+            condition=Condition(['1', '#', '0', '#', '1', '0', '1', '1']),
+            effect=Effect(      ['0', '#', '#', '#', '#', '1', '#', '#'])
+        )
+        self.assertEqual(4, cl4.specified_unchanging_attributes)
+
+        cl5 = Classifier(
+            condition=Condition(['1', '#', '#', '#', '1', '0', '1', '1']),
+            effect=Effect(      ['0', '#', '#', '#', '#', '1', '#', '#'])
+        )
+        self.assertEqual(3, cl5.specified_unchanging_attributes)
+
+    def test_should_copy_classifier(self):
+        # TODO: NYI
+        pass
