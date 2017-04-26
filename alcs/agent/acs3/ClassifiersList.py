@@ -170,15 +170,34 @@ class ClassifiersList(list):
         :return:
         """
         self.set_alp_timestamps(time)
+
+        new_list = self()
         new_cl = None
+        found_expected_case = False
 
         for cl in self:
             cl.increase_experience()
 
             if cl.does_anticipate_correctly(previous_situation, situation):
-                pass
+                new_cl = cl.expected_case(previous_situation, time)
+                found_expected_case = True
             else:
-                pass
+                new_cl = cl.unexpected_case(previous_situation, situation, time)
+                if cl.q < c.THETA_I:
+                    # TODO: NYI: handle classifier deletion
+                    pass
+
+            if new_cl is not None:
+                self.insert_alp_offspring(new_cl, new_list)
+
+        if not found_expected_case:
+            new_cl = Classifier.cover_triple(previous_situation, action, situation, time)
+            self.insert_alp_offspring(new_cl, new_list)
+
+        # TODO: Merge classifiers from new_list into self
+        # TODO: Merge classifiers from new_list into population
+        if len(match_set) > 0:
+            match_set.add_matching_classifiers(new_list, situation)
 
     def apply_reinforcement_learning(self, rho, p) -> None:
         """
@@ -194,4 +213,12 @@ class ClassifiersList(list):
             cl.update_intermediate_reward(rho)
 
     def apply_ga(self, time, population, match_set, situation) -> None:
+        pass
+
+    def insert_alp_offspring(self, cls, list):
+        # TODO: NYI
+        pass
+
+    def add_matching_classifiers(self, list, situation: Perception):
+        # TODO: NYI
         pass

@@ -13,6 +13,7 @@
 
 #include<iostream>
 #include<assert.h>
+#include <cstring>
 #include"Perception.h"
 
 /**

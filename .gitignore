@@ -94,3 +94,7 @@ ENV/
 .DS_Store
 /assets/ACS2/cmake-build-debug/
 /assets/ACS2/*.txt
+
+# C++ byproducts
+*.o
+*.out

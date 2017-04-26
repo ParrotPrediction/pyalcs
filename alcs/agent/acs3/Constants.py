@@ -12,3 +12,4 @@ REWARD_TEST_ITERATION = 50  # Trial steps of printing the performance in a trial
 BETA = 0.05
 GAMMA = 0.95
 EPSILON = 0.5  # Probability of exploration
+THETA_I = 0.1  # Removal in ALP

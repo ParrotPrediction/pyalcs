@@ -5,26 +5,35 @@ from alcs.agent.acs3 import Constants as c
 
 class Classifier(object):
 
-    def __init__(self, action=None):
-        self.condition = Condition()
-        self.action = Action(action)
-        self.effect = Effect()
+    def __init__(self,
+                 condition=None,
+                 action=None,
+                 effect=None,
+                 quality=0.5,
+                 reward=0,
+                 intermediate_reward=0,
+                 numerosity=1,
+                 experience=1):
+
+        self.condition = Condition(condition) if condition is not None else Condition()
+        self.action = Action(action) if action is not None else None
+        self.effect = Effect(effect) if effect is not None else Effect()
 
         # Quality - measures the accuracy of the anticipations
-        self.q = 0.5
+        self.q = quality
 
         # The reward prediction - predicts the reward expected after
         # the execution of action A given condition C
-        self.r = 0
+        self.r = reward
 
         # Intermediate reward
-        self.ir = 0
+        self.ir = intermediate_reward
 
         # Numerosity
-        self.num = 1
+        self.num = numerosity
 
         # Experience
-        self.exp = 1
+        self.exp = experience
 
         # When ALP learning was triggered
         self.talp = None
@@ -33,6 +42,38 @@ class Classifier(object):
 
         # Application average
         self.tav = None
+
+    @classmethod
+    def cover_triple(cls,
+                     previous_situation: Perception,
+                     action: int,
+                     situation: Perception,
+                     time: int):
+        """
+        Creates a classifier that anticipates the change correctly
+
+        :param previous_situation:
+        :param action:
+        :param situation:
+        :param time:
+
+        :return: new classifier
+        """
+        effect = Effect()
+        condition = effect.get_and_specialize(previous_situation, situation)
+
+        new_cl = cls(
+            condition=condition,
+            action=action,
+            effect=effect,
+            reward=0.5)
+
+        new_cl.pmark = None
+        new_cl.tga = time
+        new_cl.talp = time
+        new_cl.tav = 0
+
+        return new_cl
 
     @property
     def fitness(self):
@@ -44,8 +85,9 @@ class Classifier(object):
         """
         return self.effect.number_of_specified_elements > 0
 
-    def does_anticipate_correctly(self, previous_situation: Perception, situation: Perception):
-        return self.effect.does_anticipate_correctly()
+    def does_anticipate_correctly(self, previous_situation: Perception, situation: Perception) -> bool:
+        return self.effect.does_anticipate_correctly(
+            previous_situation, situation)
 
     def set_alp_timestamp(self, time: int) -> None:
         """
@@ -70,3 +112,11 @@ class Classifier(object):
     def increase_experience(self) -> int:
         self.exp += 1
         return self.exp
+
+    def expected_case(self, previous_perception: Perception, time: int):
+        # TODO: NYI
+        pass
+
+    def unexpected_case(self, previous_perception: Perception, perception: Perception, time: int):
+        # TODO: NYI
+        pass

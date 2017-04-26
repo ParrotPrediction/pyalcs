@@ -14,6 +14,7 @@
 #include<iostream>
 #include<fstream>
 
+#include <sys/resource.h>
 #include <unistd.h>
 
 #include"Perception.h"

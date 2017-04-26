@@ -1,5 +1,6 @@
 from alcs.agent import Perception
-from alcs.agent.acs2 import Constants as c
+from alcs.agent.acs3 import Condition
+from alcs.agent.acs3 import Constants as c
 
 
 class Effect(list):
@@ -29,18 +30,51 @@ class Effect(list):
         """
         return sum(1 for comp in self if comp != c.CLASSIFIER_WILDCARD)
 
+    def get_and_specialize(self,
+                           previous_situation: Perception,
+                           situation: Perception) -> Condition:
+        """
+        Specializes the effect part where necessary to correctly anticipate
+        the changes from p0 to p1 and returns a condition which specifies
+        the attributes which must be specified in the condition part.
+        The specific attributes in the returned conditions are set to
+        the necessary values.
+
+        :param previous_situation:
+        :param situation:
+        :return: condition capturing previous perception
+        """
+        con = Condition()
+
+        for idx, item in enumerate(self):
+            if previous_situation[idx] != situation[idx]:
+                self[idx] = situation[idx]
+                con[idx] = previous_situation[idx]
+
+        return con
+
     def does_anticipate_correctly(self,
                                   previous_situation: Perception,
                                   situation: Perception) -> bool:
         """
-        Returns if the effect part anticipates correctly.
-        This is the case if all changes from p0 to p1 are specified and no
-        unchanging attributes are specified. In case of a PEE attribute that
-        contains an unchanging attribute, it is still considered to be correct.
+        Checks anticipation. While the pass-through symbols in the effect part
+        of a classifier directly anticipate that these attributes stay the same
+        after the execution of an action, the specified attributes anticipate
+        a change to the specified value. Thus, if the perceived value did not
+        change to the anticipated but actually stayed at the value, the classifier
+        anticipates incorrectly.
 
         :param previous_situation:
         :param situation:
-        :return:
+        :return: True if classifier anticipates correctly, False otherwise
         """
-        for item in self:
-            
+        for idx, item in enumerate(self):
+            if item == c.CLASSIFIER_WILDCARD:
+                if previous_situation[idx] != situation[idx]:
+                    return False
+            else:
+                if (item != situation[idx] or
+                        previous_situation[idx] == situation[idx]):
+                    return False
+
+        return True

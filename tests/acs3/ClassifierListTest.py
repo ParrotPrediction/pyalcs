@@ -26,12 +26,10 @@ class ClassifierListTest(unittest.TestCase):
         c1 = Classifier()
 
         # C2 - matching condition
-        c2 = Classifier()
-        c2.condition = Condition(['1', '#', '#', '#', '0', '#', '#', '#'])
+        c2 = Classifier(condition=['1', '#', '#', '#', '0', '#', '#', '#'])
 
         # C3 - non-matching condition
-        c3 = Classifier()
-        c3.condition = Condition(['0', '#', '#', '#', '1', '#', '#', '#'])
+        c3 = Classifier(condition=['0', '#', '#', '#', '1', '#', '#', '#'])
 
         self.population.append(c1)
         self.population.append(c2)
@@ -69,18 +67,13 @@ class ClassifierListTest(unittest.TestCase):
         self.assertEqual(0.0, self.population.get_maximum_fitness())
 
         # C2 - does anticipate some change
-        c2 = Classifier()
-        c2.effect = Effect(['1', '#', '#', '#', '0', '#', '#', '#'])
-        c2.r = 0.25
+        c2 = Classifier(effect=['1', '#', '#', '#', '0', '#', '#', '#'], reward=0.25)
 
         self.population.append(c2)
         self.assertEqual(0.125, self.population.get_maximum_fitness())
 
         # C3 - does anticipate change and is quite good
-        c3 = Classifier()
-        c3.effect = Effect(['1', '#', '#', '#', '#', '#', '#', '#'])
-        c3.q = 0.8
-        c3.r = 5
+        c3 = Classifier(effect=['1', '#', '#', '#', '#', '#', '#', '#'], quality=0.8, reward=5)
 
         self.population.append(c3)
         self.assertEqual(4, self.population.get_maximum_fitness())
@@ -88,7 +81,6 @@ class ClassifierListTest(unittest.TestCase):
     def test_should_return_best_fitness_action(self):
         # C1 - does not anticipate change
         c1 = Classifier(action=1)
-
         self.population.append(c1)
 
         # Some random action should be selected here
@@ -96,10 +88,7 @@ class ClassifierListTest(unittest.TestCase):
         self.assertIsNotNone(best_action)
 
         # C2 - does anticipate some change
-        c2 = Classifier(action=2)
-        c2.effect = Effect(['1', '#', '#', '#', '0', '#', '#', '#'])
-        c2.r = 0.25
-
+        c2 = Classifier(action=2, effect=['1', '#', '#', '#', '0', '#', '#', '#'], reward=0.25)
         self.population.append(c2)
 
         # Here C2 action should be selected
@@ -107,11 +96,7 @@ class ClassifierListTest(unittest.TestCase):
         self.assertEqual(Action(2), best_action)
 
         # C3 - does anticipate change and is quite good
-        c3 = Classifier(action=3)
-        c3.effect = Effect(['1', '#', '#', '#', '#', '#', '#', '#'])
-        c3.q = 0.8
-        c3.r = 5
-
+        c3 = Classifier(action=3, effect=['1', '#', '#', '#', '#', '#', '#', '#'], quality=0.8, reward=5)
         self.population.append(c3)
 
         # Here C3 has the biggest fitness score
@@ -164,39 +149,25 @@ class ClassifierListTest(unittest.TestCase):
         self.assertEqual(Action(1), self.population.choose_action_from_knowledge_array())
 
         # Add rest of classifiers
-        c1 = Classifier(action=1)
-        c1.num = 31
-        c1.q = 0.72
+        c1 = Classifier(action=1, numerosity=31, quality=0.72)
         self.population.append(c1)
 
-        c2 = Classifier(action=2)
-        c2.num = 2
-        c2.q = 0.6
+        c2 = Classifier(action=2, numerosity=2, quality=0.6)
         self.population.append(c2)
 
-        c3 = Classifier(action=3)
-        c3.num = 2
-        c3.q = 0.63
+        c3 = Classifier(action=3, numerosity=2, quality=0.63)
         self.population.append(c3)
 
-        c4 = Classifier(action=4)
-        c4.num = 7
-        c4.q = 0.75
+        c4 = Classifier(action=4, numerosity=7, quality=0.75)
         self.population.append(c4)
 
-        c5 = Classifier(action=5)
-        c5.num = 1
-        c5.q = 0.63
+        c5 = Classifier(action=5, numerosity=1, quality=0.63)
         self.population.append(c5)
 
-        c6 = Classifier(action=6)
-        c6.num = 6
-        c6.q = 0.52
+        c6 = Classifier(action=6, numerosity=6, quality=0.52)
         self.population.append(c6)
 
-        c7 = Classifier(action=7)
-        c7.num = 10
-        c7.q = 0.36
+        c7 = Classifier(action=7, numerosity=10, quality=0.36)
         self.population.append(c7)
 
         # Classifier C7 should be the worst here
