@@ -30,6 +30,21 @@ class Effect(list):
         """
         return sum(1 for comp in self if comp != c.CLASSIFIER_WILDCARD)
 
+    def is_specializable(self, p0: Perception, p1: Perception) -> bool:
+        """
+        Determines if the effect part is specializable.
+
+        :param p0: previous perception
+        :param p1: current perception
+        :return: True if specializable, false otherwise
+        """
+        for p0i, p1i, ei in zip(p0, p1, self):
+            if ei != c.CLASSIFIER_WILDCARD:
+                if ei != p1i or p0i == p1i:
+                    return False
+
+        return True
+
     def get_and_specialize(self,
                            previous_situation: Perception,
                            situation: Perception) -> Condition:

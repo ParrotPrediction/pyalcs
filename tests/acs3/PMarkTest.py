@@ -40,19 +40,3 @@ class PMarkTest(unittest.TestCase):
 
         for mark in self.mark:
             self.assertEqual(1, len(mark))
-
-    def test_should_get_differences(self):
-        self.mark[0] = '1'
-        self.mark[1] = '0'
-        self.mark[2] = '0'
-        self.mark[3] = '0'
-        self.mark[4] = '1'
-        self.mark[5] = '0'
-        self.mark[6] = '1'
-        self.mark[7] = '1'
-
-        p0 = Perception(['0', '0', '0', '0', '0', '0', '0', '1'])
-
-        self.assertEqual(
-            Condition(['#', '#', '#', '#', '0', '#', '#', '#']),
-            self.mark.get_differences(p0))

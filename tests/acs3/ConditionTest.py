@@ -5,7 +5,6 @@ from alcs.agent.acs3 import Condition
 
 
 class ConditionTest(unittest.TestCase):
-
     def setUp(self):
         self.c = Condition()
 
@@ -19,6 +18,25 @@ class ConditionTest(unittest.TestCase):
         self.c.specialize(2, '1')
         self.c.specialize(5, '0')
         self.assertEqual(2, self.c.number_of_specified_elements)
+
+    def test_should_specialize(self):
+        c =    Condition()
+        diff =   Condition(['#', '0', '#', '#', '#', '1', '#', '1'])
+        result = Condition(['#', '0', '#', '#', '#', '1', '#', '1'])
+        c.specialize(new_condition=diff)
+        self.assertEqual(result, c)
+
+        c =      Condition(['#', '#', '#', '1', '0', '#', '1', '#'])
+        diff =   Condition(['0', '1', '0', '#', '#', '1', '#', '#'])
+        result = Condition(['0', '1', '0', '1', '0', '1', '1', '#'])
+        c.specialize(new_condition=diff)
+        self.assertEqual(result, c)
+
+        c =      Condition(['#', '1', '0', '1', '#', '1', '0', '#'])
+        diff =   Condition(['#', '#', '#', '#', '1', '#', '#', '1'])
+        result = Condition(['#', '1', '0', '1', '1', '1', '0', '1'])
+        c.specialize(new_condition=diff)
+        self.assertEqual(result, c)
 
     def test_should_match_perception(self):
         p = Perception(['1', '0', '0', '1', '1', '0', '0', '1'])

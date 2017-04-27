@@ -41,8 +41,19 @@ class Condition(list):
         """
         return self.number_of_specified_elements / len(self)
 
-    def specialize(self, position: int, value: str):
-        self[position] = value
+    def specialize(self,
+                   position: int = None,
+                   value: str = None,
+                   new_condition=None):
+
+        if position is not None and value is not None:
+            self[position] = value
+
+        if new_condition is not None:
+            for idx, (oi, ni) in enumerate(zip(self, new_condition)):
+                if ni != c.CLASSIFIER_WILDCARD:
+                    self[idx] = ni
+
 
     def generalize(self, position):
         self[position] = c.CLASSIFIER_WILDCARD

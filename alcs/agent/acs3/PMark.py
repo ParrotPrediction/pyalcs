@@ -22,6 +22,10 @@ class PMark(list):
         for idx, item in enumerate(perception):
             self[idx] = item
 
+    def set_mark2(self, condition: Condition, perception: Perception):
+        # TODO: NYI
+        pass
+
     def get_differences(self, perception: Perception) -> Condition:
         """
         Determines the strongest differences in between the mark
@@ -52,5 +56,5 @@ class PMark(list):
             # Nothing for specialization found
             pass
 
-        # TODO: NYI
+        # TODO: implement later (probably used only in exected case)
         return condition

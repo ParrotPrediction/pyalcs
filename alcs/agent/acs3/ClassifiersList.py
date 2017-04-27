@@ -171,7 +171,7 @@ class ClassifiersList(list):
         """
         self.set_alp_timestamps(time)
 
-        new_list = self()
+        new_list = ClassifiersList()
         new_cl = None
         found_expected_case = False
 
@@ -183,6 +183,7 @@ class ClassifiersList(list):
                 found_expected_case = True
             else:
                 new_cl = cl.unexpected_case(previous_situation, situation, time)
+
                 if cl.q < c.THETA_I:
                     # TODO: NYI: handle classifier deletion
                     pass
@@ -215,7 +216,7 @@ class ClassifiersList(list):
     def apply_ga(self, time, population, match_set, situation) -> None:
         pass
 
-    def insert_alp_offspring(self, cls, list):
+    def insert_alp_offspring(self, cl, list):
         # TODO: NYI
         pass
 

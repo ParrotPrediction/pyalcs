@@ -1,4 +1,3 @@
-# TODO: action setter should be limited to int and within environment range
 from functools import total_ordering
 
 

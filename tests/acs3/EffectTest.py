@@ -68,3 +68,29 @@ class EffectTest(unittest.TestCase):
         c = e.get_and_specialize(p0, p1)
         self.assertEqual(Effect(['#', '#', '#', '1', '#', '#', '#', '#']), e)
         self.assertEqual(Condition(['#', '#', '#', '0', '#', '#', '#', '#']), c)
+
+    def test_should_check_if_specializable(self):
+        p0 = Perception(['1', '1', '0', '0', '0', '0', '1', '0'])
+        p1 = Perception(['1', '1', '1', '0', '1', '1', '0', '1'])
+        e = Effect(     ['#', '#', '#', '#', '#', '#', '#', '#'])
+        self.assertTrue(e.is_specializable(p0, p1))
+
+        p0 = Perception(['0', '1', '1', '0', '0', '0', '1', '1'])
+        p1 = Perception(['1', '1', '0', '0', '0', '0', '1', '0'])
+        e = Effect(     ['#', '#', '#', '#', '#', '#', '#', '#'])
+        self.assertTrue(e.is_specializable(p0, p1))
+
+        p0 = Perception(['1', '1', '1', '1', '0', '1', '1', '1'])
+        p1 = Perception(['1', '0', '0', '0', '0', '0', '0', '0'])
+        e = Effect(     ['#', '#', '0', '0', '#', '0', '#', '#'])
+        self.assertTrue(e.is_specializable(p0, p1))
+
+        p0 = Perception(['1', '0', '0', '0', '0', '0', '0', '1'])
+        p1 = Perception(['1', '0', '0', '0', '1', '0', '1', '1'])
+        e = Effect(     ['0', '#', '#', '#', '#', '1', '#', '#'])
+        self.assertFalse(e.is_specializable(p0, p1))
+
+        p0 = Perception(['1', '1', '1', '1', '0', '1', '1', '1'])
+        p1 = Perception(['1', '0', '1', '1', '1', '1', '1', '1'])
+        e = Effect(     ['#', '0', '1', '0', '#', '0', '1', '0'])
+        self.assertFalse(e.is_specializable(p0, p1))

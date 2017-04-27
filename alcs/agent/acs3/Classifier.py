@@ -44,6 +44,9 @@ class Classifier(object):
         # Application average
         self.tav = None
 
+        # I don't know yet what it is
+        self.ee = 0
+
     @classmethod
     def copy_from(cls, old_cls, time):
         """
@@ -131,6 +134,16 @@ class Classifier(object):
         return self.effect.does_anticipate_correctly(
             previous_situation, situation)
 
+    def set_mark(self, perception: Perception) -> None:
+        """
+        Marks classifier with given perception taking into consideration its
+        condition.
+
+        :param perception:
+        """
+        if self.mark.set_mark2(self.condition, perception):
+            self.ee = 0
+
     def set_alp_timestamp(self, time: int) -> None:
         """
         Sets the ALP time stamp and the application average parameter.
@@ -159,9 +172,16 @@ class Classifier(object):
         self.q += c.BETA * (1 - self.q)
         return self.q
 
+    def decrease_quality(self) -> float:
+        self.q -= c.BETA * self.q
+        return self.q
+
     def expected_case(self, previous_perception: Perception, time: int):
         """
-        Controls the expected case of a classifier
+        Controls the expected case of a classifier. If the classifier
+        is to specific it tries to add some randomness to it by
+        generalizing some attributes.
+
         :param previous_perception:
         :param time:
         :return: new classifier or None
@@ -176,9 +196,43 @@ class Classifier(object):
         no_spec = self.specified_unchanging_attributes
         no_spec_new = diff.number_of_specified_elements
 
-        # TODO: NYI
-        pass
+        # TODO: implement later
+        # Code below won't get executed anyway because c.U_MAX is high
+        if no_spec >= c.U_MAX:
+            pass
+        else:
+            pass
 
-    def unexpected_case(self, previous_perception: Perception, perception: Perception, time: int):
-        # TODO: NYI
-        pass
+        if cl.q < 0.5:
+            cl.q = 0.5
+
+        return cl
+
+    def unexpected_case(self,
+                        previous_perception: Perception,
+                        perception: Perception,
+                        time: int):
+        """
+        Controls the unexpected case of the classifier.
+
+        :param previous_perception:
+        :param perception:
+        :param time:
+        :return: specialized classifier if generation was possible, None otherwise
+        """
+        # TODO: write test
+        self.decrease_quality()
+        self.set_mark(previous_perception)
+
+        if self.effect.is_specializable(previous_perception, perception):
+            cl = self.copy_from(self, time)
+
+            diff = self.effect.get_and_specialize(previous_perception, perception)
+            cl.condition.specialize(new_condition=diff)
+
+            if cl.q < 0.5:
+                cl.q = 0.5
+
+            return cl
+
+        return None
