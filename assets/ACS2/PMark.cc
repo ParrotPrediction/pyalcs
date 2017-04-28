@@ -41,7 +41,9 @@ int PMark::setMark(Condition *con, Perception *percept) {
     CharPosList *cpl = con->getList();
     cpl->reset();
     CharPosItem *item = cpl->getNextItem();
+
     int i;
+
     for (i = 0; i < Perception::length && item != 0; i++) {
         for (; i < item->getPos(); i++) {
             changed = 1;
@@ -49,10 +51,12 @@ int PMark::setMark(Condition *con, Perception *percept) {
         }
         item = cpl->getNextItem();
     }
+
     for (; i < Perception::length; i++) {
         changed = 1;
         list->insert(percept->getAttribute(i), i);
     }
+
     return changed;
 }
 

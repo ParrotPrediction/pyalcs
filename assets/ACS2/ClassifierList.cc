@@ -747,19 +747,24 @@ void ClassifierList::selectParents(Classifier **parent1, Classifier **parent2) {
  */
 int ClassifierList::insertALPOffspringToNewList(Classifier *child, ClassifierList **newList) {
     Classifier *oldCl = 0;
+
     if ((!DO_SUBSUMPTION || (oldCl = getSubsumer(child)) == 0) && //check if subsumer exists (cannot be a new one)
         (*newList == 0 || (oldCl = (*newList)->getSimilar(child)) == 0) &&//check if it was already created
         ((oldCl = getSimilar(child)) == 0)) {//check if it already existed
+
         if (*newList == 0) {
             (*newList) = new ClassifierList();
             (*newList)->env = env;
         }
+
         (*newList)->addClassifier(child);
+
         return 0;
     } else { //old, similar/subsuming classifier was found
         delete child;
         oldCl->increaseQuality();
     }
+
     return 1;
 }
 

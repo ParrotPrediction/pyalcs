@@ -59,7 +59,7 @@ class Classifier(object):
         """
         new_cls = cls(
             condition=old_cls.condition,
-            action=old_cls.action,
+            action=old_cls.action.action,
             effect=old_cls.effect,
             quality=old_cls.q,
             reward=old_cls.ir,
@@ -141,7 +141,7 @@ class Classifier(object):
 
         :param perception:
         """
-        if self.mark.set_mark2(self.condition, perception):
+        if self.mark.set_mark(perception):
             self.ee = 0
 
     def set_alp_timestamp(self, time: int) -> None:
@@ -220,14 +220,13 @@ class Classifier(object):
         :param time:
         :return: specialized classifier if generation was possible, None otherwise
         """
-        # TODO: write test
         self.decrease_quality()
         self.set_mark(previous_perception)
 
         if self.effect.is_specializable(previous_perception, perception):
             cl = self.copy_from(self, time)
 
-            diff = self.effect.get_and_specialize(previous_perception, perception)
+            diff = cl.effect.get_and_specialize(previous_perception, perception)
             cl.condition.specialize(new_condition=diff)
 
             if cl.q < 0.5:

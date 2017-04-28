@@ -18,13 +18,16 @@ class PMark(list):
         Directly further specializes all specified attributes in the mark
 
         :param perception:
+        :return: True if something was specialized
         """
-        for idx, item in enumerate(perception):
-            self[idx] = item
+        changed = False
 
-    def set_mark2(self, condition: Condition, perception: Perception):
-        # TODO: NYI
-        pass
+        for idx, item in enumerate(perception):
+            if item not in self[idx]:
+                changed = True
+                self[idx] = item
+
+        return changed
 
     def get_differences(self, perception: Perception) -> Condition:
         """
@@ -56,5 +59,6 @@ class PMark(list):
             # Nothing for specialization found
             pass
 
-        # TODO: implement later (probably used only in exected case)
+        # TODO: implement later
+        # probably used only in expected case
         return condition

@@ -216,10 +216,52 @@ class ClassifiersList(list):
     def apply_ga(self, time, population, match_set, situation) -> None:
         pass
 
-    def insert_alp_offspring(self, cl, list):
+    def insert_alp_offspring(self, child_cl, new_list) -> bool:
+        """
+        Looks for subsuming / similar classifiers in the current set.
+        If no appropriate classifier was found, the `child_cl` is added to
+        `new_list`.
+
+        :param child_cl:
+        :param new_list:
+        :return: True if an appropriate old classifier was found,
+        false otherwise
+        """
+        # TODO: write test
+        subsumer = self.get_subsumer(child_cl)
+        already_created = new_list.get_similar(child_cl)
+        already_existed = self.get_similar(child_cl)
+
+        if subsumer is None and already_created is None and already_existed is None:
+            self.append(child_cl)
+            return False
+
+        # Old / similar / subsuming classifier was found
+        del child_cl  # Remove child classifier from memory
+
+        # Need to check if `set` works for distinct objects
+        for old_cl in {subsumer, already_created, already_existed}:
+            old_cl.increase_quality()
+
+        return True
+
+    def add_matching_classifiers(self, list, situation: Perception):
+        """
+        Add classifiers matching perception from
+        the given list to the current list
+
+        :param list: another ClassifiersList
+        :param situation:
+        """
+        # TODO: write tests
+        for cl in list:
+            if cl.condition.does_match(situation):
+                self.append(cl)
+
+    def get_subsumer(self, cl: Classifier) -> Classifier:
         # TODO: NYI
         pass
 
-    def add_matching_classifiers(self, list, situation: Perception):
+    def get_similar(self, cl: Classifier) -> Classifier:
         # TODO: NYI
         pass
