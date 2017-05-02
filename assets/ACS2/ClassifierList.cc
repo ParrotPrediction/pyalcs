@@ -208,7 +208,7 @@ int ClassifierList::existClassifier(Perception *p1, Action *act, Perception *p2,
 
 /**
  * Adds classifier list clList to the current list.
- * The method is privat and ClassifierList assures that each classifier in 
+ * The method is private and ClassifierList assures that each classifier in
  * clList is not yet contained in the current list.
  */
 void ClassifierList::addClassifierList(ClassifierList *clList) {
@@ -221,6 +221,7 @@ void ClassifierList::addClassifierList(ClassifierList *clList) {
         help->next = list;
         list = help;
     }
+
     size += clList->size;
 }
 
@@ -591,10 +592,13 @@ void ClassifierList::applyALP(Perception *p0, Action *act, Perception *p1, int t
             expectedCase = 1;
         } else {
             newCl = listp->cl->unexpectedCase(p0, p1, time);
+
             if (listp->cl->getQuality() < THETA_I) {
                 assert(pop->deleteClassifierPointer(listp->cl) == 1);
+
                 if (matchSet != 0)
                     matchSet->deleteClassifierPointer(listp->cl);
+
                 if (listpl == 0) {
                     list = list->next;
                     listp->next = 0;

@@ -11,7 +11,7 @@ logging.basicConfig(
     level=logging.INFO)
 
 
-env = Maze('mazes/MazeF1.maze')
+env = Maze('mazes/MazeF4.maze')
 
 # Make sure that perception length is set
 # Make sure that environment actions are set
@@ -33,7 +33,7 @@ def start_experiment():
     population = ClassifiersList()
 
     while all_steps < c.MAX_STEPS:
-        logger.info("Running experiment/trial {}".format(trial))
+        logger.info("Trial/steps: [{}/{}]".format(trial, all_steps))
         all_steps += start_one_trial_explore(population, env, all_steps)
         trial += 1
 
@@ -48,7 +48,7 @@ def start_one_trial_explore(population: ClassifiersList, env: Maze, time: int):
     action_set = ClassifiersList()
 
     while not env.animat_found_reward and time + steps < c.MAX_STEPS and steps < c.MAX_TRIAL_STEPS:
-        logger.debug("Executing step: {}".format(steps))
+        logger.debug("\nExecuting step: {}".format(steps))
         situation = env.get_animat_perception()
         match_set = ClassifiersList.form_match_set(population, situation)
 
@@ -67,9 +67,9 @@ def start_one_trial_explore(population: ClassifiersList, env: Maze, time: int):
         situation = env.get_animat_perception()
 
         if env.animat_found_reward:
-            action_set.apply_alp(previous_situation, action, situation, time+steps, population, 0)
+            action_set.apply_alp(previous_situation, action, situation, time+steps, population, None)
             action_set.apply_reinforcement_learning(reward, 0)
-            action_set.apply_ga(time+steps, population, 0, situation)
+            action_set.apply_ga(time+steps, population, None, situation)
 
         steps += 1
 

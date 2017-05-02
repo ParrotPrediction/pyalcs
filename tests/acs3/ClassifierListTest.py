@@ -1,7 +1,7 @@
 import unittest
 
 from alcs.agent.Perception import Perception
-from alcs.agent.acs3 import ClassifiersList, Classifier, Condition, Action, Effect
+from alcs.agent.acs3 import ClassifiersList, Classifier, Condition, Effect
 
 from random import randint
 
@@ -50,12 +50,12 @@ class ClassifierListTest(unittest.TestCase):
         self.population.append(c01)
         self.population.append(c1)
 
-        action_set = ClassifiersList.form_action_set(self.population, Action(0))
+        action_set = ClassifiersList.form_action_set(self.population, 0)
         self.assertEqual(2, len(action_set))
         self.assertIn(c0, action_set)
         self.assertIn(c01, action_set)
 
-        action_set = ClassifiersList.form_action_set(self.population, Action(1))
+        action_set = ClassifiersList.form_action_set(self.population, 1)
         self.assertEqual(1, len(action_set))
         self.assertIn(c1, action_set)
 
@@ -93,7 +93,7 @@ class ClassifierListTest(unittest.TestCase):
 
         # Here C2 action should be selected
         best_action = self.population.choose_best_fitness_action()
-        self.assertEqual(Action(2), best_action)
+        self.assertEqual(2, best_action)
 
         # C3 - does anticipate change and is quite good
         c3 = Classifier(action=3, effect=['1', '#', '#', '#', '#', '#', '#', '#'], quality=0.8, reward=5)
@@ -101,7 +101,7 @@ class ClassifierListTest(unittest.TestCase):
 
         # Here C3 has the biggest fitness score
         best_action = self.population.choose_best_fitness_action()
-        self.assertEqual(Action(3), best_action)
+        self.assertEqual(3, best_action)
 
     def test_should_return_random_action(self):
         random_actions = []
@@ -109,11 +109,11 @@ class ClassifierListTest(unittest.TestCase):
         for _ in range(0, 500):
             random_actions.append(self.population.choose_random_action())
 
-        min_action = min(random_actions, key=lambda a: a.action)
-        max_action = max(random_actions, key=lambda a: a.action)
+        min_action = min(random_actions)
+        max_action = max(random_actions)
 
-        self.assertEqual(Action(0), min_action)
-        self.assertEqual(Action(7), max_action)
+        self.assertEqual(0, min_action)
+        self.assertEqual(7, max_action)
 
     def test_should_return_latest_action(self):
         c0 = Classifier(action=0)
@@ -122,7 +122,7 @@ class ClassifierListTest(unittest.TestCase):
         self.population.append(c0)
 
         # Should return first action with no classifiers
-        self.assertEqual(Action(1), self.population.choose_latest_action())
+        self.assertEqual(1, self.population.choose_latest_action())
 
         # Add rest of classifiers
         self.population.append(Classifier(action=3))
@@ -139,14 +139,14 @@ class ClassifierListTest(unittest.TestCase):
 
         # But third classifier (action 7) will be the executed long time ago
         self.population[2].talp = randint(10, 20)
-        self.assertEqual(Action(7), self.population.choose_latest_action())
+        self.assertEqual(7, self.population.choose_latest_action())
 
     def test_should_return_worst_quality_action(self):
         c0 = Classifier(action=0)
         self.population.append(c0)
 
         # Should return C1 (because it's first not mentioned)
-        self.assertEqual(Action(1), self.population.choose_action_from_knowledge_array())
+        self.assertEqual(1, self.population.choose_action_from_knowledge_array())
 
         # Add rest of classifiers
         c1 = Classifier(action=1, numerosity=31, quality=0.72)
@@ -171,7 +171,7 @@ class ClassifierListTest(unittest.TestCase):
         self.population.append(c7)
 
         # Classifier C7 should be the worst here
-        self.assertEqual(Action(7), self.population.choose_action_from_knowledge_array())
+        self.assertEqual(7, self.population.choose_action_from_knowledge_array())
 
     def test_should_get_similar_classifier(self):
         self.population.append(Classifier(action=1))

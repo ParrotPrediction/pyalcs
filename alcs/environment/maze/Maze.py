@@ -5,7 +5,6 @@ from os.path import dirname, abspath, join
 
 from alcs.environment.Environment import Environment
 from alcs.agent.Perception import Perception
-from alcs.agent.acs3 import Action
 from alcs.environment.maze import MazeMapping, MazeAction
 
 logger = logging.getLogger(__name__)
@@ -86,7 +85,7 @@ class Maze(Environment):
             self.animat_pos_x = pos_x
             self.animat_pos_y = pos_y
 
-            logger.info('Animat [(%d, %d)] placed into fixed initial cords',
+            logger.debug('Animat [(%d, %d)] placed into fixed initial cords',
                         pos_x, pos_y)
         else:
             possible_coords = self.get_possible_agent_insertion_coordinates()
@@ -95,7 +94,7 @@ class Maze(Environment):
             self.animat_pos_x = starting_position[0]
             self.animat_pos_y = starting_position[1]
 
-            logger.info('Animat [(%d, %d)] placed into random initial cords',
+            logger.debug('Animat [(%d, %d)] placed into random initial cords',
                         self.animat_pos_x, self.animat_pos_y)
 
     def get_animat_perception(self, pos_x=None, pos_y=None) -> Perception:
@@ -121,49 +120,49 @@ class Maze(Environment):
         if pos_y == 0:
             n = None
         else:
-            n = self.matrix[pos_y - 1][pos_x]
+            n = str(self.matrix[pos_y - 1][pos_x])
 
         # Position NE
         if pos_x == self.max_x - 1 or pos_y == 0:
             ne = None
         else:
-            ne = self.matrix[pos_y - 1][pos_x + 1]
+            ne = str(self.matrix[pos_y - 1][pos_x + 1])
 
         # Position E
         if pos_x == self.max_x - 1:
             e = None
         else:
-            e = self.matrix[pos_y][pos_x + 1]
+            e = str(self.matrix[pos_y][pos_x + 1])
 
         # Position SE
         if pos_x == self.max_x - 1 or pos_y == self.max_y - 1:
             se = None
         else:
-            se = self.matrix[pos_y + 1][pos_x + 1]
+            se = str(self.matrix[pos_y + 1][pos_x + 1])
 
         # Position S
         if pos_y == (self.max_y - 1):
             s = None
         else:
-            s = self.matrix[pos_y + 1][pos_x]
+            s = str(self.matrix[pos_y + 1][pos_x])
 
         # Position SW
         if pos_x == 0 or pos_y == self.max_y - 1:
             sw = None
         else:
-            sw = self.matrix[pos_y + 1][pos_x - 1]
+            sw = str(self.matrix[pos_y + 1][pos_x - 1])
 
         # Position W
         if pos_x == 0:
             w = None
         else:
-            w = self.matrix[pos_y][pos_x - 1]
+            w = str(self.matrix[pos_y][pos_x - 1])
 
         # Position NW
         if pos_x == 0 or pos_y == 0:
             nw = None
         else:
-            nw = self.matrix[pos_y - 1][pos_x - 1]
+            nw = str(self.matrix[pos_y - 1][pos_x - 1])
 
         maze_perception = MazePerception(
             N=n, NE=ne, E=e, SE=se, S=s, SW=sw, W=w, NW=nw)
@@ -174,7 +173,7 @@ class Maze(Environment):
         return Perception(maze_perception)
 
     def execute_action(self,
-                       action: Action,
+                       action: int,
                        perception: Perception = None) -> int:
         """
         Orders animat to execute the action. The animat is not allowed
@@ -189,7 +188,7 @@ class Maze(Environment):
         if perception is None:
             perception = self.get_animat_perception()
 
-        action = MazeAction().find_name(action.action)
+        action = MazeAction().find_name(action)
 
         m_perception = MazePerception._make(perception)
 
@@ -304,7 +303,7 @@ class Maze(Environment):
         if position_value == self.mapping['reward']['value']:
             reward = 1000
             self.animat_found_reward = True
-            logger.info('*** ANIMAT FOUND REWARD! ***')
+            logger.debug('*** ANIMAT FOUND REWARD! ***')
 
         if position_value == self.mapping['path']['value']:
             reward = 0

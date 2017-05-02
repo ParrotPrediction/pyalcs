@@ -1,9 +1,12 @@
 from alcs.agent import Perception
-from alcs.agent.acs3 import Classifier, Action
+from alcs.agent.acs3 import Classifier
 from alcs.agent.acs3 import Constants as c
 
+import logging
 from random import random, randint
 from itertools import groupby
+
+logger = logging.getLogger(__name__)
 
 
 class ClassifiersList(list):
@@ -25,21 +28,23 @@ class ClassifiersList(list):
         return cls([cl for cl in population if cl.condition.does_match(situation)])
 
     @classmethod
-    def form_action_set(cls, population, action: Action):
+    def form_action_set(cls, population, action: int):
         return cls([cl for cl in population if cl.action == action])
 
-    def choose_action(self, epsilon: float) -> Action:
+    def choose_action(self, epsilon: float) -> int:
         """
         Chooses action according to epsilon greedy policy
         :param epsilon: probability of executing exploration path
         :return: number of chosen action
         """
         if random() < epsilon:
+            logger.debug("Exploration path")
             return self.choose_explore_action()
 
+        logger.debug("Exploitation path")
         return self.choose_best_fitness_action()
 
-    def choose_explore_action(self, pb: float = 0.5) -> Action:
+    def choose_explore_action(self, pb: float = 0.5) -> int:
         """
         Chooses action according to current exploration policy
 
@@ -55,7 +60,7 @@ class ClassifiersList(list):
 
         return self.choose_random_action()
 
-    def choose_best_fitness_action(self) -> Action:
+    def choose_best_fitness_action(self) -> int:
         """
         Chooses best action according to fitness. If there is no classifier
         in list (or none is predicting change) than a random action is returned
@@ -73,11 +78,11 @@ class ClassifiersList(list):
 
         return self.choose_random_action()
 
-    def choose_latest_action(self) -> Action:
+    def choose_latest_action(self) -> int:
         """
         Chooses latest executed action ("action delay bias")
 
-        :return: chosen action
+        :return: chosen action number
         """
         last_executed_cls = None
         number_of_cls_per_action = {i: 0 for i in range(c.NUMBER_OF_POSSIBLE_ACTIONS)}
@@ -87,17 +92,17 @@ class ClassifiersList(list):
 
             self.sort(key=lambda cl: cl.action)
             for _action, _clss in groupby(self, lambda cl: cl.action):
-                number_of_cls_per_action[_action.action] = sum([cl.num for cl in _clss])
+                number_of_cls_per_action[_action] = sum([cl.num for cl in _clss])
 
         # If there are some actions with no classifiers - select them
         for action, nCls in number_of_cls_per_action.items():
             if nCls == 0:
-                return Action(action)
+                return action
 
         # Otherwise return the action of the last executed classifier
         return last_executed_cls.action
 
-    def choose_action_from_knowledge_array(self) -> Action:
+    def choose_action_from_knowledge_array(self) -> int:
         """
         Creates 'knowledge array' that represents the average quality of the
         anticipation for each action in the current list. Chosen is
@@ -114,20 +119,20 @@ class ClassifiersList(list):
             agg_q = sum(cl.q * cl.num for cl in _classifiers)
             agg_num = sum(cl.num for cl in _classifiers)
 
-            knowledge_array[_action.action] = agg_q / float(agg_num)
+            knowledge_array[_action] = agg_q / float(agg_num)
 
         by_quality = sorted(knowledge_array.items(), key=lambda el: el[1])
         action = by_quality[0][0]
 
-        return Action(action)
+        return action
 
     @staticmethod
-    def choose_random_action() -> Action:
+    def choose_random_action() -> int:
         """
         Chooses one of the possible actions in the environment randomly
-        :return: random action
+        :return: random action number
         """
-        return Action(randint(0, c.NUMBER_OF_POSSIBLE_ACTIONS - 1))
+        return randint(0, c.NUMBER_OF_POSSIBLE_ACTIONS - 1)
 
     def get_maximum_fitness(self) -> float:
         """
@@ -185,8 +190,13 @@ class ClassifiersList(list):
                 new_cl = cl.unexpected_case(previous_situation, situation, time)
 
                 if cl.q < c.THETA_I:
-                    # TODO: NYI: handle classifier deletion
-                    pass
+                    # Removes classifier from population, match set
+                    # and current list
+
+                    # TODO: validate classifier deletion
+                    # This should remove object from memory
+                    # and modify all references
+                    del cl
 
             if new_cl is not None:
                 self.insert_alp_offspring(new_cl, new_list)
@@ -195,9 +205,13 @@ class ClassifiersList(list):
             new_cl = Classifier.cover_triple(previous_situation, action, situation, time)
             self.insert_alp_offspring(new_cl, new_list)
 
-        # TODO: Merge classifiers from new_list into self
-        # TODO: Merge classifiers from new_list into population
-        if len(match_set) > 0:
+        # Merge classifiers from new_list into self and population
+        # I think these classifiers shouldn't be reconsidered in iteration
+        # TODO: validate if works properly.
+        self.extend(new_list)
+        population.extend(new_list)
+
+        if match_set is not None:
             match_set.add_matching_classifiers(new_list, situation)
 
     def apply_reinforcement_learning(self, rho, p) -> None:
@@ -233,7 +247,7 @@ class ClassifiersList(list):
         already_existed = self.get_similar(child_cl)
 
         if subsumer is None and already_created is None and already_existed is None:
-            self.append(child_cl)
+            new_list.append(child_cl)
             return False
 
         # Old / similar / subsuming classifier was found
@@ -241,7 +255,9 @@ class ClassifiersList(list):
 
         # Need to check if `set` works for distinct objects
         for old_cl in {subsumer, already_created, already_existed}:
-            old_cl.increase_quality()
+            # TODO: this fails
+            # old_cl.increase_quality()
+            pass
 
         return True
 

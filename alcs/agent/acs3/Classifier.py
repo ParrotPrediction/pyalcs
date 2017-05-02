@@ -1,5 +1,5 @@
 from alcs.agent import Perception
-from alcs.agent.acs3 import Condition, Action, Effect, PMark
+from alcs.agent.acs3 import Condition, Effect, PMark
 from alcs.agent.acs3 import Constants as c
 
 
@@ -16,7 +16,7 @@ class Classifier(object):
 
         self.condition = Condition(
             condition) if condition is not None else Condition()
-        self.action = Action(action) if action is not None else None
+        self.action = action if action is not None else None
         self.effect = Effect(effect) if effect is not None else Effect()
         self.mark = PMark()
 
@@ -59,7 +59,7 @@ class Classifier(object):
         """
         new_cls = cls(
             condition=old_cls.condition,
-            action=old_cls.action.action,
+            action=old_cls.action,
             effect=old_cls.effect,
             quality=old_cls.q,
             reward=old_cls.r,

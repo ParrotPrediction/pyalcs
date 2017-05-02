@@ -1,7 +1,7 @@
 import unittest
 
 from alcs.agent import Perception
-from alcs.agent.acs3 import Classifier, Condition, Action, Effect
+from alcs.agent.acs3 import Classifier, Condition, Effect
 
 
 class ClassifierTest(unittest.TestCase):
@@ -48,7 +48,7 @@ class ClassifierTest(unittest.TestCase):
 
         self.assertEqual(Condition(['#', '1', '#', '0', '#', '#', '0', '#']),
                          new_cl.condition)
-        self.assertEqual(Action(2), new_cl.action)
+        self.assertEqual(2, new_cl.action)
         self.assertEqual(Effect(['#', '0', '#', '1', '#', '#', '1', '#']),
                          new_cl.effect)
         self.assertEqual(0.5, new_cl.q)
@@ -124,7 +124,7 @@ class ClassifierTest(unittest.TestCase):
             Condition(['0', '1', '#', '#', '#', '#', '0', '#']),
             new_cls.condition
         )
-        self.assertEqual(Action(2), new_cls.action)
+        self.assertEqual(2, new_cls.action)
         self.assertEqual(
             Effect(['1', '0', '#', '#', '#', '#', '1', '#']),
             new_cls.effect
@@ -185,9 +185,8 @@ class ClassifierTest(unittest.TestCase):
         self.assertTrue(original_cl.condition == copied_cl.condition)
         self.assertFalse(original_cl.condition is copied_cl.condition)
 
-        # Assert that action is equal but points to another object
+        # Assert that action is equal
         self.assertTrue(original_cl.action == copied_cl.action)
-        self.assertFalse(original_cl.action is copied_cl.action)
 
         # Assert that effect is equal but points to another object
         self.assertTrue(original_cl.effect == copied_cl.effect)
