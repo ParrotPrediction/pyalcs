@@ -95,6 +95,8 @@ ENV/
 /assets/ACS2/cmake-build-debug/
 /assets/ACS2/*.txt
 
+/.coverage
+
 # C++ byproducts
 *.o
 *.out

@@ -66,8 +66,10 @@ int Condition::doesMatch(Perception *percept) {
 int Condition::doesMatch(Condition *con) {
     list->reset();
     con->list->reset();
+
     CharPosItem *item1 = list->getNextItem();
     CharPosItem *item2 = con->list->getNextItem();
+
     while (item1 != 0 && item2 != 0) {
         if (item1->getPos() < item2->getPos()) {
             item1 = list->getNextItem();
@@ -82,6 +84,7 @@ int Condition::doesMatch(Condition *con) {
             item2 = con->list->getNextItem();
         }
     }
+
     //Rest in one matches don't cares in others. Thus, we can return true!
     return 1;
 }

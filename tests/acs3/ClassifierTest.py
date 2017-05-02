@@ -5,7 +5,6 @@ from alcs.agent.acs3 import Classifier, Condition, Action, Effect
 
 
 class ClassifierTest(unittest.TestCase):
-
     def setUp(self):
         self.cls = Classifier()
 
@@ -47,9 +46,11 @@ class ClassifierTest(unittest.TestCase):
 
         new_cl = Classifier.cover_triple(p0, action_no, p1, time)
 
-        self.assertEqual(Condition(['#', '1', '#', '0', '#', '#', '0', '#']), new_cl.condition)
+        self.assertEqual(Condition(['#', '1', '#', '0', '#', '#', '0', '#']),
+                         new_cl.condition)
         self.assertEqual(Action(2), new_cl.action)
-        self.assertEqual(Effect(['#', '0', '#', '1', '#', '#', '1', '#']), new_cl.effect)
+        self.assertEqual(Effect(['#', '0', '#', '1', '#', '#', '1', '#']),
+                         new_cl.effect)
         self.assertEqual(0.5, new_cl.q)
         self.assertEqual(0.5, new_cl.r)
         self.assertEqual(0, new_cl.ir)
@@ -62,31 +63,31 @@ class ClassifierTest(unittest.TestCase):
     def test_should_count_specified_unchanging_attributes(self):
         cl1 = Classifier(
             condition=Condition(['#', '#', '#', '#', '#', '#', '0', '#']),
-            effect=Effect(      ['#', '#', '#', '#', '#', '#', '#', '#'])
+            effect=Effect(['#', '#', '#', '#', '#', '#', '#', '#'])
         )
         self.assertEqual(1, cl1.specified_unchanging_attributes)
 
         cl2 = Classifier(
             condition=Condition(['#', '#', '#', '#', '#', '0', '#', '0']),
-            effect=Effect(      ['#', '#', '#', '#', '#', '#', '#', '#'])
+            effect=Effect(['#', '#', '#', '#', '#', '#', '#', '#'])
         )
         self.assertEqual(2, cl2.specified_unchanging_attributes)
 
         cl3 = Classifier(
             condition=Condition(['1', '0', '0', '0', '0', '0', '0', '1']),
-            effect=Effect(      ['#', '#', '#', '#', '1', '#', '1', '#'])
+            effect=Effect(['#', '#', '#', '#', '1', '#', '1', '#'])
         )
         self.assertEqual(6, cl3.specified_unchanging_attributes)
 
         cl4 = Classifier(
             condition=Condition(['1', '#', '0', '#', '1', '0', '1', '1']),
-            effect=Effect(      ['0', '#', '#', '#', '#', '1', '#', '#'])
+            effect=Effect(['0', '#', '#', '#', '#', '1', '#', '#'])
         )
         self.assertEqual(4, cl4.specified_unchanging_attributes)
 
         cl5 = Classifier(
             condition=Condition(['1', '#', '#', '#', '1', '0', '1', '1']),
-            effect=Effect(      ['0', '#', '#', '#', '#', '1', '#', '#'])
+            effect=Effect(['0', '#', '#', '#', '#', '1', '#', '#'])
         )
         self.assertEqual(3, cl5.specified_unchanging_attributes)
 
@@ -166,5 +167,115 @@ class ClassifierTest(unittest.TestCase):
         self.assertIsNone(new_cls)
 
     def test_should_copy_classifier(self):
-        # TODO: NYI
-        pass
+        operation_time = 123
+        original_cl = Classifier(
+            condition=['1', '#', '#', '#', '1', '0', '1', '1'],
+            action=1,
+            effect=['1', '0', '#', '#', '#', '#', '1', '#'],
+            reward=50,
+            quality=0.7
+        )
+
+        copied_cl = Classifier.copy_from(original_cl, operation_time)
+
+        # Assert that we are dealing with different object
+        self.assertFalse(original_cl is copied_cl)
+
+        # Assert that condition is equal but points to another object
+        self.assertTrue(original_cl.condition == copied_cl.condition)
+        self.assertFalse(original_cl.condition is copied_cl.condition)
+
+        # Assert that action is equal but points to another object
+        self.assertTrue(original_cl.action == copied_cl.action)
+        self.assertFalse(original_cl.action is copied_cl.action)
+
+        # Assert that effect is equal but points to another object
+        self.assertTrue(original_cl.effect == copied_cl.effect)
+        self.assertFalse(original_cl.effect is copied_cl.effect)
+
+        # Assert that other properties were set accordingly
+        self.assertTrue(copied_cl.mark.is_empty())
+        self.assertEqual(50, copied_cl.r)
+        self.assertEqual(0.7, copied_cl.q)
+        self.assertEqual(operation_time, copied_cl.tga)
+        self.assertEqual(operation_time, copied_cl.talp)
+
+    def test_should_detect_similar_classifiers(self):
+        # Create baseline classifier
+        base = Classifier(
+            condition=['1', '#', '#', '#', '1', '0', '1', '1'],
+            action=1,
+            effect=['1', '0', '#', '#', '#', '#', '1', '#']
+        )
+
+        # Test two similar classifiers
+        c1 = Classifier(
+            condition=['1', '#', '#', '#', '1', '0', '1', '1'],
+            action=1,
+            effect=['1', '0', '#', '#', '#', '#', '1', '#']
+        )
+        self.assertTrue(base.is_similar(c1))
+
+    def test_should_spot_non_similar_classifiers(self):
+        # Create baseline classifier
+        base = Classifier(
+            condition=['1', '#', '#', '#', '1', '0', '1', '1'],
+            action=1,
+            effect=['1', '0', '#', '#', '#', '#', '1', '#']
+        )
+
+        # Changed condition part
+        self.assertFalse(base.is_similar(
+            Classifier(
+                condition=['1', '#', '1', '#', '1', '0', '1', '1'],
+                action=1,
+                effect=['1', '0', '#', '#', '#', '#', '1', '#']
+            )))
+
+        # Changed action part
+        self.assertFalse(base.is_similar(
+            Classifier(
+                condition=['1', '#', '#', '#', '1', '0', '1', '1'],
+                action=2,
+                effect=['1', '0', '#', '#', '#', '#', '1', '#']
+            )))
+
+        # Changed effect part
+        self.assertFalse(base.is_similar(
+            Classifier(
+                condition=['1', '#', '#', '#', '1', '0', '1', '1'],
+                action=1,
+                effect=['1', '0', '#', '#', '#', '#', '1', '1']
+            )))
+
+    def test_should_detect_more_general_classifier(self):
+        # No specified elements - should not be more general
+        self.assertFalse(self.cls.is_more_general(Classifier()))
+
+        # Should be more general
+        c = Classifier(condition=['1', '#', '#', '#', '1', '0', '1', '1'])
+        self.assertTrue(self.cls.is_more_general(c))
+
+        # Shouldn't be more general
+        c = Classifier(condition=['1', '#', '#', '#', '1', '#', '#', '#'])
+        self.cls.condition = Condition(['1', '#', '1', '#', '1', '0', '1', '1'])
+        self.assertFalse(self.cls.is_more_general(c))
+
+    def test_should_distinguish_classifier_as_subsumer(self):
+        # General classifier should not be considered as subsumer
+        self.assertFalse(self.cls.is_subsumer())
+
+        # Let's assign enough experience and quality
+        self.cls.exp = 30
+        self.cls.q = 0.92
+        self.assertTrue(self.cls.is_subsumer())
+
+        # Let's reduce experience below threshold
+        self.cls.exp = 15
+        self.assertFalse(self.cls.is_subsumer())
+
+        # Now check if the fact that classifier is marked will block
+        # it from being considered as a subsumer
+        self.cls.exp = 30
+        self.cls.mark[3] = '1'
+        self.assertFalse(self.cls.is_subsumer())

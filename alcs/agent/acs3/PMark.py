@@ -29,6 +29,14 @@ class PMark(list):
 
         return changed
 
+    def is_empty(self) -> bool:
+        """
+        Check if there is any mark
+
+        :return: True if is marked, False otherwise
+        """
+        return not any([True for m in self if len(m) > 0])
+
     def get_differences(self, perception: Perception) -> Condition:
         """
         Determines the strongest differences in between the mark

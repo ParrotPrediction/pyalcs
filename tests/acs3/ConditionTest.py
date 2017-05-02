@@ -13,11 +13,11 @@ class ConditionTest(unittest.TestCase):
         self.assertRaises(TypeError, self.c.__setitem__, 0, 1)
 
     def test_should_return_number_of_specified_elements(self):
-        self.assertEqual(0, self.c.number_of_specified_elements)
+        self.assertEqual(0, self.c.specificity)
 
         self.c.specialize(2, '1')
         self.c.specialize(5, '0')
-        self.assertEqual(2, self.c.number_of_specified_elements)
+        self.assertEqual(2, self.c.specificity)
 
     def test_should_specialize(self):
         c =    Condition()
@@ -41,7 +41,7 @@ class ConditionTest(unittest.TestCase):
     def test_should_match_perception(self):
         p = Perception(['1', '0', '0', '1', '1', '0', '0', '1'])
 
-        # General perception - should match everything
+        # General condition - should match everything
         self.assertTrue(self.c.does_match(p))
 
         # Correct first position
@@ -54,3 +54,20 @@ class ConditionTest(unittest.TestCase):
 
         # Should fail when perception length is different
         self.assertRaises(ValueError, self.c.does_match, Perception(['1', '2']))
+
+    def test_should_match_condition(self):
+        c = Condition(['1', '0', '0', '1', '1', '0', '0', '1'])
+
+        # General condition - should match everything
+        self.assertTrue(self.c.does_match(c))
+
+        # Correct first position
+        self.c.specialize(0, '1')
+        self.assertTrue(self.c.does_match(c))
+
+        # Expects 0 as the first condition
+        self.c.specialize(0, '0')
+        self.assertFalse(self.c.does_match(c))
+
+        # Should fail when condition length is different
+        self.assertRaises(ValueError, self.c.does_match, Condition(['1', '2']))

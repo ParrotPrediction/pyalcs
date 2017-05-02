@@ -227,7 +227,7 @@ class ClassifiersList(list):
         :return: True if an appropriate old classifier was found,
         false otherwise
         """
-        # TODO: write test
+        # TODO: write tests
         subsumer = self.get_subsumer(child_cl)
         already_created = new_list.get_similar(child_cl)
         already_existed = self.get_similar(child_cl)
@@ -245,23 +245,61 @@ class ClassifiersList(list):
 
         return True
 
-    def add_matching_classifiers(self, list, situation: Perception):
+    def add_matching_classifiers(self, lst, situation: Perception):
         """
         Add classifiers matching perception from
         the given list to the current list
 
-        :param list: another ClassifiersList
+        :param lst: another ClassifiersList
         :param situation:
         """
+        new_matching = [cl for cl in lst if cl.condition.does_match(situation)]
+        self.extend(new_matching)
+
+    def get_subsumer(self, scl: Classifier) -> Classifier:
+        """
+        Searches the list for the subsuming classifier.
+        
+        :param scl: 
+        :return: subsuming classifier, None otherwise 
+        """
         # TODO: write tests
-        for cl in list:
-            if cl.condition.does_match(situation):
-                self.append(cl)
+        subsumer = None
+        subsumers = [cl for cl in self if cl.does_subsume(scl)]
 
-    def get_subsumer(self, cl: Classifier) -> Classifier:
-        # TODO: NYI
-        pass
+        tmp_subs_lst = []
 
-    def get_similar(self, cl: Classifier) -> Classifier:
-        # TODO: NYI
-        pass
+        for cl in subsumers:
+            if subsumer is None:
+                subsumer = cl
+                tmp_subs_lst.append(subsumer)
+            elif cl.is_more_general(subsumer):
+                # Another more general subsumer found
+                subsumer = cl
+                tmp_subs_lst.clear()
+                tmp_subs_lst.append(subsumer)
+            elif not subsumer.is_more_general(cl):
+                # Another subsumer with equal generality was found
+                tmp_subs_lst.append(cl)
+
+        # Look through found subsumers and randomly select one
+        if len(tmp_subs_lst) > 0:
+            current_num = 0
+            micro_cls_numerosity = sum(cl.num for cl in tmp_subs_lst)
+            select = randint(1, micro_cls_numerosity)
+
+            for cl in tmp_subs_lst:
+                current_num += cl.num
+                if current_num >= select:
+                    return cl
+
+        return subsumer
+
+    def get_similar(self, other: Classifier) -> Classifier:
+        """
+        Searches for the first similar classifier `other` and returns it.
+
+        :param other: classifier to compare
+        :return: first similar classifier, None otherwise
+        """
+        return next(filter(lambda cl: cl.is_similar(other), self), None)

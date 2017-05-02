@@ -172,3 +172,36 @@ class ClassifierListTest(unittest.TestCase):
 
         # Classifier C7 should be the worst here
         self.assertEqual(Action(7), self.population.choose_action_from_knowledge_array())
+
+    def test_should_get_similar_classifier(self):
+        self.population.append(Classifier(action=1))
+        self.population.append(Classifier(action=2))
+        self.population.append(Classifier(action=3))
+
+        # No similar classifiers exist
+        self.assertIsNone(self.population.get_similar(Classifier(action=4)))
+
+        # Should find similar classifier
+        self.assertIsNotNone(self.population.get_similar(Classifier(action=2)))
+
+    def test_should_add_matching_classifiers(self):
+        cls_lst = ClassifiersList()
+        cls_lst.append(Classifier(
+            condition=['#', '0', '#', '#', '#', '#', '#', '#']
+        ))
+        cls_lst.append(Classifier(
+            condition=['1', '#', '#', '#', '#', '#', '#', '#']
+        ))
+        cls_lst.append(Classifier(
+            condition=['0', '1', '#', '#', '#', '#', '#', '#']
+        ))
+
+        # Based on the perception should add 2 classifiers to the population
+        situation = Perception(['1', '0', '1', '1', '0', '0', '0', '0'])
+        self.population.add_matching_classifiers(cls_lst, situation)
+        self.assertEqual(2, len(self.population))
+
+        # Try to add last one
+        situation = Perception(['0', '1', '1', '1', '0', '0', '0', '0'])
+        self.population.add_matching_classifiers(cls_lst, situation)
+        self.assertEqual(3, len(self.population))

@@ -40,3 +40,10 @@ class PMarkTest(unittest.TestCase):
 
         for mark in self.mark:
             self.assertEqual(1, len(mark))
+
+    def test_should_detect_if_marked(self):
+        self.assertTrue(self.mark.is_empty())
+
+        # Add some mark
+        self.mark[1] = '0'
+        self.assertFalse(self.mark.is_empty())

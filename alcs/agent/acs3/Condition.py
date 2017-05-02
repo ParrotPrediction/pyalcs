@@ -23,23 +23,13 @@ class Condition(list):
         return ''.join(map(str, self))
 
     @property
-    def number_of_specified_elements(self) -> int:
+    def specificity(self) -> int:
         """
         Returns the number of  specific symbols (non-#)
 
         :return: number of non-general elements
         """
         return sum(1 for comp in self if comp != c.CLASSIFIER_WILDCARD)
-
-    @property
-    def specificity(self) -> float:
-        """
-        Return information what percentage of condition elements are
-        specific.
-
-        :return: number from [0,1]
-        """
-        return self.number_of_specified_elements / len(self)
 
     def specialize(self,
                    position: int = None,
@@ -54,22 +44,23 @@ class Condition(list):
                 if ni != c.CLASSIFIER_WILDCARD:
                     self[idx] = ni
 
-
     def generalize(self, position):
         self[position] = c.CLASSIFIER_WILDCARD
 
-    def does_match(self, perception: list) -> bool:
+    def does_match(self, lst: list) -> bool:
         """
-        Check if condition match given perception
+        Check if condition match other list such as perception or another
+        condition.
 
-        :param perception: perception given as list
-        :return: True if condition match given perception, false otherwise
+        :param lst: perception or condition given as list
+        :return: True if condition match given list, false otherwise
         """
-        if len(perception) != len(self):
-            raise ValueError('Perception and condition length is different')
+        if len(self) != len(lst):
+            raise ValueError('Cannot execute `does_match` '
+                             'because lengths are different')
 
         for i, symbol in enumerate(self):
-            if symbol != c.CLASSIFIER_WILDCARD and symbol != perception[i]:
+            if symbol != c.CLASSIFIER_WILDCARD and symbol != lst[i]:
                 return False
 
         return True

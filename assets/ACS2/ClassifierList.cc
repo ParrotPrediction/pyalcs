@@ -1004,6 +1004,7 @@ Classifier *ClassifierList::getSubsumer(Classifier *cl) {
             }
         }
     }
+
     if (subsList != 0) {
         // choose randomly one subsumer among the most-general subsumers
         int select = (int) (frand() * (double) subsList->getNumSize());
@@ -1015,6 +1016,7 @@ Classifier *ClassifierList::getSubsumer(Classifier *cl) {
         delete subsList;
         return subsumer;
     }
+
     return 0;
 }
 

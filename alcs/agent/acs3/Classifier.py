@@ -4,7 +4,6 @@ from alcs.agent.acs3 import Constants as c
 
 
 class Classifier(object):
-
     def __init__(self,
                  condition=None,
                  action=None,
@@ -15,7 +14,8 @@ class Classifier(object):
                  numerosity=1,
                  experience=1):
 
-        self.condition = Condition(condition) if condition is not None else Condition()
+        self.condition = Condition(
+            condition) if condition is not None else Condition()
         self.action = Action(action) if action is not None else None
         self.effect = Effect(effect) if effect is not None else Effect()
         self.mark = PMark()
@@ -62,7 +62,7 @@ class Classifier(object):
             action=old_cls.action.action,
             effect=old_cls.effect,
             quality=old_cls.q,
-            reward=old_cls.ir,
+            reward=old_cls.r,
             intermediate_reward=old_cls.ir)
 
         new_cls.tga = time
@@ -130,7 +130,8 @@ class Classifier(object):
         """
         return self.effect.number_of_specified_elements > 0
 
-    def does_anticipate_correctly(self, previous_situation: Perception, situation: Perception) -> bool:
+    def does_anticipate_correctly(self, previous_situation: Perception,
+                                  situation: Perception) -> bool:
         return self.effect.does_anticipate_correctly(
             previous_situation, situation)
 
@@ -150,7 +151,8 @@ class Classifier(object):
         :param time: current step
         """
         if 1. / self.exp > c.BETA:
-            self.tav = (self.tav * self.exp + (time - self.talp)) / (self.exp + 1)
+            self.tav = (self.tav * self.exp + (time - self.talp)) / (
+                self.exp + 1)
         else:
             self.tav = c.BETA * ((time - self.talp) - self.tav)
 
@@ -194,7 +196,7 @@ class Classifier(object):
 
         cl = self.copy_from(self, time)
         no_spec = self.specified_unchanging_attributes
-        no_spec_new = diff.number_of_specified_elements
+        no_spec_new = diff.specificity
 
         # TODO: implement later
         # Code below won't get executed anyway because c.U_MAX is high
@@ -235,3 +237,58 @@ class Classifier(object):
             return cl
 
         return None
+
+    def is_similar(self, other) -> bool:
+        """
+        Check if classifier is equals to `other` classifier in condition,
+        action and effect part.
+
+        :param other: other classifier
+        :return: True if equals, False otherwise
+        """
+        if self.condition == other.condition and self.action == other.action and self.effect == other.effect:
+            return True
+
+        return False
+
+    def does_subsume(self, other) -> bool:
+        """
+        Returns if a classifier subsumes `other` classifier
+        
+        :param other: other classifiers
+        :return: True if `other` classifier is subsumed, False otherwise
+        """
+        # TODO: write tests (check if == works properly)
+        if self.is_subsumer() and \
+                self.is_more_general(other) and \
+                self.condition.does_match(other.condition) and \
+                self.action == other.action and \
+                self.effect == other.effect:
+            return True
+
+        return False
+
+    def is_subsumer(self) -> bool:
+        """
+        Controls if the classifier satisfies the subsume criteria.
+
+        :return: True is classifier can be considered as subsumer, False otherwise
+        """
+        if self.exp > c.THETA_EXP:
+            if self.q > c.THETA_R:
+                if self.mark.is_empty():
+                    return True
+
+        return False
+
+    def is_more_general(self, other) -> bool:
+        """
+        Checks if the classifier is formally more general than `other`.
+
+        :param other: other classifier to compare
+        :return: True if `other` classifier is more general
+        """
+        if self.condition.specificity < other.condition.specificity:
+            return True
+
+        return False
