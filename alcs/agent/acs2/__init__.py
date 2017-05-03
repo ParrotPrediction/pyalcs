@@ -1,2 +1,6 @@
-from alcs.agent.acs2.classifier.Classifier import Classifier
+from .Condition import Condition
+from .Effect import Effect
+from .PMark import PMark
+from .Classifier import Classifier
+from .ClassifiersList import ClassifiersList
 from .ACS2 import ACS2

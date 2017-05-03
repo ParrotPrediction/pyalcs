@@ -1,4 +1,4 @@
-from alcs.agent.acs3 import Constants as c
+from alcs.agent.acs2 import Constants as c
 
 
 class Condition(list):

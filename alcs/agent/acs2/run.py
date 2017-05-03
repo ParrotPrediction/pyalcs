@@ -2,8 +2,8 @@ import logging
 
 from alcs.environment.maze.Maze import Maze
 
-from alcs.agent.acs3 import Constants as c
-from alcs.agent.acs3 import ClassifiersList
+from alcs.agent.acs2 import Constants as c
+from alcs.agent.acs2 import ClassifiersList
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(

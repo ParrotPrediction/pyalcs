@@ -1,7 +1,7 @@
 import unittest
 
 from alcs.agent import Perception
-from alcs.agent.acs3 import Condition, PMark
+from alcs.agent.acs2 import Condition, PMark
 
 
 class PMarkTest(unittest.TestCase):

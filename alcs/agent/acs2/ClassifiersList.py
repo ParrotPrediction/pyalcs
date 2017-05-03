@@ -1,6 +1,6 @@
 from alcs.agent import Perception
-from alcs.agent.acs3 import Classifier
-from alcs.agent.acs3 import Constants as c
+from alcs.agent.acs2 import Classifier
+from alcs.agent.acs2 import Constants as c
 
 import logging
 from random import random, randint

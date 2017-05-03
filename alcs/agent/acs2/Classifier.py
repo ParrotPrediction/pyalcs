@@ -1,6 +1,6 @@
 from alcs.agent import Perception
-from alcs.agent.acs3 import Condition, Effect, PMark
-from alcs.agent.acs3 import Constants as c
+from alcs.agent.acs2 import Condition, Effect, PMark
+from alcs.agent.acs2 import Constants as c
 
 
 class Classifier(object):

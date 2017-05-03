@@ -1,7 +1,7 @@
 import unittest
 
 from alcs.agent.Perception import Perception
-from alcs.agent.acs3 import ClassifiersList, Classifier, Condition, Effect
+from alcs.agent.acs2 import ClassifiersList, Classifier, Condition, Effect
 
 from random import randint
 

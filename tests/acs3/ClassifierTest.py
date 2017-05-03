@@ -1,7 +1,7 @@
 import unittest
 
 from alcs.agent import Perception
-from alcs.agent.acs3 import Classifier, Condition, Effect
+from alcs.agent.acs2 import Classifier, Condition, Effect
 
 
 class ClassifierTest(unittest.TestCase):
