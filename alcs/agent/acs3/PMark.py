@@ -67,6 +67,5 @@ class PMark(list):
             # Nothing for specialization found
             pass
 
-        # TODO: implement later
-        # probably used only in expected case
+        # TODO: NYI
         return condition

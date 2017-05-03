@@ -172,8 +172,10 @@ int startOneTrialExplore(ClassifierList *population, Environment *env, int time,
 
     Action *act = new Action();
 
-    for (steps = 0; !env->isReset() && (REWARD_TEST || time + steps <= MAX_STEPS) &&
-                    (!REWARD_TEST || steps < MAX_TRIAL_STEPS); steps++) {
+//    for (steps = 0; !env->isReset() && (REWARD_TEST || time + steps <= MAX_STEPS) &&
+//                    (REWARD_TEST || steps < MAX_TRIAL_STEPS); steps++) {
+
+    for (steps = 0; !env->isReset() && (time + steps <= MAX_STEPS) && (steps < MAX_TRIAL_STEPS); steps++) {
 
         if (!REWARD_TEST && (time + steps) % MODEL_TEST_ITERATION == 0) {
             if (MODEL_TEST_TYPE == 0)

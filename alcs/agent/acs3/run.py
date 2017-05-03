@@ -13,10 +13,6 @@ logging.basicConfig(
 
 env = Maze('mazes/MazeF4.maze')
 
-# Make sure that perception length is set
-# Make sure that environment actions are set
-
-
 def start_experiments():
     """
     Runs all the experiments

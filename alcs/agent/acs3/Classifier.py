@@ -130,6 +130,30 @@ class Classifier(object):
         """
         return self.effect.number_of_specified_elements > 0
 
+    def is_reliable(self):
+        return self.q > c.THETA_R
+
+    def predicts_successfully(self,
+                              p0: Perception,
+                              action: int,
+                              p1: Perception) -> bool:
+        """
+        Check if classifier matches previous situation `p0`,
+        has action `action` and predicts the effect `p1`
+        
+        :param p0: previous situation
+        :param action: 
+        :param p1: anticipated situation after execution action
+        :return: True if classifier makes successful predictions,
+        False otherwise
+        """
+        if self.condition.does_match(p0):
+            if self.action == action:
+                if self.does_anticipate_correctly(p0, p1):
+                    return True
+
+        return False
+
     def does_anticipate_correctly(self, previous_situation: Perception,
                                   situation: Perception) -> bool:
         return self.effect.does_anticipate_correctly(
@@ -194,15 +218,17 @@ class Classifier(object):
             self.increase_quality()
             return
 
+        # TODO: Never reaching this part of code
         cl = self.copy_from(self, time)
         no_spec = self.specified_unchanging_attributes
         no_spec_new = diff.specificity
 
-        # TODO: implement later
-        # Code below won't get executed anyway because c.U_MAX is high
         if no_spec >= c.U_MAX:
+            # TODO: implement later
+            # Code below won't get executed anyway because c.U_MAX is high
             pass
         else:
+            # TODO: implement it
             pass
 
         if cl.q < 0.5:
