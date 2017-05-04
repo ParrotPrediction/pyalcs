@@ -28,15 +28,21 @@ class ClassifierTest(unittest.TestCase):
 
     def test_should_update_reward(self):
         self.cls.update_reward(1000)
-        self.assertEqual(50.0, self.cls.r)
+        self.assertEqual(50.475, self.cls.r)
 
     def test_should_update_intermediate_reward(self):
         self.cls.update_intermediate_reward(1000)
         self.assertEqual(50.0, self.cls.ir)
 
     def test_should_increase_quality(self):
+        self.cls.q = 0.5
         self.cls.increase_quality()
         self.assertEqual(0.525, self.cls.q)
+
+    def test_should_decrease_quality(self):
+        self.cls.q = 0.47
+        self.cls.decrease_quality()
+        self.assertAlmostEqual(0.45, self.cls.q, 2)
 
     def test_should_cover_triple(self):
         action_no = 2
@@ -278,3 +284,96 @@ class ClassifierTest(unittest.TestCase):
         self.cls.exp = 30
         self.cls.mark[3] = '1'
         self.assertFalse(self.cls.is_subsumer())
+
+    def test_should_subsume_another_classifier(self):
+        self.cls.condition[3] = '0'
+        self.cls.action = 3
+        self.cls.effect[2] = '1'
+        self.cls.q = 0.93
+        self.cls.r = 1.35
+        self.cls.exp = 23
+
+        other = Classifier()
+        other.condition[0] = '1'
+        other.condition[3] = '0'
+        other.action = 3
+        other.effect[2] = '1'
+        other.q = 0.5
+        other.r = 0.35
+        other.exp = 1
+
+        self.assertTrue(self.cls.does_subsume(other))
+
+    def test_should_not_subsume_another_classifier(self):
+        self.cls.condition[0] = '1'
+        self.cls.condition[1] = '0'
+        self.cls.condition[4] = '0'
+        self.cls.condition[6] = '1'
+        self.cls.action = 6
+        self.cls.effect[0] = '0'
+        self.cls.effect[1] = '1'
+        self.cls.effect[6] = '0'
+        self.cls.q = 0.84
+        self.cls.r = 0.33
+        self.cls.exp = 3
+
+        other = Classifier()
+        other.condition[0] = '1'
+        other.condition[1] = '0'
+        other.condition[6] = '2'
+        other.action = 3
+        other.effect[0] = '0'
+        other.effect[1] = '1'
+        other.effect[6] = '0'
+        other.q = 0.5
+        other.r = 0.41
+        other.exp = 1
+
+        self.assertFalse(self.cls.does_subsume(other))
+
+    def test_should_set_mark_from_condition(self):
+        # Given
+        p0 = Perception(['0', '0', '0', '0', '1', '1', '1', '1'])
+        self.cls.condition = Condition(['#', '#', '0', '#', '1', '#', '1', '#'])
+        self.cls.mark[0] = '0'
+        self.cls.mark[1] = '0'
+        self.cls.mark[3] = '0'
+        self.cls.mark[5] = '1'
+        self.cls.mark[7] = '1'
+
+        # When
+        self.cls.set_mark(p0)
+
+        # Then
+        self.assertEqual(5, len(self.cls.mark))
+        self.assertEqual(1, len(self.cls.mark[0]))  # 0
+        self.assertEqual(1, len(self.cls.mark[1]))  # 0
+        self.assertEqual(0, len(self.cls.mark[2]))
+        self.assertEqual(1, len(self.cls.mark[3]))  # 0
+        self.assertEqual(0, len(self.cls.mark[4]))
+        self.assertEqual(1, len(self.cls.mark[5]))  # 1
+        self.assertEqual(0, len(self.cls.mark[6]))
+        self.assertEqual(1, len(self.cls.mark[7]))  # 1
+
+    def test_should_set_mark_from_condition_2(self):
+        # Given
+        p0 = Perception(['1', '2', '1', '0', '1', '1', '0', '1'])
+        self.cls.condition = Condition(['#', '#', '#', '0', '#', '1', '0', '1'])
+
+        # When
+        self.cls.set_mark(p0)
+
+        # Then
+        self.assertEqual(4, len(self.cls.mark))
+
+        self.assertEqual(1, len(self.cls.mark[0]))
+        self.assertIn('1', self.cls.mark[0])
+
+        self.assertEqual(1, len(self.cls.mark[1]))
+        self.assertIn('2', self.cls.mark[1])
+
+        self.assertEqual(1, len(self.cls.mark[2]))
+        self.assertIn('1', self.cls.mark[2])
+
+        self.assertEqual(1, len(self.cls.mark[4]))
+        self.assertIn('1', self.cls.mark[4])

@@ -11,7 +11,8 @@ from alcs.helpers.metrics import \
     Experiment, \
     ClassifierPopulationSize, \
     ReliableClassifierPopulationSize, \
-    AchievedKnowledge
+    AchievedKnowledge, \
+    AverageSpecificity
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -33,11 +34,12 @@ if __name__ == '__main__':
         Experiment('experiment_id'),
         ClassifierPopulationSize('total_classifiers'),
         ReliableClassifierPopulationSize('reliable_classifiers'),
-        AchievedKnowledge('knowledge')
+        AchievedKnowledge('knowledge'),
+        AverageSpecificity('specificity')
     ])
 
     # Evaluate simulation
-    metrics = agent.evaluate(env, 1, 1000)
+    metrics = agent.evaluate(env, 1, 15000)
 
     logger.info("Algorithm finished")
     logger.info("Last knowledge: {:.2f}%".format(metrics['knowledge'][-1]))

@@ -4,6 +4,7 @@ from alcs.agent.acs2 import Constants as c
 
 import logging
 from random import random, randint
+from copy import copy
 from itertools import groupby
 
 logger = logging.getLogger(__name__)
@@ -180,6 +181,8 @@ class ClassifiersList(list):
         new_cl = None
         found_expected_case = False
 
+        # Because we will be changing classifiers (adding/removing) - we will
+        # iterate over the copy of the list
         for cl in self:
             cl.increase_experience()
 
@@ -193,10 +196,16 @@ class ClassifiersList(list):
                     # Removes classifier from population, match set
                     # and current list
 
-                    # TODO: validate classifier deletion
+                    # TODO: p0: validate classifier deletion
                     # This should remove object from memory
                     # and modify all references
-                    del cl
+                    # from population, match set, self
+
+                    # population.remove(cl)
+                    # match_set.remove(cl)
+                    # self.remove(cl)
+                    # del cl
+                    pass
 
             if new_cl is not None:
                 self.insert_alp_offspring(new_cl, new_list)
@@ -207,7 +216,7 @@ class ClassifiersList(list):
 
         # Merge classifiers from new_list into self and population
         # I think these classifiers shouldn't be reconsidered in iteration
-        # TODO: validate if works properly.
+        # TODO: p1: validate if works properly.
         self.extend(new_list)
         population.extend(new_list)
 
@@ -241,23 +250,20 @@ class ClassifiersList(list):
         :return: True if an appropriate old classifier was found,
         false otherwise
         """
-        # TODO: write tests
+        # TODO: p4: write tests
         subsumer = self.get_subsumer(child_cl)
         already_created = new_list.get_similar(child_cl)
         already_existed = self.get_similar(child_cl)
 
-        if subsumer is None and already_created is None and already_existed is None:
+        old_cl = subsumer if subsumer is not None else None
+        old_cl = already_created if already_created is not None else old_cl
+        old_cl = already_existed if already_existed is not None else old_cl
+
+        if old_cl is None:
             new_list.append(child_cl)
             return False
-
-        # Old / similar / subsuming classifier was found
-        del child_cl  # Remove child classifier from memory
-
-        # Need to check if `set` works for distinct objects
-        for old_cl in {subsumer, already_created, already_existed}:
-            # TODO: this fails
-            # old_cl.increase_quality()
-            pass
+        else:
+            old_cl.increase_quality()
 
         return True
 
@@ -279,7 +285,8 @@ class ClassifiersList(list):
         :param scl: 
         :return: subsuming classifier, None otherwise 
         """
-        # TODO: write tests
+        # TODO: p4: write tests
+        # Doesnt find any subsumers
         subsumer = None
         subsumers = [cl for cl in self if cl.does_subsume(scl)]
 

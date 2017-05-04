@@ -9,7 +9,7 @@ class Classifier(object):
                  action=None,
                  effect=None,
                  quality=0.5,
-                 reward=0,
+                 reward=0.5,
                  intermediate_reward=0,
                  numerosity=1,
                  experience=1):
@@ -42,7 +42,7 @@ class Classifier(object):
         self.tga = 0
 
         # Application average
-        self.tav = None
+        self.tav = 0
 
         # I don't know yet what it is
         self.ee = 0
@@ -96,7 +96,7 @@ class Classifier(object):
             effect=effect,
             reward=0.5)
 
-        new_cl.pmark = None
+        new_cl.mark = PMark()
         new_cl.tga = time
         new_cl.talp = time
         new_cl.tav = 0
@@ -123,6 +123,10 @@ class Classifier(object):
                 spec += 1
 
         return spec
+
+    @property
+    def specificity(self):
+        return self.condition.specificity / len(self.condition)
 
     def does_anticipate_change(self):
         """
@@ -163,22 +167,26 @@ class Classifier(object):
         """
         Marks classifier with given perception taking into consideration its
         condition.
+        
+        Specializes the mark in all attributes which are not specified
+        in the conditions, yet
 
-        :param perception:
+        :param perception: current situation
         """
-        if self.mark.set_mark(perception):
+        if self.mark.set_mark_using_condition(self.condition, perception):
             self.ee = 0
 
     def set_alp_timestamp(self, time: int) -> None:
         """
         Sets the ALP time stamp and the application average parameter.
+        
         :param time: current step
         """
         if 1. / self.exp > c.BETA:
             self.tav = (self.tav * self.exp + (time - self.talp)) / (
                 self.exp + 1)
         else:
-            self.tav = c.BETA * ((time - self.talp) - self.tav)
+            self.tav += c.BETA * ((time - self.talp) - self.tav)
 
         self.talp = time
 
@@ -216,20 +224,21 @@ class Classifier(object):
 
         if diff is None:
             self.increase_quality()
-            return
+            return None
 
-        # TODO: Never reaching this part of code
         cl = self.copy_from(self, time)
         no_spec = self.specified_unchanging_attributes
         no_spec_new = diff.specificity
 
         if no_spec >= c.U_MAX:
-            # TODO: implement later
+            # TODO: p4: implement later
             # Code below won't get executed anyway because c.U_MAX is high
             pass
         else:
-            # TODO: implement it
+            # TODO: p4: implement later
             pass
+
+        cl.condition.specialize(new_condition=diff)
 
         if cl.q < 0.5:
             cl.q = 0.5
@@ -255,6 +264,7 @@ class Classifier(object):
             cl = self.copy_from(self, time)
 
             diff = cl.effect.get_and_specialize(previous_perception, perception)
+
             cl.condition.specialize(new_condition=diff)
 
             if cl.q < 0.5:
@@ -284,7 +294,6 @@ class Classifier(object):
         :param other: other classifiers
         :return: True if `other` classifier is subsumed, False otherwise
         """
-        # TODO: write tests (check if == works properly)
         if self.is_subsumer() and \
                 self.is_more_general(other) and \
                 self.condition.does_match(other.condition) and \

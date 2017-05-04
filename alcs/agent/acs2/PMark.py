@@ -2,10 +2,15 @@ from alcs.agent.acs2 import Constants as c
 from alcs.agent import Perception
 from alcs.agent.acs2 import Condition
 
+from random import randint
+
 
 class PMark(list):
     def __init__(self):
         list.__init__(self, [set() for _ in range(c.CLASSIFIER_LENGTH)])
+
+    def __len__(self):
+        return sum(1 for m in self if len(m) > 0)
 
     def __setitem__(self, idx, value):
         if not isinstance(value, str):
@@ -13,7 +18,7 @@ class PMark(list):
 
         self[idx].add(value)
 
-    def set_mark(self, perception: Perception):
+    def set_mark(self, perception: Perception) -> bool:
         """
         Directly further specializes all specified attributes in the mark
 
@@ -22,10 +27,24 @@ class PMark(list):
         """
         changed = False
 
-        for idx, item in enumerate(perception):
-            if item not in self[idx]:
+        for idx, item in enumerate(self):
+            if len(item) > 0:
+                self[idx] = perception[idx]
                 changed = True
-                self[idx] = item
+
+        return changed
+
+    def set_mark_using_condition(self, condition: Condition, perception: Perception) -> bool:
+        if not self.is_empty():
+            # Mark is already specified. Further specialize all specified attributes
+            return self.set_mark(perception)
+
+        changed = False
+
+        for idx, item in enumerate(condition):
+            if item == c.CLASSIFIER_WILDCARD:
+                self[idx] = perception[idx]
+                changed = True
 
         return changed
 
@@ -56,16 +75,28 @@ class PMark(list):
             elif len(item) > 1:
                 nr2 += 1
 
+        # TODO: p1: after implementing knowledge is 0
         if nr1 > 0:
             # One or more absolute differences detected -> specialize one
             # randomly chosen
-            pass
+            condition = Condition()
+            selected = randint(0, nr1)
+
+            for idx, item in enumerate(self):
+                if perception[idx] not in item:
+                    if selected == 0:
+                        condition[idx] = perception[idx]
+                        break
+                    selected -= 1
         elif nr2 > 0:
             # One or more equal differences detected -> specialize all of them
-            pass
+            condition = Condition()
+
+            for idx, item in enumerate(self):
+                if len(item) > 1:
+                    condition[idx] = perception[idx]
         else:
             # Nothing for specialization found
             pass
 
-        # TODO: NYI
         return condition

@@ -50,6 +50,16 @@ class ACS2(Agent):
                 classifiers=population
             )
 
+            logger.info("Know: {:.1f}% Pop: {} Num: {} Rel: {} Ina: {} Fit: {:.1f} Spec: {:.2f}\n".format(
+                self.metrics['knowledge'][-1],
+                len(population),
+                sum(cl.num for cl in population),
+                len([cl for cl in population if cl.is_reliable()]),
+                len([cl for cl in population if cl.q < 0.1]),
+                sum(cl.fitness for cl in population) / len(population),
+                self.metrics['specificity'][-1]
+            ))
+
         return population
 
     @staticmethod

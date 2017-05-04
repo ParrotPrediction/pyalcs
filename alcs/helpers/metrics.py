@@ -73,14 +73,14 @@ class AveragedFitnessScore(Metric):
         return sum_fitness / total_classifiers
 
 
-class AveragedConditionSpecificity(Metric):
+class AverageSpecificity(Metric):
     def requirements(self):
         return ['classifiers']
 
     def calculate(self, *args, **kwargs):
         classifiers = kwargs.get('classifiers')
 
-        sum_specificity = sum(cl.condition.specificity for cl in classifiers)
+        sum_specificity = sum(cl.specificity for cl in classifiers)
         total_classifiers = sum(cl.num for cl in classifiers)
 
         return sum_specificity / total_classifiers

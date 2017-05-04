@@ -205,3 +205,15 @@ class ClassifierListTest(unittest.TestCase):
         situation = Perception(['0', '1', '1', '1', '0', '0', '0', '0'])
         self.population.add_matching_classifiers(cls_lst, situation)
         self.assertEqual(3, len(self.population))
+
+    def test_should_apply_reinforcement_learning(self):
+        c1 = Classifier()
+        c1.r = 34.29
+        c1.ir = 11.29
+        self.population.append(c1)
+
+        self.population.apply_reinforcement_learning(0, 28.79)
+
+        self.assertAlmostEqual(33.94, self.population[0].r, 2)
+        self.assertAlmostEqual(10.73, self.population[0].ir, 2)
+
