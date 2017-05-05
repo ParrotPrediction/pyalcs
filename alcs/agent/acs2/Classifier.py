@@ -47,6 +47,9 @@ class Classifier(object):
         # I don't know yet what it is
         self.ee = 0
 
+    def __repr__(self):
+        return "{}-{}-{} @ {}".format(self.condition, self.action, self.effect, hex(id(self)))
+
     @classmethod
     def copy_from(cls, old_cls, time):
         """

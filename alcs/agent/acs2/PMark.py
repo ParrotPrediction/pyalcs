@@ -54,7 +54,7 @@ class PMark(list):
 
         :return: True if is marked, False otherwise
         """
-        return not any([True for m in self if len(m) > 0])
+        return not len(self) > 0
 
     def get_differences(self, perception: Perception) -> Condition:
         """

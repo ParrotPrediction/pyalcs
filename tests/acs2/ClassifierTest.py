@@ -66,31 +66,35 @@ class ClassifierTest(unittest.TestCase):
         self.assertEqual(1, new_cl.num)
         self.assertEqual(1, new_cl.exp)
 
-    def test_should_count_specified_unchanging_attributes(self):
+    def test_should_count_specified_unchanging_attributes_1(self):
         cl1 = Classifier(
             condition=Condition(['#', '#', '#', '#', '#', '#', '0', '#']),
             effect=Effect(['#', '#', '#', '#', '#', '#', '#', '#'])
         )
         self.assertEqual(1, cl1.specified_unchanging_attributes)
 
+    def test_should_count_specified_unchanging_attributes_2(self):
         cl2 = Classifier(
             condition=Condition(['#', '#', '#', '#', '#', '0', '#', '0']),
             effect=Effect(['#', '#', '#', '#', '#', '#', '#', '#'])
         )
         self.assertEqual(2, cl2.specified_unchanging_attributes)
 
+    def test_should_count_specified_unchanging_attributes_3(self):
         cl3 = Classifier(
             condition=Condition(['1', '0', '0', '0', '0', '0', '0', '1']),
             effect=Effect(['#', '#', '#', '#', '1', '#', '1', '#'])
         )
         self.assertEqual(6, cl3.specified_unchanging_attributes)
 
+    def test_should_count_specified_unchanging_attributes_4(self):
         cl4 = Classifier(
             condition=Condition(['1', '#', '0', '#', '1', '0', '1', '1']),
             effect=Effect(['0', '#', '#', '#', '#', '1', '#', '#'])
         )
         self.assertEqual(4, cl4.specified_unchanging_attributes)
 
+    def test_should_count_specified_unchanging_attributes_5(self):
         cl5 = Classifier(
             condition=Condition(['1', '#', '#', '#', '1', '0', '1', '1']),
             effect=Effect(['0', '#', '#', '#', '#', '1', '#', '#'])
@@ -144,6 +148,37 @@ class ClassifierTest(unittest.TestCase):
         self.assertEqual(self.cls.r, new_cls.r)
         self.assertEqual(time, new_cls.tga)
         self.assertEqual(time, new_cls.talp)
+
+    def test_should_generate_new_classifier_from_unexpected_case_2(self):
+        # Given
+        self.cls.condition = Condition(['#', '#', '#', '#', '#', '#', '#', '0'])
+        self.cls.action = 4
+        self.cls.effect = Effect()
+        self.cls.mark[0].update([0, 1])
+        self.cls.mark[1].update([0, 1])
+        self.cls.mark[2].update([0, 1])
+        self.cls.mark[3].update([0, 1])
+        self.cls.mark[4].update([1])
+        self.cls.mark[5].update([0, 1])
+        self.cls.mark[6].update([0, 1])
+        self.cls.q = 0.4
+
+        p0 = Perception(['1', '0', '1', '0', '1', '0', '1', '0'])
+        p1 = Perception(['1', '1', '0', '1', '1', '1', '0', '1'])
+        time = 94
+
+        # When
+        new_cl = self.cls.unexpected_case(p0, p1, time)
+
+        # Then
+        self.assertEqual(new_cl.condition,
+                         Condition(['#', '0', '1', '0', '#', '0', '1', '0']))
+        self.assertEqual(new_cl.effect,
+                         Effect(['#', '1', '0', '1', '#', '1', '0', '1']))
+        self.assertTrue(new_cl.mark.is_empty())
+        self.assertEqual(time, new_cl.tga)
+        self.assertEqual(time, new_cl.talp)
+        self.assertAlmostEqual(self.cls.q, 0.38, 1)
 
     def test_should_not_generate_new_classifier_from_unexpected_case(self):
         self.cls = Classifier(

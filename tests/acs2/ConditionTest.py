@@ -19,25 +19,28 @@ class ConditionTest(unittest.TestCase):
         self.c.specialize(5, '0')
         self.assertEqual(2, self.c.specificity)
 
-    def test_should_specialize(self):
+    def test_should_specialize_1(self):
         c =    Condition()
         diff =   Condition(['#', '0', '#', '#', '#', '1', '#', '1'])
         result = Condition(['#', '0', '#', '#', '#', '1', '#', '1'])
         c.specialize(new_condition=diff)
         self.assertEqual(result, c)
 
+    def test_should_specialize_2(self):
         c =      Condition(['#', '#', '#', '1', '0', '#', '1', '#'])
         diff =   Condition(['0', '1', '0', '#', '#', '1', '#', '#'])
         result = Condition(['0', '1', '0', '1', '0', '1', '1', '#'])
         c.specialize(new_condition=diff)
         self.assertEqual(result, c)
 
+    def test_should_specialize_3(self):
         c =      Condition(['#', '1', '0', '1', '#', '1', '0', '#'])
         diff =   Condition(['#', '#', '#', '#', '1', '#', '#', '1'])
         result = Condition(['#', '1', '0', '1', '1', '1', '0', '1'])
         c.specialize(new_condition=diff)
         self.assertEqual(result, c)
 
+    def test_should_specialize_4(self):
         c =      Condition(['#', '#', '#', '#', '0', '1', '#', '1'])
         diff =   Condition(['2', '#', '0', '0', '#', '#', '#', '#'])
         result = Condition(['2', '#', '0', '0', '0', '1', '#', '1'])

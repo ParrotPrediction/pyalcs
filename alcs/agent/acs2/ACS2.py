@@ -75,8 +75,9 @@ class ACS2(Agent):
         previous_situation = None
         action_set = ClassifiersList()
 
+        situation = env.get_animat_perception()
+
         while not env.trial_finished() and time + steps <= max_steps and steps < c.MAX_TRIAL_STEPS:
-            situation = env.get_animat_perception()
             match_set = ClassifiersList.form_match_set(population, situation)
 
             if steps > 0:

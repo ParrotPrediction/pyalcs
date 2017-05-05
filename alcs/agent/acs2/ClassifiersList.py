@@ -183,7 +183,7 @@ class ClassifiersList(list):
 
         # Because we will be changing classifiers (adding/removing) - we will
         # iterate over the copy of the list
-        for cl in self:
+        for cl in copy(self):
             cl.increase_experience()
 
             if cl.does_anticipate_correctly(previous_situation, situation):
