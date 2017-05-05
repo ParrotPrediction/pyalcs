@@ -575,8 +575,9 @@ void ClassifierList::setALPTimeStamps(int time) {
  * insertion of new classifiers in pop and possibly matchSet, and
  * deletion of inadequate classifiers in pop and possibly matchSet.
  */
-void ClassifierList::applyALP(Perception *p0, Action *act, Perception *p1, int time, ClassifierList *pop,
-                              ClassifierList *matchSet) {
+void ClassifierList::applyALP(Perception *p0, Action *act, Perception *p1,
+                              int time, ClassifierList *pop, ClassifierList *matchSet) {
+
     ClassifierList *newList = 0;
     PureClassifierList *listp, *listpl;
 
@@ -584,6 +585,7 @@ void ClassifierList::applyALP(Perception *p0, Action *act, Perception *p1, int t
 
     int expectedCase = 0;
     Classifier *newCl = 0;
+
     for (listp = list, listpl = 0; listp != 0;) {
         listp->cl->increaseExperience();
 

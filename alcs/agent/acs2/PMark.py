@@ -75,7 +75,7 @@ class PMark(list):
             elif len(item) > 1:
                 nr2 += 1
 
-        # TODO: p1: after implementing knowledge is 0
+        # TODO: p2: after implementing knowledge is 0
         if nr1 > 0:
             # One or more absolute differences detected -> specialize one
             # randomly chosen

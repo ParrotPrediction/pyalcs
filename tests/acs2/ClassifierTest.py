@@ -320,7 +320,7 @@ class ClassifierTest(unittest.TestCase):
         self.cls.mark[3] = '1'
         self.assertFalse(self.cls.is_subsumer())
 
-    def test_should_subsume_another_classifier(self):
+    def test_should_subsume_another_classifier_1(self):
         self.cls.condition[3] = '0'
         self.cls.action = 3
         self.cls.effect[2] = '1'
@@ -339,7 +339,7 @@ class ClassifierTest(unittest.TestCase):
 
         self.assertTrue(self.cls.does_subsume(other))
 
-    def test_should_not_subsume_another_classifier(self):
+    def test_should_subsume_another_classifier_2(self):
         self.cls.condition[0] = '1'
         self.cls.condition[1] = '0'
         self.cls.condition[4] = '0'
@@ -365,6 +365,25 @@ class ClassifierTest(unittest.TestCase):
         other.exp = 1
 
         self.assertFalse(self.cls.does_subsume(other))
+
+    def test_should_subsume_another_classifier_3(self):
+        # Given
+        self.cls.condition[6] = '0'
+        self.cls.action = 6
+        self.cls.q = 0.99
+        self.cls.r = 11.4
+        self.cls.exp = 32
+
+        other = Classifier()
+        other.condition[3] = '1'
+        other.condition[6] = '0'
+        other.action = 6
+        other.q = 0.5
+        other.r = 9.89
+        other.exp = 1
+
+        # When, Then
+        self.assertTrue(self.cls.does_subsume(other))
 
     def test_should_set_mark_from_condition(self):
         # Given

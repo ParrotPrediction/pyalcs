@@ -196,7 +196,7 @@ class ClassifiersList(list):
                     # Removes classifier from population, match set
                     # and current list
 
-                    # TODO: p0: validate classifier deletion
+                    # TODO: p2: validate classifier deletion
                     # This should remove object from memory
                     # and modify all references
                     # from population, match set, self
@@ -210,13 +210,14 @@ class ClassifiersList(list):
             if new_cl is not None:
                 self.insert_alp_offspring(new_cl, new_list)
 
+        # No classifier anticipated correctly - generate new one
         if not found_expected_case:
             new_cl = Classifier.cover_triple(previous_situation, action, situation, time)
             self.insert_alp_offspring(new_cl, new_list)
 
         # Merge classifiers from new_list into self and population
         # I think these classifiers shouldn't be reconsidered in iteration
-        # TODO: p1: validate if works properly.
+        # TODO: p2: validate if works properly.
         self.extend(new_list)
         population.extend(new_list)
 
@@ -250,7 +251,7 @@ class ClassifiersList(list):
         :return: True if an appropriate old classifier was found,
         false otherwise
         """
-        # TODO: p4: write tests
+        # TODO: p0: write tests
         subsumer = self.get_subsumer(child_cl)
         already_created = new_list.get_similar(child_cl)
         already_existed = self.get_similar(child_cl)
@@ -281,42 +282,38 @@ class ClassifiersList(list):
     def get_subsumer(self, scl: Classifier) -> Classifier:
         """
         Searches the list for the subsuming classifier.
-        
+
         :param scl: 
         :return: subsuming classifier, None otherwise 
         """
-        # TODO: p4: write tests
-        # Doesnt find any subsumers
+        # TODO: write tests
         subsumer = None
-        subsumers = [cl for cl in self if cl.does_subsume(scl)]
+        subsList = ClassifiersList()
 
-        tmp_subs_lst = []
-
-        for cl in subsumers:
-            if subsumer is None:
-                subsumer = cl
-                tmp_subs_lst.append(subsumer)
-            elif cl.is_more_general(subsumer):
-                # Another more general subsumer found
-                subsumer = cl
-                tmp_subs_lst.clear()
-                tmp_subs_lst.append(subsumer)
-            elif not subsumer.is_more_general(cl):
-                # Another subsumer with equal generality was found
-                tmp_subs_lst.append(cl)
+        for cl in self:
+            if cl.does_subsume(scl):
+                if subsumer is None:
+                    subsumer = cl
+                    subsList.append(subsumer)
+                elif cl.is_more_general(subsumer):
+                    subsList.clear()
+                    subsumer = cl
+                    subsList.append(subsumer)
+                elif not subsumer.is_more_general(cl):
+                    subsList.append(cl)
 
         # Look through found subsumers and randomly select one
-        if len(tmp_subs_lst) > 0:
+        if len(subsList) > 0:
             current_num = 0
-            micro_cls_numerosity = sum(cl.num for cl in tmp_subs_lst)
+            micro_cls_numerosity = sum(cl.num for cl in subsList)
             select = randint(1, micro_cls_numerosity)
 
-            for cl in tmp_subs_lst:
+            for cl in subsList:
                 current_num += cl.num
                 if current_num >= select:
                     return cl
 
-        return subsumer
+        return None
 
     def get_similar(self, other: Classifier) -> Classifier:
         """
