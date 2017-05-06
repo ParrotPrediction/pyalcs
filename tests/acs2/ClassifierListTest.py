@@ -184,28 +184,6 @@ class ClassifierListTest(unittest.TestCase):
         # Should find similar classifier
         self.assertIsNotNone(self.population.get_similar(Classifier(action=2)))
 
-    def test_should_add_matching_classifiers(self):
-        cls_lst = ClassifiersList()
-        cls_lst.append(Classifier(
-            condition=['#', '0', '#', '#', '#', '#', '#', '#']
-        ))
-        cls_lst.append(Classifier(
-            condition=['1', '#', '#', '#', '#', '#', '#', '#']
-        ))
-        cls_lst.append(Classifier(
-            condition=['0', '1', '#', '#', '#', '#', '#', '#']
-        ))
-
-        # Based on the perception should add 2 classifiers to the population
-        situation = Perception(['1', '0', '1', '1', '0', '0', '0', '0'])
-        self.population.add_matching_classifiers(cls_lst, situation)
-        self.assertEqual(2, len(self.population))
-
-        # Try to add last one
-        situation = Perception(['0', '1', '1', '1', '0', '0', '0', '0'])
-        self.population.add_matching_classifiers(cls_lst, situation)
-        self.assertEqual(3, len(self.population))
-
     def test_should_apply_reinforcement_learning(self):
         c1 = Classifier()
         c1.r = 34.29
@@ -227,65 +205,8 @@ class ClassifierListTest(unittest.TestCase):
         )
 
         # When
-        self.population.insert_alp_offspring(child, new_list)
+        self.population.add_alp_classifier(child, new_list)
 
         # Then
         self.assertEqual(1, len(new_list))
         self.assertIn(child, new_list)
-
-    def test_should_insert_alp_offspring_2(self):
-        # Given
-        child = Classifier()
-        child.q = 0.6
-        child.r = 3.34
-        child.exp = 1
-
-        c1 = Classifier(
-            condition=Condition(['0', '#', '0', '#', '0', '#', '1', '1']),
-            action=5,
-            effect=Effect(['1', '#', '#', '#', '1', '#', '0', '0']),
-            quality=0.63,
-            reward=3.41,
-            experience=2
-        )
-
-        c2 = Classifier(
-            condition=Condition(['#', '#', '0', '#', '#', '1', '#', '#']),
-            action=5,
-            effect=Effect(['#', '#', '1', '#', '#', '0', '#', '#']),
-            quality=0.26,
-            reward=3.92,
-            experience=21
-        )
-        c2.mark[0].update(['0', '1', '2'])
-        c2.mark[1].update(['0', '1'])
-        c2.mark[3].update(['0', '1'])
-        c2.mark[4].update(['0', '1'])
-        c2.mark[6].update(['0', '1'])
-        c2.mark[7].update(['0', '1'])
-
-        c3 = Classifier(
-            condition=Condition(['0', '#', '#', '#', '0', '#', '1', '1']),
-            action=5,
-            effect=Effect(['1', '#', '#', '#', '1', '#', '0', '0']),
-            quality=0.6,
-            reward=3.34,
-            experience=8
-        )
-        c3.mark[1].update(['1'])
-        c3.mark[2].update(['1'])
-        c3.mark[3].update(['0', '1'])
-        c3.mark[5].update(['0', '1'])
-
-        new_list = ClassifiersList()
-
-        # When
-        self.population.append(c1)
-        self.population.append(c2)
-        self.population.append(c3)
-
-        self.population.insert_alp_offspring(child, new_list)
-
-        # Then
-        self.assertEqual(0, len(new_list))
-        self.assertAlmostEqual(0.65, c1.q, places=1)

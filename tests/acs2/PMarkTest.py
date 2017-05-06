@@ -67,4 +67,3 @@ class PMarkTest(unittest.TestCase):
 
         self.assertEqual(1, len(self.mark[6]))
         self.assertIn('1', self.mark[6])
-

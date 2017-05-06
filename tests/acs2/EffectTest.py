@@ -1,7 +1,7 @@
 import unittest
 
 from alcs.agent import Perception
-from alcs.agent.acs2 import Condition, Effect
+from alcs.agent.acs2 import Effect
 
 
 class EffectTest(unittest.TestCase):
@@ -53,21 +53,6 @@ class EffectTest(unittest.TestCase):
         self.assertFalse(self.effect.does_anticipate_correctly(
             self.previous_situation, self.situation
         ))
-
-    def test_should_get_and_specialize_no_changes(self):
-        e = Effect()
-        c = e.get_and_specialize(self.previous_situation, self.situation)
-        self.assertEqual(Effect(['#', '#', '#', '#', '#', '#', '#', '#']), e)
-        self.assertEqual(Condition(['#', '#', '#', '#', '#', '#', '#', '#']), c)
-
-    def test_should_get_and_specialize_changes(self):
-        p0 = Perception(['0', '0', '0', '0', '1', '1', '1', '1'])
-        p1 = Perception(['0', '0', '0', '1', '1', '1', '1', '1'])
-
-        e = Effect()
-        c = e.get_and_specialize(p0, p1)
-        self.assertEqual(Effect(['#', '#', '#', '1', '#', '#', '#', '#']), e)
-        self.assertEqual(Condition(['#', '#', '#', '0', '#', '#', '#', '#']), c)
 
     def test_should_check_if_specializable(self):
         p0 = Perception(['1', '1', '0', '0', '0', '0', '1', '0'])

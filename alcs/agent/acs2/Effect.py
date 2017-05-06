@@ -45,29 +45,6 @@ class Effect(list):
 
         return True
 
-    def get_and_specialize(self,
-                           previous_situation: Perception,
-                           situation: Perception) -> Condition:
-        """
-        Specializes the effect part where necessary to correctly anticipate
-        the changes from p0 to p1 and returns a condition which specifies
-        the attributes which must be specified in the condition part.
-        The specific attributes in the returned conditions are set to
-        the necessary values.
-
-        :param previous_situation:
-        :param situation:
-        :return: condition capturing previous perception
-        """
-        con = Condition()
-
-        for idx, item in enumerate(self):
-            if previous_situation[idx] != situation[idx]:
-                self[idx] = situation[idx]
-                con[idx] = previous_situation[idx]
-
-        return con
-
     def does_anticipate_correctly(self,
                                   previous_situation: Perception,
                                   situation: Perception) -> bool:

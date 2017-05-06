@@ -59,8 +59,8 @@ class Condition(list):
             raise ValueError('Cannot execute `does_match` '
                              'because lengths are different')
 
-        for i, symbol in enumerate(self):
-            if symbol != c.CLASSIFIER_WILDCARD and symbol != lst[i]:
+        for idx, attrib in enumerate(self):
+            if attrib != c.CLASSIFIER_WILDCARD and attrib != lst[idx]:
                 return False
 
         return True

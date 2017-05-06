@@ -66,6 +66,30 @@ class ClassifierTest(unittest.TestCase):
         self.assertEqual(1, new_cl.num)
         self.assertEqual(1, new_cl.exp)
 
+    def test_should_specialize_1(self):
+        # Given
+        p0 = Perception(['0', '0', '0', '0', '1', '1', '1', '1'])
+        p1 = Perception(['0', '0', '0', '0', '1', '1', '1', '1'])
+
+        # When
+        self.cls.specialize(p0, p1)
+
+        # Then
+        self.assertEqual(Condition(['#', '#', '#', '#', '#', '#', '#', '#']), self.cls.condition)
+        self.assertEqual(Effect(['#', '#', '#', '#', '#', '#', '#', '#']), self.cls.effect)
+
+    def test_should_specialize_2(self):
+        # Given
+        p0 = Perception(['0', '0', '0', '0', '1', '1', '1', '1'])
+        p1 = Perception(['0', '0', '0', '1', '1', '1', '1', '1'])
+
+        # When
+        self.cls.specialize(p0, p1)
+
+        # Then
+        self.assertEqual(Condition(['#', '#', '#', '0', '#', '#', '#', '#']), self.cls.condition)
+        self.assertEqual(Effect(['#', '#', '#', '1', '#', '#', '#', '#']), self.cls.effect)
+
     def test_should_count_specified_unchanging_attributes_1(self):
         cl1 = Classifier(
             condition=Condition(['#', '#', '#', '#', '#', '#', '0', '#']),
@@ -303,22 +327,22 @@ class ClassifierTest(unittest.TestCase):
 
     def test_should_distinguish_classifier_as_subsumer(self):
         # General classifier should not be considered as subsumer
-        self.assertFalse(self.cls.is_subsumer())
+        self.assertFalse(self.cls._is_subsumer())
 
         # Let's assign enough experience and quality
         self.cls.exp = 30
         self.cls.q = 0.92
-        self.assertTrue(self.cls.is_subsumer())
+        self.assertTrue(self.cls._is_subsumer())
 
         # Let's reduce experience below threshold
         self.cls.exp = 15
-        self.assertFalse(self.cls.is_subsumer())
+        self.assertFalse(self.cls._is_subsumer())
 
         # Now check if the fact that classifier is marked will block
         # it from being considered as a subsumer
         self.cls.exp = 30
         self.cls.mark[3] = '1'
-        self.assertFalse(self.cls.is_subsumer())
+        self.assertFalse(self.cls._is_subsumer())
 
     def test_should_subsume_another_classifier_1(self):
         self.cls.condition[3] = '0'

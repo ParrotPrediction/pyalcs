@@ -12,7 +12,6 @@ class ACS2(Agent):
 
     def __init__(self):
         super().__init__()
-        # TODO: Here agent will be initialize with constants
 
     def evaluate(self,
                  env: Environment,

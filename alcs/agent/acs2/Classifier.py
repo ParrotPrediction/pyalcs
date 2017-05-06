@@ -48,7 +48,10 @@ class Classifier(object):
         self.ee = 0
 
     def __repr__(self):
-        return "{}-{}-{} @ {}".format(self.condition, self.action, self.effect, hex(id(self)))
+        return "{}-{}-{} @ {}".format(self.condition,
+                                      self.action,
+                                      self.effect,
+                                      hex(id(self)))
 
     @classmethod
     def copy_from(cls, old_cls, time):
@@ -90,19 +93,12 @@ class Classifier(object):
 
         :return: new classifier
         """
-        effect = Effect()
-        condition = effect.get_and_specialize(previous_situation, situation)
-
-        new_cl = cls(
-            condition=condition,
-            action=action,
-            effect=effect,
-            reward=0.5)
-
-        new_cl.mark = PMark()
+        new_cl = cls(action=action)  # TODO: p5 exp=0, r=0 (paper)
         new_cl.tga = time
         new_cl.talp = time
         new_cl.tav = 0
+
+        new_cl.specialize(previous_situation, situation)
 
         return new_cl
 
@@ -140,6 +136,44 @@ class Classifier(object):
     def is_reliable(self):
         return self.q > c.THETA_R
 
+    def update_reward(self, p: float) -> float:
+        self.r += c.BETA * (p - self.r)
+        return self.r
+
+    def update_intermediate_reward(self, rho) -> float:
+        self.ir += c.BETA * (rho - self.ir)
+        return self.ir
+
+    def increase_experience(self) -> int:
+        self.exp += 1
+        return self.exp
+
+    def increase_quality(self) -> float:
+        self.q += c.BETA * (1 - self.q)
+        return self.q
+
+    def decrease_quality(self) -> float:
+        self.q -= c.BETA * self.q
+        return self.q
+
+    def specialize(self,
+                   previous_situation: Perception,
+                   situation: Perception):
+        """
+        Specializes the effect part where necessary to correctly anticipate
+        the changes from p0 to p1 and returns a condition which specifies
+        the attributes which must be specified in the condition part.
+        The specific attributes in the returned conditions are set to
+        the necessary values.
+
+        :param previous_situation:
+        :param situation:
+        """
+        for idx, item in enumerate(situation):
+            if previous_situation[idx] != situation[idx]:
+                self.effect[idx] = situation[idx]
+                self.condition[idx] = previous_situation[idx]
+
     def predicts_successfully(self,
                               p0: Perception,
                               action: int,
@@ -161,7 +195,8 @@ class Classifier(object):
 
         return False
 
-    def does_anticipate_correctly(self, previous_situation: Perception,
+    def does_anticipate_correctly(self,
+                                  previous_situation: Perception,
                                   situation: Perception) -> bool:
         return self.effect.does_anticipate_correctly(
             previous_situation, situation)
@@ -193,27 +228,9 @@ class Classifier(object):
 
         self.talp = time
 
-    def update_reward(self, p: float) -> float:
-        self.r += c.BETA * (p - self.r)
-        return self.r
-
-    def update_intermediate_reward(self, rho) -> float:
-        self.ir += c.BETA * (rho - self.ir)
-        return self.ir
-
-    def increase_experience(self) -> int:
-        self.exp += 1
-        return self.exp
-
-    def increase_quality(self) -> float:
-        self.q += c.BETA * (1 - self.q)
-        return self.q
-
-    def decrease_quality(self) -> float:
-        self.q -= c.BETA * self.q
-        return self.q
-
-    def expected_case(self, previous_perception: Perception, time: int):
+    def expected_case(self,
+                      previous_perception: Perception,
+                      time: int):
         """
         Controls the expected case of a classifier. If the classifier
         is to specific it tries to add some randomness to it by
@@ -229,9 +246,9 @@ class Classifier(object):
             self.increase_quality()
             return None
 
-        cl = self.copy_from(self, time)
         no_spec = self.specified_unchanging_attributes
         no_spec_new = diff.specificity
+        child = self.copy_from(self, time)
 
         if no_spec >= c.U_MAX:
             # TODO: p4: implement later
@@ -241,12 +258,12 @@ class Classifier(object):
             # TODO: p4: implement later
             pass
 
-        cl.condition.specialize(new_condition=diff)
+        child.condition.specialize(new_condition=diff)
 
-        if cl.q < 0.5:
-            cl.q = 0.5
+        if child.q < 0.5:
+            child.q = 0.5
 
-        return cl
+        return child
 
     def unexpected_case(self,
                         previous_perception: Perception,
@@ -258,24 +275,24 @@ class Classifier(object):
         :param previous_perception:
         :param perception:
         :param time:
-        :return: specialized classifier if generation was possible, None otherwise
+        :return: specialized classifier if generation was possible,
+        None otherwise
         """
         self.decrease_quality()
         self.set_mark(previous_perception)
 
-        if self.effect.is_specializable(previous_perception, perception):
-            cl = self.copy_from(self, time)
+        if not self.effect.is_specializable(previous_perception, perception):
+            return None
 
-            diff = cl.effect.get_and_specialize(previous_perception, perception)
+        child = self.copy_from(self, time)
 
-            cl.condition.specialize(new_condition=diff)
+        # TODO: p5 maybe also take into consideration cl.E = # (paper)
+        child.specialize(previous_perception, perception)
 
-            if cl.q < 0.5:
-                cl.q = 0.5
+        if child.q < 0.5:
+            child.q = 0.5
 
-            return cl
-
-        return None
+        return child
 
     def is_similar(self, other) -> bool:
         """
@@ -285,37 +302,10 @@ class Classifier(object):
         :param other: other classifier
         :return: True if equals, False otherwise
         """
-        if self.condition == other.condition and self.action == other.action and self.effect == other.effect:
-            return True
-
-        return False
-
-    def does_subsume(self, other) -> bool:
-        """
-        Returns if a classifier subsumes `other` classifier
-        
-        :param other: other classifiers
-        :return: True if `other` classifier is subsumed, False otherwise
-        """
-        if self.is_subsumer() and \
-                self.is_more_general(other) and \
-                self.condition.does_match(other.condition) and \
+        if self.condition == other.condition and \
                 self.action == other.action and \
                 self.effect == other.effect:
             return True
-
-        return False
-
-    def is_subsumer(self) -> bool:
-        """
-        Controls if the classifier satisfies the subsume criteria.
-
-        :return: True is classifier can be considered as subsumer, False otherwise
-        """
-        if self.exp > c.THETA_EXP:
-            if self.q > c.THETA_R:
-                if self.mark.is_empty():
-                    return True
 
         return False
 
@@ -328,5 +318,34 @@ class Classifier(object):
         """
         if self.condition.specificity < other.condition.specificity:
             return True
+
+        return False
+
+    def does_subsume(self, other) -> bool:
+        """
+        Returns if a classifier subsumes `other` classifier
+
+        :param other: other classifiers
+        :return: True if `other` classifier is subsumed, False otherwise
+        """
+        if self._is_subsumer() and \
+            self.is_more_general(other) and \
+            self.condition.does_match(other.condition) and \
+                self.effect == other.effect:
+            return True
+
+        return False
+
+    def _is_subsumer(self) -> bool:
+        """
+        Controls if the classifier satisfies the subsumer criteria.
+
+        :return: True is classifier can be considered as subsumer, 
+        False otherwise
+        """
+        if self.exp > c.THETA_EXP:
+            if self.q > c.THETA_R:
+                if self.mark.is_empty():
+                    return True
 
         return False

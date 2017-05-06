@@ -72,7 +72,7 @@ class PMark(list):
         for idx, item in enumerate(self):
             if perception[idx] not in item:
                 nr1 += 1
-            elif len(item) > 1:
+            elif len(item) > 1:  # TODO p4: Maybe 0
                 nr2 += 1
 
         # TODO: p2: after implementing knowledge is 0

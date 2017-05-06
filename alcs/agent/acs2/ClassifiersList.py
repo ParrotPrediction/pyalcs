@@ -32,6 +32,15 @@ class ClassifiersList(list):
     def form_action_set(cls, population, action: int):
         return cls([cl for cl in population if cl.action == action])
 
+    @staticmethod
+    def _remove_classifier(population, cl: Classifier):
+        """
+        Searches the list and removes classifier
+        :param cl: classifier to remove
+        """
+        if population is not None and cl in population:
+            population.remove(cl)
+
     def choose_action(self, epsilon: float) -> int:
         """
         Chooses action according to epsilon greedy policy
@@ -150,18 +159,13 @@ class ClassifiersList(list):
 
         return 0.0
 
-    def set_alp_timestamps(self, time: int) -> None:
-        """
-        Sets the ALP time stamp to monitor the frequency of application
-        and the last application. This method also sets the application
-        average parameter.
-
-        :param time: current step
-        """
-        for cl in self:
-            cl.set_alp_timestamp(time)
-
-    def apply_alp(self, previous_situation: Perception, action, situation: Perception, time, population, match_set) -> None:
+    def apply_alp(self,
+                  previous_situation: Perception,
+                  action: int,
+                  situation: Perception,
+                  time: int,
+                  population,
+                  match_set) -> None:
         """
         The Anticipatory Learning Process. Handles all updates by the ALP,
         insertion of new classifiers in pop and possibly matchSet, and
@@ -173,47 +177,37 @@ class ClassifiersList(list):
         :param time:
         :param population:
         :param match_set:
-        :return:
         """
-        self.set_alp_timestamps(time)
-
         new_list = ClassifiersList()
         new_cl = None
-        found_expected_case = False
+        was_expected_case = False
 
         # Because we will be changing classifiers (adding/removing) - we will
         # iterate over the copy of the list
         for cl in copy(self):
             cl.increase_experience()
+            cl.set_alp_timestamp(time)
 
             if cl.does_anticipate_correctly(previous_situation, situation):
                 new_cl = cl.expected_case(previous_situation, time)
-                found_expected_case = True
+                was_expected_case = True
             else:
                 new_cl = cl.unexpected_case(previous_situation, situation, time)
 
                 if cl.q < c.THETA_I:
                     # Removes classifier from population, match set
                     # and current list
-
-                    # TODO: p2: validate classifier deletion
-                    # This should remove object from memory
-                    # and modify all references
-                    # from population, match set, self
-
-                    # population.remove(cl)
-                    # match_set.remove(cl)
-                    # self.remove(cl)
-                    # del cl
-                    pass
+                    for lst in [population, match_set, self]:
+                        self._remove_classifier(lst, cl)
 
             if new_cl is not None:
-                self.insert_alp_offspring(new_cl, new_list)
+                new_cl.tga = time
+                self.add_alp_classifier(new_cl, new_list)
 
         # No classifier anticipated correctly - generate new one
-        if not found_expected_case:
+        if not was_expected_case:
             new_cl = Classifier.cover_triple(previous_situation, action, situation, time)
-            self.insert_alp_offspring(new_cl, new_list)
+            self.add_alp_classifier(new_cl, new_list)
 
         # Merge classifiers from new_list into self and population
         # I think these classifiers shouldn't be reconsidered in iteration
@@ -222,7 +216,9 @@ class ClassifiersList(list):
         population.extend(new_list)
 
         if match_set is not None:
-            match_set.add_matching_classifiers(new_list, situation)
+            new_matching = [cl for cl in new_list if
+                            cl.condition.does_match(situation)]
+            match_set.extend(new_matching)
 
     def apply_reinforcement_learning(self, rho, p) -> None:
         """
@@ -240,80 +236,43 @@ class ClassifiersList(list):
     def apply_ga(self, time, population, match_set, situation) -> None:
         pass
 
-    def insert_alp_offspring(self, child_cl, new_list) -> bool:
+    def add_alp_classifier(self, cl, new_list):
         """
         Looks for subsuming / similar classifiers in the current set.
         If no appropriate classifier was found, the `child_cl` is added to
         `new_list`.
 
-        :param child_cl:
+        :param cl:
         :param new_list:
         :return: True if an appropriate old classifier was found,
         false otherwise
         """
         # TODO: p0: write tests
-        subsumer = self.get_subsumer(child_cl)
-        already_created = new_list.get_similar(child_cl)
-        already_existed = self.get_similar(child_cl)
+        old_cl = None
 
-        old_cl = subsumer if subsumer is not None else None
-        old_cl = already_created if already_created is not None else old_cl
-        old_cl = already_existed if already_existed is not None else old_cl
+        # Look if there is a classifier that subsumes the insertion
+        # candidate
+        for c in self:
+            if c.does_subsume(cl):
+                if old_cl is None or c.is_more_general(old_cl):
+                    old_cl = c
+
+        # Check if there is similar classifier already
+        if old_cl is None:
+            for c in self:
+                if c.is_similar(cl):
+                    old_cl = c
+
+        # Check if any similar classifier wasn't created before
+        if old_cl is None:
+            for c in new_list:
+                if c.is_similar(cl):
+                    old_cl = c
 
         if old_cl is None:
-            new_list.append(child_cl)
-            return False
+            new_list.append(cl)
         else:
             old_cl.increase_quality()
-
-        return True
-
-    def add_matching_classifiers(self, lst, situation: Perception):
-        """
-        Add classifiers matching perception from
-        the given list to the current list
-
-        :param lst: another ClassifiersList
-        :param situation:
-        """
-        new_matching = [cl for cl in lst if cl.condition.does_match(situation)]
-        self.extend(new_matching)
-
-    def get_subsumer(self, scl: Classifier) -> Classifier:
-        """
-        Searches the list for the subsuming classifier.
-
-        :param scl: 
-        :return: subsuming classifier, None otherwise 
-        """
-        # TODO: write tests
-        subsumer = None
-        subsList = ClassifiersList()
-
-        for cl in self:
-            if cl.does_subsume(scl):
-                if subsumer is None:
-                    subsumer = cl
-                    subsList.append(subsumer)
-                elif cl.is_more_general(subsumer):
-                    subsList.clear()
-                    subsumer = cl
-                    subsList.append(subsumer)
-                elif not subsumer.is_more_general(cl):
-                    subsList.append(cl)
-
-        # Look through found subsumers and randomly select one
-        if len(subsList) > 0:
-            current_num = 0
-            micro_cls_numerosity = sum(cl.num for cl in subsList)
-            select = randint(1, micro_cls_numerosity)
-
-            for cl in subsList:
-                current_num += cl.num
-                if current_num >= select:
-                    return cl
-
-        return None
 
     def get_similar(self, other: Classifier) -> Classifier:
         """
