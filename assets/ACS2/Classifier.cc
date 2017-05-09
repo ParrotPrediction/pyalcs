@@ -196,8 +196,8 @@ Classifier *Classifier::unexpectedCase(Perception *p0, Perception *p1, int time)
 
     if (E->isSpecializable(p0, p1) != 0) {
         Classifier *cl = new Classifier(this, time);
-        Condition *diff = cl->E->getAndSpecialize(p0, p1);
 
+        Condition *diff = cl->E->getAndSpecialize(p0, p1);
         cl->C->specialize(diff);
 
         delete diff;

@@ -11,11 +11,11 @@ class ClassifierListTest(unittest.TestCase):
     def setUp(self):
         self.population = ClassifiersList()
 
-    def test_restrict_to_only_classifiers(self):
+    def test_should_insert_classifier_1(self):
         # Try to insert an integer instead of classifier object
         self.assertRaises(TypeError, self.population.append, 4)
 
-    def test_try_to_insert_classifier(self):
+    def test_should_insert_classifier_2(self):
         self.population.append(Classifier())
         self.assertEqual(1, len(self.population))
 
@@ -67,13 +67,16 @@ class ClassifierListTest(unittest.TestCase):
         self.assertEqual(0.0, self.population.get_maximum_fitness())
 
         # C2 - does anticipate some change
-        c2 = Classifier(effect=['1', '#', '#', '#', '0', '#', '#', '#'], reward=0.25)
+        c2 = Classifier(effect=['1', '#', '#', '#', '0', '#', '#', '#'],
+                        reward=0.25)
 
         self.population.append(c2)
         self.assertEqual(0.125, self.population.get_maximum_fitness())
 
         # C3 - does anticipate change and is quite good
-        c3 = Classifier(effect=['1', '#', '#', '#', '#', '#', '#', '#'], quality=0.8, reward=5)
+        c3 = Classifier(effect=['1', '#', '#', '#', '#', '#', '#', '#'],
+                        quality=0.8,
+                        reward=5)
 
         self.population.append(c3)
         self.assertEqual(4, self.population.get_maximum_fitness())
@@ -88,7 +91,9 @@ class ClassifierListTest(unittest.TestCase):
         self.assertIsNotNone(best_action)
 
         # C2 - does anticipate some change
-        c2 = Classifier(action=2, effect=['1', '#', '#', '#', '0', '#', '#', '#'], reward=0.25)
+        c2 = Classifier(action=2,
+                        effect=['1', '#', '#', '#', '0', '#', '#', '#'],
+                        reward=0.25)
         self.population.append(c2)
 
         # Here C2 action should be selected
@@ -96,7 +101,10 @@ class ClassifierListTest(unittest.TestCase):
         self.assertEqual(2, best_action)
 
         # C3 - does anticipate change and is quite good
-        c3 = Classifier(action=3, effect=['1', '#', '#', '#', '#', '#', '#', '#'], quality=0.8, reward=5)
+        c3 = Classifier(action=3,
+                        effect=['1', '#', '#', '#', '#', '#', '#', '#'],
+                        quality=0.8,
+                        reward=5)
         self.population.append(c3)
 
         # Here C3 has the biggest fitness score
@@ -146,7 +154,8 @@ class ClassifierListTest(unittest.TestCase):
         self.population.append(c0)
 
         # Should return C1 (because it's first not mentioned)
-        self.assertEqual(1, self.population.choose_action_from_knowledge_array())
+        self.assertEqual(1,
+                         self.population.choose_action_from_knowledge_array())
 
         # Add rest of classifiers
         c1 = Classifier(action=1, numerosity=31, quality=0.72)
@@ -171,7 +180,8 @@ class ClassifierListTest(unittest.TestCase):
         self.population.append(c7)
 
         # Classifier C7 should be the worst here
-        self.assertEqual(7, self.population.choose_action_from_knowledge_array())
+        self.assertEqual(7,
+                         self.population.choose_action_from_knowledge_array())
 
     def test_should_get_similar_classifier(self):
         self.population.append(Classifier(action=1))

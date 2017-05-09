@@ -9,6 +9,7 @@ from alcs.environment.maze import Maze
 from alcs.helpers.metrics import \
     StepsInTrial, \
     Experiment, \
+    Trial, \
     ClassifierPopulationSize, \
     ReliableClassifierPopulationSize, \
     AchievedKnowledge, \
@@ -32,6 +33,7 @@ if __name__ == '__main__':
     agent.add_metrics_handlers([
         StepsInTrial('steps'),
         Experiment('experiment_id'),
+        Trial('trial'),
         ClassifierPopulationSize('total_classifiers'),
         ReliableClassifierPopulationSize('reliable_classifiers'),
         AchievedKnowledge('knowledge'),

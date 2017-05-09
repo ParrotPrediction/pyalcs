@@ -172,7 +172,6 @@ class Classifier(object):
         :param previous_situation:
         :param situation:
         """
-        # TODO: p2: rewrite, tests for this part
         for idx, item in enumerate(situation):
             if previous_situation[idx] != situation[idx]:
                 self.effect[idx] = situation[idx]

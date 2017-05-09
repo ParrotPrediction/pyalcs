@@ -23,6 +23,14 @@ class Metric(metaclass=ABCMeta):
         raise NotImplementedError()
 
 
+class Trial(Metric):
+    def requirements(self):
+        return ['trial']
+
+    def calculate(self, *args, **kwargs):
+        trial_no = kwargs.get('trial')
+        return trial_no
+
 class Experiment(Metric):
     def requirements(self):
         return ['experiment']

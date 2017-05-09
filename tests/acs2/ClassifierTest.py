@@ -96,19 +96,23 @@ class ClassifierTest(unittest.TestCase):
 
     def test_should_specialize_3(self):
         # Given
-        p0 = Perception(['0', '1', '1', '1', '1', '1', '0', '1'])
-        p1 = Perception(['1', '1', '0', '1', '1', '1', '1', '0'])
-        self.cls.effect[0] = '1'
-        self.cls.effect[2] = '0'
-        self.cls.effect[7] = '0'
+        p0 = Perception(['0', '1', '1', '1', '0', '1', '1', '1'])
+        p1 = Perception(['1', '0', '1', '0', '1', '0', '1', '0'])
+        self.cls.condition = Condition(['0', '1', '#', '#', '#', '#', '#', '1'])
+        self.cls.effect = Effect(['1', '0', '#', '#', '#', '#', '#', '0'])
 
         # When
         self.cls.specialize(p0, p1)
+        # diff = Condition(['#', '#', '#', '1', '0', '1', '#', '#'])
 
         # Then
-        self.assertEqual(1, self.cls.condition.specificity)
-        self.assertEqual('0', self.cls.condition[6])
+        self.assertEqual(6, self.cls.condition.specificity)
+        self.assertEqual(Condition(['0', '1', '#', '1', '0', '1', '#', '1']),
+                         self.cls.condition)
 
+        self.assertEqual(6, self.cls.effect.number_of_specified_elements)
+        self.assertEqual(Effect(['1', '0', '#', '0', '1', '0', '#', '0']),
+                         self.cls.effect)
 
     def test_should_count_specified_unchanging_attributes_1(self):
         cl1 = Classifier(
@@ -343,7 +347,7 @@ class ClassifierTest(unittest.TestCase):
         self.assertEqual(operation_time, copied_cl.tga)
         self.assertEqual(operation_time, copied_cl.talp)
 
-    def test_should_detect_similar_classifiers(self):
+    def test_should_detect_similar_classifiers_1(self):
         # Create baseline classifier
         base = Classifier(
             condition=['1', '#', '#', '#', '1', '0', '1', '1'],
@@ -359,7 +363,7 @@ class ClassifierTest(unittest.TestCase):
         )
         self.assertTrue(base.is_similar(c1))
 
-    def test_should_spot_non_similar_classifiers(self):
+    def test_should_detect_similar_classifiers_2(self):
         # Create baseline classifier
         base = Classifier(
             condition=['1', '#', '#', '#', '1', '0', '1', '1'],
@@ -404,22 +408,27 @@ class ClassifierTest(unittest.TestCase):
         self.cls.condition = Condition(['1', '#', '1', '#', '1', '0', '1', '1'])
         self.assertFalse(self.cls.is_more_general(c))
 
-    def test_should_distinguish_classifier_as_subsumer(self):
+    def test_should_distinguish_classifier_as_subsumer_1(self):
         # General classifier should not be considered as subsumer
         self.assertFalse(self.cls._is_subsumer())
 
+    def test_should_distinguish_classifier_as_subsumer_2(self):
         # Let's assign enough experience and quality
         self.cls.exp = 30
         self.cls.q = 0.92
         self.assertTrue(self.cls._is_subsumer())
 
+    def test_should_distinguish_classifier_as_subsumer_3(self):
         # Let's reduce experience below threshold
         self.cls.exp = 15
+        self.cls.q = 0.92
         self.assertFalse(self.cls._is_subsumer())
 
+    def test_should_distinguish_classifier_as_subsumer_4(self):
         # Now check if the fact that classifier is marked will block
         # it from being considered as a subsumer
         self.cls.exp = 30
+        self.cls.q = 0.92
         self.cls.mark[3] = '1'
         self.assertFalse(self.cls._is_subsumer())
 
@@ -488,7 +497,7 @@ class ClassifierTest(unittest.TestCase):
         # When, Then
         self.assertTrue(self.cls.does_subsume(other))
 
-    def test_should_set_mark_from_condition(self):
+    def test_should_set_mark_from_condition_1(self):
         # Given
         p0 = Perception(['0', '0', '0', '0', '1', '1', '1', '1'])
         self.cls.condition = Condition(['#', '#', '0', '#', '1', '#', '1', '#'])
@@ -534,3 +543,52 @@ class ClassifierTest(unittest.TestCase):
 
         self.assertEqual(1, len(self.cls.mark[4]))
         self.assertIn('1', self.cls.mark[4])
+
+    def test_should_set_mark_from_condition_3(self):
+        # Given
+        p0 = Perception(['1', '1', '1', '1', '1', '0', '1', '0'])
+        self.cls.condition = Condition(['1', '1', '#', '1', '1', '#', '#', '0'])
+
+        # When
+        self.cls.set_mark(p0)
+
+        # Then
+        self.assertEqual(3, len(self.cls.mark))
+
+        self.assertEqual(1, len(self.cls.mark[2]))
+        self.assertIn('1', self.cls.mark[2])
+
+        self.assertEqual(1, len(self.cls.mark[5]))
+        self.assertIn('0', self.cls.mark[5])
+
+        self.assertEqual(1, len(self.cls.mark[6]))
+        self.assertIn('1', self.cls.mark[6])
+
+    def test_should_set_mark_from_condition_4(self):
+        # Given
+        p0 = Perception(['0', '1', '1', '0', '0', '0', '0', '0'])
+        self.cls.condition = Condition(['#', '#', '#', '0', '#', '#', '#', '0'])
+
+        # When
+        self.cls.set_mark(p0)
+
+        # Then
+        self.assertEqual(6, len(self.cls.mark))
+
+        self.assertEqual(1, len(self.cls.mark[0]))
+        self.assertIn('0', self.cls.mark[0])
+
+        self.assertEqual(1, len(self.cls.mark[1]))
+        self.assertIn('1', self.cls.mark[1])
+
+        self.assertEqual(1, len(self.cls.mark[2]))
+        self.assertIn('1', self.cls.mark[2])
+
+        self.assertEqual(1, len(self.cls.mark[4]))
+        self.assertIn('0', self.cls.mark[4])
+
+        self.assertEqual(1, len(self.cls.mark[5]))
+        self.assertIn('0', self.cls.mark[5])
+
+        self.assertEqual(1, len(self.cls.mark[6]))
+        self.assertIn('0', self.cls.mark[6])

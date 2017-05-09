@@ -47,6 +47,7 @@ class ACS2(Agent):
             logger.debug("Collecting metrics...")
             self.acquire_metrics(
                 experiment=experiment_id,
+                trial=trial,
                 maze=env,
                 steps=steps_in_trial,
                 classifiers=population

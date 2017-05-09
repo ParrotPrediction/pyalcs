@@ -38,6 +38,7 @@ class Effect(list):
         :param p1: current perception
         :return: True if specializable, false otherwise
         """
+        # TODO: maybe write tests
         for p0i, p1i, ei in zip(p0, p1, self):
             if ei != c.CLASSIFIER_WILDCARD:
                 if ei != p1i or p0i == p1i:
@@ -60,6 +61,7 @@ class Effect(list):
         :param situation:
         :return: True if classifier anticipates correctly, False otherwise
         """
+        # TODO: maybe write tests
         for idx, item in enumerate(self):
             if item == c.CLASSIFIER_WILDCARD:
                 if previous_situation[idx] != situation[idx]:
