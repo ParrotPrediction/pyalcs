@@ -234,6 +234,7 @@ Condition *Effect::getAndSpecialize(Perception *p0, Perception *p1) {
     Condition *con = new Condition();
     list->reset();
     ProbCharPosItem *item;
+
     int i;
     for (i = 0, item = list->getNextItem(); item != 0; item = list->getNextItem(), i++) {
         for (; i < item->getPos(); i++) {
@@ -247,6 +248,7 @@ Condition *Effect::getAndSpecialize(Perception *p0, Perception *p1) {
             return 0;
         }
     }
+
     for (; i < Perception::length; i++) {
         if (p0->getAttribute(i) != p1->getAttribute(i)) {
             list->insert(p1->getAttribute(i), i);

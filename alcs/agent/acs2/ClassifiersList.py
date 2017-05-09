@@ -4,7 +4,6 @@ from alcs.agent.acs2 import Constants as c
 
 import logging
 from random import random, randint
-from copy import copy
 from itertools import groupby
 
 logger = logging.getLogger(__name__)
@@ -26,11 +25,13 @@ class ClassifiersList(list):
 
     @classmethod
     def form_match_set(cls, population, situation: Perception):
-        return cls([cl for cl in population if cl.condition.does_match(situation)])
+        return cls([cl for cl in population
+                    if cl.condition.does_match(situation)])
 
     @classmethod
     def form_action_set(cls, population, action: int):
-        return cls([cl for cl in population if cl.action == action])
+        return cls([cl for cl in population
+                    if cl.action == action])
 
     @staticmethod
     def _remove_classifier(population, cl: Classifier):
@@ -78,10 +79,12 @@ class ClassifiersList(list):
         :return: action from the best classifier
         """
         best_classifier = None
-        anticipated_change_cls = [cl for cl in self if cl.does_anticipate_change()]
+        anticipated_change_cls = [cl for cl in self
+                                  if cl.does_anticipate_change()]
 
         if len(anticipated_change_cls) > 0:
-            best_classifier = max(anticipated_change_cls, key=lambda cl: cl.fitness)
+            best_classifier = max(anticipated_change_cls,
+                                  key=lambda cl: cl.fitness)
 
         if best_classifier is not None:
             return best_classifier.action
@@ -151,7 +154,8 @@ class ClassifiersList(list):
 
         :return: fitness value
         """
-        anticipated_change_cls = [cl for cl in self if cl.does_anticipate_change()]
+        anticipated_change_cls = [cl for cl in self
+                                  if cl.does_anticipate_change()]
 
         if len(anticipated_change_cls) > 0:
             best_cl = max(anticipated_change_cls, key=lambda cl: cl.fitness)
@@ -184,7 +188,7 @@ class ClassifiersList(list):
 
         # Because we will be changing classifiers (adding/removing) - we will
         # iterate over the copy of the list
-        for cl in copy(self):
+        for cl in self:
             cl.increase_experience()
             cl.set_alp_timestamp(time)
 
@@ -194,7 +198,7 @@ class ClassifiersList(list):
             else:
                 new_cl = cl.unexpected_case(previous_situation, situation, time)
 
-                if cl.q < c.THETA_I:
+                if cl.is_inadequate():
                     # Removes classifier from population, match set
                     # and current list
                     for lst in [population, match_set, self]:
@@ -210,8 +214,6 @@ class ClassifiersList(list):
             self.add_alp_classifier(new_cl, new_list)
 
         # Merge classifiers from new_list into self and population
-        # I think these classifiers shouldn't be reconsidered in iteration
-        # TODO: p2: validate if works properly.
         self.extend(new_list)
         population.extend(new_list)
 

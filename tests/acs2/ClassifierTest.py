@@ -1,7 +1,7 @@
 import unittest
 
 from alcs.agent import Perception
-from alcs.agent.acs2 import Classifier, Condition, Effect
+from alcs.agent.acs2 import Classifier, Condition, Effect, PMark
 
 
 class ClassifierTest(unittest.TestCase):
@@ -75,8 +75,10 @@ class ClassifierTest(unittest.TestCase):
         self.cls.specialize(p0, p1)
 
         # Then
-        self.assertEqual(Condition(['#', '#', '#', '#', '#', '#', '#', '#']), self.cls.condition)
-        self.assertEqual(Effect(['#', '#', '#', '#', '#', '#', '#', '#']), self.cls.effect)
+        self.assertEqual(Condition(['#', '#', '#', '#', '#', '#', '#', '#']),
+                         self.cls.condition)
+        self.assertEqual(Effect(['#', '#', '#', '#', '#', '#', '#', '#']),
+                         self.cls.effect)
 
     def test_should_specialize_2(self):
         # Given
@@ -87,8 +89,26 @@ class ClassifierTest(unittest.TestCase):
         self.cls.specialize(p0, p1)
 
         # Then
-        self.assertEqual(Condition(['#', '#', '#', '0', '#', '#', '#', '#']), self.cls.condition)
-        self.assertEqual(Effect(['#', '#', '#', '1', '#', '#', '#', '#']), self.cls.effect)
+        self.assertEqual(Condition(['#', '#', '#', '0', '#', '#', '#', '#']),
+                         self.cls.condition)
+        self.assertEqual(Effect(['#', '#', '#', '1', '#', '#', '#', '#']),
+                         self.cls.effect)
+
+    def test_should_specialize_3(self):
+        # Given
+        p0 = Perception(['0', '1', '1', '1', '1', '1', '0', '1'])
+        p1 = Perception(['1', '1', '0', '1', '1', '1', '1', '0'])
+        self.cls.effect[0] = '1'
+        self.cls.effect[2] = '0'
+        self.cls.effect[7] = '0'
+
+        # When
+        self.cls.specialize(p0, p1)
+
+        # Then
+        self.assertEqual(1, self.cls.condition.specificity)
+        self.assertEqual('0', self.cls.condition[6])
+
 
     def test_should_count_specified_unchanging_attributes_1(self):
         cl1 = Classifier(
@@ -125,7 +145,35 @@ class ClassifierTest(unittest.TestCase):
         )
         self.assertEqual(3, cl5.specified_unchanging_attributes)
 
-    def test_should_generate_new_classifier_from_unexpected_case(self):
+    def test_should_handle_expected_case_1(self):
+        # Given
+        self.cls.condition = ['#', '#', '#', '#', '#', '#', '#', '0']
+        self.cls.q = 0.525
+        p0 = Perception(['1', '1', '1', '1', '1', '0', '1', '0'])
+        time = 47
+
+        # When
+        new_cls = self.cls.expected_case(p0, time)
+
+        # Then
+        self.assertIsNone(new_cls)
+        self.assertAlmostEqual(0.54, self.cls.q, places=1)
+
+    def test_should_handle_expected_case_2(self):
+        # Given
+        self.cls.condition = ['#', '0', '#', '#', '#', '#', '#', '#']
+        self.cls.q = 0.521
+        p0 = Perception(['1', '0', '1', '0', '1', '0', '0', '1'])
+        time = 59
+
+        # When
+        new_cls = self.cls.expected_case(p0, time)
+
+        # Then
+        self.assertIsNone(new_cls)
+        self.assertAlmostEqual(0.54, self.cls.q, places=1)
+
+    def test_should_handle_unexpected_case_1(self):
         self.cls = Classifier(action=2)
 
         p0 = Perception(['0', '1', '1', '0', '0', '0', '0', '0'])
@@ -173,7 +221,7 @@ class ClassifierTest(unittest.TestCase):
         self.assertEqual(time, new_cls.tga)
         self.assertEqual(time, new_cls.talp)
 
-    def test_should_generate_new_classifier_from_unexpected_case_2(self):
+    def test_should_handle_unexpected_case_2(self):
         # Given
         self.cls.condition = Condition(['#', '#', '#', '#', '#', '#', '#', '0'])
         self.cls.action = 4
@@ -204,10 +252,9 @@ class ClassifierTest(unittest.TestCase):
         self.assertEqual(time, new_cl.talp)
         self.assertAlmostEqual(self.cls.q, 0.38, 1)
 
-    def test_should_not_generate_new_classifier_from_unexpected_case(self):
+    def test_should_handle_unexpected_case_3(self):
         self.cls = Classifier(
             condition=['#', '#', '#', '#', '1', '#', '0', '#'],
-            action=5,
             effect=Effect(['#', '#', '#', '#', '0', '#', '1', '#']),
             quality=0.475
         )
@@ -230,6 +277,38 @@ class ClassifierTest(unittest.TestCase):
 
         # No classifier should be generated here
         self.assertIsNone(new_cls)
+
+    def test_should_handle_unexpected_case_4(self):
+        # Given
+        self.cls = Classifier(
+            condition=['#', '#', '1', '1', '#', '1', '#', '#'],
+            effect=Effect(['#', '#', '0', '0', '#', '0', '#', '#']),
+            quality=0.42
+        )
+
+        mark = PMark()
+        mark[0].update(['0', '1'])
+        mark[1].update(['0', '1'])
+        mark[4].update(['0', '1'])
+        mark[6].update(['0', '1'])
+        mark[7].update(['0', '1'])
+
+        self.cls.mark = mark
+
+        p0 = Perception(['1', '1', '1', '1', '0', '1', '1', '1'])
+        p1 = Perception(['1', '0', '0', '0', '0', '0', '0', '1'])
+        time = 684
+
+        # When
+        new_cls = self.cls.unexpected_case(p0, p1, time)
+
+        # Then
+        self.assertEqual(Condition(['#', '1', '1', '1', '#', '1', '1', '#']),
+                         new_cls.condition)
+        self.assertEqual(Effect(['#', '0', '0', '0', '#', '0', '0', '#']),
+                         new_cls.effect)
+        self.assertEqual(mark, self.cls.mark)
+        self.assertAlmostEqual(0.39, self.cls.q, places=1)
 
     def test_should_copy_classifier(self):
         operation_time = 123

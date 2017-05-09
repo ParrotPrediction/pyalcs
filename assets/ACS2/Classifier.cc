@@ -85,7 +85,7 @@ Classifier *Classifier::expectedCase(Perception *percept, int time) {
             }
         }
     } else {
-        //Remove positions if too many specializations are suggested
+        //Remove positions if toxo many specializations are suggested
         while (noSpec + noSpecNew > U_MAX) {
             if (diff->generalize((int) (frand() * noSpecNew)))
                 noSpecNew--;
@@ -193,15 +193,21 @@ int Classifier::getUnchangeSpec() {
 Classifier *Classifier::unexpectedCase(Perception *p0, Perception *p1, int time) {
     decreaseQuality();
     mark(p0);
+
     if (E->isSpecializable(p0, p1) != 0) {
         Classifier *cl = new Classifier(this, time);
         Condition *diff = cl->E->getAndSpecialize(p0, p1);
+
         cl->C->specialize(diff);
+
         delete diff;
+
         if (cl->q < 0.5)
             cl->q = 0.5;
+
         return cl;
     }
+
     return 0;
 }
 

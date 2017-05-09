@@ -2,7 +2,7 @@ from alcs.agent.acs2 import Constants as c
 from alcs.agent import Perception
 from alcs.agent.acs2 import Condition
 
-from random import randint
+from random import choice
 
 
 class PMark(list):
@@ -34,9 +34,12 @@ class PMark(list):
 
         return changed
 
-    def set_mark_using_condition(self, condition: Condition, perception: Perception) -> bool:
+    def set_mark_using_condition(self,
+                                 condition: Condition,
+                                 perception: Perception) -> bool:
         if not self.is_empty():
-            # Mark is already specified. Further specialize all specified attributes
+            # Mark is already specified. Further specialize all
+            # specified attributes
             return self.set_mark(perception)
 
         changed = False
@@ -70,24 +73,23 @@ class PMark(list):
 
         # Count difference types
         for idx, item in enumerate(self):
-            if perception[idx] not in item:
+            if len(item) > 0 and perception[idx] not in item:
                 nr1 += 1
-            elif len(item) > 1:  # TODO p4: Maybe 0
+            elif len(item) > 1:
                 nr2 += 1
 
-        # TODO: p2: after implementing knowledge is 0
         if nr1 > 0:
             # One or more absolute differences detected -> specialize one
             # randomly chosen
             condition = Condition()
-            selected = randint(0, nr1)
 
+            possible_idx = []
             for idx, item in enumerate(self):
-                if perception[idx] not in item:
-                    if selected == 0:
-                        condition[idx] = perception[idx]
-                        break
-                    selected -= 1
+                if len(item) > 0 and perception[idx] not in item:
+                    possible_idx.append(idx)
+
+            rand_idx = choice(possible_idx)
+            condition[rand_idx] = perception[rand_idx]
         elif nr2 > 0:
             # One or more equal differences detected -> specialize all of them
             condition = Condition()
@@ -97,6 +99,6 @@ class PMark(list):
                     condition[idx] = perception[idx]
         else:
             # Nothing for specialization found
-            pass
+            return None
 
         return condition

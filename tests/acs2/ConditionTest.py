@@ -47,6 +47,13 @@ class ConditionTest(unittest.TestCase):
         c.specialize(new_condition=diff)
         self.assertEqual(result, c)
 
+    def test_should_specialize_5(self):
+        c =      Condition(['#', '#', '#', '0', '1', '#', '0', '#'])
+        diff =   Condition(['1', '0', '1', '#', '#', '0', '#', '#'])
+        result = Condition(['1', '0', '1', '0', '1', '0', '0', '#'])
+        c.specialize(new_condition=diff)
+        self.assertEqual(result, c)
+
     def test_should_match_perception(self):
         p = Perception(['1', '0', '0', '1', '1', '0', '0', '1'])
 

@@ -1,7 +1,8 @@
 import unittest
 
 from alcs.agent import Perception
-from alcs.agent.acs2 import Condition, PMark
+from alcs.agent.acs2 import PMark
+from alcs.agent.acs2 import Constants as c
 
 
 class PMarkTest(unittest.TestCase):
@@ -67,3 +68,86 @@ class PMarkTest(unittest.TestCase):
 
         self.assertEqual(1, len(self.mark[6]))
         self.assertIn('1', self.mark[6])
+
+    def test_should_get_differences_1(self):
+        # Given
+        p0 = Perception(['0', '1', '1', '0', '0', '0', '1', '1'])
+
+        # When
+        diff = self.mark.get_differences(p0)
+
+        # Then
+        self.assertIsNone(diff)
+
+    def test_should_get_differences_2(self):
+        # Given
+        p0 = Perception(['1', '1', '0', '1', '1', '1', '0', '1'])
+        self.mark[0] = '1'
+        self.mark[1] = '1'
+        self.mark[2] = '0'
+        self.mark[3] = '0'
+        self.mark[4] = '0'
+        self.mark[5] = '0'
+        self.mark[6] = '1'
+        self.mark[7] = '0'
+
+        for _ in range(100):
+            # When
+            diff = self.mark.get_differences(p0)
+
+            # Then
+            self.assertIsNotNone(diff)
+            self.assertEqual(c.CLASSIFIER_WILDCARD, diff[0])
+            self.assertEqual(c.CLASSIFIER_WILDCARD, diff[1])
+            self.assertEqual(c.CLASSIFIER_WILDCARD, diff[2])
+            self.assertEqual(1, diff.specificity)
+
+    def test_should_get_differences_3(self):
+        # Given
+        p0 = Perception(['0', '1', '1', '0', '0', '0', '0', '0'])
+        self.mark[0].update(['0', '1'])
+        self.mark[1].update(['1'])
+        self.mark[2].update(['0', '1'])
+        self.mark[3].update(['1'])
+        self.mark[4].update(['0', '1'])
+        self.mark[5].update(['1'])
+        self.mark[6].update(['0', '1'])
+        self.mark[7].update(['1'])
+
+        for _ in range(100):
+            # When
+            diff = self.mark.get_differences(p0)
+
+            # Then
+            self.assertIsNotNone(diff)
+            self.assertEqual(c.CLASSIFIER_WILDCARD, diff[0])
+            self.assertEqual(c.CLASSIFIER_WILDCARD, diff[1])
+            self.assertEqual(c.CLASSIFIER_WILDCARD, diff[2])
+            self.assertEqual(c.CLASSIFIER_WILDCARD, diff[4])
+            self.assertEqual(c.CLASSIFIER_WILDCARD, diff[6])
+            self.assertEqual(1, diff.specificity)
+
+    def test_should_get_differences_4(self):
+        # Given
+        p0 = Perception(['1', '1', '1', '1', '1', '0', '1', '0'])
+        self.mark[0].update(['0', '1'])
+        self.mark[1].update(['0', '1'])
+        self.mark[3].update(['0', '1'])
+        self.mark[4].update(['0', '1'])
+        self.mark[6].update(['0', '1'])
+        self.mark[7].update(['0'])
+
+        # When
+        diff = self.mark.get_differences(p0)
+
+        # Then
+        self.assertIsNotNone(diff)
+        self.assertEqual(5, diff.specificity)
+        self.assertEqual('1', diff[0])
+        self.assertEqual('1', diff[1])
+        self.assertEqual(c.CLASSIFIER_WILDCARD, diff[2])
+        self.assertEqual('1', diff[3])
+        self.assertEqual('1', diff[4])
+        self.assertEqual(c.CLASSIFIER_WILDCARD, diff[5])
+        self.assertEqual('1', diff[6])
+        self.assertEqual(c.CLASSIFIER_WILDCARD, diff[7])

@@ -36,7 +36,10 @@ class ACS2(Agent):
 
         while all_steps < max_steps:
             logger.info("Trial/steps: [{}/{}]".format(trial, all_steps))
-            steps_in_trial = self._start_one_trial_explore(population, env, all_steps, max_steps)
+            steps_in_trial = self._start_one_trial_explore(population,
+                                                           env,
+                                                           all_steps,
+                                                           max_steps)
 
             all_steps += steps_in_trial
             trial += 1
@@ -49,12 +52,18 @@ class ACS2(Agent):
                 classifiers=population
             )
 
-            logger.info("Know: {:.1f}% Pop: {} Num: {} Rel: {} Ina: {} Fit: {:.1f} Spec: {:.2f}\n".format(
+            logger.info("Know: {:.1f}% "
+                        "Pop: {} "
+                        "Num: {} "
+                        "Rel: {} "
+                        "Ina: {} "
+                        "Fit: {:.1f} "
+                        "Spec: {:.2f}\n".format(
                 self.metrics['knowledge'][-1],
                 len(population),
                 sum(cl.num for cl in population),
                 len([cl for cl in population if cl.is_reliable()]),
-                len([cl for cl in population if cl.q < 0.1]),
+                len([cl for cl in population if cl.is_inadequate()]),
                 sum(cl.fitness for cl in population) / len(population),
                 self.metrics['specificity'][-1]
             ))
@@ -76,17 +85,18 @@ class ACS2(Agent):
 
         situation = env.get_animat_perception()
 
-        while not env.trial_finished() and time + steps <= max_steps and steps < c.MAX_TRIAL_STEPS:
+        while not env.trial_finished() and \
+                time + steps <= max_steps and \
+                steps < c.MAX_TRIAL_STEPS:
+
             match_set = ClassifiersList.form_match_set(population, situation)
 
             if steps > 0:
                 # Apply learning in the last action set
                 action_set.apply_alp(previous_situation, action, situation,
                                      time + steps, population, match_set)
-                action_set.apply_reinforcement_learning(reward,
-                                                        match_set.get_maximum_fitness())
-                action_set.apply_ga(time + steps, population, match_set,
-                                    situation)
+                action_set.apply_reinforcement_learning(reward, match_set.get_maximum_fitness())
+                action_set.apply_ga(time + steps, population, match_set, situation)
 
             action = match_set.choose_action(epsilon=c.EPSILON)
             action_set = ClassifiersList.form_action_set(match_set, action)
