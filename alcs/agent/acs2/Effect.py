@@ -1,5 +1,4 @@
 from alcs.agent import Perception
-from alcs.agent.acs2 import Condition
 from alcs.agent.acs2 import Constants as c
 
 
@@ -38,7 +37,6 @@ class Effect(list):
         :param p1: current perception
         :return: True if specializable, false otherwise
         """
-        # TODO: maybe write tests
         for p0i, p1i, ei in zip(p0, p1, self):
             if ei != c.CLASSIFIER_WILDCARD:
                 if ei != p1i or p0i == p1i:
@@ -54,14 +52,13 @@ class Effect(list):
         of a classifier directly anticipate that these attributes stay the same
         after the execution of an action, the specified attributes anticipate
         a change to the specified value. Thus, if the perceived value did not
-        change to the anticipated but actually stayed at the value, the classifier
-        anticipates incorrectly.
+        change to the anticipated but actually stayed at the value, the
+        classifier anticipates incorrectly.
 
         :param previous_situation:
         :param situation:
         :return: True if classifier anticipates correctly, False otherwise
         """
-        # TODO: maybe write tests
         for idx, item in enumerate(self):
             if item == c.CLASSIFIER_WILDCARD:
                 if previous_situation[idx] != situation[idx]:

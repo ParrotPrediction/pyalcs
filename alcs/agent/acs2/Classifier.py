@@ -223,6 +223,7 @@ class Classifier(object):
         
         :param time: current step
         """
+        # TODO p5: write test
         if 1. / self.exp > c.BETA:
             self.tav = (self.tav * self.exp + (time - self.talp)) / (
                 self.exp + 1)

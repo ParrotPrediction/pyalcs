@@ -26,6 +26,45 @@ class ClassifierTest(unittest.TestCase):
 
         self.assertTrue(self.cls.does_anticipate_correctly(p0, p1))
 
+    def test_should_calculate_specificity_1(self):
+        self.assertEqual(0, self.cls.specificity)
+
+    def test_should_calculate_specificity_2(self):
+        self.cls.condition = Condition(['#', '1', '#', '0', '1', '#', '0', '#'])
+        self.assertEqual(0.5, self.cls.specificity)
+
+    def test_should_calculate_specificity_3(self):
+        self.cls.condition = Condition(['1', '1', '1', '0', '1', '0', '0', '1'])
+        self.assertEqual(1, self.cls.specificity)
+
+    def test_should_be_considered_as_reliable_1(self):
+        # Given
+        self.cls.q = 0.89
+
+        # Then
+        self.assertFalse(self.cls.is_reliable())
+
+    def test_should_be_considered_as_reliable_2(self):
+        # Given
+        self.cls.q = 0.91
+
+        # Then
+        self.assertTrue(self.cls.is_reliable())
+
+    def test_should_be_considered_as_inadequate_1(self):
+        # Given
+        self.cls.q = 0.50
+
+        # Then
+        self.assertFalse(self.cls.is_inadequate())
+
+    def test_should_be_considered_as_inadequate_2(self):
+        # Given
+        self.cls.q = 0.09
+
+        # Then
+        self.assertTrue(self.cls.is_inadequate())
+
     def test_should_update_reward(self):
         self.cls.update_reward(1000)
         self.assertEqual(50.475, self.cls.r)
@@ -34,14 +73,34 @@ class ClassifierTest(unittest.TestCase):
         self.cls.update_intermediate_reward(1000)
         self.assertEqual(50.0, self.cls.ir)
 
+    def test_should_increase_experience(self):
+        # Given
+        self.cls.exp = 5
+
+        # When
+        self.cls.increase_experience()
+
+        # Then
+        self.assertEqual(6, self.cls.exp)
+
     def test_should_increase_quality(self):
+        # Given
         self.cls.q = 0.5
+
+        # When
         self.cls.increase_quality()
+
+        # Then
         self.assertEqual(0.525, self.cls.q)
 
     def test_should_decrease_quality(self):
+        # Given
         self.cls.q = 0.47
+
+        # When
         self.cls.decrease_quality()
+
+        # Then
         self.assertAlmostEqual(0.45, self.cls.q, 2)
 
     def test_should_cover_triple(self):
@@ -176,6 +235,60 @@ class ClassifierTest(unittest.TestCase):
         # Then
         self.assertIsNone(new_cls)
         self.assertAlmostEqual(0.54, self.cls.q, places=1)
+
+    def test_should_handle_expected_case_3(self):
+        # Given
+        p0 = Perception(['0', '0', '1', '1', '0', '0', '0', '0'])
+        time = 26
+        self.cls.action = 5
+        self.cls.q = 0.46
+        self.cls.mark[0] = '0'
+        self.cls.mark[1] = '1'
+        self.cls.mark[2] = '0'
+        self.cls.mark[3] = '1'
+        self.cls.mark[4] = '0'
+        self.cls.mark[5] = '1'
+        self.cls.mark[6] = '1'
+        self.cls.mark[7] = '1'
+
+        # When
+        new_cls = self.cls.expected_case(p0, time)
+
+        # Then
+        self.assertIsNotNone(new_cls)
+        # One `random` attribute gets specified
+        self.assertEqual(1, new_cls.condition.specificity)
+        self.assertEqual(Effect(['#', '#', '#', '#', '#', '#', '#', '#']),
+                         new_cls.effect)
+        self.assertEqual(5, new_cls.action)
+        self.assertTrue(new_cls.mark.is_empty())
+        self.assertEqual(0.5, new_cls.q)
+
+    def test_should_handle_expected_case_4(self):
+        # Given
+        p0 = Perception(['1', '1', '1', '0', '1', '1', '0', '1'])
+        time = 703
+        self.cls.condition = Condition(['1', '#', '#', '0', '1', '#', '0', '#'])
+        self.cls.action = 7
+        self.cls.effect = Effect(['0', '#', '#', '1', '0', '#', '1', '#'])
+        self.cls.q = 0.47
+        self.cls.mark[1].update(['0', '2'])
+        self.cls.mark[2].update(['1'])
+        self.cls.mark[5].update(['0', '1'])
+        self.cls.mark[7].update(['1'])
+
+        # When
+        new_cls = self.cls.expected_case(p0, time)
+
+        # Then
+        self.assertIsNotNone(new_cls)
+        # One `random` attribute gets specified
+        self.assertEqual(5, new_cls.condition.specificity)
+        self.assertEqual(Effect(['0', '#', '#', '1', '0', '#', '1', '#']),
+                         new_cls.effect)
+        self.assertEqual(7, new_cls.action)
+        self.assertTrue(new_cls.mark.is_empty())
+        self.assertEqual(0.5, new_cls.q)
 
     def test_should_handle_unexpected_case_1(self):
         self.cls = Classifier(action=2)
@@ -592,3 +705,18 @@ class ClassifierTest(unittest.TestCase):
 
         self.assertEqual(1, len(self.cls.mark[6]))
         self.assertIn('0', self.cls.mark[6])
+
+    def test_should_predict_successfully_1(self):
+        # Given
+        self.cls = Classifier(
+            condition=['1', '#', '0', '1', '1', '1', '#', '1'],
+            action=5,
+            effect=['0', '#', '1', '0', '0', '0', '#', '0'],
+            quality=0.94
+        )
+        action = 5
+        p0 = Perception(['1', '1', '0', '1', '1', '1', '0', '1'])
+        p1 = Perception(['0', '1', '1', '0', '0', '0', '0', '0'])
+
+        # Then
+        self.assertTrue(self.cls.predicts_successfully(p0, action, p1))

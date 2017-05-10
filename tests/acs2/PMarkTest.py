@@ -16,6 +16,9 @@ class PMarkTest(unittest.TestCase):
         for mark in self.mark:
             self.assertEqual(0, len(mark))
 
+    def test_should_mark_with_non_string_char(self):
+        self.assertRaises(TypeError, self.mark.__setitem__, 0, 1)
+
     def test_should_detect_if_marked(self):
         self.assertTrue(self.mark.is_empty())
 

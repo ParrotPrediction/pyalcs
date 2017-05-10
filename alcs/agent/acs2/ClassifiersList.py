@@ -39,6 +39,7 @@ class ClassifiersList(list):
         Searches the list and removes classifier
         :param cl: classifier to remove
         """
+        # TODO p4: write test
         if population is not None and cl in population:
             population.remove(cl)
 

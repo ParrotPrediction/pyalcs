@@ -44,9 +44,6 @@ class Condition(list):
                 if ni != c.CLASSIFIER_WILDCARD:
                     self[idx] = ni
 
-    def generalize(self, position):
-        self[position] = c.CLASSIFIER_WILDCARD
-
     def does_match(self, lst: list) -> bool:
         """
         Check if condition match other list such as perception or another

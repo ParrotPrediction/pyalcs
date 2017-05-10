@@ -116,9 +116,11 @@ int Effect::doesAnticipateCorrectly(Perception *p0, Perception *p1) {
             return 0;
         i++;
     }
+
     for (; i < Perception::length; i++)
         if (p0->getAttribute(i) != p1->getAttribute(i))
             return 0;
+
     return 1;
 }
 
