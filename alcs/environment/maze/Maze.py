@@ -29,14 +29,6 @@ class Maze(Environment):
         self.max_x, self.max_y, self.matrix = None, None, None
         self._load_maze_from_file(maze_file)
 
-    def move_was_successful(self) -> bool:
-        """
-        Checks if animat moved in this turn.
-
-        :return: True is animat moved, false otherwise
-        """
-        return self.animat_moved
-
     def trial_finished(self) -> bool:
         """
         Gives information whether an animat is still searching the reward.
@@ -198,6 +190,7 @@ class Maze(Environment):
         logger.debug('Animat [(%d, %d)] ordered to execute action: [%s]',
                      self.animat_pos_x, self.animat_pos_y, action)
 
+        # TODO: p0 write tests (edge conditions)
         if (action == "N" and
                 self.not_wall(m_perception.N) and
                 self._within_y_range()):
