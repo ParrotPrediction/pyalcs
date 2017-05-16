@@ -31,7 +31,8 @@ class Effect(list):
 
     def is_specializable(self, p0: Perception, p1: Perception) -> bool:
         """
-        Determines if the effect part is specializable.
+        Determines if the effect part can be modified to anticipate
+        changes from `p0` to `p1` correctly by only specializing attributes.
 
         :param p0: previous perception
         :param p1: current perception

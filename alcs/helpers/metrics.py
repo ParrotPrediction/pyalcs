@@ -31,6 +31,7 @@ class Trial(Metric):
         trial_no = kwargs.get('trial')
         return trial_no
 
+
 class Experiment(Metric):
     def requirements(self):
         return ['experiment']

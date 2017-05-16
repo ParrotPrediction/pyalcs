@@ -293,6 +293,7 @@ class Classifier(object):
         # TODO: p5 maybe also take into consideration cl.E = # (paper)
         child.specialize(previous_perception, perception)
 
+        # TODO: p5 cl.q? (paper)
         if child.q < 0.5:
             child.q = 0.5
 
