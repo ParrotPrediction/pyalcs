@@ -56,8 +56,7 @@ public:
 
     CharPosList *getList() { return list; }
 
-    friend ostream &
-    operator<<(ostream &out, Condition *c);
+    friend ostream & operator<<(ostream &out, Condition *c);
 
 private:
     CharPosList *list;

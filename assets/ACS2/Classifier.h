@@ -100,8 +100,7 @@ public:
 
     int increaseExperience() { return ++exp; }
 
-    friend ostream &
-    operator<<(ostream &out, Classifier *cl);
+    friend ostream & operator<<(ostream &out, Classifier *cl);
 
     Condition *getCondition() { return C; }
 

@@ -55,6 +55,7 @@ Classifier *Classifier::expectedCase(Perception *percept, int time) {
 
     //Check out the possible specializations comparing mark to the percept
     Condition *diff = M->getDifferences(percept);
+
     if (diff == 0) {
         //No possibility for a further specialization was found
         if (DO_PEES && !M->isEmpty()) {
@@ -513,8 +514,8 @@ int Classifier::isMoreGeneral(Classifier *cl) {
 
 ostream &operator<<(ostream &out, Classifier *cl) {
     out << cl->C << " " << cl->A << " " << cl->E << " ";
-    out << cl->M << " ";
-    out << cl->q << "\t" << cl->r << "\t" << cl->i << "\t" << cl->exp << " " << cl->tga << "\t" << cl->talp << " "
-        << cl->tav << " " << cl->num;
+    out << cl->M << " q: ";
+    out << cl->q << "\tr: " << cl->r << "\ti: " << cl->i << "\texp: " << cl->exp << " tga: " << cl->tga << "\ttalp: " << cl->talp << " tav: "
+        << cl->tav << " num: " << cl->num;
     return out;
 }

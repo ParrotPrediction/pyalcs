@@ -12,7 +12,10 @@ class Classifier(object):
                  reward=0.5,
                  intermediate_reward=0,
                  numerosity=1,
-                 experience=1):
+                 experience=1,
+                 talp=None,
+                 tga=0,
+                 tav=0):
 
         self.condition = Condition(
             condition) if condition is not None else Condition()
@@ -37,12 +40,12 @@ class Classifier(object):
         self.exp = experience
 
         # When ALP learning was triggered
-        self.talp = None
+        self.talp = talp
 
-        self.tga = 0
+        self.tga = tga
 
         # Application average
-        self.tav = 0
+        self.tav = tav
 
         # I don't know yet what it is
         self.ee = 0
@@ -84,7 +87,7 @@ class Classifier(object):
                      situation: Perception,
                      time: int):
         """
-        Creates a classifier that anticipates the change correctly
+        Creates a classifier that anticipates a change correctly
 
         :param previous_situation:
         :param action:
@@ -96,7 +99,6 @@ class Classifier(object):
         new_cl = cls(action=action)  # TODO: p5 exp=0, r=0 (paper)
         new_cl.tga = time
         new_cl.talp = time
-        new_cl.tav = 0
 
         new_cl.specialize(previous_situation, situation)
 
@@ -233,18 +235,18 @@ class Classifier(object):
         self.talp = time
 
     def expected_case(self,
-                      previous_perception: Perception,
+                      perception: Perception,
                       time: int):
         """
         Controls the expected case of a classifier. If the classifier
         is to specific it tries to add some randomness to it by
         generalizing some attributes.
 
-        :param previous_perception:
+        :param perception:
         :param time:
         :return: new classifier or None
         """
-        diff = self.mark.get_differences(previous_perception)
+        diff = self.mark.get_differences(perception)
 
         if diff is None:
             self.increase_quality()
@@ -285,6 +287,7 @@ class Classifier(object):
         self.decrease_quality()
         self.set_mark(previous_perception)
 
+        # Return if the effect is not specializable
         if not self.effect.is_specializable(previous_perception, perception):
             return None
 

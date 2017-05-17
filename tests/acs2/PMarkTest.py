@@ -154,3 +154,27 @@ class PMarkTest(unittest.TestCase):
         self.assertEqual(c.CLASSIFIER_WILDCARD, diff[5])
         self.assertEqual('1', diff[6])
         self.assertEqual(c.CLASSIFIER_WILDCARD, diff[7])
+
+    def test_should_get_differences_5(self):
+        # Given
+        p0 = Perception(['0', '0', '2', '1', '1', '0', '1', '0'])
+        self.mark[3] = '0'
+        self.mark[6] = '0'
+
+        for _ in range(100):
+            # When
+            diff = self.mark.get_differences(p0)
+
+            # Then
+            self.assertIsNotNone(diff)
+            self.assertEqual(1, diff.specificity)
+
+    def test_should_get_differences_6(self):
+        # Given
+        p0 = Perception(['1', '0', '1', '0', '1', '0', '0', '1'])
+
+        # When
+        diff = self.mark.get_differences(p0)
+
+        # Then
+        self.assertIsNone(diff)

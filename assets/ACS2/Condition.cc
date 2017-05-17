@@ -133,7 +133,6 @@ int Condition::getSpecificity() {
     return list->getSize();
 }
 
-
 ostream &operator<<(ostream &out, Condition *c) {
     c->list->reset();
     CharPosItem *item = c->list->getNextItem();
