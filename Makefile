@@ -8,3 +8,5 @@ coverage:
 	rm .coverage
 pep8:
 	find . -name \*.py -exec pep8 --ignore=E129,E402 {} +
+notebook:
+	jupyter notebook

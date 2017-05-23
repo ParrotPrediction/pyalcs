@@ -266,7 +266,7 @@ class ClassifiersList(list):
                 if c.is_similar(cl):
                     old_cl = c
 
-        # Check if any similar classifier wasn't created before
+        # Check if any similar classifier wasn't in this ALP application
         if old_cl is None:
             for c in new_list:
                 if c.is_similar(cl):

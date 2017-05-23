@@ -594,14 +594,24 @@ class ClassifierTest(unittest.TestCase):
                 effect=['1', '0', '#', '#', '#', '#', '1', '1']
             )))
 
-    def test_should_detect_more_general_classifier(self):
+    def test_should_detect_more_general_classifier_1(self):
         # No specified elements - should not be more general
-        self.assertFalse(self.cls.is_more_general(Classifier()))
 
+        # Given
+        c = Classifier()
+
+        # When
+        res = self.cls.is_more_general(c)
+
+        # Then
+        self.assertFalse(res)
+
+    def test_should_detect_more_general_classifier_2(self):
         # Should be more general
         c = Classifier(condition=['1', '#', '#', '#', '1', '0', '1', '1'])
         self.assertTrue(self.cls.is_more_general(c))
 
+    def test_should_detect_more_general_classifier_3(self):
         # Shouldn't be more general
         c = Classifier(condition=['1', '#', '#', '#', '1', '#', '#', '#'])
         self.cls.condition = Condition(['1', '#', '1', '#', '1', '0', '1', '1'])

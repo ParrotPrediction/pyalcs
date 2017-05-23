@@ -8,10 +8,12 @@ class Condition(list):
     """
 
     def __init__(self, *args):
-        if len(args) > 0:
-            list.__init__(self, *args)
-        else:
+        if not args:
             list.__init__(self, [c.CLASSIFIER_WILDCARD] * c.CLASSIFIER_LENGTH)
+        else:
+            list.__init__(self, *args)
+            if len(self) != c.CLASSIFIER_LENGTH:
+                raise ValueError('Illegal length of condition string')
 
     def __setitem__(self, idx, value):
         if not isinstance(value, str):
@@ -52,6 +54,11 @@ class Condition(list):
         :param lst: perception or condition given as list
         :return: True if condition match given list, false otherwise
         """
+        # TODO: p0 test for the case below (these should match)
+        # ####O### (self)
+        # #*O##O## (lst)
+        # The case when there is '#' in other list
+
         if len(self) != len(lst):
             raise ValueError('Cannot execute `does_match` '
                              'because lengths are different')

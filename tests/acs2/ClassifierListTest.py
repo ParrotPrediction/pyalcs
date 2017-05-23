@@ -205,18 +205,228 @@ class ClassifierListTest(unittest.TestCase):
         self.assertAlmostEqual(33.94, self.population[0].r, 2)
         self.assertAlmostEqual(10.73, self.population[0].ir, 2)
 
-    def test_should_insert_alp_offspring(self):
+    def test_should_insert_alp_offspring_1(self):
         # Given
         new_list = ClassifiersList()
+
+        # *##*#O*O N O####*O* (########) q: 0.5	r: 8.96245	i: 0	exp: 1 tga: 423	talp: 423 tav: 27.3182 num: 1
         child = Classifier(
-            condition=Condition(['1', '#', '1', '0', '#', '#', '0', '1']),
+            condition=Condition(['1', '#', '#', '1', '#', '0', '1', '0']),
             action=0,
-            effect=Effect(['0', '#', '0', '1', '#', '#', '1', '0'])
+            effect=Effect(['0', '#', '#', '#', '#', '1', '0', '1']),
+            quality=0.5,
+            reward=8.96245,
+            intermediate_reward=0,
+            experience=1,
+            tga=423,
+            talp=423,
+            tav=27.3182
         )
+
+        # *##*#O*O N O####*O* (########) q: 0.571313	r: 7.67011	i: 0	exp: 3 tga: 225	talp: 423 tav: 70.881 num: 1
+        c1 = Classifier(
+            condition=Condition(['1', '#', '#', '1', '#', '0', '1', '0']),
+            action=0,
+            effect=Effect(['0', '#', '#', '#', '#', '1', '0', '1']),
+            quality=0.571313,
+            reward=7.67011,
+            intermediate_reward=0,
+            experience=3,
+            tga=225,
+            talp=423,
+            tav=70.881
+        )
+
+        # *####O*O N O####*O* (#{*,O}{O,*}O{O,*}###) q: 0.462151	r: 8.96245	i: 0	exp: 11 tga: 143	talp: 423 tav: 27.3182 num: 1
+        c2 = Classifier(
+            condition=Condition(['1', '#', '#', '#', '#', '0', '1', '0']),
+            action=0,
+            effect=Effect(['0', '#', '#', '#', '#', '1', '0', '1']),
+            quality=0.462151,
+            reward=8.96245,
+            intermediate_reward=0,
+            experience=11,
+            tga=143,
+            talp=423,
+            tav=27.3182
+        )
+
+        # *####O## N O####*## (#{O,*}{*,O}{O,*}{O,*}#{*,O}{O,*}) q: 0.31452	r: 9.04305	i: 0	exp: 19 tga: 49	talp: 423 tav: 19.125 num: 1
+        c3 = Classifier(
+            condition=Condition(['1', '#', '#', '#', '#', '0', '#', '#']),
+            action=0,
+            effect=Effect(['0', '#', '#', '#', '#', '1', '#', '#']),
+            quality=0.31452,
+            reward=9.04305,
+            intermediate_reward=0,
+            experience=19,
+            tga=49,
+            talp=423,
+            tav=19.125
+        )
+
+        # Add classifiers into current ClassifierList
+        self.population.extend([c1, c2, c3])
 
         # When
         self.population.add_alp_classifier(child, new_list)
 
         # Then
-        self.assertEqual(1, len(new_list))
-        self.assertIn(child, new_list)
+        self.assertEqual(3, len(self.population))
+        self.assertIn(c1, self.population)
+        self.assertIn(c2, self.population)
+        self.assertIn(c3, self.population)
+        self.assertAlmostEqual(0.592747, c1.q, places=1)
+
+    def test_should_insert_alp_offspring_2(self):
+        # Given
+        new_list = ClassifiersList()
+
+        # #*O##O## S ######## (########) q: 0.5	r: 18.206	i: 0	exp: 1 tga: 747	talp: 747 tav: 22.0755 num: 1
+        child = Classifier(
+            condition=Condition('#1O##O##'),
+            action=0,
+            quality=0.5,
+            reward=18.206,
+            intermediate_reward=0,
+            experience=1,
+            tga=747,
+            talp=747,
+            tav=22.0755
+        )
+
+        # #*O#O### S ######## (########) q: 0.650831	r: 14.8323	i: 0	exp: 5 tga: 531	talp: 747 tav: 48.3562 num: 1
+        c1 = Classifier(
+            condition=Condition('#1O#O###'),
+            action=0,
+            quality=0.650831,
+            reward=14.8323,
+            intermediate_reward=0,
+            experience=5,
+            tga=531,
+            talp=747,
+            tav=48.3562
+        )
+
+        # ##O#O### S ######## (########) q: 0.79094	r: 9.97782	i: 0	exp: 10 tga: 330	talp: 747 tav: 43.7171 num: 1
+        c2 = Classifier(
+            condition=Condition('##O#O###'),
+            action=0,
+            quality=0.79094,
+            reward=9.97782,
+            intermediate_reward=0,
+            experience=10,
+            tga=330,
+            talp=747,
+            tav=43.7171
+        )
+
+        # #*O###*O S #O*####* (*##OOO##) q: 0.515369	r: 8.3284	i: 0	exp: 8 tga: 316	talp: 747 tav: 57.8883 num: 1
+        c3 = Classifier(
+            condition=Condition('#1O###1O'),
+            action=0,
+            effect=Effect('#O1####1'),
+            quality=0.515369,
+            reward=8.3284,
+            intermediate_reward=0,
+            experience=8,
+            tga=316,
+            talp=747,
+            tav=57.8883
+        )
+        # TODO p2: Maybe checking wheter marked sometimes does not work..
+        # I mean type incompability
+        c3.mark[0].update(['1'])
+        c3.mark[3].update(['0'])
+        c3.mark[4].update(['0'])
+        c3.mark[5].update(['0'])
+
+        # ####O### S ######## (########) q: 0.903144	r: 14.8722	i: 0	exp: 25 tga: 187	talp: 747 tav: 23.0038 num: 1
+        c4 = Classifier(
+            condition=Condition('####O###'),
+            action=0,
+            quality=0.903144,
+            reward=14.8722,
+            intermediate_reward=0,
+            experience=25,
+            tga=187,
+            talp=747,
+            tav=23.0038
+        )
+
+        # #*O####O S #O*####* (*##{*,O}{*,O}{*,O}{O,*}#) q: 0.647915	r: 9.24712	i: 0	exp: 14 tga: 154	talp: 747 tav: 44.5457 num: 1
+        c5 = Classifier(
+            condition=Condition('#1O####O'),
+            action=0,
+            effect=Effect('#O1####1'),
+            quality=0.647915,
+            reward=9.24712,
+            intermediate_reward=0,
+            experience=14,
+            tga=154,
+            talp=747,
+            tav=44.5457
+        )
+        c5.mark[0].update(['1'])
+        c5.mark[3].update(['0', '1'])
+        c5.mark[4].update(['0', '1'])
+        c5.mark[5].update(['0', '1'])
+        c5.mark[6].update(['0', '1'])
+
+        # #*O##### S ######## (*##***{*,O}{O,*}) q: 0.179243	r: 18.206	i: 0	exp: 29 tga: 104	talp: 747 tav: 22.0755 num: 1
+        c6 = Classifier(
+            condition=Condition('#1O#####'),
+            action=0,
+            quality=0.179243,
+            reward=18.206,
+            intermediate_reward=0,
+            experience=29,
+            tga=104,
+            talp=747,
+            tav=22.0755
+        )
+        c6.mark[0].update(['1'])
+        c6.mark[3].update(['1'])
+        c6.mark[4].update(['1'])
+        c6.mark[5].update(['1'])
+        c6.mark[6].update(['0', '1'])
+        c6.mark[7].update(['0', '1'])
+
+        # ##O##### S ######## ({*,O}{O,*}#{O,*}*{O,*}{*,O}{*,O}) q: 0.100984	r: 15.91	i: 0	exp: 44 tga: 58	talp: 747 tav: 14.4171 num: 1
+        c7 = Classifier(
+            condition=Condition('##O#####'),
+            action=0,
+            quality=0.100984,
+            reward=15.91,
+            intermediate_reward=0,
+            experience=44,
+            tga=58,
+            talp=747,
+            tav=14.4171
+        )
+        c7.mark[0].update(['0', '1'])
+        c7.mark[1].update(['0', '1'])
+        c7.mark[3].update(['0', '1'])
+        c7.mark[5].update(['0', '1'])
+        c7.mark[6].update(['0', '1'])
+        c7.mark[7].update(['0', '1'])
+
+        # Add classifiers into current ClassifierList
+        self.population.extend([c1, c2, c3, c4, c5, c6, c7])
+
+        # When
+        self.population.add_alp_classifier(child, new_list)
+
+        # Then
+        self.assertEqual(7, len(self.population))
+        self.assertEqual(0, len(new_list))
+        self.assertIn(c1, self.population)
+        self.assertIn(c2, self.population)
+        self.assertIn(c3, self.population)
+        self.assertIn(c4, self.population)
+        self.assertIn(c5, self.population)
+        self.assertIn(c6, self.population)
+        self.assertIn(c7, self.population)
+
+        # `C4` should be subsumer of `child`
+        self.assertAlmostEqual(0.907987, c4.q, places=1)

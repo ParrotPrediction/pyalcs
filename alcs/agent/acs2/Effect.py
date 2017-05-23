@@ -8,10 +8,12 @@ class Effect(list):
     to be caused by the specified action.
     """
     def __init__(self, *args):
-        if len(args) > 0:
-            list.__init__(self, *args)
-        else:
+        if not args:
             list.__init__(self, [c.CLASSIFIER_WILDCARD] * c.CLASSIFIER_LENGTH)
+        else:
+            list.__init__(self, *args)
+            if len(self) != c.CLASSIFIER_LENGTH:
+                raise ValueError('Illegal length of effect string')
 
     def __setitem__(self, idx, value):
         if not isinstance(value, str):
@@ -25,7 +27,7 @@ class Effect(list):
     @property
     def number_of_specified_elements(self) -> int:
         """
-        :return: number of specific components
+        :return: number of specified components
         """
         return sum(1 for comp in self if comp != c.CLASSIFIER_WILDCARD)
 

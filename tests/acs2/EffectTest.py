@@ -12,6 +12,16 @@ class EffectTest(unittest.TestCase):
     def test_should_initialize_correctly(self):
         self.assertTrue(len(self.effect) > 0)
 
+    def test_should_get_initialized_with_str_1(self):
+        eff = "#1O##O##"
+        self.effect = Effect(eff)
+        self.assertEqual(8, len(self.effect))
+
+    def test_should_get_initialized_with_str_2(self):
+        eff = "#1O##O#"
+        # Too short effect
+        self.assertRaises(ValueError, Effect, eff)
+
     def test_should_set_effect_with_non_string_char(self):
         self.assertRaises(TypeError, self.effect.__setitem__, 0, 1)
 
@@ -27,9 +37,9 @@ class EffectTest(unittest.TestCase):
         # should predict correctly
 
         # Given
-        self.effect = Effect(['#', '#', '#', '#', '#', '#', '#', '#'])
-        p0 = Perception(['0', '0', '0', '0', '1', '1', '1', '1'])
-        p1 = Perception(['0', '0', '0', '0', '1', '1', '1', '1'])
+        self.effect = Effect('########')
+        p0 = Perception('00001111')
+        p1 = Perception('00001111')
 
         # When
         res = self.effect.does_anticipate_correctly(p0, p1)

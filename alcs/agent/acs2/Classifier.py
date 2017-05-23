@@ -129,7 +129,7 @@ class Classifier(object):
     def specificity(self):
         return self.condition.specificity / len(self.condition)
 
-    def does_anticipate_change(self):
+    def does_anticipate_change(self) -> bool:
         """
         :return: true if the effect part contains any specified attributes
         """

@@ -19,6 +19,16 @@ class ConditionTest(unittest.TestCase):
         self.c.specialize(5, '0')
         self.assertEqual(2, self.c.specificity)
 
+    def test_should_get_initialized_with_str_1(self):
+        cond = "#1O##O##"
+        self.c = Condition(cond)
+        self.assertEqual(8, len(self.c))
+
+    def test_should_get_initialized_with_str_2(self):
+        cond = "#1O##O#"
+        # Too short condition
+        self.assertRaises(ValueError, Condition, cond)
+
     def test_should_specialize_1(self):
         c =    Condition()
         diff =   Condition(['#', '0', '#', '#', '#', '1', '#', '1'])
@@ -85,5 +95,3 @@ class ConditionTest(unittest.TestCase):
         self.c.specialize(0, '0')
         self.assertFalse(self.c.does_match(c))
 
-        # Should fail when condition length is different
-        self.assertRaises(ValueError, self.c.does_match, Condition(['1', '2']))

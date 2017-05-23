@@ -754,6 +754,14 @@ void ClassifierList::selectParents(Classifier **parent1, Classifier **parent2) {
 int ClassifierList::insertALPOffspringToNewList(Classifier *child, ClassifierList **newList) {
     Classifier *oldCl = 0;
 
+    // TODO: khozzy
+    cout << "== INSERT ALP OFFSPRING ==" << endl;
+    cout << "TRYING TO INSERT: " << endl << "\t" << child << endl;
+    cout << "ACTION SET CLASSIFIERS:" << endl;
+    for (PureClassifierList *listp = list; listp != 0; listp = listp->next) {
+        cout << "\t" << listp->cl << endl;
+    }
+
     if ((!DO_SUBSUMPTION || (oldCl = getSubsumer(child)) == 0) && //check if subsumer exists (cannot be a new one)
         (*newList == 0 || (oldCl = (*newList)->getSimilar(child)) == 0) &&//check if it was already created
         ((oldCl = getSimilar(child)) == 0)) {//check if it already existed
@@ -763,14 +771,19 @@ int ClassifierList::insertALPOffspringToNewList(Classifier *child, ClassifierLis
             (*newList)->env = env;
         }
 
+        cout << "* NO CLASSIFIER FOUND *" << endl;
         (*newList)->addClassifier(child);
+        cout << "Adding: " << endl << "\t" << child << endl;
 
         return 0;
     } else { //old, similar/subsuming classifier was found
         delete child;
+        cout << "* OLD / SIMILAR / SUBSUMING CLASSIFIER FOUND ..." << endl;
         oldCl->increaseQuality();
+        cout << "Increased quality of: " <<  endl << "\t" << oldCl << endl;
     }
 
+    cout << endl;
     return 1;
 }
 
