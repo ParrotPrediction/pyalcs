@@ -62,6 +62,7 @@ class Effect(list):
         :param situation:
         :return: True if classifier anticipates correctly, False otherwise
         """
+        # TODO p1: write some tests
         for idx, item in enumerate(self):
             if item == c.CLASSIFIER_WILDCARD:
                 if previous_situation[idx] != situation[idx]:

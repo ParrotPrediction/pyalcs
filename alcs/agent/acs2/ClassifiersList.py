@@ -203,7 +203,7 @@ class ClassifiersList(list):
                     # Removes classifier from population, match set
                     # and current list
                     for lst in [population, match_set, self]:
-                        self._remove_classifier(lst, cl)
+                        __class__._remove_classifier(lst, cl)
 
             if new_cl is not None:
                 new_cl.tga = time
@@ -239,13 +239,13 @@ class ClassifiersList(list):
     def apply_ga(self, time, population, match_set, situation) -> None:
         pass
 
-    def add_alp_classifier(self, cl, new_list):
+    def add_alp_classifier(self, child, new_list):
         """
         Looks for subsuming / similar classifiers in the current set.
         If no appropriate classifier was found, the `child_cl` is added to
         `new_list`.
 
-        :param cl:
+        :param child:
         :param new_list:
         :return: True if an appropriate old classifier was found,
         false otherwise
@@ -256,24 +256,24 @@ class ClassifiersList(list):
         # Look if there is a classifier that subsumes the insertion
         # candidate
         for c in self:
-            if c.does_subsume(cl):
+            if c.does_subsume(child):
                 if old_cl is None or c.is_more_general(old_cl):
+                    old_cl = c
+
+            # Check if any similar classifier wasn't in this ALP application
+        if old_cl is None:
+            for c in new_list:
+                if c.is_similar(child):
                     old_cl = c
 
         # Check if there is similar classifier already
         if old_cl is None:
             for c in self:
-                if c.is_similar(cl):
-                    old_cl = c
-
-        # Check if any similar classifier wasn't in this ALP application
-        if old_cl is None:
-            for c in new_list:
-                if c.is_similar(cl):
+                if c.is_similar(child):
                     old_cl = c
 
         if old_cl is None:
-            new_list.append(cl)
+            new_list.append(child)
         else:
             old_cl.increase_quality()
 

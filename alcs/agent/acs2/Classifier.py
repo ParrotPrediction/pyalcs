@@ -352,7 +352,7 @@ class Classifier(object):
         False otherwise
         """
         if self.exp > c.THETA_EXP:
-            if self.q > c.THETA_R:
+            if self.is_reliable():
                 if self.mark.is_empty():
                     return True
 

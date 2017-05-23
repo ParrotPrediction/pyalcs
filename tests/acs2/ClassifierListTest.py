@@ -81,6 +81,18 @@ class ClassifierListTest(unittest.TestCase):
         self.population.append(c3)
         self.assertEqual(4, self.population.get_maximum_fitness())
 
+    def test_should_return_all_possible_actions(self):
+        # Given
+        actions = set()
+
+        # When
+        for _ in range(1000):
+            act = self.population.choose_action(epsilon=1.0)
+            actions.add(act)
+
+        # Then
+        self.assertEqual(8, len(actions))
+
     def test_should_return_best_fitness_action(self):
         # C1 - does not anticipate change
         c1 = Classifier(action=1)

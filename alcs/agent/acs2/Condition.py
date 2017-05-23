@@ -54,17 +54,14 @@ class Condition(list):
         :param lst: perception or condition given as list
         :return: True if condition match given list, false otherwise
         """
-        # TODO: p0 test for the case below (these should match)
-        # ####O### (self)
-        # #*O##O## (lst)
-        # The case when there is '#' in other list
-
         if len(self) != len(lst):
             raise ValueError('Cannot execute `does_match` '
                              'because lengths are different')
 
         for idx, attrib in enumerate(self):
-            if attrib != c.CLASSIFIER_WILDCARD and attrib != lst[idx]:
+            if attrib != c.CLASSIFIER_WILDCARD \
+                    and lst[idx] != c.CLASSIFIER_WILDCARD \
+                    and attrib != lst[idx]:
                 return False
 
         return True

@@ -81,7 +81,7 @@ class ConditionTest(unittest.TestCase):
         # Should fail when perception length is different
         self.assertRaises(ValueError, self.c.does_match, Perception(['1', '2']))
 
-    def test_should_match_condition(self):
+    def test_should_match_condition_1(self):
         c = Condition(['1', '0', '0', '1', '1', '0', '0', '1'])
 
         # General condition - should match everything
@@ -94,4 +94,15 @@ class ConditionTest(unittest.TestCase):
         # Expects 0 as the first condition
         self.c.specialize(0, '0')
         self.assertFalse(self.c.does_match(c))
+
+    def test_should_match_condition_2(self):
+        # Given
+        self.c = Condition('####O###')
+        other = Condition('#1O##O##')
+
+        # When
+        res = self.c.does_match(other)
+
+        # Then
+        self.assertTrue(res)
 
