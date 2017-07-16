@@ -7,40 +7,41 @@ sys.path.insert(0, abspath(join(dirname(__file__), '..')))
 from alcs.agent.acs2 import ACS2
 from alcs.environment.maze import Maze
 from alcs.helpers.metrics import \
-    ActualStep,\
-    ClassifierPopulationSize,\
-    AveragedFitnessScore,\
-    SuccessfulTrial,\
-    AveragedConditionSpecificity,\
-    AchievedKnowledge
+    StepsInTrial, \
+    Experiment, \
+    Trial, \
+    ClassifierPopulationSize, \
+    ReliableClassifierPopulationSize, \
+    AchievedKnowledge, \
+    AverageSpecificity
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
     format='[%(asctime)s] [%(levelname)s] [%(name)s]: %(message)s',
-    level=logging.DEBUG)
+    level=logging.INFO)
 
 
 if __name__ == '__main__':
 
     # Load environment
-    env = Maze('mazes/MazeF1.maze')
+    env = Maze('mazes/BMaze4.maze')
 
     # Initialize agent
     agent = ACS2()
 
     # Specify which metrics will be collected
     agent.add_metrics_handlers([
-        ActualStep('time'),
-        SuccessfulTrial('found_reward'),
+        StepsInTrial('steps'),
+        Experiment('experiment_id'),
+        Trial('trial'),
         ClassifierPopulationSize('total_classifiers'),
-        AveragedFitnessScore('average_fitness'),
-        AveragedConditionSpecificity('average_specificity'),
-        AchievedKnowledge('achieved_knowledge')
+        ReliableClassifierPopulationSize('reliable_classifiers'),
+        AchievedKnowledge('knowledge'),
+        AverageSpecificity('specificity')
     ])
 
     # Evaluate simulation
-    classifiers, metrics = agent.evaluate(env, 500, 5)
+    metrics = agent.evaluate(env, 1, 15000)
 
-    reliable = [c for c in classifiers if c.is_reliable()]
-
-    print("Reliable classifiers: {}".format(len(reliable)))
+    logger.info("Algorithm finished")
+    logger.info("Last knowledge: {:.2f}%".format(metrics['knowledge'][-1]))

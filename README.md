@@ -33,11 +33,5 @@ Prior to PR please execute:
 and check if standards are holding:
 
     make test
+    make coverage
     make pep8
-
-#### Improvements
-- more intelligent exploration/exploitation,
-- kill animat after certain time of wandering (`MaxSteps`),
-- better choice of reward values,
-- perception of 8 cells (not just 4),
-- 8 possible actions (not just 4),

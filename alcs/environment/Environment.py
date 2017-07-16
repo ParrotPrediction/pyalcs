@@ -11,14 +11,6 @@ class Environment(metaclass=ABCMeta):
         raise NotImplementedError()
 
     @abstractmethod
-    def move_was_successful(self) -> bool:
-        """
-        Returns information whether the animat has proceeded to another
-        situation (perception).
-        """
-        raise NotImplementedError
-
-    @abstractmethod
     def trial_finished(self) -> bool:
         """
         Returns information whether an animat has accomplished his task.

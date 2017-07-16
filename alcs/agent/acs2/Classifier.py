@@ -1,254 +1,359 @@
-from copy import deepcopy
-
-from . import Constants as c
-from alcs.environment.maze import MazeAction
+from alcs.agent import Perception
+from alcs.agent.acs2 import Condition, Effect, PMark
+from alcs.agent.acs2 import Constants as c
 
 
 class Classifier(object):
-    """
-    Represents a condition-action-effect rule that anticipates the model
-    state resulting from the execution of the specified action given the
-    specified condition.
+    def __init__(self,
+                 condition=None,
+                 action=None,
+                 effect=None,
+                 quality=0.5,
+                 reward=0.5,
+                 intermediate_reward=0,
+                 numerosity=1,
+                 experience=1,
+                 talp=None,
+                 tga=0,
+                 tav=0):
 
-    Always specifies a complete resulting state.
-    """
-
-    def __init__(self):
-        # The Condition Part - specifies the set of situations (perceptions)
-        # in which the classifier can be applied
-        self.condition = [c.CLASSIFIER_WILDCARD] * c.CLASSIFIER_LENGTH
-
-        # The Action Part - proposes an available action
-        self.action = None
-
-        # The Effect Part - anticipates the effects that the classifier
-        # 'believes' to be caused by the specified action
-        self.effect = [c.CLASSIFIER_WILDCARD] * c.CLASSIFIER_LENGTH
-
-        # The Mark - records the properties in which the classifier did
-        # not work correctly before
-        self.mark = Classifier.empty_mark()
+        self.condition = Condition(
+            condition) if condition is not None else Condition()
+        self.action = action if action is not None else None
+        self.effect = Effect(effect) if effect is not None else Effect()
+        self.mark = PMark()
 
         # Quality - measures the accuracy of the anticipations
-        self.q = 0.5
+        self.q = quality
 
         # The reward prediction - predicts the reward expected after
         # the execution of action A given condition C
-        self.r = 0
+        self.r = reward
 
-        # The immediate reward prediction - predicts the reinforcement
-        # directly encountered after the execution of action A
-        self.ir = 0
+        # Intermediate reward
+        self.ir = intermediate_reward
 
-        # In which generation the classifier was created
-        self.t = None
+        # Numerosity
+        self.num = numerosity
 
-        # The GA timestamp - records the last time the classifier was part
-        # of an action set in which GA was applied
-        self.t_ga = 0
+        # Experience
+        self.exp = experience
 
-        # The ALP timestamp - records the time the classifier underwent
-        # the last ALP update
-        self.t_alp = 0
+        # When ALP learning was triggered
+        self.talp = talp
 
-        # The 'application average' - estimates the ALP update frequency
-        self.aav = 0
+        self.tga = tga
 
-        # The 'experience counter' - counts the number of times the classifier
-        # underwent the ALP
-        self.exp = 0
+        # Application average
+        self.tav = tav
 
-        # The numerosity - specifies the number of actual (micro-) classifier
-        # this macroclassifier represents
-        self.num = 1
-
-    @staticmethod
-    def copy_from(old_classifier):
-        return deepcopy(old_classifier)
+        # I don't know yet what it is
+        self.ee = 0
 
     def __repr__(self):
-        return 'Classifier{{{} {} {} q:{:.2f}, r:{:.2f}, ir:{:.2f}}}'.format(
-            ''.join(map(str, self.condition)),
-            MazeAction().find_symbol(self.action),
-            ''.join(map(str, self.effect)),
-            self.q,
-            self.r,
-            self.ir
-        )
+        return "{}-{}-{} @ {}".format(self.condition,
+                                      self.action,
+                                      self.effect,
+                                      hex(id(self)))
 
-    def __eq__(self, other):
+    @classmethod
+    def copy_from(cls, old_cls, time):
         """
-        Equality check. The other classifier is the same when
-        it has the same condition, action and effect part
+        Copies old classifier with given time.
+        New classifier has no mark.
 
-        :param other: the other classifier
-        :return: true if classifier is the same, false otherwise
+        :param old_cls: classifier to copy from
+        :param time:
+        :return: new classifier
         """
-        if isinstance(other, self.__class__):
-            if (other.condition == self.condition and
-                    other.action == self.action and
-                    other.effect == self.effect):
-                return True
+        new_cls = cls(
+            condition=old_cls.condition,
+            action=old_cls.action,
+            effect=old_cls.effect,
+            quality=old_cls.q,
+            reward=old_cls.r,
+            intermediate_reward=old_cls.ir)
 
-        return False
+        new_cls.tga = time
+        new_cls.talp = time
+        new_cls.tav = old_cls.tav
 
-    def __ne__(self, other):
-        return not self.__eq__(other)
+        return new_cls
 
-    def __hash__(self):
-        return hash((self.condition, self.action, self.effect))
+    @classmethod
+    def cover_triple(cls,
+                     previous_situation: Perception,
+                     action: int,
+                     situation: Perception,
+                     time: int):
+        """
+        Creates a classifier that anticipates a change correctly
 
+        :param previous_situation:
+        :param action:
+        :param situation:
+        :param time:
+
+        :return: new classifier
+        """
+        new_cl = cls(action=action)  # TODO: p5 exp=0, r=0 (paper)
+        new_cl.tga = time
+        new_cl.talp = time
+
+        new_cl.specialize(previous_situation, situation)
+
+        return new_cl
+
+    @property
     def fitness(self):
         return self.q * self.r
 
-    def is_reliable(self) -> bool:
+    @property
+    def specified_unchanging_attributes(self):
         """
-        Returns information whether a classifier
-        can be considered as reliable
+        Determines the number of specified unchanging attributes in
+        the classifier. An unchanging attribute is one that is anticipated
+        not to change in the effect part.
+
+        :return: number of specified unchanging attributes
         """
+        spec = 0
+
+        for cpi, epi in zip(self.condition, self.effect):
+            if cpi != c.CLASSIFIER_WILDCARD and epi == c.CLASSIFIER_WILDCARD:
+                spec += 1
+
+        return spec
+
+    @property
+    def specificity(self):
+        return self.condition.specificity / len(self.condition)
+
+    def does_anticipate_change(self) -> bool:
+        """
+        :return: true if the effect part contains any specified attributes
+        """
+        return self.effect.number_of_specified_elements > 0
+
+    def is_reliable(self):
         return self.q > c.THETA_R
 
-    def is_inadequate(self) -> bool:
-        """
-        Returns information whether a classifier
-        can be considered as inadequate.
-        """
+    def is_inadequate(self):
         return self.q < c.THETA_I
 
-    def get_condition_specificity(self) -> float:
+    def update_reward(self, p: float) -> float:
+        self.r += c.BETA * (p - self.r)
+        return self.r
+
+    def update_intermediate_reward(self, rho) -> float:
+        self.ir += c.BETA * (rho - self.ir)
+        return self.ir
+
+    def increase_experience(self) -> int:
+        self.exp += 1
+        return self.exp
+
+    def increase_quality(self) -> float:
+        self.q += c.BETA * (1 - self.q)
+        return self.q
+
+    def decrease_quality(self) -> float:
+        self.q -= c.BETA * self.q
+        return self.q
+
+    def specialize(self,
+                   previous_situation: Perception,
+                   situation: Perception):
         """
-        Return information what percentage of condition elements are
-        specific.
-        :return: number from [0,1]
+        Specializes the effect part where necessary to correctly anticipate
+        the changes from p0 to p1 and returns a condition which specifies
+        the attributes which must be specified in the condition part.
+        The specific attributes in the returned conditions are set to
+        the necessary values.
+
+        :param previous_situation:
+        :param situation:
         """
-        specific = sum(1 for e in self.condition if e != c.CLASSIFIER_WILDCARD)
-        return specific / c.CLASSIFIER_LENGTH
+        for idx, item in enumerate(situation):
+            if previous_situation[idx] != situation[idx]:
+                self.effect[idx] = situation[idx]
+                self.condition[idx] = previous_situation[idx]
 
-    def get_micro_classifiers(self) -> []:
+    def predicts_successfully(self,
+                              p0: Perception,
+                              action: int,
+                              p1: Perception) -> bool:
         """
-        Returns an array of self-contained micro-classifiers (according
-        to numerosity).
-
-        :return: array of classifiers
+        Check if classifier matches previous situation `p0`,
+        has action `action` and predicts the effect `p1`
+        
+        :param p0: previous situation
+        :param action: 
+        :param p1: anticipated situation after execution action
+        :return: True if classifier makes successful predictions,
+        False otherwise
         """
-        micros = []
-
-        for micro_cl in range(0, self.num):
-            micros.append(self)
-
-        return micros
-
-    def can_subsume(self, cl_tos, theta_exp=None, theta_r=None):
-        """
-        Subsume operation - capture another, similar but more
-        general classifier.
-
-        In order to subsume another classifier, the subsumer needs to be
-        experienced, reliable and not marked. Moreover the subsumer condition
-        part needs to be syntactically more general and the effect part
-        needs to be identical
-
-        :param cl_tos: classifier to subsume
-        :param theta_exp: threshold of required classifier experience
-        to subsume another classifier
-        :param theta_r: threshold of required classifier quality to
-        subsume another classifier
-        :return: true if classifier cl is subsumed, false otherwise
-        """
-        if not isinstance(cl_tos, self.__class__):
-            raise TypeError('Illegal type of classifier passed')
-
-        if theta_exp is None:
-            theta_exp = c.THETA_EXP
-
-        if theta_r is None:
-            theta_r = c.THETA_R
-
-        cp = 0  # number of subsumer wildcards in condition part
-        cpt = 0  # number of wildcards in condition part in other classifier
-
-        if (self.exp > theta_exp and
-                self.q > theta_r and
-                not __class__.is_marked(self.mark)):
-
-            for i in range(c.CLASSIFIER_LENGTH):
-                if self.condition[i] == c.CLASSIFIER_WILDCARD:
-                    cp += 1
-
-                if cl_tos.condition[i] == c.CLASSIFIER_WILDCARD:
-                    cpt += 1
-
-            if cp <= cpt:
-                if self.effect == cl_tos.effect:
+        if self.condition.does_match(p0):
+            if self.action == action:
+                if self.does_anticipate_correctly(p0, p1):
                     return True
 
         return False
 
-    def is_more_general(self, cl):
+    def does_anticipate_correctly(self,
+                                  previous_situation: Perception,
+                                  situation: Perception) -> bool:
+        return self.effect.does_anticipate_correctly(
+            previous_situation, situation)
+
+    def set_mark(self, perception: Perception) -> None:
         """
-        Checks if classifier is more general than classifier passed in
-        an argument. It's made sure that classifier is indeed *more* general,
-        as well as that the more specific classifier is completely included
-        in the more general one (do not specify overlapping regions).
+        Marks classifier with given perception taking into consideration its
+        condition.
+        
+        Specializes the mark in all attributes which are not specified
+        in the conditions, yet
 
-        :param cl: classifier to compare
-        :return: true if a base classifier is more general, false otherwise
+        :param perception: current situation
         """
-        if not isinstance(cl, self.__class__):
-            raise TypeError('Illegal type of classifier passed')
+        if self.mark.set_mark_using_condition(self.condition, perception):
+            self.ee = 0
 
-        base_more_general = False
-
-        for i in range(c.CLASSIFIER_LENGTH):
-            if (self.condition[i] != c.CLASSIFIER_WILDCARD and
-                    self.condition[i] != cl.condition[i]):
-
-                return False
-            elif self.condition[i] != cl.condition[i]:
-                base_more_general = True
-
-        return base_more_general
-
-    def set_mark(self, previous_perception: list, perception: list):
+    def set_alp_timestamp(self, time: int) -> None:
         """
-        Function sets compares previous and current perception with
-        classifier anticipations and sets mark accordingly.
-
-        :param previous_perception: perception in previous trial
-        :param perception: obtained perception
+        Sets the ALP time stamp and the application average parameter.
+        
+        :param time: current step
         """
-        for i, (condition, anticipation, perception, previous_perception) \
-            in enumerate(zip(self.condition, self.effect, previous_perception,
-                             perception)):
+        # TODO p5: write test
+        if 1. / self.exp > c.BETA:
+            self.tav = (self.tav * self.exp + (time - self.talp)) / (
+                self.exp + 1)
+        else:
+            self.tav += c.BETA * ((time - self.talp) - self.tav)
 
-            if previous_perception == perception:
-                # classifier predicted correctly
-                if anticipation == c.CLASSIFIER_WILDCARD:
-                    pass
-                else:
-                    # Effect part required a change
-                    self.mark[i].add(previous_perception)
-            else:
-                # classifier did not predict correctly
-                self.mark[i].add(previous_perception)
+        self.talp = time
 
-    @staticmethod
-    def is_marked(mark: list) -> bool:
+    def expected_case(self,
+                      perception: Perception,
+                      time: int):
         """
-        Returns information whether classifier is marked.
+        Controls the expected case of a classifier. If the classifier
+        is to specific it tries to add some randomness to it by
+        generalizing some attributes.
 
-        :param mark: list of sets containing mark
-        :return: True if is marked, false otherwise
+        :param perception:
+        :param time:
+        :return: new classifier or None
         """
-        for m in mark:
-            if len(m) > 0:
-                return True
+        diff = self.mark.get_differences(perception)
+
+        if diff is None:
+            self.increase_quality()
+            return None
+
+        no_spec = self.specified_unchanging_attributes
+        no_spec_new = diff.specificity
+        child = self.copy_from(self, time)
+
+        if no_spec >= c.U_MAX:
+            # TODO: p4: implement later
+            # Code below won't get executed anyway because c.U_MAX is high
+            pass
+        else:
+            # TODO: p4: implement later
+            pass
+
+        child.condition.specialize(new_condition=diff)
+
+        if child.q < 0.5:
+            child.q = 0.5
+
+        return child
+
+    def unexpected_case(self,
+                        previous_perception: Perception,
+                        perception: Perception,
+                        time: int):
+        """
+        Controls the unexpected case of the classifier.
+
+        :param previous_perception:
+        :param perception:
+        :param time:
+        :return: specialized classifier if generation was possible,
+        None otherwise
+        """
+        self.decrease_quality()
+        self.set_mark(previous_perception)
+
+        # Return if the effect is not specializable
+        if not self.effect.is_specializable(previous_perception, perception):
+            return None
+
+        child = self.copy_from(self, time)
+
+        # TODO: p5 maybe also take into consideration cl.E = # (paper)
+        child.specialize(previous_perception, perception)
+
+        # TODO: p5 cl.q? (paper)
+        if child.q < 0.5:
+            child.q = 0.5
+
+        return child
+
+    def is_similar(self, other) -> bool:
+        """
+        Check if classifier is equals to `other` classifier in condition,
+        action and effect part.
+
+        :param other: other classifier
+        :return: True if equals, False otherwise
+        """
+        if self.condition == other.condition and \
+                self.action == other.action and \
+                self.effect == other.effect:
+            return True
 
         return False
 
-    @staticmethod
-    def empty_mark():
+    def is_more_general(self, other) -> bool:
         """
-        Returns a collection of empty marks
+        Checks if the classifier is formally more general than `other`.
+
+        :param other: other classifier to compare
+        :return: True if `other` classifier is more general
         """
-        return [set() for _ in range(c.CLASSIFIER_LENGTH)]
+        if self.condition.specificity < other.condition.specificity:
+            return True
+
+        return False
+
+    def does_subsume(self, other) -> bool:
+        """
+        Returns if a classifier subsumes `other` classifier
+
+        :param other: other classifiers
+        :return: True if `other` classifier is subsumed, False otherwise
+        """
+        if self._is_subsumer() and \
+            self.is_more_general(other) and \
+            self.condition.does_match(other.condition) and \
+                self.effect == other.effect:
+            return True
+
+        return False
+
+    def _is_subsumer(self) -> bool:
+        """
+        Controls if the classifier satisfies the subsumer criteria.
+
+        :return: True is classifier can be considered as subsumer, 
+        False otherwise
+        """
+        if self.exp > c.THETA_EXP:
+            if self.is_reliable():
+                if self.mark.is_empty():
+                    return True
+
+        return False

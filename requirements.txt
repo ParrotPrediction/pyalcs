@@ -1,1 +1,4 @@
+pep8==1.7.0
+jupyter
 networkx==1.11
+coverage==4.3.4

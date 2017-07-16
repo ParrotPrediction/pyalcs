@@ -34,11 +34,13 @@ class Agent(metaclass=ABCMeta):
     @abstractmethod
     def evaluate(self,
                  environment: Environment,
+                 experiments: int,
                  generations: int) -> None:
         """
         Evaluates selected algorithm.
 
         :param environment: environment to operate on
+        :param experiments: number of experiments
         :param generations: number of generations
         """
         raise NotImplementedError()

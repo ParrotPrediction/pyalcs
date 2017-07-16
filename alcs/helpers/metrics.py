@@ -1,8 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from collections import defaultdict
-
-from alcs.agent.acs2.ACS2Utils import does_anticipate_correctly
-from alcs.environment.maze import Maze
+from alcs.helpers.maze_utils import get_all_possible_transitions
 
 
 class Metric(metaclass=ABCMeta):
@@ -26,22 +23,31 @@ class Metric(metaclass=ABCMeta):
         raise NotImplementedError()
 
 
-class ActualStep(Metric):
+class Trial(Metric):
     def requirements(self):
-        return ['step']
+        return ['trial']
 
     def calculate(self, *args, **kwargs):
-        current_step = kwargs.get('step')
+        trial_no = kwargs.get('trial')
+        return trial_no
+
+
+class Experiment(Metric):
+    def requirements(self):
+        return ['experiment']
+
+    def calculate(self, *args, **kwargs):
+        experiment_id = kwargs.get('experiment')
+        return experiment_id
+
+
+class StepsInTrial(Metric):
+    def requirements(self):
+        return ['steps']
+
+    def calculate(self, *args, **kwargs):
+        current_step = kwargs.get('steps')
         return current_step
-
-
-class SuccessfulTrial(Metric):
-    def requirements(self):
-        return ['was_successful']
-
-    def calculate(self, *args, **kwargs):
-        success = kwargs.get('was_successful')
-        return success
 
 
 class ClassifierPopulationSize(Metric):
@@ -70,22 +76,21 @@ class AveragedFitnessScore(Metric):
     def calculate(self, *args, **kwargs):
         classifiers = kwargs.get('classifiers')
 
-        sum_fitness = sum(cl.fitness() for cl in classifiers)
-        total_classifiers = len(classifiers)
+        sum_fitness = sum(cl.fitness for cl in classifiers)
+        total_classifiers = sum(cl.num for cl in classifiers)
 
         return sum_fitness / total_classifiers
 
 
-class AveragedConditionSpecificity(Metric):
+class AverageSpecificity(Metric):
     def requirements(self):
         return ['classifiers']
 
     def calculate(self, *args, **kwargs):
         classifiers = kwargs.get('classifiers')
 
-        sum_specificity = sum(cl.get_condition_specificity()
-                              for cl in classifiers)
-        total_classifiers = len(classifiers)
+        sum_specificity = sum(cl.specificity for cl in classifiers)
+        total_classifiers = sum(cl.num for cl in classifiers)
 
         return sum_specificity / total_classifiers
 
@@ -95,102 +100,25 @@ class AchievedKnowledge(Metric):
         return ['maze', 'classifiers']
 
     def calculate(self, *args, **kwargs):
-        env = kwargs.get('maze')
+        maze = kwargs.get('maze')
         classifiers = kwargs.get('classifiers')
 
+        transitions = get_all_possible_transitions(maze)
+
+        # Take into consideration only reliable classifiers
         reliable_classifiers = [c for c in classifiers if c.is_reliable()]
 
-        # Filter classifiers for each possible action
-        n_classifiers = [c for c in reliable_classifiers if c.action == 0]
-        ne_classifiers = [c for c in reliable_classifiers if c.action == 1]
-        e_classifiers = [c for c in reliable_classifiers if c.action == 2]
-        se_classifiers = [c for c in reliable_classifiers if c.action == 3]
-        s_classifiers = [c for c in reliable_classifiers if c.action == 4]
-        sw_classifiers = [c for c in reliable_classifiers if c.action == 5]
-        w_classifiers = [c for c in reliable_classifiers if c.action == 6]
-        nw_classifiers = [c for c in reliable_classifiers if c.action == 7]
-
-        possible_moves = 0
-        reliable_moves = 0
-
-        path_possible_destinations = defaultdict(list)
+        # Count how many transitions are anticipated correctly
+        nr_correct = 0
 
         # For all possible destinations from each path cell
-        for pos_x, pos_y in env.get_possible_agent_insertion_coordinates():
-            neighbour_cells = env.get_possible_neighbour_cords(pos_x, pos_y)
-            allowed_cells = [c for c in neighbour_cells
-                             if env.is_path(*c) or env.is_reward(*c)]
+        for start, action, end in transitions:
 
-            path_possible_destinations[(pos_x, pos_y)] = allowed_cells
+            p0 = maze.get_animat_perception(*start)
+            p1 = maze.get_animat_perception(*end)
 
-        # Now, for each possible transition check if there is a classifier
-        for start, destinations in path_possible_destinations.items():
-            for destination in destinations:
-                possible_moves += 1
+            if any([True for cl in reliable_classifiers
+                    if cl.predicts_successfully(p0, action, p1)]):
+                nr_correct += 1
 
-                previous_perception = env.get_animat_perception(start[0],
-                                                                start[1])
-                perception = env.get_animat_perception(destination[0],
-                                                       destination[1])
-
-                # North transition
-                if Maze.moved_north(start, destination):
-                    if any(does_anticipate_correctly(cl, perception,
-                                                     previous_perception)
-                           for cl in n_classifiers):
-                        reliable_moves += 1
-
-                # North-East transition
-                if Maze.moved_north(start, destination) \
-                        and Maze.moved_east(start, destination):
-                    if any(does_anticipate_correctly(cl, perception,
-                                                     previous_perception)
-                           for cl in ne_classifiers):
-                        reliable_moves += 1
-
-                # East transition
-                if Maze.moved_east(start, destination):
-                    if any(does_anticipate_correctly(cl, perception,
-                                                     previous_perception)
-                           for cl in e_classifiers):
-                        reliable_moves += 1
-
-                # South-East transition
-                if Maze.moved_south(start, destination) \
-                        and Maze.moved_east(start, destination):
-                    if any(does_anticipate_correctly(cl, perception,
-                                                     previous_perception)
-                           for cl in se_classifiers):
-                        reliable_moves += 1
-
-                # South transition
-                if Maze.moved_south(start, destination):
-                    if any(does_anticipate_correctly(cl, perception,
-                                                     previous_perception)
-                           for cl in s_classifiers):
-                        reliable_moves += 1
-
-                # South-West transition
-                if Maze.moved_south(start, destination) \
-                        and Maze.moved_west(start, destination):
-                    if any(does_anticipate_correctly(cl, perception,
-                                                     previous_perception)
-                           for cl in sw_classifiers):
-                        reliable_moves += 1
-
-                # West transition
-                if Maze.moved_west(start, destination):
-                    if any(does_anticipate_correctly(cl, perception,
-                                                     previous_perception)
-                           for cl in w_classifiers):
-                        reliable_moves += 1
-
-                # North-West transition
-                if Maze.moved_north(start, destination) \
-                        and Maze.moved_west(start, destination):
-                    if any(does_anticipate_correctly(cl, perception,
-                                                     previous_perception)
-                           for cl in nw_classifiers):
-                        reliable_moves += 1
-
-        return reliable_moves / possible_moves
+        return nr_correct / len(transitions) * 100.0

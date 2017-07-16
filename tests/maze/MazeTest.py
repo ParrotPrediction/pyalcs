@@ -317,3 +317,179 @@ class MazeTest(unittest.TestCase):
         self.assertTrue(Maze.moved_east((5, 5), (6, 5)))
         self.assertTrue(Maze.moved_south((5, 5), (5, 6)))
         self.assertTrue(Maze.moved_west((5, 5), (4, 5)))
+
+    def test_should_move_n(self):
+        # Given
+        maze = Maze('tests/maze/test2.maze')
+        maze.insert_animat(2, 2)
+
+        # When
+        maze.execute_action(self.MA['N']['value'])
+
+        # Then
+        self.assertEqual(2, maze.animat_pos_x)
+        self.assertEqual(1, maze.animat_pos_y)
+        self.assertListEqual(
+            [maze.mapping['wall']['value'],  # N
+             maze.mapping['wall']['value'],  # NE
+             maze.mapping['path']['value'],  # E
+             maze.mapping['path']['value'],  # SE
+             maze.mapping['path']['value'],  # S
+             maze.mapping['path']['value'],  # SW
+             maze.mapping['path']['value'],  # W
+             maze.mapping['wall']['value']],  # NW
+            list(maze.get_animat_perception()))
+
+    def test_should_move_ne(self):
+        # Given
+        maze = Maze('tests/maze/test2.maze')
+        maze.insert_animat(2, 2)
+
+        # When
+        maze.execute_action(self.MA['NE']['value'])
+
+        # Then
+        self.assertEqual(3, maze.animat_pos_x)
+        self.assertEqual(1, maze.animat_pos_y)
+        self.assertListEqual(
+            [maze.mapping['wall']['value'],  # N
+             maze.mapping['wall']['value'],  # NE
+             maze.mapping['wall']['value'],  # E
+             maze.mapping['wall']['value'],  # SE
+             maze.mapping['path']['value'],  # S
+             maze.mapping['path']['value'],  # SW
+             maze.mapping['path']['value'],  # W
+             maze.mapping['wall']['value']],  # NW
+            list(maze.get_animat_perception()))
+
+    def test_should_move_e(self):
+        # Given
+        maze = Maze('tests/maze/test2.maze')
+        maze.insert_animat(2, 2)
+
+        # When
+        maze.execute_action(self.MA['E']['value'])
+
+        # Then
+        self.assertEqual(3, maze.animat_pos_x)
+        self.assertEqual(2, maze.animat_pos_y)
+        self.assertListEqual(
+            [maze.mapping['path']['value'],  # N
+             maze.mapping['wall']['value'],  # NE
+             maze.mapping['wall']['value'],  # E
+             maze.mapping['wall']['value'],  # SE
+             maze.mapping['path']['value'],  # S
+             maze.mapping['path']['value'],  # SW
+             maze.mapping['path']['value'],  # W
+             maze.mapping['path']['value']],  # NW
+            list(maze.get_animat_perception()))
+
+    def test_should_move_se(self):
+        # Given
+        maze = Maze('tests/maze/test2.maze')
+        maze.insert_animat(2, 2)
+
+        # When
+        maze.execute_action(self.MA['SE']['value'])
+
+        # Then
+        self.assertEqual(3, maze.animat_pos_x)
+        self.assertEqual(3, maze.animat_pos_y)
+        self.assertListEqual(
+            [maze.mapping['path']['value'],  # N
+             maze.mapping['wall']['value'],  # NE
+             maze.mapping['wall']['value'],  # E
+             maze.mapping['wall']['value'],  # SE
+             maze.mapping['wall']['value'],  # S
+             maze.mapping['wall']['value'],  # SW
+             maze.mapping['path']['value'],  # W
+             maze.mapping['path']['value']],  # NW
+            list(maze.get_animat_perception()))
+
+    def test_should_move_s(self):
+        # Given
+        maze = Maze('tests/maze/test2.maze')
+        maze.insert_animat(2, 2)
+
+        # When
+        maze.execute_action(self.MA['S']['value'])
+
+        # Then
+        self.assertEqual(2, maze.animat_pos_x)
+        self.assertEqual(3, maze.animat_pos_y)
+        self.assertListEqual(
+            [maze.mapping['path']['value'],  # N
+             maze.mapping['path']['value'],  # NE
+             maze.mapping['path']['value'],  # E
+             maze.mapping['wall']['value'],  # SE
+             maze.mapping['wall']['value'],  # S
+             maze.mapping['wall']['value'],  # SW
+             maze.mapping['path']['value'],  # W
+             maze.mapping['path']['value']],  # NW
+            list(maze.get_animat_perception()))
+
+    def test_should_move_sw(self):
+        # Given
+        maze = Maze('tests/maze/test2.maze')
+        maze.insert_animat(2, 2)
+
+        # When
+        maze.execute_action(self.MA['SW']['value'])
+
+        # Then
+        self.assertEqual(1, maze.animat_pos_x)
+        self.assertEqual(3, maze.animat_pos_y)
+        self.assertListEqual(
+            [maze.mapping['path']['value'],  # N
+             maze.mapping['path']['value'],  # NE
+             maze.mapping['path']['value'],  # E
+             maze.mapping['wall']['value'],  # SE
+             maze.mapping['wall']['value'],  # S
+             maze.mapping['wall']['value'],  # SW
+             maze.mapping['wall']['value'],  # W
+             maze.mapping['wall']['value']],  # NW
+            list(maze.get_animat_perception()))
+
+    def test_should_move_w(self):
+        # Given
+        maze = Maze('tests/maze/test2.maze')
+        maze.insert_animat(2, 2)
+
+        # When
+        maze.execute_action(self.MA['W']['value'])
+
+        # Then
+        self.assertEqual(1, maze.animat_pos_x)
+        self.assertEqual(2, maze.animat_pos_y)
+        self.assertListEqual(
+            [maze.mapping['path']['value'],  # N
+             maze.mapping['path']['value'],  # NE
+             maze.mapping['path']['value'],  # E
+             maze.mapping['path']['value'],  # SE
+             maze.mapping['path']['value'],  # S
+             maze.mapping['wall']['value'],  # SW
+             maze.mapping['wall']['value'],  # W
+             maze.mapping['wall']['value']],  # NW
+            list(maze.get_animat_perception()))
+
+    def test_should_move_nw(self):
+        # Given
+        maze = Maze('tests/maze/test2.maze')
+        maze.insert_animat(2, 2)
+
+        # When
+        maze.execute_action(self.MA['NW']['value'])
+
+        # Then
+        self.assertEqual(1, maze.animat_pos_x)
+        self.assertEqual(1, maze.animat_pos_y)
+        self.assertListEqual(
+            [maze.mapping['wall']['value'],  # N
+             maze.mapping['wall']['value'],  # NE
+             maze.mapping['path']['value'],  # E
+             maze.mapping['path']['value'],  # SE
+             maze.mapping['path']['value'],  # S
+             maze.mapping['wall']['value'],  # SW
+             maze.mapping['wall']['value'],  # W
+             maze.mapping['wall']['value']],  # NW
+            list(maze.get_animat_perception()))

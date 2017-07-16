@@ -24,6 +24,8 @@ class MazeAction:
         return [v['value'] for k, v in self.actions.items()]
 
     def find_name(self, value: int):
+        assert isinstance(value, int)
+
         for name, mapping in self.actions.items():
             if mapping['value'] == value:
                 return name
