@@ -191,69 +191,45 @@ class Maze(Environment):
                      self.animat_pos_x, self.animat_pos_y, action)
 
         # TODO: p0 write tests (edge conditions)
-        if (action == "N" and
-                self.not_wall(m_perception.N) and
-                self._within_y_range()):
+        if action == "N" and self.not_wall(m_perception.N):
 
             self.animat_pos_y -= 1
             self.animat_moved = True
 
-        if (action == 'NE' and
-                self.not_wall(m_perception.N) and
-                self.not_wall(m_perception.E) and
-                self._within_x_range() and
-                self._within_y_range()):
+        if action == 'NE' and self.not_wall(m_perception.NE):
 
             self.animat_pos_x += 1
             self.animat_pos_y -= 1
             self.animat_moved = True
 
-        if (action == "E" and
-                self.not_wall(m_perception.E) and
-                self._within_x_range()):
+        if action == "E" and self.not_wall(m_perception.E):
 
             self.animat_pos_x += 1
             self.animat_moved = True
 
-        if (action == 'SE' and
-                self.not_wall(m_perception.S) and
-                self.not_wall(m_perception.E) and
-                self._within_x_range() and
-                self._within_y_range()):
+        if action == 'SE' and self.not_wall(m_perception.SE):
 
             self.animat_pos_x += 1
             self.animat_pos_y += 1
             self.animat_moved = True
 
-        if (action == "S" and
-                self.not_wall(m_perception.S) and
-                self._within_y_range()):
+        if action == "S" and self.not_wall(m_perception.S):
 
             self.animat_pos_y += 1
             self.animat_moved = True
 
-        if (action == 'SW' and
-                self.not_wall(m_perception.S) and
-                self.not_wall(m_perception.W) and
-                self._within_x_range() and
-                self._within_y_range()):
+        if action == 'SW' and self.not_wall(m_perception.SW):
 
             self.animat_pos_x -= 1
             self.animat_pos_y += 1
             self.animat_moved = True
 
-        if (action == "W" and
-                self.not_wall(m_perception.W) and
-                self._within_x_range()):
+        if action == "W" and self.not_wall(m_perception.W):
 
             self.animat_pos_x -= 1
             self.animat_moved = True
 
-        if (action == 'NW' and
-                self.not_wall(m_perception.N) and
-                self.not_wall(m_perception.W) and
-                self._within_x_range() and
-                self._within_y_range()):
+        if action == 'NW' and self.not_wall(m_perception.NW):
 
             self.animat_pos_x -= 1
             self.animat_pos_y -= 1
