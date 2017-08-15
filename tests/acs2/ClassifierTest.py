@@ -30,11 +30,13 @@ class ClassifierTest(unittest.TestCase):
         self.assertEqual(0, self.cls.specificity)
 
     def test_should_calculate_specificity_2(self):
-        self.cls.condition = Condition(['#', '1', '#', '0', '1', '#', '0', '#'])
+        self.cls.condition = Condition(
+            ['#', '1', '#', '0', '1', '#', '0', '#'])
         self.assertEqual(0.5, self.cls.specificity)
 
     def test_should_calculate_specificity_3(self):
-        self.cls.condition = Condition(['1', '1', '1', '0', '1', '0', '0', '1'])
+        self.cls.condition = Condition(
+            ['1', '1', '1', '0', '1', '0', '0', '1'])
         self.assertEqual(1, self.cls.specificity)
 
     def test_should_be_considered_as_reliable_1(self):
@@ -157,7 +159,8 @@ class ClassifierTest(unittest.TestCase):
         # Given
         p0 = Perception(['0', '1', '1', '1', '0', '1', '1', '1'])
         p1 = Perception(['1', '0', '1', '0', '1', '0', '1', '0'])
-        self.cls.condition = Condition(['0', '1', '#', '#', '#', '#', '#', '1'])
+        self.cls.condition = Condition(
+            ['0', '1', '#', '#', '#', '#', '#', '1'])
         self.cls.effect = Effect(['1', '0', '#', '#', '#', '#', '#', '0'])
 
         # When
@@ -268,7 +271,8 @@ class ClassifierTest(unittest.TestCase):
         # Given
         p0 = Perception(['1', '1', '1', '0', '1', '1', '0', '1'])
         time = 703
-        self.cls.condition = Condition(['1', '#', '#', '0', '1', '#', '0', '#'])
+        self.cls.condition = Condition(
+            ['1', '#', '#', '0', '1', '#', '0', '#'])
         self.cls.action = 7
         self.cls.effect = Effect(['0', '#', '#', '1', '0', '#', '1', '#'])
         self.cls.q = 0.47
@@ -340,7 +344,8 @@ class ClassifierTest(unittest.TestCase):
 
     def test_should_handle_unexpected_case_2(self):
         # Given
-        self.cls.condition = Condition(['#', '#', '#', '#', '#', '#', '#', '0'])
+        self.cls.condition = Condition(
+            ['#', '#', '#', '#', '#', '#', '#', '0'])
         self.cls.action = 4
         self.cls.effect = Effect()
         self.cls.mark[0].update([0, 1])
@@ -614,7 +619,8 @@ class ClassifierTest(unittest.TestCase):
     def test_should_detect_more_general_classifier_3(self):
         # Shouldn't be more general
         c = Classifier(condition=['1', '#', '#', '#', '1', '#', '#', '#'])
-        self.cls.condition = Condition(['1', '#', '1', '#', '1', '0', '1', '1'])
+        self.cls.condition = Condition(
+            ['1', '#', '1', '#', '1', '0', '1', '1'])
         self.assertFalse(self.cls.is_more_general(c))
 
     def test_should_distinguish_classifier_as_subsumer_1(self):
@@ -709,7 +715,8 @@ class ClassifierTest(unittest.TestCase):
     def test_should_set_mark_from_condition_1(self):
         # Given
         p0 = Perception(['0', '0', '0', '0', '1', '1', '1', '1'])
-        self.cls.condition = Condition(['#', '#', '0', '#', '1', '#', '1', '#'])
+        self.cls.condition = Condition(
+            ['#', '#', '0', '#', '1', '#', '1', '#'])
         self.cls.mark[0] = '0'
         self.cls.mark[1] = '0'
         self.cls.mark[3] = '0'
@@ -733,7 +740,8 @@ class ClassifierTest(unittest.TestCase):
     def test_should_set_mark_from_condition_2(self):
         # Given
         p0 = Perception(['1', '2', '1', '0', '1', '1', '0', '1'])
-        self.cls.condition = Condition(['#', '#', '#', '0', '#', '1', '0', '1'])
+        self.cls.condition = Condition(
+            ['#', '#', '#', '0', '#', '1', '0', '1'])
 
         # When
         self.cls.set_mark(p0)
@@ -756,7 +764,8 @@ class ClassifierTest(unittest.TestCase):
     def test_should_set_mark_from_condition_3(self):
         # Given
         p0 = Perception(['1', '1', '1', '1', '1', '0', '1', '0'])
-        self.cls.condition = Condition(['1', '1', '#', '1', '1', '#', '#', '0'])
+        self.cls.condition = Condition(
+            ['1', '1', '#', '1', '1', '#', '#', '0'])
 
         # When
         self.cls.set_mark(p0)
@@ -776,7 +785,8 @@ class ClassifierTest(unittest.TestCase):
     def test_should_set_mark_from_condition_4(self):
         # Given
         p0 = Perception(['0', '1', '1', '0', '0', '0', '0', '0'])
-        self.cls.condition = Condition(['#', '#', '#', '0', '#', '#', '#', '0'])
+        self.cls.condition = Condition(
+            ['#', '#', '#', '0', '#', '#', '#', '0'])
 
         # When
         self.cls.set_mark(p0)

@@ -65,4 +65,3 @@ class Condition(list):
                 return False
 
         return True
-

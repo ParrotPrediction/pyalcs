@@ -32,11 +32,12 @@ class ACS2(Agent):
         trial = 0
         all_steps = 0
 
-        population = ClassifiersList()
+        # Classifiers population
+        pop = ClassifiersList()
 
         while all_steps < max_steps:
             logger.info("Trial/steps: [{}/{}]".format(trial, all_steps))
-            steps_in_trial = self._start_one_trial_explore(population,
+            steps_in_trial = self._start_one_trial_explore(pop,
                                                            env,
                                                            all_steps,
                                                            max_steps)
@@ -50,7 +51,7 @@ class ACS2(Agent):
                 trial=trial,
                 maze=env,
                 steps=steps_in_trial,
-                classifiers=population
+                classifiers=pop
             )
 
             logger.info("Know: {:.1f}% "
@@ -60,16 +61,16 @@ class ACS2(Agent):
                         "Ina: {} "
                         "Fit: {:.1f} "
                         "Spec: {:.2f}\n".format(
-                self.metrics['knowledge'][-1],
-                len(population),
-                sum(cl.num for cl in population),
-                len([cl for cl in population if cl.is_reliable()]),
-                len([cl for cl in population if cl.is_inadequate()]),
-                sum(cl.fitness for cl in population) / len(population),
-                self.metrics['specificity'][-1]
-            ))
+                            self.metrics['knowledge'][-1],
+                            len(pop),
+                            sum(cl.num for cl in pop),
+                            len([cl for cl in pop if cl.is_reliable()]),
+                            len([cl for cl in pop if cl.is_inadequate()]),
+                            sum(cl.fitness for cl in pop) / len(pop),
+                            self.metrics['specificity'][-1]
+                        ))
 
-        return population
+        return pop
 
     @staticmethod
     def _start_one_trial_explore(population: ClassifiersList,
@@ -94,10 +95,21 @@ class ACS2(Agent):
 
             if steps > 0:
                 # Apply learning in the last action set
-                action_set.apply_alp(previous_situation, action, situation,
-                                     time + steps, population, match_set)
-                action_set.apply_reinforcement_learning(reward, match_set.get_maximum_fitness())
-                action_set.apply_ga(time + steps, population, match_set, situation)
+                action_set.apply_alp(
+                    previous_situation,
+                    action,
+                    situation,
+                    time + steps,
+                    population,
+                    match_set)
+                action_set.apply_reinforcement_learning(
+                    reward,
+                    match_set.get_maximum_fitness())
+                action_set.apply_ga(
+                    time + steps,
+                    population,
+                    match_set,
+                    situation)
 
             action = match_set.choose_action(epsilon=c.EPSILON)
             action_set = ClassifiersList.form_action_set(match_set, action)
@@ -108,10 +120,21 @@ class ACS2(Agent):
             situation = env.get_animat_perception()
 
             if env.trial_finished():
-                action_set.apply_alp(previous_situation, action, situation,
-                                     time + steps, population, None)
-                action_set.apply_reinforcement_learning(reward, 0)
-                action_set.apply_ga(time + steps, population, None, situation)
+                action_set.apply_alp(
+                    previous_situation,
+                    action,
+                    situation,
+                    time + steps,
+                    population,
+                    None)
+                action_set.apply_reinforcement_learning(
+                    reward,
+                    0)
+                action_set.apply_ga(
+                    time + steps,
+                    population,
+                    None,
+                    situation)
 
             steps += 1
 

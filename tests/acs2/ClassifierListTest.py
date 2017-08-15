@@ -221,7 +221,8 @@ class ClassifierListTest(unittest.TestCase):
         # Given
         new_list = ClassifiersList()
 
-        # *##*#O*O N O####*O* (########) q: 0.5	r: 8.96245	i: 0	exp: 1 tga: 423	talp: 423 tav: 27.3182 num: 1
+        # *##*#O*O N O####*O* (########) q: 0.5	r: 8.96245	i: 0
+        # exp: 1 tga: 423	talp: 423 tav: 27.3182 num: 1
         child = Classifier(
             condition=Condition(['1', '#', '#', '1', '#', '0', '1', '0']),
             action=0,
@@ -235,7 +236,8 @@ class ClassifierListTest(unittest.TestCase):
             tav=27.3182
         )
 
-        # *##*#O*O N O####*O* (########) q: 0.571313	r: 7.67011	i: 0	exp: 3 tga: 225	talp: 423 tav: 70.881 num: 1
+        # *##*#O*O N O####*O* (########) q: 0.571313	r: 7.67011	i: 0
+        # exp: 3 tga: 225	talp: 423 tav: 70.881 num: 1
         c1 = Classifier(
             condition=Condition(['1', '#', '#', '1', '#', '0', '1', '0']),
             action=0,
@@ -249,7 +251,9 @@ class ClassifierListTest(unittest.TestCase):
             tav=70.881
         )
 
-        # *####O*O N O####*O* (#{*,O}{O,*}O{O,*}###) q: 0.462151	r: 8.96245	i: 0	exp: 11 tga: 143	talp: 423 tav: 27.3182 num: 1
+        # *####O*O N O####*O* (#{*,O}{O,*}O{O,*}###) q: 0.462151
+        # r: 8.96245	i: 0	exp: 11 tga: 143	talp: 423
+        # tav: 27.3182 num: 1
         c2 = Classifier(
             condition=Condition(['1', '#', '#', '#', '#', '0', '1', '0']),
             action=0,
@@ -263,7 +267,8 @@ class ClassifierListTest(unittest.TestCase):
             tav=27.3182
         )
 
-        # *####O## N O####*## (#{O,*}{*,O}{O,*}{O,*}#{*,O}{O,*}) q: 0.31452	r: 9.04305	i: 0	exp: 19 tga: 49	talp: 423 tav: 19.125 num: 1
+        # *####O## N O####*## (#{O,*}{*,O}{O,*}{O,*}#{*,O}{O,*}) q: 0.31452
+        # r: 9.04305	i: 0	exp: 19 tga: 49	talp: 423 tav: 19.125 num: 1
         c3 = Classifier(
             condition=Condition(['1', '#', '#', '#', '#', '0', '#', '#']),
             action=0,
@@ -294,7 +299,8 @@ class ClassifierListTest(unittest.TestCase):
         # Given
         new_list = ClassifiersList()
 
-        # #*O##O## S ######## (########) q: 0.5	r: 18.206	i: 0	exp: 1 tga: 747	talp: 747 tav: 22.0755 num: 1
+        # #*O##O## S ######## (########) q: 0.5	r: 18.206	i: 0
+        # exp: 1 tga: 747	talp: 747 tav: 22.0755 num: 1
         child = Classifier(
             condition=Condition('#1O##O##'),
             action=0,
@@ -307,7 +313,8 @@ class ClassifierListTest(unittest.TestCase):
             tav=22.0755
         )
 
-        # #*O#O### S ######## (########) q: 0.650831	r: 14.8323	i: 0	exp: 5 tga: 531	talp: 747 tav: 48.3562 num: 1
+        # #*O#O### S ######## (########) q: 0.650831	r: 14.8323	i: 0
+        # exp: 5 tga: 531	talp: 747 tav: 48.3562 num: 1
         c1 = Classifier(
             condition=Condition('#1O#O###'),
             action=0,
@@ -320,7 +327,8 @@ class ClassifierListTest(unittest.TestCase):
             tav=48.3562
         )
 
-        # ##O#O### S ######## (########) q: 0.79094	r: 9.97782	i: 0	exp: 10 tga: 330	talp: 747 tav: 43.7171 num: 1
+        # ##O#O### S ######## (########) q: 0.79094	r: 9.97782	i: 0
+        # exp: 10 tga: 330	talp: 747 tav: 43.7171 num: 1
         c2 = Classifier(
             condition=Condition('##O#O###'),
             action=0,
@@ -333,7 +341,8 @@ class ClassifierListTest(unittest.TestCase):
             tav=43.7171
         )
 
-        # #*O###*O S #O*####* (*##OOO##) q: 0.515369	r: 8.3284	i: 0	exp: 8 tga: 316	talp: 747 tav: 57.8883 num: 1
+        # #*O###*O S #O*####* (*##OOO##) q: 0.515369	r: 8.3284	i: 0
+        # exp: 8 tga: 316	talp: 747 tav: 57.8883 num: 1
         c3 = Classifier(
             condition=Condition('#1O###1O'),
             action=0,
@@ -353,7 +362,8 @@ class ClassifierListTest(unittest.TestCase):
         c3.mark[4].update(['0'])
         c3.mark[5].update(['0'])
 
-        # ####O### S ######## (########) q: 0.903144	r: 14.8722	i: 0	exp: 25 tga: 187	talp: 747 tav: 23.0038 num: 1
+        # ####O### S ######## (########) q: 0.903144	r: 14.8722	i: 0
+        # exp: 25 tga: 187	talp: 747 tav: 23.0038 num: 1
         c4 = Classifier(
             condition=Condition('####O###'),
             action=0,
@@ -366,7 +376,9 @@ class ClassifierListTest(unittest.TestCase):
             tav=23.0038
         )
 
-        # #*O####O S #O*####* (*##{*,O}{*,O}{*,O}{O,*}#) q: 0.647915	r: 9.24712	i: 0	exp: 14 tga: 154	talp: 747 tav: 44.5457 num: 1
+        # #*O####O S #O*####* (*##{*,O}{*,O}{*,O}{O,*}#) q: 0.647915
+        # r: 9.24712	i: 0	exp: 14 tga: 154	talp: 747
+        # tav: 44.5457 num: 1
         c5 = Classifier(
             condition=Condition('#1O####O'),
             action=0,
@@ -385,7 +397,8 @@ class ClassifierListTest(unittest.TestCase):
         c5.mark[5].update(['0', '1'])
         c5.mark[6].update(['0', '1'])
 
-        # #*O##### S ######## (*##***{*,O}{O,*}) q: 0.179243	r: 18.206	i: 0	exp: 29 tga: 104	talp: 747 tav: 22.0755 num: 1
+        # #*O##### S ######## (*##***{*,O}{O,*}) q: 0.179243	r: 18.206
+        # i: 0	exp: 29 tga: 104	talp: 747 tav: 22.0755 num: 1
         c6 = Classifier(
             condition=Condition('#1O#####'),
             action=0,
@@ -404,7 +417,8 @@ class ClassifierListTest(unittest.TestCase):
         c6.mark[6].update(['0', '1'])
         c6.mark[7].update(['0', '1'])
 
-        # ##O##### S ######## ({*,O}{O,*}#{O,*}*{O,*}{*,O}{*,O}) q: 0.100984	r: 15.91	i: 0	exp: 44 tga: 58	talp: 747 tav: 14.4171 num: 1
+        # ##O##### S ######## ({*,O}{O,*}#{O,*}*{O,*}{*,O}{*,O}) q: 0.100984
+        # r: 15.91	i: 0	exp: 44 tga: 58	talp: 747 tav: 14.4171 num: 1
         c7 = Classifier(
             condition=Condition('##O#####'),
             action=0,

@@ -99,14 +99,16 @@ class ClassifiersList(list):
         :return: chosen action number
         """
         last_executed_cls = None
-        number_of_cls_per_action = {i: 0 for i in range(c.NUMBER_OF_POSSIBLE_ACTIONS)}
+        number_of_cls_per_action = \
+            {i: 0 for i in range(c.NUMBER_OF_POSSIBLE_ACTIONS)}
 
         if len(self) > 0:
             last_executed_cls = min(self, key=lambda cl: cl.talp)
 
             self.sort(key=lambda cl: cl.action)
             for _action, _clss in groupby(self, lambda cl: cl.action):
-                number_of_cls_per_action[_action] = sum([cl.num for cl in _clss])
+                number_of_cls_per_action[_action] = \
+                    sum([cl.num for cl in _clss])
 
         # If there are some actions with no classifiers - select them
         for action, nCls in number_of_cls_per_action.items():
@@ -197,7 +199,9 @@ class ClassifiersList(list):
                 new_cl = cl.expected_case(previous_situation, time)
                 was_expected_case = True
             else:
-                new_cl = cl.unexpected_case(previous_situation, situation, time)
+                new_cl = cl.unexpected_case(previous_situation,
+                                            situation,
+                                            time)
 
                 if cl.is_inadequate():
                     # Removes classifier from population, match set
@@ -211,7 +215,10 @@ class ClassifiersList(list):
 
         # No classifier anticipated correctly - generate new one
         if not was_expected_case:
-            new_cl = Classifier.cover_triple(previous_situation, action, situation, time)
+            new_cl = Classifier.cover_triple(previous_situation,
+                                             action,
+                                             situation,
+                                             time)
             self.add_alp_classifier(new_cl, new_list)
 
         # Merge classifiers from new_list into self and population

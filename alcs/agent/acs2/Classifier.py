@@ -186,9 +186,9 @@ class Classifier(object):
         """
         Check if classifier matches previous situation `p0`,
         has action `action` and predicts the effect `p1`
-        
+
         :param p0: previous situation
-        :param action: 
+        :param action:
         :param p1: anticipated situation after execution action
         :return: True if classifier makes successful predictions,
         False otherwise
@@ -210,7 +210,7 @@ class Classifier(object):
         """
         Marks classifier with given perception taking into consideration its
         condition.
-        
+
         Specializes the mark in all attributes which are not specified
         in the conditions, yet
 
@@ -222,7 +222,7 @@ class Classifier(object):
     def set_alp_timestamp(self, time: int) -> None:
         """
         Sets the ALP time stamp and the application average parameter.
-        
+
         :param time: current step
         """
         # TODO p5: write test
@@ -348,7 +348,7 @@ class Classifier(object):
         """
         Controls if the classifier satisfies the subsumer criteria.
 
-        :return: True is classifier can be considered as subsumer, 
+        :return: True is classifier can be considered as subsumer,
         False otherwise
         """
         if self.exp > c.THETA_EXP:

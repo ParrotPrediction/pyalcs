@@ -78,7 +78,7 @@ class Maze(Environment):
             self.animat_pos_y = pos_y
 
             logger.debug('Animat [(%d, %d)] placed into fixed initial cords',
-                        pos_x, pos_y)
+                         pos_x, pos_y)
         else:
             possible_coords = self.get_possible_agent_insertion_coordinates()
 
@@ -87,7 +87,7 @@ class Maze(Environment):
             self.animat_pos_y = starting_position[1]
 
             logger.debug('Animat [(%d, %d)] placed into random initial cords',
-                        self.animat_pos_x, self.animat_pos_y)
+                         self.animat_pos_x, self.animat_pos_y)
 
     def get_animat_perception(self, pos_x=None, pos_y=None) -> Perception:
         """

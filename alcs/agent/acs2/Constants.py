@@ -9,12 +9,19 @@ MAX_TRIAL_STEPS = 50
 BETA = 0.05
 GAMMA = 0.95
 
-THETA_I = 0.1  # Removal in ALP
-THETA_R = 0.9  # Classifier quality threshold for determining the subsumer / reliability threshold
+# Removal in ALP
+THETA_I = 0.1
 
-EPSILON = 1.0  # Probability of exploration
+# Classifier quality threshold for determining
+# the subsumer / reliability threshold
+THETA_R = 0.9
 
-U_MAX = 100000  # Maximum number of specified elements
+# Probability of exploration
+EPSILON = 1.0
+
+# Maximum number of specified elements
+U_MAX = 100000
 
 # GA constants
-THETA_EXP = 20  # Classifier experience threshold for determining the subsumer
+# Classifier experience threshold for determining the subsumer
+THETA_EXP = 20
