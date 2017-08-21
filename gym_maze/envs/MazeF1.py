@@ -3,7 +3,7 @@ from gym_maze.envs import AbstractMaze
 import numpy as np
 
 
-class Maze1(AbstractMaze):
+class MazeF1(AbstractMaze):
     def __init__(self):
         super().__init__(np.matrix([
             [1, 1, 1, 1],

@@ -7,10 +7,12 @@ from gym_maze import Maze, WALL_MAPPING
 import numpy as np
 import logging
 import random
+import sys
 
 
 logger = logging.getLogger(__name__)
 
+ANIMAT_MARKER = 5
 ACTION_LOOKUP = {
     0: 'N',
     1: 'NE',
@@ -34,7 +36,6 @@ class AbstractMaze(gym.Env):
 
     def _step(self, action):
         previous_observation = self._observe()
-        logger.debug("Previous observation: [{}]".format(previous_observation))
         self._take_action(action, previous_observation)
 
         observation = self._observe()
@@ -50,12 +51,17 @@ class AbstractMaze(gym.Env):
 
     def _render(self, mode='human', close=False):
         logging.debug("Rendering the environment")
-        ANIMAT_MARKER = '5'
 
-        situation = np.copy(self.maze.matrix)
-        situation[self.pos_y, self.pos_x] = ANIMAT_MARKER
+        if mode == 'human':
+            outfile = sys.stdout
+            outfile.write("\n")
 
-        logger.info("\n{}".format(situation))
+            situation = np.copy(self.maze.matrix)
+            situation[self.pos_y, self.pos_x] = ANIMAT_MARKER
+
+            for row in situation:
+                outfile.write(" ".join(self._render_element(el) for el in row))
+                outfile.write("\n")
 
     def _observe(self):
         return self.maze.perception(self.pos_x, self.pos_y)
@@ -122,3 +128,16 @@ class AbstractMaze(gym.Env):
     @staticmethod
     def is_wall(perception):
         return perception == str(WALL_MAPPING)
+
+    @staticmethod
+    def _render_element(el):
+        if el == 1:
+            return utils.colorize('■', 'gray')
+        elif el == 0:
+            return utils.colorize('□', 'white')
+        elif el == 9:
+            return utils.colorize('$', 'yellow')
+        elif el == ANIMAT_MARKER:
+            return utils.colorize('🚹', 'red')
+        else:
+            return utils.colorize(el, 'cyan')
