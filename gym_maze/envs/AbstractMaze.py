@@ -30,6 +30,8 @@ class AbstractMaze(gym.Env):
 
     def __init__(self, matrix):
         self.maze = Maze(matrix)
+        self.pos_x = None
+        self.pos_y = None
 
         self.action_space = spaces.Discrete(8)
         self.observation_space = spaces.Discrete(8)
