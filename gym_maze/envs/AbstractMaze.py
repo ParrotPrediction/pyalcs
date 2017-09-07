@@ -52,8 +52,10 @@ class AbstractMaze(gym.Env):
         return self._observe()
 
     def _render(self, mode='human', close=False):
-        logging.debug("Rendering the environment")
+        if close:
+            return
 
+        logging.debug("Rendering the environment")
         if mode == 'human':
             outfile = sys.stdout
             outfile.write("\n")
@@ -64,6 +66,8 @@ class AbstractMaze(gym.Env):
             for row in situation:
                 outfile.write(" ".join(self._render_element(el) for el in row))
                 outfile.write("\n")
+        else:
+            super(AbstractMaze, self).render(mode=mode)
 
     def _observe(self):
         return self.maze.perception(self.pos_x, self.pos_y)
