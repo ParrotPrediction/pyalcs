@@ -2,7 +2,6 @@ from alcs.agent.acs2 import ClassifiersList
 
 
 class ACS2:
-
     def __init__(self, population=None):
         if population is not None:
             self.population = population
@@ -15,11 +14,13 @@ class ACS2:
 
     def exploit(self, state):
         """
-        Exploits the environment returning the best possible action in given state
+        Exploits the environment returning the best possible action in given
+        state
         :param state: observation (state) of the environment
         :return: integer describing the action
         """
-        applicable_cls = [cl for cl in self.population if cl.condition.does_match(state)]
+        applicable_cls = [cl for cl in
+                          self.population if cl.condition.does_match(state)]
         best_cl = max(applicable_cls, key=lambda cl: cl.fitness)
 
         return best_cl.action
@@ -102,8 +103,10 @@ class ACS2:
         return {
             'population': len(self.population),
             'numerosity': sum(cl.num for cl in self.population),
-            'reliable': len([cl for cl in self.population if cl.is_reliable()]),
-            'fitness': sum(cl.fitness for cl in self.population) / len(self.population),
+            'reliable': len([cl for cl in
+                             self.population if cl.is_reliable()]),
+            'fitness': (sum(cl.fitness for cl in self.population) /
+                        len(self.population)),
             'trials': trials,
             'max_steps': max_steps
         }

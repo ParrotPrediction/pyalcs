@@ -15,7 +15,7 @@ sys.path.insert(0, abspath(join(dirname(__file__), '..')))
 if __name__ == '__main__':
 
     # Load desired environment
-    env = gym.make('MazeF3-v0')
+    env = gym.make('MazeF2-v0')
 
     # Create the agent
     agent = ACS2()
