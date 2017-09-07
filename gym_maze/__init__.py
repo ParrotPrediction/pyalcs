@@ -20,3 +20,31 @@ register(
     max_episode_steps=50,
     nondeterministic=False
 )
+
+register(
+    id='MazeF3-v0',
+    entry_point='gym_maze.envs:MazeF3',
+    max_episode_steps=50,
+    nondeterministic=False
+)
+
+register(
+    id='MazeF4-v0',
+    entry_point='gym_maze.envs:MazeF4',
+    max_episode_steps=50,
+    nondeterministic=True
+)
+
+register(
+    id='Maze5-v0',
+    entry_point='gym_maze.envs:Maze5',
+    max_episode_steps=50,
+    nondeterministic=True
+)
+
+register(
+    id='BMaze4-v0',
+    entry_point='gym_maze.envs:BMaze4',
+    max_episode_steps=50,
+    nondeterministic=False
+)

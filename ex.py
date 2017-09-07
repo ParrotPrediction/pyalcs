@@ -8,7 +8,7 @@ import gym_maze
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
-env = gym.make('MazeF2-v0')
+env = gym.make('BMaze4-v0')
 
 possible_actions = list(range(8))
 
