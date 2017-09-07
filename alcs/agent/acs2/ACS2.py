@@ -1,141 +1,109 @@
-import logging
-
-from alcs.agent.Agent import Agent
 from alcs.agent.acs2 import ClassifiersList
-from alcs.environment.Environment import Environment
-from alcs.agent.acs2 import Constants as c
-
-logger = logging.getLogger(__name__)
 
 
-class ACS2(Agent):
+class ACS2:
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, population=None):
+        if population is not None:
+            self.population = population
+        else:
+            self.population = ClassifiersList()
 
-    def evaluate(self,
-                 env: Environment,
-                 experiments: int,
-                 max_steps: int):
+    def explore(self, env, max_steps=10000):
+        metrics = self._run_experiment(env, max_steps)
+        return self.population, metrics
 
-        self.metrics.clear()
+    def exploit(self, state):
+        """
+        Exploits the environment returning the best possible action in given state
+        :param state: observation (state) of the environment
+        :return: integer describing the action
+        """
+        applicable_cls = [cl for cl in self.population if cl.condition.does_match(state)]
+        best_cl = max(applicable_cls, key=lambda cl: cl.fitness)
 
-        for experiment_id in range(0, experiments):
-            self._run_experiment(env, experiment_id, max_steps)
+        return best_cl.action
 
-        return self.metrics
-
-    def _run_experiment(self,
-                        env: Environment,
-                        experiment_id: int,
-                        max_steps: int) -> ClassifiersList:
-        trial = 0
-        all_steps = 0
-
-        # Classifiers population
-        pop = ClassifiersList()
-
-        while all_steps < max_steps:
-            logger.info("Trial/steps: [{}/{}]".format(trial, all_steps))
-            steps_in_trial = self._start_one_trial_explore(pop,
-                                                           env,
-                                                           all_steps,
-                                                           max_steps)
-
-            all_steps += steps_in_trial
-            trial += 1
-
-            logger.debug("Collecting metrics...")
-            self.acquire_metrics(
-                experiment=experiment_id,
-                trial=trial,
-                maze=env,
-                steps=steps_in_trial,
-                classifiers=pop
-            )
-
-            logger.info("Know: {:.1f}% "
-                        "Pop: {} "
-                        "Num: {} "
-                        "Rel: {} "
-                        "Ina: {} "
-                        "Fit: {:.1f} "
-                        "Spec: {:.2f}\n".format(
-                            self.metrics['knowledge'][-1],
-                            len(pop),
-                            sum(cl.num for cl in pop),
-                            len([cl for cl in pop if cl.is_reliable()]),
-                            len([cl for cl in pop if cl.is_inadequate()]),
-                            sum(cl.fitness for cl in pop) / len(pop),
-                            self.metrics['specificity'][-1]
-                        ))
-
-        return pop
-
-    @staticmethod
-    def _start_one_trial_explore(population: ClassifiersList,
-                                 env: Environment,
-                                 time: int,
-                                 max_steps: int):
+    def _run_experiment(self, env, max_steps):
+        trials = 0
         steps = 0
-        env.insert_animat()
+
+        while steps < max_steps:
+            steps_in_trial = self._run_trial_explore(env, steps, max_steps)
+            steps += steps_in_trial
+            trials += 1
+
+        return self._collect_metrics(trials, max_steps)
+
+    def _run_trial_explore(self, env, time, max_steps):
+        # Initial conditions
+        steps = 0
+        state = env.reset()
 
         action = None
         reward = None
-        previous_situation = None
+        prev_state = None
         action_set = ClassifiersList()
+        done = False
 
-        situation = env.get_animat_perception()
-
-        while not env.trial_finished() and \
-                time + steps <= max_steps and \
-                steps < c.MAX_TRIAL_STEPS:
-
-            match_set = ClassifiersList.form_match_set(population, situation)
+        while not done and time + steps <= max_steps:
+            match_set = ClassifiersList.form_match_set(
+                self.population, state)
 
             if steps > 0:
                 # Apply learning in the last action set
                 action_set.apply_alp(
-                    previous_situation,
+                    prev_state,
                     action,
-                    situation,
+                    state,
                     time + steps,
-                    population,
+                    self.population,
                     match_set)
                 action_set.apply_reinforcement_learning(
                     reward,
                     match_set.get_maximum_fitness())
                 action_set.apply_ga(
                     time + steps,
-                    population,
+                    self.population,
                     match_set,
-                    situation)
+                    state)
 
-            action = match_set.choose_action(epsilon=c.EPSILON)
+            action = match_set.choose_action(epsilon=1.0)
             action_set = ClassifiersList.form_action_set(match_set, action)
 
-            reward = env.execute_action(action)
+            prev_state = state
+            state, reward, done, _ = env.step(action)
 
-            previous_situation = situation
-            situation = env.get_animat_perception()
-
-            if env.trial_finished():
+            if done:
                 action_set.apply_alp(
-                    previous_situation,
+                    prev_state,
                     action,
-                    situation,
+                    state,
                     time + steps,
-                    population,
+                    self.population,
                     None)
                 action_set.apply_reinforcement_learning(
                     reward,
                     0)
                 action_set.apply_ga(
                     time + steps,
-                    population,
+                    self.population,
                     None,
-                    situation)
+                    state)
 
             steps += 1
 
         return steps
+
+    def _run_trial_exploit(self):
+        pass
+
+    def _collect_metrics(self, trials, max_steps):
+        return {
+            'population': len(self.population),
+            'numerosity': sum(cl.num for cl in self.population),
+            'reliable': len([cl for cl in self.population if cl.is_reliable()]),
+            'fitness': sum(cl.fitness for cl in self.population) / len(self.population),
+            'trials': trials,
+            'max_steps': max_steps
+        }
