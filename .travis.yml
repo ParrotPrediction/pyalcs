@@ -1,16 +1,16 @@
 language: python
 python:
-  - "3.5"
+- '3.5'
 before_install:
-  - make install_deps
+- make install_deps
 script:
-  - make pep8
-  - make test
+- make pep8
+- make test
 deploy:
   provider: pypi
   user: khozzy
   password:
-    secure: foo
+    secure: sf1nCbtMTGEJNv0GsKzdJT3zghwUGe8jvvjky377Y7lU2Kk7PKxxti8lNE60ET+KuI7ePuiR4Fb+8UuvCPVfhRu7b5bgyDghstQEoNPuzebHynkWc17d4+i9UwY+SsqamxaBQ8ol+iqRHi6HzYiX7Bpe8eFK8B3Lee14RFWSPTtOUrSv5TZCtShS98JW5qds4TwsMRWNghdcp9o170DSvk8yR9TCSSwZYpXt51xqN413nuw7bwrFreTl2/4lsvM0Z205MkHjAfIgDh5DV8+cy7zlVe2qhCKVBnKYdxOlNSS0K6vKbwr1R0S7Fcw6XTqqZE0pIQLXEMbMFeiOTzkvs2gZiR3GsbQQ4XNevnMS1mcMjA6dc//8mug9fKMbDA0RD/EQB3a0+JTGZovWKSFleg6XkA5mwNC1CwnzMY+ZOjACQQaOpbvE/1tx5m0lfBbIG8vnlnFA53X2VedIILa6Pq+vhfaH8Zrz2MvGFb8+aiI5N5qfOr7eKoBZPQn2g4CjsJLQhfZ3k9FxuDYX+9X90O7yLhEMocP4g2W4Zoi7IDDOxlp7B5ZoRAH0Z2E25COEr/4dl5I1/oax1ZA4bgNKiszyWAST4HjhQ8p2KZNJWRdCjzLbAMAdcHsOUx9Bcj8xJ6pWq/KWMCGOzeD7hIrIp5ur6w1BrKcRS2s0KSLoiIs=
   on:
     tags: true
     branch: master
