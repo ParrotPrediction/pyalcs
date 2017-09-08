@@ -107,3 +107,74 @@ class Maze:
 
     def _within_y_range(self, y):
         return 0 <= y < self.max_y
+
+    @staticmethod
+    def moved_north(start, destination) -> bool:
+        """
+        :param start: start (X, Y) coordinates tuple
+        :param destination: destination (X, Y) coordinates tuple
+        :return: true if it was north move
+        """
+        return destination[1] + 1 == start[1]
+
+    @staticmethod
+    def moved_east(start, destination) -> bool:
+        """
+        :param start: start (X, Y) coordinates tuple
+        :param destination: destination (X, Y) coordinates tuple
+        :return: true if it was east move
+        """
+        return destination[0] - 1 == start[0]
+
+    @staticmethod
+    def moved_south(start, destination) -> bool:
+        """
+        :param start: start (X, Y) coordinates tuple
+        :param destination: destination (X, Y) coordinates tuple
+        :return: true if it was south move
+        """
+        return destination[1] - 1 == start[1]
+
+    @staticmethod
+    def moved_west(start, destination) -> bool:
+        """
+        :param start: start (X, Y) coordinates tuple
+        :param destination: destination (X, Y) coordinates tuple
+        :return: true if it was west move
+        """
+        return destination[0] + 1 == start[0]
+
+    @staticmethod
+    def distinguish_direction(start, end):
+        direction = ''
+
+        if Maze.moved_north(start, end):
+            direction += 'N'
+
+        if Maze.moved_south(start, end):
+            direction += 'S'
+
+        if Maze.moved_west(start, end):
+            direction += 'W'
+
+        if Maze.moved_east(start, end):
+            direction += 'E'
+
+        return direction
+
+    @staticmethod
+    def get_possible_neighbour_cords(pos_x, pos_y) -> tuple:
+        """
+        Returns a tuple with coordinates for
+        N, NE, E, SE, S, SW, W, NW neighbouring cells.
+        """
+        n = (pos_x, pos_y - 1)
+        ne = (pos_x + 1, pos_y - 1)
+        e = (pos_x + 1, pos_y)
+        se = (pos_x + 1, pos_y + 1)
+        s = (pos_x, pos_y + 1)
+        sw = (pos_x - 1, pos_y + 1)
+        w = (pos_x - 1, pos_y)
+        nw = (pos_x - 1, pos_y - 1)
+
+        return n, ne, e, se, s, sw, w, nw

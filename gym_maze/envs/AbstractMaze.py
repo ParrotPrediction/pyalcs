@@ -2,7 +2,8 @@ import gym
 from gym import error, spaces, utils
 from gym.utils import seeding
 
-from gym_maze import Maze, WALL_MAPPING
+from gym_maze import Maze, WALL_MAPPING, ACTION_LOOKUP
+from gym_maze.utils import get_all_possible_transitions
 
 import numpy as np
 import logging
@@ -13,16 +14,6 @@ import sys
 logger = logging.getLogger(__name__)
 
 ANIMAT_MARKER = 5
-ACTION_LOOKUP = {
-    0: 'N',
-    1: 'NE',
-    2: 'E',
-    3: 'SE',
-    4: 'S',
-    5: 'SW',
-    6: 'W',
-    7: 'NW'
-}
 
 
 class AbstractMaze(gym.Env):
@@ -80,6 +71,14 @@ class AbstractMaze(gym.Env):
 
     def _is_over(self):
         return self.maze.is_reward(self.pos_x, self.pos_y)
+
+    def get_all_possible_transitions(self):
+        """
+        Debugging only
+        
+        :return: 
+        """
+        return get_all_possible_transitions(self)
 
     def _take_action(self, action, observation):
         """Executes the action inside the maze"""
