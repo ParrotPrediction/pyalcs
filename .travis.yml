@@ -6,3 +6,11 @@ before_install:
 script:
   - make pep8
   - make test
+deploy:
+  provider: pypi
+  user: khozzy
+  password:
+    secure: foo
+  on:
+    tags: true
+    branch: master

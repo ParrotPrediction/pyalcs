@@ -1,5 +1,5 @@
-from alcs.agent import Perception
-from alcs.agent.acs2 import Constants as c
+from alcs.acs2 import Constants as c
+from alcs import Perception
 
 
 class Effect(list):

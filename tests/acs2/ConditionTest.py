@@ -1,7 +1,8 @@
 import unittest
 
-from alcs.agent.Perception import Perception
-from alcs.agent.acs2 import Condition
+from alcs.acs2 import Condition
+
+from alcs import Perception
 
 
 class ConditionTest(unittest.TestCase):

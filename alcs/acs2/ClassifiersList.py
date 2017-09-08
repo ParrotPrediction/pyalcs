@@ -1,10 +1,11 @@
-from alcs.agent import Perception
-from alcs.agent.acs2 import Classifier
-from alcs.agent.acs2 import Constants as c
-
 import logging
-from random import random, randint
 from itertools import groupby
+from random import random, randint
+
+from alcs.acs2 import Classifier
+
+from alcs.acs2 import Constants as c
+from alcs import Perception
 
 logger = logging.getLogger(__name__)
 

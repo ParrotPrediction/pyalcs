@@ -1,7 +1,7 @@
 import unittest
 
-from alcs.agent import Perception
-from alcs.agent.acs2 import Effect
+from alcs.acs2 import Effect
+from alcs import Perception
 
 
 class EffectTest(unittest.TestCase):

@@ -1,8 +1,9 @@
-from alcs.agent.acs2 import Constants as c
-from alcs.agent import Perception
-from alcs.agent.acs2 import Condition
-
 from random import choice
+
+from alcs.acs2 import Condition
+
+from alcs.acs2 import Constants as c
+from alcs import Perception
 
 
 class PMark(list):

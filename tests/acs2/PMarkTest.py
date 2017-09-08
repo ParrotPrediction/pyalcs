@@ -1,8 +1,9 @@
 import unittest
 
-from alcs.agent import Perception
-from alcs.agent.acs2 import PMark
-from alcs.agent.acs2 import Constants as c
+from alcs.acs2 import PMark
+
+from alcs.acs2 import Constants as c
+from alcs import Perception
 
 
 class PMarkTest(unittest.TestCase):

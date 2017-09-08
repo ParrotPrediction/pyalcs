@@ -1,4 +1,4 @@
-from alcs.agent.acs2 import ClassifiersList
+from alcs.acs2 import ClassifiersList
 
 
 class ACS2:
