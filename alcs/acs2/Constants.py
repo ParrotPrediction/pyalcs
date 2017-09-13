@@ -4,21 +4,22 @@ CLASSIFIER_WILDCARD = '#'
 CLASSIFIER_LENGTH = 8
 NUMBER_OF_POSSIBLE_ACTIONS = 8
 
-# Algorithm
+# Learning rate
 BETA = 0.05
+
+# Discount rate
 GAMMA = 0.95
 
-# Removal in ALP
+# Inadequacy threshold
 THETA_I = 0.1
 
-# Classifier quality threshold for determining
-# the subsumer / reliability threshold
+# Reliability threshold
 THETA_R = 0.9
 
 # Probability of exploration
 EPSILON = 1.0
 
-# Maximum number of specified elements
+# Maximum number of specified unchanging attributes
 U_MAX = 100000
 
 # GA constants
