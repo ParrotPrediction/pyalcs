@@ -25,3 +25,8 @@ U_MAX = 100000
 # GA constants
 # Classifier experience threshold for determining the subsumer
 THETA_EXP = 20
+
+THETA_GA = 100
+THETA_AS = 20
+MU = 0.3
+CHI = 0.8

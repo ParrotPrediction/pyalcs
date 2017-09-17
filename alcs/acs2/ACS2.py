@@ -1,5 +1,7 @@
 from alcs.acs2 import ClassifiersList
 
+DO_GA = False
+
 
 class ACS2:
     def __init__(self, population=None):
@@ -8,35 +10,41 @@ class ACS2:
         else:
             self.population = ClassifiersList()
 
-    def explore(self, env, max_steps=10000):
-        metrics = self._run_experiment(env, max_steps)
-        return self.population, metrics
-
-    def exploit(self, state):
-        """
-        Exploits the environment returning the best possible action in given
-        state
-        :param state: observation (state) of the environment
-        :return: integer describing the action
-        """
-        applicable_cls = [cl for cl in
-                          self.population if cl.condition.does_match(state)]
-        best_cl = max(applicable_cls, key=lambda cl: cl.fitness)
-
-        return best_cl.action
-
-    def _run_experiment(self, env, max_steps):
-        trials = 0
+    def explore(self, env, max_trials):
+        current_trial = 0
         steps = 0
 
-        while steps < max_steps:
-            steps_in_trial = self._run_trial_explore(env, steps, max_steps)
+        metrics = []
+        while current_trial < max_trials:
+            steps_in_trial = self._run_trial_explore(env, steps)
             steps += steps_in_trial
-            trials += 1
 
-        return self._collect_metrics(trials, max_steps)
+            # Collect metrics of trial
+            metrics.append(self._collect_metrics(
+                current_trial, steps_in_trial))
 
-    def _run_trial_explore(self, env, time, max_steps):
+            current_trial += 1
+
+        return self.population, metrics
+
+    def exploit(self, env, max_trials):
+        current_trial = 0
+        steps = 0
+
+        metrics = []
+        while current_trial < max_trials:
+            steps_in_trial = self._run_trial_exploit(env)
+            steps += steps_in_trial
+
+            # Collect metrics of trial
+            metrics.append(self._collect_metrics(
+                current_trial, steps_in_trial))
+
+            current_trial += 1
+
+        return self.population, metrics
+
+    def _run_trial_explore(self, env, time):
         # Initial conditions
         steps = 0
         state = env.reset()
@@ -47,7 +55,7 @@ class ACS2:
         action_set = ClassifiersList()
         done = False
 
-        while not done and time + steps <= max_steps:
+        while not done:
             match_set = ClassifiersList.form_match_set(
                 self.population, state)
 
@@ -63,11 +71,12 @@ class ACS2:
                 action_set.apply_reinforcement_learning(
                     reward,
                     match_set.get_maximum_fitness())
-                action_set.apply_ga(
-                    time + steps,
-                    self.population,
-                    match_set,
-                    state)
+                if DO_GA:
+                    action_set.apply_ga(
+                        time + steps,
+                        self.population,
+                        match_set,
+                        state)
 
             action = match_set.choose_action(epsilon=1.0)
             action_set = ClassifiersList.form_action_set(match_set, action)
@@ -86,20 +95,48 @@ class ACS2:
                 action_set.apply_reinforcement_learning(
                     reward,
                     0)
-                action_set.apply_ga(
-                    time + steps,
-                    self.population,
-                    None,
-                    state)
+                if DO_GA:
+                    action_set.apply_ga(
+                        time + steps,
+                        self.population,
+                        None,
+                        state)
 
             steps += 1
 
         return steps
 
-    def _run_trial_exploit(self):
-        pass
+    def _run_trial_exploit(self, env):
+        # Initial conditions
+        steps = 0
+        state = env.reset()
 
-    def _collect_metrics(self, trials, max_steps):
+        reward = None
+        action_set = ClassifiersList()
+        done = False
+
+        while not done:
+            match_set = ClassifiersList.form_match_set(
+                self.population, state)
+
+            if steps > 0:
+                action_set.apply_reinforcement_learning(
+                    reward,
+                    match_set.get_maximum_fitness())
+
+            action = match_set.choose_action(epsilon=0.0)
+            action_set = ClassifiersList.form_action_set(match_set, action)
+
+            state, reward, done, _ = env.step(action)
+
+            if done:
+                action_set.apply_reinforcement_learning(reward, 0)
+
+            steps += 1
+
+        return steps
+
+    def _collect_metrics(self, trial, steps):
         return {
             'population': len(self.population),
             'numerosity': sum(cl.num for cl in self.population),
@@ -107,6 +144,6 @@ class ACS2:
                              self.population if cl.is_reliable()]),
             'fitness': (sum(cl.fitness for cl in self.population) /
                         len(self.population)),
-            'trials': trials,
-            'max_steps': max_steps
+            'trial': trial,
+            'steps': steps
         }

@@ -897,6 +897,7 @@ void ClassifierList::deleteGAClassifiers(ClassifierList *pop, ClassifierList *se
         for (j = 0, listp = list; listp != 0; j++) {
             //We do consider the micro-classifiers here! (see if clause later)
             if (frand() < 1. / 3.) {
+
                 if (delCl == 0) {
                     delCl = listp->cl;
                 } else {
@@ -911,6 +912,7 @@ void ClassifierList::deleteGAClassifiers(ClassifierList *pop, ClassifierList *se
                         delCl = listp->cl;
                 }
             }
+
             if (j + 1 == listp->cl->getNumerosity()) {
                 j = -1;
                 listp = listp->next;

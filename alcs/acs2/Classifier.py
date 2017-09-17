@@ -3,6 +3,8 @@ from alcs.acs2 import Condition, Effect, PMark
 from alcs.acs2 import Constants as c
 from alcs import Perception
 
+from random import random
+
 
 class Classifier(object):
     def __init__(self,
@@ -303,6 +305,14 @@ class Classifier(object):
 
         return child
 
+    def mutate(self):
+        """
+        Executes the generalizing mutation in the classifier.
+        """
+        for idx, cond in enumerate(self.condition):
+            if cond != c.CLASSIFIER_WILDCARD and random() < c.MU:
+                self.condition.generalize(idx)
+
     def is_similar(self, other) -> bool:
         """
         Check if classifier is equals to `other` classifier in condition,
@@ -358,3 +368,25 @@ class Classifier(object):
                     return True
 
         return False
+
+    def is_marked(self):
+        """
+        Returns if classifier is marked
+        """
+        if self.mark.is_empty():
+            return False
+
+        return True
+
+    def crossover(self, cl2):
+        """
+        Executes crossover with other classifier
+        :param cl2: other classifier
+        """
+        self.condition.two_point_crossover(cl2.condition)
+
+        q = float(sum([self.q, cl2.q]) / 2)
+        r = float(sum([self.r, cl2.r]) / 2)
+
+        cl2.q = q
+        cl2.r = r

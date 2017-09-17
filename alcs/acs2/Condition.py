@@ -1,5 +1,5 @@
 from alcs.acs2 import Constants as c
-
+from random import sample
 
 class Condition(list):
     """
@@ -46,6 +46,9 @@ class Condition(list):
                 if ni != c.CLASSIFIER_WILDCARD:
                     self[idx] = ni
 
+    def generalize(self, position=None):
+        self[position] = c.CLASSIFIER_WILDCARD
+
     def does_match(self, lst: list) -> bool:
         """
         Check if condition match other list such as perception or another
@@ -65,3 +68,22 @@ class Condition(list):
                 return False
 
         return True
+
+    def two_point_crossover(self, other):
+        """
+        Executes two-point crossover
+        :param other: other condition given as list
+        """
+        left, right = sample(range(0, c.CLASSIFIER_LENGTH), 2)
+
+        if left > right:
+            left, right = right, left
+
+        # Extract chromosomes
+        chromosome1 = self[left:right]
+        chromosome2 = other[left: right]
+
+        # Flip them
+        for idx, el in enumerate(range(left, right)):
+            self[el] = chromosome2[idx]
+            other[el] = chromosome1[idx]

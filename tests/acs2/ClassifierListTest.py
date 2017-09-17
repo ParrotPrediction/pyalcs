@@ -59,6 +59,25 @@ class ClassifierListTest(unittest.TestCase):
         self.assertEqual(1, len(action_set))
         self.assertIn(c1, action_set)
 
+    def test_should_expand(self):
+        # given
+        c0 = Classifier(action=0)
+        c1 = Classifier(action=1, numerosity=2)
+        c2 = Classifier(action=2, numerosity=3)
+
+        self.population.append(c0)
+        self.population.append(c1)
+        self.population.append(c2)
+
+        # when
+        expanded = self.population.expand()
+
+        # then
+        self.assertEqual(6, len(expanded))
+        self.assertIn(c0, expanded)
+        self.assertIn(c1, expanded)
+        self.assertIn(c2, expanded)
+
     def test_should_calculate_maximum_fitness(self):
         # C1 - does not anticipate change
         c1 = Classifier()
