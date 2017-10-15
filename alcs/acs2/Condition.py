@@ -1,6 +1,7 @@
 from alcs.acs2 import Constants as c
 from random import sample
 
+
 class Condition(list):
     """
     Specifies the set of situations (perceptions) in which the classifier

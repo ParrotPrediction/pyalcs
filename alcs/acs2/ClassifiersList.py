@@ -254,7 +254,6 @@ class ClassifiersList(list):
 
     def apply_ga(self, time, population, match_set, situation) -> None:
         if self.should_apply_ga(time):
-            print("Applying GA, time: {}".format(time))
             self.set_ga_timestamp(time)
 
             # Selecting parents
@@ -358,9 +357,8 @@ class ClassifiersList(list):
         Checks the average last GA application to determine if a GA
         should be applied.If no classifier is in the current set,
         no GA is applied!
-        
-        :param time: 
-        :return: 
+        :param time:
+        :return:
         """
         overall_time = sum(cl.tga * cl.num for cl in self)
         overall_num = self.overall_numerosity()
@@ -380,9 +378,8 @@ class ClassifiersList(list):
         """
         Sets the GA time stamps to the current time to control
         the GA application frequency.
-        
-        :param time: 
-        :return: 
+        :param time:
+        :return:
         """
         for cl in self:
             cl.tga = time
@@ -421,14 +418,13 @@ class ClassifiersList(list):
     def delete_ga_classifiers(self, population, set, child_no):
         """
         Deletes classifiers in the set to keep the size THETA_AS.
-        Also considers that still childNo classifiers are added by the GA. 
-        
-        :param population: 
-        :param set: 
+        Also considers that still childNo classifiers are added by the GA.
+        :param population:
+        :param set:
         :param child_no: number of classifiers that will be inserted
-        :return: 
+        :return:
         """
-        del_no = self.overall_numerosity() + child_no + c.THETA_AS
+        del_no = self.overall_numerosity() + child_no - c.THETA_AS
         if del_no <= 0:
             # There is still room for more classifiers
             return
@@ -478,7 +474,3 @@ class ClassifiersList(list):
                     old_cl = c
 
         return old_cl
-
-
-
-

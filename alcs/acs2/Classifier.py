@@ -62,11 +62,12 @@ class Classifier(object):
     @classmethod
     def copy_from(cls, old_cls, time):
         """
-        Copies old classifier with given time.
-        New classifier has no mark.
+        Copies old classifier with given time (tga, talp).
+        Old tav gets replaced with new value.
+        New classifier also has no mark.
 
         :param old_cls: classifier to copy from
-        :param time:
+        :param time: time of creation
         :return: new classifier
         """
         new_cls = cls(
