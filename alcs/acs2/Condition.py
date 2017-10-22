@@ -1,3 +1,5 @@
+from builtins import isinstance
+
 from alcs.acs2 import Constants as c
 from random import sample
 
@@ -88,3 +90,8 @@ class Condition(list):
         for idx, el in enumerate(range(left, right)):
             self[el] = chromosome2[idx]
             other[el] = chromosome1[idx]
+
+    def equal(self, other):
+        return isinstance(other, Condition) \
+               and self.specificity == other.specificity \
+               and ''.join(self) == ''.join(other)

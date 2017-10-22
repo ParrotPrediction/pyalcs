@@ -53,6 +53,9 @@ class Classifier(object):
         # I don't know yet what it is
         self.ee = 0
 
+    def q3num(self):
+        return pow(self.q, 3) * self.num
+
     def __repr__(self):
         return "{}-{}-{} @ {}".format(self.condition,
                                       self.action,
@@ -306,12 +309,12 @@ class Classifier(object):
 
         return child
 
-    def mutate(self):
+    def mutate(self, randomfunc=random):
         """
         Executes the generalizing mutation in the classifier.
         """
         for idx, cond in enumerate(self.condition):
-            if cond != c.CLASSIFIER_WILDCARD and random() < c.MU:
+            if cond != c.CLASSIFIER_WILDCARD and randomfunc() < c.MU:
                 self.condition.generalize(idx)
 
     def is_similar(self, other) -> bool:
@@ -322,6 +325,7 @@ class Classifier(object):
         :param other: other classifier
         :return: True if equals, False otherwise
         """
+        # TODO Deep condition comparison?
         if self.condition == other.condition and \
                 self.action == other.action and \
                 self.effect == other.effect:

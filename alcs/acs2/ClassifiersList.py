@@ -289,9 +289,10 @@ class ClassifiersList(list):
                     child2 = None
                     child_no -= 1
 
-            self.delete_ga_classifiers(population, match_set, child_no)
+            self.delete_ga_classifiers(population, match_set, child_no) # TODO Check
             childs = [child for child in [child1, child2] if child is not None]
 
+            # TODO Check the logic to the end, together with
             # check for subsumers / similar classifiers
             for child in childs:
                 if child.condition.specificity != 0:
@@ -384,34 +385,27 @@ class ClassifiersList(list):
         for cl in self:
             cl.tga = time
 
-    def select_parents(self):
+    def select_parents(self, randomfunc=random):
         """
         Select two parents for the GA with roulette-wheel selection.
         """
         parent1, parent2 = None, None
-        q_sum = sum(pow(cl.q, 3) * cl.num for cl in self)
 
-        q_sel1 = random() * q_sum
-        q_sel2 = random() * q_sum
+        q_sum = sum(cl.q3num() for cl in self)
 
-        if q_sel1 > q_sel2:
-            q_sel1, q_sel2 = q_sel2, q_sel1
+        q_sel1 = randomfunc() * q_sum
+        q_sel2 = randomfunc() * q_sum
+
+        q_sel1, q_sel2 = sorted([q_sel2, q_sel1])
 
         q_counter = 0.0
         for cl in self:
-            q_counter += pow(cl.q, 3) * cl.num
-
-            if q_counter > q_sel1:
-                if q_sel2 != -1:
-                    parent1 = cl
-
-                    if q_counter > q_sel2:
-                        parent2 = cl
-
-                    q_sel1 = q_sel2
-                    q_sel2 = -1
-                else:
-                    parent2 = cl
+            q_counter += cl.q3num()
+            if parent1 is None and q_counter > q_sel1:
+                parent1 = cl
+            if q_counter > q_sel2:
+                parent2 = cl
+                break
 
         return parent1, parent2
 
@@ -433,13 +427,14 @@ class ClassifiersList(list):
             cl_del = None
 
             for cl in self.expand():
-                if random() < 0.3:
+                if random() < 1. / 3.:
                     if cl_del is None:
                         cl_del = cl
                     else:
                         if cl.q - cl_del.q < 0.1:
                             cl_del = cl
 
+                        # TODO Check this logic construct
                         if abs(cl.q - cl_del.q) <= 0.1:
                             if cl.is_marked() and not cl_del.is_marked():
                                 cl_del = cl
