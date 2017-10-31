@@ -9,9 +9,36 @@ class ConditionTest(unittest.TestCase):
     def setUp(self):
         self.c = Condition()
 
+    def test_equal(self): # TODO remove
+        self.assertTrue(Condition('########').equal(Condition('########')))
+        self.assertFalse(Condition('1#######').equal(Condition('########')))
+        self.assertFalse(Condition('########').equal(Condition('#######1')))
+        self.assertTrue(Condition('1111####').equal(Condition('1111####')))
+        self.assertFalse(Condition('1111####').equal(Condition('1011####')))
+        self.assertFalse(Condition('1101####').equal(Condition('1111####')))
+        self.assertTrue(Condition('00001###').equal(Condition('00001###')))
+
+    def test_should_generalize(self):
+        cond = "#1O##O##"
+        self.c = Condition(cond)
+        self.c.generalize(position=1)
+        expected_result = Condition("##O##O##")
+        self.assertEqual(expected_result, self.c)
+
+    def test_generalize_decrements_specificity(self):
+        self.c = Condition('#11#####')
+        self.assertEqual(2, self.c.specificity)
+        self.c.generalize(1)
+        self.assertEqual(1, self.c.specificity)
+
     def test_should_only_accept_strings(self):
         # Try to store an integer
         self.assertRaises(TypeError, self.c.__setitem__, 0, 1)
+
+    def test_should_initialize_two_times_the_same_way(self):
+        c1 = Condition("#1O##O##")
+        c2 = Condition("#1O##O##")
+        self.assertEqual(c1, c2)
 
     def test_should_return_number_of_specified_elements(self):
         self.assertEqual(0, self.c.specificity)

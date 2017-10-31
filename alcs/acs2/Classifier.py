@@ -3,7 +3,7 @@ from alcs.acs2 import Condition, Effect, PMark
 from alcs.acs2 import Constants as c
 from alcs import Perception
 
-from random import random
+from random import random, sample
 
 
 class Classifier(object):
@@ -53,6 +53,9 @@ class Classifier(object):
         # I don't know yet what it is
         self.ee = 0
 
+    def q3num(self):
+        return pow(self.q, 3) * self.num
+
     def __repr__(self):
         return "{}-{}-{} @ {}".format(self.condition,
                                       self.action,
@@ -71,7 +74,8 @@ class Classifier(object):
         :return: new classifier
         """
         new_cls = cls(
-            condition=old_cls.condition,
+            condition=Condition(old_cls.condition),
+            #         ^^^^^^^^^ copy it, not just pass the reference!
             action=old_cls.action,
             effect=old_cls.effect,
             quality=old_cls.q,
@@ -306,12 +310,12 @@ class Classifier(object):
 
         return child
 
-    def mutate(self):
+    def mutate(self, randomfunc=random):
         """
         Executes the generalizing mutation in the classifier.
         """
         for idx, cond in enumerate(self.condition):
-            if cond != c.CLASSIFIER_WILDCARD and random() < c.MU:
+            if cond != c.CLASSIFIER_WILDCARD and randomfunc() < c.MU:
                 self.condition.generalize(idx)
 
     def is_similar(self, other) -> bool:
@@ -326,8 +330,10 @@ class Classifier(object):
                 self.action == other.action and \
                 self.effect == other.effect:
             return True
-
         return False
+
+    def is_equally_general(self, other) -> bool:
+        return self.condition.specificity == other.condition.specificity
 
     def is_more_general(self, other) -> bool:
         """
@@ -370,6 +376,9 @@ class Classifier(object):
 
         return False
 
+    def is_unmarked(self):
+        return not self.is_marked()
+
     def is_marked(self):
         """
         Returns if classifier is marked
@@ -379,15 +388,21 @@ class Classifier(object):
 
         return True
 
-    def crossover(self, cl2):
+    def crossover(self, cl2, samplefunc=sample):
         """
         Executes crossover with other classifier
         :param cl2: other classifier
         """
-        self.condition.two_point_crossover(cl2.condition)
+        self.condition.two_point_crossover(cl2.condition, samplefunc=samplefunc)
 
         q = float(sum([self.q, cl2.q]) / 2)
         r = float(sum([self.r, cl2.r]) / 2)
 
         cl2.q = q
         cl2.r = r
+
+    def __eq__(self, other):
+        return self.condition == other.condition and self.effect == other.effect and self.action == other.action \
+            and self.num == other.num and self.r == other.r and self.q == other.q and self.talp == other.talp \
+            and self.tav == other.tav and self.tga == other.tga and self.exp == other.exp and self.ee == other.ee \
+            and self.mark == other.mark and self.ir == other.ir

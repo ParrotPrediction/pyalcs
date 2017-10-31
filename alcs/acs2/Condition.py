@@ -1,3 +1,5 @@
+from builtins import isinstance
+
 from alcs.acs2 import Constants as c
 from random import sample
 
@@ -62,6 +64,7 @@ class Condition(list):
             raise ValueError('Cannot execute `does_match` '
                              'because lengths are different')
 
+        # TODO zip can be used instead
         for idx, attrib in enumerate(self):
             if attrib != c.CLASSIFIER_WILDCARD \
                     and lst[idx] != c.CLASSIFIER_WILDCARD \
@@ -70,21 +73,27 @@ class Condition(list):
 
         return True
 
-    def two_point_crossover(self, other):
+    def two_point_crossover(self, other, samplefunc=sample):
         """
         Executes two-point crossover
         :param other: other condition given as list
         """
-        left, right = sample(range(0, c.CLASSIFIER_LENGTH), 2)
+        left, right = samplefunc(range(0, c.CLASSIFIER_LENGTH+1), 2)
 
         if left > right:
             left, right = right, left
 
         # Extract chromosomes
         chromosome1 = self[left:right]
-        chromosome2 = other[left: right]
+        chromosome2 = other[left:right]
 
         # Flip them
         for idx, el in enumerate(range(left, right)):
             self[el] = chromosome2[idx]
             other[el] = chromosome1[idx]
+
+    # TODO not needed
+    def equal(self, other):
+        return isinstance(other, Condition) \
+               and self.specificity == other.specificity \
+               and ''.join(self) == ''.join(other)

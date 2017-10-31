@@ -1,6 +1,6 @@
 from alcs.acs2 import ClassifiersList
 
-DO_GA = False
+DO_GA = True
 
 
 class ACS2:

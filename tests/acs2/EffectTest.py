@@ -216,3 +216,6 @@ class EffectTest(unittest.TestCase):
 
         # Then
         self.assertTrue(res)
+
+    def testEq(self):
+        self.assertTrue(Effect('00001111') == Effect('00001111'))

@@ -4,12 +4,56 @@ from random import randint
 from alcs.acs2 import ClassifiersList, Classifier, Condition, Effect
 
 from alcs import Perception
+from alcs.acs2.testrandom import TestRandom
 
 
 class ClassifierListTest(unittest.TestCase):
 
     def setUp(self):
         self.population = ClassifiersList()
+
+    def test_should_select_parents1(self):
+        population = ClassifiersList()
+        c0 = Classifier(Condition('######00'))
+        c1 = Classifier(Condition('######01'))
+        c2 = Classifier(Condition('######10'))
+        c3 = Classifier(Condition('######11'))
+        population.append(c0)
+        population.append(c1)
+        population.append(c2)
+        population.append(c3)
+        # q3num= 0.125 for all
+
+        p1, p2 = population.select_parents(randomfunc=(TestRandom([0.7, 0.1])))
+        self.assertEqual(c0, p1)
+        self.assertEqual(c2, p2)
+
+        p1, p2 = population.select_parents(randomfunc=(TestRandom([0.3, 0.6])))
+        self.assertEqual(c1, p1)
+        self.assertEqual(c2, p2)
+
+        p1, p2 = population.select_parents(randomfunc=(TestRandom([0.2, 0.8])))
+        self.assertEqual(c0, p1)
+        self.assertEqual(c3, p2)
+
+
+    def test_quality_and_numerosity_influence_parent_selection(self):
+        population = ClassifiersList()
+        c0 = Classifier(Condition('######00'), quality=1, numerosity=1)
+        c1 = Classifier(Condition('######01'))
+        c2 = Classifier(Condition('######10'))
+        population.append(c0)  # q3num = 1
+        population.append(c1)  # q3num = 0.0625
+        population.append(c2)  # q3num = 0.0625
+
+        p1, p2 = population.select_parents(randomfunc=(TestRandom([0.888, 0.999])))
+        self.assertEqual(c1, p1)
+        self.assertEqual(c2, p2)
+
+        p1, p2 = population.select_parents(randomfunc=(TestRandom([0.888, 0.777])))
+        self.assertEqual(c0, p1)
+        self.assertEqual(c1, p2)
+
 
     def test_should_insert_classifier_1(self):
         # Try to insert an integer instead of classifier object

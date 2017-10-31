@@ -1,12 +1,26 @@
 import unittest
 
-from alcs.acs2 import Classifier, Condition, Effect, PMark
+from alcs.acs2 import Classifier, Condition, Effect, PMark, Constants
 from alcs import Perception
+from alcs.acs2.testrandom import TestRandom
+
+s = Constants.MU*0.5  # less then MU
+b = 1-(1-Constants.MU)*0.5  # more then MU
 
 
 class ClassifierTest(unittest.TestCase):
     def setUp(self):
         self.cls = Classifier()
+
+    def test_mutate_1(self):
+        cls = Classifier(Condition('##011###'))
+        cls.mutate(randomfunc=TestRandom([s,b,b]))
+        self.assertEqual(Condition('###11###'), cls.condition)
+
+    def test_mutate_2(self):
+        cls = Classifier(Condition('##011###'))
+        cls.mutate(randomfunc=TestRandom([b,b,s,b,b,b,b]))
+        self.assertEqual(Condition('##01####'), cls.condition)
 
     def test_should_calculate_fitness(self):
         self.cls.r = 0.25
