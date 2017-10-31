@@ -4,8 +4,10 @@ from random import random, randint, choice, sample
 
 from alcs.acs2 import Classifier
 
-from alcs.acs2 import Constants as c
+from alcs.acs2 import default_configuration
 from alcs import Perception
+
+DO_SUBSUMPTION = True
 
 logger = logging.getLogger(__name__)
 
@@ -15,8 +17,9 @@ class ClassifiersList(list):
     Represents overall population, match/action sets
     """
 
-    def __init__(self, *args):
-        list.__init__(self, *args)
+    def __init__(self, seq=(), cfg=default_configuration):
+        self.cfg = cfg
+        list.__init__(self, seq or [])
 
     def append(self, item):
         if not isinstance(item, Classifier):
@@ -109,7 +112,7 @@ class ClassifiersList(list):
         """
         last_executed_cls = None
         number_of_cls_per_action = \
-            {i: 0 for i in range(c.NUMBER_OF_POSSIBLE_ACTIONS)}
+            {i: 0 for i in range(self.cfg.number_of_posiible_actions)}
 
         if len(self) > 0:
             last_executed_cls = min(self, key=lambda cl: cl.talp)
@@ -135,7 +138,8 @@ class ClassifiersList(list):
 
         :return: chosen action
         """
-        knowledge_array = {i: 0 for i in range(c.NUMBER_OF_POSSIBLE_ACTIONS)}
+        knowledge_array = {i: 0
+                           for i in range(self.cfg.number_of_posiible_actions)}
         self.sort(key=lambda cl: cl.action)
 
         for _action, _clss in groupby(self, lambda cl: cl.action):
@@ -151,13 +155,12 @@ class ClassifiersList(list):
 
         return action
 
-    @staticmethod
-    def choose_random_action() -> int:
+    def choose_random_action(self) -> int:
         """
         Chooses one of the possible actions in the environment randomly
         :return: random action number
         """
-        return randint(0, c.NUMBER_OF_POSSIBLE_ACTIONS - 1)
+        return randint(0, self.cfg.number_of_posiible_actions - 1)
 
     def get_maximum_fitness(self) -> float:
         """
@@ -251,7 +254,7 @@ class ClassifiersList(list):
         :param p: maximum fitness - back-propagated reinforcement
         """
         for cl in self:
-            cl.update_reward(rho + c.GAMMA * p)
+            cl.update_reward(rho + self.cfg.gamma * p)
             cl.update_intermediate_reward(rho)
 
     def apply_ga(self, time, population, match_set, situation,
@@ -267,7 +270,7 @@ class ClassifiersList(list):
             child1.mutate(randomfunc=randomfunc)
             child2.mutate(randomfunc=randomfunc)
 
-            if randomfunc() < c.CHI:
+            if randomfunc() < self.cfg.chi:
                 if child1.effect == child2.effect:
                     child1.crossover(child2, samplefunc=samplefunc)
 
@@ -376,7 +379,7 @@ class ClassifiersList(list):
         if overall_num == 0:
             return False
 
-        if time - overall_time / overall_num > c.THETA_GA:
+        if time - overall_time / overall_num > self.cfg.theta_ga:
             # print("Shoud apply GA!")
             return True
 
@@ -430,7 +433,7 @@ class ClassifiersList(list):
         :param child_no: number of classifiers that will be inserted
         :return:
         """
-        del_no = self.overall_numerosity() + child_no - c.THETA_AS
+        del_no = self.overall_numerosity() + child_no - self.cfg.theta_as
         if del_no <= 0:
             # There is still room for more classifiers
             return
@@ -490,7 +493,7 @@ class ClassifiersList(list):
 
         old_cl = None
 
-        if c.DO_SUBSUMPTION:
+        if DO_SUBSUMPTION:
             old_cl = ClassifiersList.find_subsumer(cl, existing_classifiers)
 
         if old_cl is None:

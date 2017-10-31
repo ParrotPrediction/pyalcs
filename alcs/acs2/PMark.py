@@ -2,13 +2,15 @@ from random import choice
 
 from alcs.acs2 import Condition
 
-from alcs.acs2 import Constants as c
+from alcs.acs2 import default_configuration
 from alcs import Perception
+from alcs.acs2.ACS2Configuration import ACS2Configuration
 
 
 class PMark(list):
-    def __init__(self):
-        list.__init__(self, [set() for _ in range(c.CLASSIFIER_LENGTH)])
+    def __init__(self, cfg: ACS2Configuration = default_configuration):
+        self.cfg = default_configuration
+        list.__init__(self, [set() for _ in range(cfg.classifier_length)])
 
     def __len__(self):
         return sum(1 for m in self if len(m) > 0)
@@ -46,7 +48,7 @@ class PMark(list):
         changed = False
 
         for idx, item in enumerate(condition):
-            if item == c.CLASSIFIER_WILDCARD:
+            if item == self.cfg.classifier_wildcard:
                 self[idx] = perception[idx]
                 changed = True
 
@@ -68,7 +70,6 @@ class PMark(list):
         :param: perception
         :return: condition that specifies all the differences.
         """
-        condition = None
         nr1 = 0
         nr2 = 0
 

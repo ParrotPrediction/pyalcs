@@ -1,9 +1,9 @@
 from alcs.acs2 import Condition, Effect, PMark
 
-from alcs.acs2 import Constants as c
 from alcs import Perception
 
 from random import random, sample
+from alcs.acs2 import default_configuration
 
 
 class Classifier(object):
@@ -18,12 +18,15 @@ class Classifier(object):
                  experience=1,
                  talp=None,
                  tga=0,
-                 tav=0):
+                 tav=0,
+                 cfg=default_configuration):
 
-        self.condition = Condition(
-            condition) if condition is not None else Condition()
+        self.cfg = cfg
+        self.condition = Condition(condition, cfg=cfg) \
+            if condition is not None else Condition(cfg=cfg)
         self.action = action if action is not None else None
-        self.effect = Effect(effect) if effect is not None else Effect()
+        self.effect = Effect(effect, cfg=cfg) \
+            if effect is not None else Effect(cfg=cfg)
         self.mark = PMark()
 
         # Quality - measures the accuracy of the anticipations
@@ -128,7 +131,8 @@ class Classifier(object):
         spec = 0
 
         for cpi, epi in zip(self.condition, self.effect):
-            if cpi != c.CLASSIFIER_WILDCARD and epi == c.CLASSIFIER_WILDCARD:
+            if cpi != self.cfg.classifier_wildcard and \
+                    epi == self.cfg.classifier_wildcard:
                 spec += 1
 
         return spec
@@ -144,17 +148,17 @@ class Classifier(object):
         return self.effect.number_of_specified_elements > 0
 
     def is_reliable(self):
-        return self.q > c.THETA_R
+        return self.q > self.cfg.theta_r
 
     def is_inadequate(self):
-        return self.q < c.THETA_I
+        return self.q < self.cfg.theta_i
 
     def update_reward(self, p: float) -> float:
-        self.r += c.BETA * (p - self.r)
+        self.r += self.cfg.beta * (p - self.r)
         return self.r
 
     def update_intermediate_reward(self, rho) -> float:
-        self.ir += c.BETA * (rho - self.ir)
+        self.ir += self.cfg.beta * (rho - self.ir)
         return self.ir
 
     def increase_experience(self) -> int:
@@ -162,11 +166,11 @@ class Classifier(object):
         return self.exp
 
     def increase_quality(self) -> float:
-        self.q += c.BETA * (1 - self.q)
+        self.q += self.cfg.beta * (1 - self.q)
         return self.q
 
     def decrease_quality(self) -> float:
-        self.q -= c.BETA * self.q
+        self.q -= self.cfg.beta * self.q
         return self.q
 
     def specialize(self,
@@ -234,11 +238,11 @@ class Classifier(object):
         :param time: current step
         """
         # TODO p5: write test
-        if 1. / self.exp > c.BETA:
+        if 1. / self.exp > self.cfg.beta:
             self.tav = (self.tav * self.exp + (time - self.talp)) / (
                 self.exp + 1)
         else:
-            self.tav += c.BETA * ((time - self.talp) - self.tav)
+            self.tav += self.cfg.beta * ((time - self.talp) - self.tav)
 
         self.talp = time
 
@@ -264,7 +268,7 @@ class Classifier(object):
         no_spec_new = diff.specificity
         child = self.copy_from(self, time)
 
-        if no_spec >= c.U_MAX:
+        if no_spec >= self.cfg.u_max:
             # TODO: p4: implement later
             # Code below won't get executed anyway because c.U_MAX is high
             pass
@@ -315,7 +319,8 @@ class Classifier(object):
         Executes the generalizing mutation in the classifier.
         """
         for idx, cond in enumerate(self.condition):
-            if cond != c.CLASSIFIER_WILDCARD and randomfunc() < c.MU:
+            if cond != self.cfg.classifier_wildcard and \
+                    randomfunc() < self.cfg.mu:
                 self.condition.generalize(idx)
 
     def is_similar(self, other) -> bool:
@@ -369,7 +374,7 @@ class Classifier(object):
         :return: True is classifier can be considered as subsumer,
         False otherwise
         """
-        if self.exp > c.THETA_EXP:
+        if self.exp > self.cfg.theta_exp:
             if self.is_reliable():
                 if self.mark.is_empty():
                     return True

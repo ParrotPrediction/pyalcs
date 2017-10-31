@@ -1,10 +1,16 @@
-from alcs.acs2 import ClassifiersList
+from alcs.acs2 import ClassifiersList, default_configuration, ACS2Configuration
 
 DO_GA = True
 
 
 class ACS2:
-    def __init__(self, population=None):
+    def __init__(self,
+                 configuration: ACS2Configuration = default_configuration,
+                 population=None):
+        if configuration:
+            self.cfg = configuration
+        else:
+            self.cfg = default_configuration
         if population is not None:
             self.population = population
         else:
@@ -21,7 +27,7 @@ class ACS2:
 
             # Collect metrics of trial
             metrics.append(self._collect_metrics(
-                env, current_trial, steps_in_trial, steps))
+                current_trial, steps_in_trial, steps))
 
             current_trial += 1
 
@@ -38,7 +44,7 @@ class ACS2:
 
             # Collect metrics of trial
             metrics.append(self._collect_metrics(
-                env, current_trial, steps_in_trial, steps))
+                current_trial, steps_in_trial, steps))
 
             current_trial += 1
 
@@ -99,13 +105,11 @@ class ACS2:
                     reward,
                     0)
             if DO_GA:
-                prev_num = self.population.overall_numerosity()
                 action_set.apply_ga(
                     time + steps,
                     self.population,
                     None,
                     state)
-                post_num = self.population.overall_numerosity()
 
             steps += 1
 
@@ -141,7 +145,7 @@ class ACS2:
 
         return steps
 
-    def _collect_metrics(self, env, trial, steps, total_steps):
+    def _collect_metrics(self, trial, steps, total_steps):
         return {
             'population': len(self.population),
             'numerosity': sum(cl.num for cl in self.population),
