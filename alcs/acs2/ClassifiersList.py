@@ -1,6 +1,6 @@
 import logging
 from itertools import groupby, chain
-from random import random, randint
+from random import random, randint, choice, sample
 
 from alcs.acs2 import Classifier
 
@@ -21,7 +21,7 @@ class ClassifiersList(list):
     def append(self, item):
         if not isinstance(item, Classifier):
             raise TypeError("Item should be a Classifier object")
-
+        # print(type(self))
         super(ClassifiersList, self).append(item)
 
     @classmethod
@@ -197,6 +197,7 @@ class ClassifiersList(list):
         new_list = ClassifiersList()
         new_cl = None
         was_expected_case = False
+        delete_count = 0
 
         # Because we will be changing classifiers (adding/removing) - we will
         # iterate over the copy of the list
@@ -215,6 +216,7 @@ class ClassifiersList(list):
                 if cl.is_inadequate():
                     # Removes classifier from population, match set
                     # and current list
+                    delete_count += 1
                     for lst in [population, match_set, self]:
                         __class__._remove_classifier(lst, cl)
 
@@ -234,6 +236,8 @@ class ClassifiersList(list):
         self.extend(new_list)
         population.extend(new_list)
 
+        # print("ALP removed: %d, added: %d, delta: %d" % (delete_count, len(new_list), len(new_list)-delete_count))
+
         if match_set is not None:
             new_matching = [cl for cl in new_list if
                             cl.condition.does_match(situation)]
@@ -252,59 +256,59 @@ class ClassifiersList(list):
             cl.update_reward(rho + c.GAMMA * p)
             cl.update_intermediate_reward(rho)
 
-    def apply_ga(self, time, population, match_set, situation) -> None:
+    def apply_ga(self, time, population, match_set, situation, randomfunc=random, samplefunc=sample) -> None:
         if self.should_apply_ga(time):
             self.set_ga_timestamp(time)
 
-            # Selecting parents
-            parent1, parent2 = self.select_parents()
+            parent1, parent2 = self.select_parents(randomfunc=randomfunc)
 
             child1 = Classifier.copy_from(parent1, time)
             child2 = Classifier.copy_from(parent2, time)
 
-            child1.mutate()
-            child2.mutate()
+            child1.mutate(randomfunc=randomfunc)
+            child2.mutate(randomfunc=randomfunc)
 
-            if random() < c.CHI:
+            if randomfunc() < c.CHI:
                 if child1.effect == child2.effect:
-                    child1.crossover(child2)
+                    child1.crossover(child2, samplefunc=samplefunc)
 
             child1.q /= 2
             child2.q /= 2
 
-            child_no = 2
-
-            # do not insert completely general classifiers
-            if child1.condition.specificity == 0:
-                child1 = None
-                child_no -= 1
-
-            if child2.condition.specificity == 0:
-                child2 = None
-                child_no -= 1
+            children = [child for child in [child1, child2] if child.condition.specificity > 0]
 
             # if two classifiers are identical, leave only one
-            if child1 and child2:
-                if child1.is_similar(child2):
-                    child2 = None
-                    child_no -= 1
+            if len(children) == 2 and children[0].is_similar(children[1]):
+                children = [children[0]]
 
-            self.delete_ga_classifiers(population, match_set, child_no) # TODO Check
-            childs = [child for child in [child1, child2] if child is not None]
+            self.delete_ga_classifiers(population, match_set, len(children), randomfunc=randomfunc)
 
-            # TODO Check the logic to the end, together with
             # check for subsumers / similar classifiers
-            for child in childs:
-                if child.condition.specificity != 0:
-                    old_cl = self.find_old_classifier(child, match_set)
+            for child in children:
+                self.add_ga_classifier(child, match_set, population)
 
-                    if old_cl is None:
-                        population.append(child)
-                        if match_set is not None:
-                            match_set.append(child)
-                    else:
-                        if not old_cl.is_marked():
-                            old_cl.num += 1
+    def add_ga_classifier(self, child, match_set, population):
+        """
+        Find subsumer/similar classifier, if present - increase its numerosity,
+        else add this new classifier
+        :param child: new classifier to add
+        :param match_set:
+        :param population:
+        :return:
+        """
+        if child.condition.specificity != 0:
+            old_cl = self.find_old_classifier(child, match_set)
+
+            if old_cl is None:
+                # TODO  need to add to self?
+                # self.append(child)  # ?
+                population.append(child)
+                if match_set is not None:
+                    match_set.append(child)
+            else:
+                # TODO in C++ code, in case old_cl was found as subsumer, its numerosity is increased anyway
+                if not old_cl.is_marked():
+                    old_cl.num += 1
 
     def add_alp_classifier(self, child, new_list):
         """
@@ -327,7 +331,7 @@ class ClassifiersList(list):
                 if old_cl is None or c.is_more_general(old_cl):
                     old_cl = c
 
-            # Check if any similar classifier wasn't in this ALP application
+                    # Check if any similar classifier wasn't in this ALP application
         if old_cl is None:
             for c in new_list:
                 if c.is_similar(child):
@@ -364,10 +368,13 @@ class ClassifiersList(list):
         overall_time = sum(cl.tga * cl.num for cl in self)
         overall_num = self.overall_numerosity()
 
+        # print("Overall numerosity: %d" % overall_num)
+
         if overall_num == 0:
             return False
 
         if time - overall_time / overall_num > c.THETA_GA:
+            # print("Shoud apply GA!")
             return True
 
         return False
@@ -409,12 +416,13 @@ class ClassifiersList(list):
 
         return parent1, parent2
 
-    def delete_ga_classifiers(self, population, set, child_no):
+    def delete_ga_classifiers(self, population, match_set, child_no, randomfunc=random):
         """
         Deletes classifiers in the set to keep the size THETA_AS.
         Also considers that still childNo classifiers are added by the GA.
+        :param randomfunc:
         :param population:
-        :param set:
+        :param match_set:
         :param child_no: number of classifiers that will be inserted
         :return:
         """
@@ -423,49 +431,85 @@ class ClassifiersList(list):
             # There is still room for more classifiers
             return
 
+        # print("GA: requested to delete: %d classifiers", del_no)
         for _ in range(0, del_no):
-            cl_del = None
+            self.delete_a_classifier(match_set, population, randomfunc=randomfunc)
 
+    def delete_a_classifier(self, match_set, population, randomfunc=random):
+        """ Delete one classifier from a population """
+        if len(population) == 0:   # Nothing to remove
+            return None
+        cl_del = self.select_classifier_to_delete(randomfunc=randomfunc)
+        if cl_del is not None:
+            if cl_del.num > 1:
+                cl_del.num -= 1
+            else:
+                # Removes classifier from population, match set
+                # and current list
+                for lst in [self, population, match_set]:
+                    if lst is not None:
+                        __class__._remove_classifier(lst, cl_del)
+
+    def select_classifier_to_delete(self, randomfunc=random):
+        if len(self) == 0:
+            return None
+        cl_del = None
+        while cl_del is None:  # We must delete at least one
             for cl in self.expand():
-                if random() < 1. / 3.:
+                if randomfunc() < 1. / 3.:
                     if cl_del is None:
                         cl_del = cl
                     else:
-                        if cl.q - cl_del.q < 0.1:
-                            cl_del = cl
-
-                        # TODO Check this logic construct
-                        if abs(cl.q - cl_del.q) <= 0.1:
-                            if cl.is_marked() and not cl_del.is_marked():
-                                cl_del = cl
-                            elif cl.is_marked or not cl_del.is_marked():
-                                if cl.tav > cl_del.tav:
-                                    cl_del = cl
-
-            if cl_del is not None:
-                if cl_del.num > 1:
-                    cl_del.num -= 1
-                else:
-                    # Removes classifier from population, match set
-                    # and current list
-                    for lst in [population, set]:
-                        __class__._remove_classifier(lst, cl_del)
+                        cl_del = self.select_preferred_to_delete(cl, cl_del)
+        return cl_del
 
     @staticmethod
-    def find_old_classifier(cl, set):
-        if set is None:
+    def select_preferred_to_delete(cl: Classifier, cl_to_delete: Classifier) -> Classifier:
+        if cl.q - cl_to_delete.q < -0.1:
+            cl_to_delete = cl
+            return cl_to_delete
+
+        if abs(cl.q - cl_to_delete.q) <= 0.1:
+            if cl.is_marked() and not cl_to_delete.is_marked():
+                cl_to_delete = cl
+            elif cl.is_marked or not cl_to_delete.is_marked():
+                if cl.tav > cl_to_delete.tav:
+                    cl_to_delete = cl
+        return cl_to_delete
+
+    @staticmethod
+    def find_old_classifier(cl: Classifier, existing_classifiers):
+        if existing_classifiers is None:
             return None
 
         old_cl = None
 
-        for c in set:
-            if c.does_subsume(cl):  # TODO: maybe reverse
-                if old_cl is None or c.is_more_general(old_cl):
-                    old_cl = c
+        if c.DO_SUBSUMPTION:
+            old_cl = ClassifiersList.find_subsumer(cl, existing_classifiers)
 
         if old_cl is None:
-            for c in set:
-                if c.condition == cl.condition and c.effect == cl.effect:
-                    old_cl = c
+            old_cl = ClassifiersList.find_similar_classifier(cl, existing_classifiers)
 
         return old_cl
+
+    @staticmethod
+    def find_similar_classifier(cl: Classifier, existing_classifiers) -> Classifier:
+        return existing_classifiers.get_similar(cl)
+        # return next((cls for cls in existing_classifiers if cls.is_similar(cl)), None)
+
+    @staticmethod
+    def find_subsumer(cl: Classifier, existing_classifiers, choice_func=choice) -> Classifier:
+        subsumer = None
+        most_general_subsumers = []
+        for classifier in existing_classifiers:
+            if classifier.does_subsume(cl):
+                if subsumer is None:
+                    subsumer = classifier
+                    most_general_subsumers = [subsumer]
+                elif classifier.is_more_general(subsumer):
+                    subsumer = classifier
+                    most_general_subsumers = [subsumer]
+                elif subsumer.is_equally_general(classifier):
+                    most_general_subsumers.append(classifier) # !
+
+        return choice_func(most_general_subsumers) if most_general_subsumers else None
