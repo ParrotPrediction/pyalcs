@@ -391,6 +391,7 @@ class Classifier(object):
     def crossover(self, cl2, samplefunc=sample):
         """
         Executes crossover with other classifier
+        :param samplefunc:
         :param cl2: other classifier
         """
         self.condition.two_point_crossover(cl2.condition, samplefunc=samplefunc)

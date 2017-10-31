@@ -326,22 +326,22 @@ class ClassifiersList(list):
 
         # Look if there is a classifier that subsumes the insertion
         # candidate
-        for c in self:
-            if c.does_subsume(child):
-                if old_cl is None or c.is_more_general(old_cl):
-                    old_cl = c
+        for classifier in self:
+            if classifier.does_subsume(child):
+                if old_cl is None or classifier.is_more_general(old_cl):
+                    old_cl = classifier
 
                     # Check if any similar classifier wasn't in this ALP application
         if old_cl is None:
-            for c in new_list:
-                if c.is_similar(child):
-                    old_cl = c
+            for classifier in new_list:
+                if classifier.is_similar(child):
+                    old_cl = classifier
 
         # Check if there is similar classifier already
         if old_cl is None:
-            for c in self:
-                if c.is_similar(child):
-                    old_cl = c
+            for classifier in self:
+                if classifier.is_similar(child):
+                    old_cl = classifier
 
         if old_cl is None:
             new_list.append(child)
@@ -510,6 +510,6 @@ class ClassifiersList(list):
                     subsumer = classifier
                     most_general_subsumers = [subsumer]
                 elif subsumer.is_equally_general(classifier):
-                    most_general_subsumers.append(classifier) # !
+                    most_general_subsumers.append(classifier)  # !
 
         return choice_func(most_general_subsumers) if most_general_subsumers else None

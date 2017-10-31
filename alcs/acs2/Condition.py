@@ -76,6 +76,7 @@ class Condition(list):
     def two_point_crossover(self, other, samplefunc=sample):
         """
         Executes two-point crossover
+        :param samplefunc:
         :param other: other condition given as list
         """
         left, right = samplefunc(range(0, c.CLASSIFIER_LENGTH+1), 2)

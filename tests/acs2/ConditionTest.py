@@ -3,13 +3,14 @@ import unittest
 from alcs.acs2 import Condition
 
 from alcs import Perception
+from alcs.acs2.testrandom import TestSample
 
 
 class ConditionTest(unittest.TestCase):
     def setUp(self):
         self.c = Condition()
 
-    def test_equal(self): # TODO remove
+    def test_equal(self):  # TODO remove
         self.assertTrue(Condition('########').equal(Condition('########')))
         self.assertFalse(Condition('1#######').equal(Condition('########')))
         self.assertFalse(Condition('########').equal(Condition('#######1')))
@@ -58,36 +59,36 @@ class ConditionTest(unittest.TestCase):
         self.assertRaises(ValueError, Condition, cond)
 
     def test_should_specialize_1(self):
-        c =    Condition()
-        diff =   Condition(['#', '0', '#', '#', '#', '1', '#', '1'])
+        c = Condition()
+        diff = Condition(['#', '0', '#', '#', '#', '1', '#', '1'])
         result = Condition(['#', '0', '#', '#', '#', '1', '#', '1'])
         c.specialize(new_condition=diff)
         self.assertEqual(result, c)
 
     def test_should_specialize_2(self):
-        c =      Condition(['#', '#', '#', '1', '0', '#', '1', '#'])
-        diff =   Condition(['0', '1', '0', '#', '#', '1', '#', '#'])
+        c = Condition(['#', '#', '#', '1', '0', '#', '1', '#'])
+        diff = Condition(['0', '1', '0', '#', '#', '1', '#', '#'])
         result = Condition(['0', '1', '0', '1', '0', '1', '1', '#'])
         c.specialize(new_condition=diff)
         self.assertEqual(result, c)
 
     def test_should_specialize_3(self):
-        c =      Condition(['#', '1', '0', '1', '#', '1', '0', '#'])
-        diff =   Condition(['#', '#', '#', '#', '1', '#', '#', '1'])
+        c = Condition(['#', '1', '0', '1', '#', '1', '0', '#'])
+        diff = Condition(['#', '#', '#', '#', '1', '#', '#', '1'])
         result = Condition(['#', '1', '0', '1', '1', '1', '0', '1'])
         c.specialize(new_condition=diff)
         self.assertEqual(result, c)
 
     def test_should_specialize_4(self):
-        c =      Condition(['#', '#', '#', '#', '0', '1', '#', '1'])
-        diff =   Condition(['2', '#', '0', '0', '#', '#', '#', '#'])
+        c = Condition(['#', '#', '#', '#', '0', '1', '#', '1'])
+        diff = Condition(['2', '#', '0', '0', '#', '#', '#', '#'])
         result = Condition(['2', '#', '0', '0', '0', '1', '#', '1'])
         c.specialize(new_condition=diff)
         self.assertEqual(result, c)
 
     def test_should_specialize_5(self):
-        c =      Condition(['#', '#', '#', '0', '1', '#', '0', '#'])
-        diff =   Condition(['1', '0', '1', '#', '#', '0', '#', '#'])
+        c = Condition(['#', '#', '#', '0', '1', '#', '0', '#'])
+        diff = Condition(['1', '0', '1', '#', '#', '0', '#', '#'])
         result = Condition(['1', '0', '1', '0', '1', '0', '0', '#'])
         c.specialize(new_condition=diff)
         self.assertEqual(result, c)
@@ -135,3 +136,17 @@ class ConditionTest(unittest.TestCase):
 
         # Then
         self.assertTrue(res)
+
+    def test_crossover(self):
+        c1 = Condition('0##10###')
+        c2 = Condition('#10##0##')
+        c1.two_point_crossover(c2, samplefunc=TestSample([1, 4]))
+        self.assertEqual(Condition('010#0###'), c1)
+        self.assertEqual(Condition('###1#0##'), c2)
+
+    def test_crossover_allows_to_change_last_element(self):
+        c1 = Condition('0##10###')
+        c2 = Condition('#10##011')
+        c1.two_point_crossover(c2, samplefunc=TestSample([5, 8]))
+        self.assertEqual(Condition('0##10011'), c1)
+        self.assertEqual(Condition('#10#####'), c2)

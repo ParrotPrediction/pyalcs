@@ -1,16 +1,308 @@
 import unittest
 from random import randint
 
-from alcs.acs2 import ClassifiersList, Classifier, Condition, Effect
+from alcs.acs2 import ClassifiersList, Condition, Effect, Classifier
 
 from alcs import Perception
-from alcs.acs2.testrandom import TestRandom
+from alcs.acs2.testrandom import TestRandom, TestSample
 
 
 class ClassifierListTest(unittest.TestCase):
-
     def setUp(self):
         self.population = ClassifiersList()
+
+    def test_find_subsumer_finds_single_subsumer(self):
+        subsumer = Classifier(condition=Condition('###0####'), action=3, effect=Effect('##1#####'), quality=0.93,
+                              reward=1.35, experience=23)
+        nonsubsumer = Classifier()
+
+        classifier = Classifier(condition=Condition('1##0####'), action=3, effect=Effect('##1#####'), quality=0.5,
+                                reward=0.35, experience=1)
+        classifiers_list = ClassifiersList([nonsubsumer, subsumer, nonsubsumer])
+        actual_subsumer = ClassifiersList.find_subsumer(classifier, classifiers_list, choice_func=lambda l: l[0])
+        self.assertEqual(subsumer, actual_subsumer)
+
+    def test_find_subsumer_finds_single_subsumer_among_nonsubsumers(self):
+        subsumer = Classifier(condition=Condition('###0####'), action=3, effect=Effect('##1#####'), quality=0.93,
+                              reward=1.35, experience=23)
+        nonsubsumer = Classifier()
+
+        classifier = Classifier(condition=Condition('1##0####'), action=3, effect=Effect('##1#####'), quality=0.5,
+                                reward=0.35, experience=1)
+        classifiers_list = ClassifiersList([nonsubsumer, subsumer, nonsubsumer])
+
+        actual_subsumer = ClassifiersList.find_subsumer(classifier, classifiers_list, choice_func=lambda l: l[0])
+        self.assertEqual(actual_subsumer, subsumer)
+
+    def test_find_subsumer_finds_selects_more_general_subsumer1(self):
+        subsumer1 = Classifier(condition=Condition('1##0####'), action=3, effect=Effect('##1#####'), quality=0.93,
+                               reward=1.35, experience=23)
+        subsumer2 = Classifier(condition=Condition('###0####'), action=3, effect=Effect('##1#####'), quality=0.93,
+                               reward=1.35, experience=23)
+        nonsubsumer = Classifier()
+
+        classifier = Classifier(condition=Condition('11#0####'), action=3, effect=Effect('##1#####'), quality=0.5,
+                                reward=0.35, experience=1)
+        classifiers_list = ClassifiersList([nonsubsumer, subsumer2, subsumer1, nonsubsumer])
+
+        actual_subsumer = ClassifiersList.find_subsumer(classifier, classifiers_list, choice_func=lambda l: l[0])
+        self.assertEqual(actual_subsumer, subsumer2)
+
+    def test_find_subsumer_finds_selects_more_general_subsumer2(self):
+        subsumer1 = Classifier(condition=Condition('1##0####'), action=3, effect=Effect('##1#####'), quality=0.93,
+                               reward=1.35, experience=23)
+        subsumer2 = Classifier(condition=Condition('###0####'), action=3, effect=Effect('##1#####'), quality=0.93,
+                               reward=1.35, experience=23)
+        nonsubsumer = Classifier()
+
+        classifier = Classifier(condition=Condition('11#0####'), action=3, effect=Effect('##1#####'), quality=0.5,
+                                reward=0.35, experience=1)
+        classifiers_list = ClassifiersList([nonsubsumer, subsumer1, subsumer2, nonsubsumer])
+
+        actual_subsumer = ClassifiersList.find_subsumer(classifier, classifiers_list, choice_func=lambda l: l[0])
+        self.assertEqual(actual_subsumer, subsumer2)
+
+    def test_find_subsumer_finds_randomly_selects_one_of_equally_general_subsumers(self):
+        subsumer1 = Classifier(condition=Condition('1##0####'), action=3, effect=Effect('##1#####'), quality=0.93,
+                               reward=1.35, experience=23)
+        subsumer2 = Classifier(condition=Condition('#1#0####'), action=3, effect=Effect('##1#####'), quality=0.93,
+                               reward=1.35, experience=23)
+        nonsubsumer = Classifier()
+
+        classifier = Classifier(condition=Condition('11#0####'), action=3, effect=Effect('##1#####'), quality=0.5,
+                                reward=0.35, experience=1)
+        classifiers_list = ClassifiersList([nonsubsumer, subsumer1, subsumer2, nonsubsumer])
+
+        actual_subsumer = ClassifiersList.find_subsumer(classifier, classifiers_list, choice_func=lambda l: l[0])
+        self.assertEqual(actual_subsumer, subsumer1)
+        actual_subsumer = ClassifiersList.find_subsumer(classifier, classifiers_list, choice_func=lambda l: l[1])
+        self.assertEqual(actual_subsumer, subsumer2)
+
+    def test_find_subsumer_selects_most_general_subsumer(self):
+        subsumer1 = Classifier(condition=Condition('1##0####'), action=3, effect=Effect('##1#####'), quality=0.93,
+                               reward=1.35, experience=23)
+        subsumer2 = Classifier(condition=Condition('#1#0####'), action=3, effect=Effect('##1#####'), quality=0.93,
+                               reward=1.35, experience=23)
+        most_general = Classifier(condition=Condition('###0####'), action=3, effect=Effect('##1#####'), quality=0.93,
+                                  reward=1.35, experience=23)
+        nonsubsumer = Classifier()
+
+        classifier = Classifier(condition=Condition('11#0####'), action=3, effect=Effect('##1#####'), quality=0.5,
+                                reward=0.35, experience=1)
+        classifiers_list = ClassifiersList([nonsubsumer, subsumer1, nonsubsumer, most_general, subsumer2, nonsubsumer])
+
+        actual_subsumer = ClassifiersList.find_subsumer(classifier, classifiers_list, choice_func=lambda l: l[0])
+        self.assertEqual(actual_subsumer, most_general)
+
+    def test_find_old_classifier_only_subsumer(self):
+        subsumer1 = Classifier(condition=Condition('1##0####'), action=3, effect=Effect('##1#####'), quality=0.93,
+                               reward=1.35, experience=23)
+        subsumer2 = Classifier(condition=Condition('#1#0####'), action=3, effect=Effect('##1#####'), quality=0.93,
+                               reward=1.35, experience=23)
+        most_general = Classifier(condition=Condition('###0####'), action=3, effect=Effect('##1#####'), quality=0.93,
+                                  reward=1.35, experience=23)
+        nonsubsumer = Classifier()
+
+        classifier = Classifier(condition=Condition('11#0####'), action=3, effect=Effect('##1#####'), quality=0.5,
+                                reward=0.35, experience=1)
+        classifiers_list = ClassifiersList([nonsubsumer, subsumer1, nonsubsumer, most_general, subsumer2, nonsubsumer])
+
+        actual_old_classifier = ClassifiersList.find_old_classifier(classifier, classifiers_list)
+        self.assertEqual(most_general, actual_old_classifier)
+
+    def test_find_old_classifier_only_similar(self):
+        classifier_1 = Classifier(action=1, experience=32)
+        classifier_2 = Classifier(action=1)
+        classifiers = ClassifiersList([classifier_1, Classifier(action=2), Classifier(action=3), classifier_2])
+        self.assertEqual(classifier_1, ClassifiersList.find_old_classifier(Classifier(action=1), classifiers))
+
+    def test_find_old_classifier_similar_and_subsumer_subsumer_returned(self):
+        subsumer = Classifier(condition=Condition('1#######'), action=1, experience=21, quality=0.95)
+        similar = Classifier(condition=Condition('10######'), action=1)
+
+        existing_classifiers = ClassifiersList([similar, subsumer])
+        classifier = Classifier(condition=Condition('10######'), action=1)
+        self.assertTrue(subsumer.does_subsume(classifier))
+        self.assertTrue(similar.is_similar(classifier))
+
+        self.assertEqual(subsumer, ClassifiersList.find_old_classifier(classifier, existing_classifiers))
+
+    def test_find_old_classifier_none(self):
+        self.assertIsNone(ClassifiersList.find_old_classifier(Classifier(), None))
+        self.assertIsNone(ClassifiersList.find_old_classifier(Classifier(), ClassifiersList([])))
+
+    def test_select_classifier_to_delete(self):
+        selected_first = Classifier(quality=0.5)
+        much_worse = Classifier(quality=0.2)
+        yet_another_to_consider = Classifier(quality=0.2)
+        classifiers = ClassifiersList([Classifier(), selected_first, Classifier(), much_worse,
+                                       yet_another_to_consider, Classifier()])
+        actual_selected = classifiers.select_classifier_to_delete(randomfunc=TestRandom([0.5, 0.1, 0.5, 0.1, 0.1, 0.5]))
+        self.assertEqual(much_worse, actual_selected)
+
+    def test_delete_a_classifier_delete(self):
+        cl_1 = Classifier(action=1)
+        cl_2 = Classifier(action=2)
+        cl_3 = Classifier(action=3)
+        cl_4 = Classifier(action=4)
+        action_set = ClassifiersList([cl_1, cl_2])
+        match_set = ClassifiersList([cl_2])
+        population = ClassifiersList([cl_1, cl_2, cl_3, cl_4])
+        action_set.delete_a_classifier(match_set, population, randomfunc=TestRandom([0.5, 0.1, 0.5, 0.5]))
+        self.assertEqual(ClassifiersList([cl_1]), action_set)
+        self.assertEqual(ClassifiersList([]), match_set)
+        self.assertEqual(ClassifiersList([cl_1, cl_3, cl_4]), population)
+
+    def test_delete_a_classifier_decrease_numerosity(self):
+        cl_1 = Classifier(action=1)
+        cl_2 = Classifier(action=2, numerosity=3)
+        cl_3 = Classifier(action=3)
+        cl_4 = Classifier(action=4)
+        action_set = ClassifiersList([cl_1, cl_2])
+        match_set = ClassifiersList([cl_2])
+        population = ClassifiersList([cl_1, cl_2, cl_3, cl_4])
+        action_set.delete_a_classifier(match_set, population, randomfunc=TestRandom([0.5, 0.1, 0.5, 0.5]))
+
+        self.assertListEqual(ClassifiersList([cl_1, Classifier(action=2, numerosity=2)]), action_set)
+        self.assertListEqual(ClassifiersList([Classifier(action=2, numerosity=2)]), match_set)
+        self.assertListEqual(ClassifiersList([cl_1, Classifier(action=2, numerosity=2), cl_3, cl_4]), population)
+
+    def test_delete_ga_classifiers(self):
+        cl_1 = Classifier(action=1)
+        cl_2 = Classifier(action=2, numerosity=20)
+        cl_3 = Classifier(action=3)
+        cl_4 = Classifier(action=4)
+        action_set = ClassifiersList([cl_1, cl_2])
+        match_set = ClassifiersList([cl_2])
+        population = ClassifiersList([cl_1, cl_2, cl_3, cl_4])
+        action_set.delete_ga_classifiers(population, match_set, 2, randomfunc=TestRandom(([0.5, 0.1] + [0.5] * 19) * 3))
+
+        self.assertListEqual(ClassifiersList([cl_1, Classifier(action=2, numerosity=17)]), action_set)
+        self.assertListEqual(ClassifiersList([Classifier(action=2, numerosity=17)]), match_set)
+        self.assertListEqual(ClassifiersList([cl_1, Classifier(action=2, numerosity=17), cl_3, cl_4]), population)
+
+    def test_other_preferred_to_delete_if_significantly_worse(self):
+        cl = Classifier(quality=0.5)
+        cl_del = Classifier(quality=0.8)
+        self.assertEqual(cl, ClassifiersList().select_preferred_to_delete(cl, cl_del))
+
+    def test_other_not_preferred_to_delete_if_significantly_better(self):
+        cl = Classifier(quality=0.8)
+        cl_del = Classifier(quality=0.5)
+        self.assertEqual(cl_del, ClassifiersList().select_preferred_to_delete(cl, cl_del))
+
+    def test_if_selected_somewhat_close_to_other_marked_considered1(self):
+        cl = Classifier(quality=0.8)
+        cl.mark[0] = '0'
+        cl_del = Classifier(quality=0.85)
+        self.assertFalse(cl_del.is_marked())
+        self.assertTrue(cl.is_marked())
+        self.assertEqual(cl, ClassifiersList().select_preferred_to_delete(cl, cl_del))
+
+    def test_if_selected_somewhat_close_to_other_marked_considered2(self):
+        cl = Classifier(quality=0.8)
+        cl_del = Classifier(quality=0.85)
+        cl_del.mark[0] = '0'
+        self.assertTrue(cl.is_unmarked())
+        self.assertTrue(cl_del.is_marked())
+        self.assertEqual(cl_del, ClassifiersList().select_preferred_to_delete(cl, cl_del))
+
+    def test_if_selected_somewhat_close_to_other_both_umarked_tav_considered1(self):
+        cl = Classifier(quality=0.8, tav=0.2)
+        cl_del = Classifier(quality=0.85, tav=0.1)
+        self.assertFalse(cl.is_marked())
+        self.assertFalse(cl_del.is_marked())
+        self.assertEqual(cl, ClassifiersList().select_preferred_to_delete(cl, cl_del))
+
+    def test_if_selected_somewhat_close_to_other_both_umarked_tav_considered2(self):
+        cl = Classifier(quality=0.8, tav=0.1)
+        cl_del = Classifier(quality=0.85, tav=0.1)
+        self.assertFalse(cl.is_marked())
+        self.assertFalse(cl_del.is_marked())
+        self.assertEqual(cl_del, ClassifiersList().select_preferred_to_delete(cl, cl_del))
+
+    def test_if_selected_somewhat_close_to_other_both_marked_tav_considered1(self):
+        cl = Classifier(quality=0.85, tav=0.2)
+        cl.mark[0] = '0'
+        cl_del = Classifier(quality=0.8, tav=0.1)
+        cl_del.mark[0] = '0'
+        self.assertTrue(cl.is_marked())
+        self.assertTrue(cl_del.is_marked())
+        self.assertEqual(cl, ClassifiersList().select_preferred_to_delete(cl, cl_del))
+
+    def test_if_selected_somewhat_close_to_other_both_marked_tav_considered2(self):
+        cl = Classifier(quality=0.8, tav=0.1)
+        cl.mark[0] = '0'
+        cl_del = Classifier(quality=0.85, tav=0.1)
+        cl_del.mark[0] = '0'
+        self.assertTrue(cl.is_marked())
+        self.assertTrue(cl_del.is_marked())
+        self.assertEqual(cl_del, ClassifiersList().select_preferred_to_delete(cl, cl_del))
+
+    def test_overall_numerosity(self):
+        population = ClassifiersList()
+        self.assertEqual(0, population.overall_numerosity())
+
+        population.append(Classifier(numerosity=2))
+        self.assertEqual(2, population.overall_numerosity())
+        population.append(Classifier(numerosity=1))
+        self.assertEqual(3, population.overall_numerosity())
+        population.append(Classifier(numerosity=3))
+        self.assertEqual(6, population.overall_numerosity())
+
+    def test_add_ga_classifier_add(self):
+        cl_1 = Classifier(action=1)
+        cl_2 = Classifier(action=2, condition=Condition('1#######'))
+        cl_3 = Classifier(action=3)
+        cl_4 = Classifier(action=4)
+        action_set = ClassifiersList([cl_1])
+        match_set = ClassifiersList([])
+        population = ClassifiersList([cl_1, cl_3, cl_4])
+        action_set.add_ga_classifier(cl_2, match_set, population)
+        # self.assertEqual(ClassifiersList([cl_1, cl_2]), action_set)
+        self.assertEqual(ClassifiersList([cl_2]), match_set)
+        self.assertEqual(ClassifiersList([cl_1, cl_3, cl_4, cl_2]), population)
+
+    def test_add_ga_classifier_increase_numerosity(self):
+        cl_1 = Classifier(action=2, condition=Condition('1#######'))
+        cl_2 = Classifier(action=2, condition=Condition('1#######'))
+        cl_3 = Classifier(action=3)
+        cl_4 = Classifier(action=4)
+        action_set = ClassifiersList([cl_1])
+        match_set = ClassifiersList([cl_1])
+        population = ClassifiersList([cl_1, cl_3, cl_4])
+        action_set.add_ga_classifier(cl_2, match_set, population)
+
+        new_classifier = Classifier(action=2, condition=Condition('1#######'), numerosity=2)
+        self.assertEqual(ClassifiersList([new_classifier, cl_3, cl_4]), population)
+
+    def test_apply_ga(self):
+        cl_1 = Classifier(Condition('#1#1#1#1'), numerosity=12)
+        cl_2 = Classifier(Condition('0#0#0#0#'), numerosity=9)
+        action_set = ClassifiersList([cl_1, cl_2])
+        match_set = ClassifiersList([cl_1, cl_2])
+        population = ClassifiersList([cl_1, cl_2])
+
+        action_set.apply_ga(101, population, match_set, None, randomfunc=TestRandom([
+                                                                                        0.1, 0.6,  # parent selection
+                                                                                        0.1, 0.5, 0.5, 0.5,
+                                                                                        # mutation of child1
+                                                                                        0.5, 0.1, 0.5, 0.5,
+                                                                                        # mutation of child2
+                                                                                        0.1,  # do crossover
+                                                                                    ] + [0.5] * 12 + [0.2] + [
+                                                                                        0.5] * 8 + [0.2] + [
+                                                                                        0.5] * 20 + [0.2] + [0.5] * 20
+                                                                                    ), samplefunc=TestSample([0, 4]))
+
+        modified_parent1 = Classifier(Condition('#1#1#1#1'), numerosity=10, tga=101)
+        modified_parent2 = Classifier(Condition('0#0#0#0#'), numerosity=8, tga=101)
+        child1 = Classifier(Condition('0####1#1'), quality=0.25, talp=101, tga=101)
+        child2 = Classifier(Condition('###10#0#'), quality=0.25, talp=101, tga=101)
+        expected_population = ClassifiersList([modified_parent1, modified_parent2, child1, child2])
+        self.assertEqual(expected_population, population)
+        self.assertEqual(expected_population, match_set)
+        self.assertEqual(ClassifiersList([modified_parent1, modified_parent2]), action_set)
 
     def test_should_select_parents1(self):
         population = ClassifiersList()
@@ -26,7 +318,7 @@ class ClassifierListTest(unittest.TestCase):
 
         p1, p2 = population.select_parents(randomfunc=(TestRandom([0.7, 0.1])))
         self.assertEqual(c0, p1)
-        self.assertEqual(c2, p2)
+        # self.assertEqual(c2, p2)
 
         p1, p2 = population.select_parents(randomfunc=(TestRandom([0.3, 0.6])))
         self.assertEqual(c1, p1)
@@ -35,7 +327,6 @@ class ClassifierListTest(unittest.TestCase):
         p1, p2 = population.select_parents(randomfunc=(TestRandom([0.2, 0.8])))
         self.assertEqual(c0, p1)
         self.assertEqual(c3, p2)
-
 
     def test_quality_and_numerosity_influence_parent_selection(self):
         population = ClassifiersList()
@@ -53,7 +344,6 @@ class ClassifierListTest(unittest.TestCase):
         p1, p2 = population.select_parents(randomfunc=(TestRandom([0.888, 0.777])))
         self.assertEqual(c0, p1)
         self.assertEqual(c1, p2)
-
 
     def test_should_insert_classifier_1(self):
         # Try to insert an integer instead of classifier object
