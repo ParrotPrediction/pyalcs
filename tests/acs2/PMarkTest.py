@@ -2,7 +2,6 @@ import unittest
 
 from alcs.acs2 import PMark
 
-from alcs.acs2 import Constants as c
 from alcs import Perception
 
 
@@ -101,9 +100,9 @@ class PMarkTest(unittest.TestCase):
 
             # Then
             self.assertIsNotNone(diff)
-            self.assertEqual(c.CLASSIFIER_WILDCARD, diff[0])
-            self.assertEqual(c.CLASSIFIER_WILDCARD, diff[1])
-            self.assertEqual(c.CLASSIFIER_WILDCARD, diff[2])
+            self.assertEqual('#', diff[0])
+            self.assertEqual('#', diff[1])
+            self.assertEqual('#', diff[2])
             self.assertEqual(1, diff.specificity)
 
     def test_should_get_differences_3(self):
@@ -124,11 +123,11 @@ class PMarkTest(unittest.TestCase):
 
             # Then
             self.assertIsNotNone(diff)
-            self.assertEqual(c.CLASSIFIER_WILDCARD, diff[0])
-            self.assertEqual(c.CLASSIFIER_WILDCARD, diff[1])
-            self.assertEqual(c.CLASSIFIER_WILDCARD, diff[2])
-            self.assertEqual(c.CLASSIFIER_WILDCARD, diff[4])
-            self.assertEqual(c.CLASSIFIER_WILDCARD, diff[6])
+            self.assertEqual('#', diff[0])
+            self.assertEqual('#', diff[1])
+            self.assertEqual('#', diff[2])
+            self.assertEqual('#', diff[4])
+            self.assertEqual('#', diff[6])
             self.assertEqual(1, diff.specificity)
 
     def test_should_get_differences_4(self):
@@ -149,12 +148,12 @@ class PMarkTest(unittest.TestCase):
         self.assertEqual(5, diff.specificity)
         self.assertEqual('1', diff[0])
         self.assertEqual('1', diff[1])
-        self.assertEqual(c.CLASSIFIER_WILDCARD, diff[2])
+        self.assertEqual('#', diff[2])
         self.assertEqual('1', diff[3])
         self.assertEqual('1', diff[4])
-        self.assertEqual(c.CLASSIFIER_WILDCARD, diff[5])
+        self.assertEqual('#', diff[5])
         self.assertEqual('1', diff[6])
-        self.assertEqual(c.CLASSIFIER_WILDCARD, diff[7])
+        self.assertEqual('#', diff[7])
 
     def test_should_get_differences_5(self):
         # Given

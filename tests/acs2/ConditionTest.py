@@ -11,13 +11,13 @@ class ConditionTest(unittest.TestCase):
         self.c = Condition()
 
     def test_equal(self):  # TODO remove
-        self.assertTrue(Condition('########').equal(Condition('########')))
-        self.assertFalse(Condition('1#######').equal(Condition('########')))
-        self.assertFalse(Condition('########').equal(Condition('#######1')))
-        self.assertTrue(Condition('1111####').equal(Condition('1111####')))
-        self.assertFalse(Condition('1111####').equal(Condition('1011####')))
-        self.assertFalse(Condition('1101####').equal(Condition('1111####')))
-        self.assertTrue(Condition('00001###').equal(Condition('00001###')))
+        self.assertTrue(Condition('########') == (Condition('########')))
+        self.assertFalse(Condition('1#######') == (Condition('########')))
+        self.assertFalse(Condition('########') == (Condition('#######1')))
+        self.assertTrue(Condition('1111####') == (Condition('1111####')))
+        self.assertFalse(Condition('1111####') == (Condition('1011####')))
+        self.assertFalse(Condition('1101####') == (Condition('1111####')))
+        self.assertTrue(Condition('00001###') == (Condition('00001###')))
 
     def test_should_generalize(self):
         cond = "#1O##O##"

@@ -1,11 +1,12 @@
 import unittest
 
-from alcs.acs2 import Classifier, Condition, Effect, PMark, Constants
+from alcs.acs2 import Classifier, Condition, Effect, PMark, \
+    default_configuration
 from alcs import Perception
 from alcs.acs2.testrandom import TestRandom
 
-s = Constants.MU * 0.5  # less then MU
-b = 1 - (1 - Constants.MU) * 0.5  # more then MU
+s = default_configuration.mu * 0.5  # less then MU
+b = 1 - (1 - default_configuration.mu) * 0.5  # more then MU
 
 
 class ClassifierTest(unittest.TestCase):
