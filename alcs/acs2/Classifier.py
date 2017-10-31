@@ -394,7 +394,8 @@ class Classifier(object):
         :param samplefunc:
         :param cl2: other classifier
         """
-        self.condition.two_point_crossover(cl2.condition, samplefunc=samplefunc)
+        self.condition.two_point_crossover(
+            cl2.condition, samplefunc=samplefunc)
 
         q = float(sum([self.q, cl2.q]) / 2)
         r = float(sum([self.r, cl2.r]) / 2)
@@ -403,7 +404,16 @@ class Classifier(object):
         cl2.r = r
 
     def __eq__(self, other):
-        return self.condition == other.condition and self.effect == other.effect and self.action == other.action \
-            and self.num == other.num and self.r == other.r and self.q == other.q and self.talp == other.talp \
-            and self.tav == other.tav and self.tga == other.tga and self.exp == other.exp and self.ee == other.ee \
-            and self.mark == other.mark and self.ir == other.ir
+        return self.condition == other.condition \
+            and self.effect == other.effect \
+            and self.action == other.action \
+            and self.num == other.num \
+            and self.r == other.r \
+            and self.q == other.q \
+            and self.talp == other.talp \
+            and self.tav == other.tav \
+            and self.tga == other.tga \
+            and self.exp == other.exp \
+            and self.ee == other.ee \
+            and self.mark == other.mark \
+            and self.ir == other.ir

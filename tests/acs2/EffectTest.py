@@ -220,4 +220,3 @@ class EffectTest(unittest.TestCase):
     def testEq(self):
         self.assertTrue(Effect('00001111') == Effect('00001111'))
         self.assertFalse(Effect('00001111') == Effect('0000111#'))
-

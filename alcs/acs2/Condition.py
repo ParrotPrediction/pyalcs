@@ -79,7 +79,7 @@ class Condition(list):
         :param samplefunc:
         :param other: other condition given as list
         """
-        left, right = samplefunc(range(0, c.CLASSIFIER_LENGTH+1), 2)
+        left, right = samplefunc(range(0, c.CLASSIFIER_LENGTH + 1), 2)
 
         if left > right:
             left, right = right, left
@@ -96,5 +96,5 @@ class Condition(list):
     # TODO not needed
     def equal(self, other):
         return isinstance(other, Condition) \
-               and self.specificity == other.specificity \
-               and ''.join(self) == ''.join(other)
+            and self.specificity == other.specificity \
+            and ''.join(self) == ''.join(other)

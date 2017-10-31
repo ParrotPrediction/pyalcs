@@ -4,8 +4,8 @@ from alcs.acs2 import Classifier, Condition, Effect, PMark, Constants
 from alcs import Perception
 from alcs.acs2.testrandom import TestRandom
 
-s = Constants.MU*0.5  # less then MU
-b = 1-(1-Constants.MU)*0.5  # more then MU
+s = Constants.MU * 0.5  # less then MU
+b = 1 - (1 - Constants.MU) * 0.5  # more then MU
 
 
 class ClassifierTest(unittest.TestCase):
@@ -18,11 +18,16 @@ class ClassifierTest(unittest.TestCase):
 
     def test_is_equally_general(self):
         c1 = Classifier(Condition('1#######'))
-        self.assertTrue(c1.is_equally_general(Classifier(Condition('1#######'))))
-        self.assertTrue(c1.is_equally_general(Classifier(Condition('0#######'))))
-        self.assertTrue(c1.is_equally_general(Classifier(Condition('#0######'))))
-        self.assertFalse(c1.is_equally_general(Classifier(Condition('#01#####'))))
-        self.assertFalse(c1.is_equally_general(Classifier(Condition('########'))))
+        self.assertTrue(
+            c1.is_equally_general(Classifier(Condition('1#######'))))
+        self.assertTrue(
+            c1.is_equally_general(Classifier(Condition('0#######'))))
+        self.assertTrue(
+            c1.is_equally_general(Classifier(Condition('#0######'))))
+        self.assertFalse(
+            c1.is_equally_general(Classifier(Condition('#01#####'))))
+        self.assertFalse(
+            c1.is_equally_general(Classifier(Condition('########'))))
 
     def test_mutate_1(self):
         cls = Classifier(Condition('##011###'))
