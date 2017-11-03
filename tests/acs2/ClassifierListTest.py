@@ -4,7 +4,7 @@ from random import randint
 from alcs.acs2 import ClassifiersList, Condition, Effect, Classifier
 
 from alcs import Perception
-from alcs.acs2.testrandom import TestRandom, TestSample
+from .randommock import RandomMock, SampleMock
 
 
 class ClassifierListTest(unittest.TestCase):
@@ -12,18 +12,23 @@ class ClassifierListTest(unittest.TestCase):
         self.population = ClassifiersList()
 
     def test_find_subsumer_finds_single_subsumer(self):
+        # Given
         subsumer = Classifier(condition=Condition('###0####'), action=3,
                               effect=Effect('##1#####'), quality=0.93,
                               reward=1.35, experience=23)
         nonsubsumer = Classifier()
+        classifiers_list = ClassifiersList(
+            [nonsubsumer, subsumer, nonsubsumer])
 
         classifier = Classifier(condition=Condition('1##0####'), action=3,
                                 effect=Effect('##1#####'), quality=0.5,
                                 reward=0.35, experience=1)
-        classifiers_list = ClassifiersList(
-            [nonsubsumer, subsumer, nonsubsumer])
+
+        # When
         actual_subsumer = ClassifiersList.find_subsumer(
             classifier, classifiers_list, choice_func=lambda l: l[0])
+
+        # Then
         self.assertEqual(subsumer, actual_subsumer)
 
     def test_find_subsumer_finds_single_subsumer_among_nonsubsumers(self):
@@ -196,7 +201,7 @@ class ClassifierListTest(unittest.TestCase):
             [Classifier(), selected_first, Classifier(), much_worse,
              yet_another_to_consider, Classifier()])
         actual_selected = classifiers.select_classifier_to_delete(
-            randomfunc=TestRandom([0.5, 0.1, 0.5, 0.1, 0.1, 0.5]))
+            randomfunc=RandomMock([0.5, 0.1, 0.5, 0.1, 0.1, 0.5]))
         self.assertEqual(much_worse, actual_selected)
 
     def test_delete_a_classifier_delete(self):
@@ -208,7 +213,7 @@ class ClassifierListTest(unittest.TestCase):
         match_set = ClassifiersList([cl_2])
         population = ClassifiersList([cl_1, cl_2, cl_3, cl_4])
         action_set.delete_a_classifier(
-            match_set, population, randomfunc=TestRandom([0.5, 0.1, 0.5, 0.5]))
+            match_set, population, randomfunc=RandomMock([0.5, 0.1, 0.5, 0.5]))
         self.assertEqual(ClassifiersList([cl_1]), action_set)
         self.assertEqual(ClassifiersList([]), match_set)
         self.assertEqual(ClassifiersList([cl_1, cl_3, cl_4]), population)
@@ -222,7 +227,7 @@ class ClassifierListTest(unittest.TestCase):
         match_set = ClassifiersList([cl_2])
         population = ClassifiersList([cl_1, cl_2, cl_3, cl_4])
         action_set.delete_a_classifier(
-            match_set, population, randomfunc=TestRandom([0.5, 0.1, 0.5, 0.5]))
+            match_set, population, randomfunc=RandomMock([0.5, 0.1, 0.5, 0.5]))
 
         expected_action_set = ClassifiersList(
             [cl_1, Classifier(action=2, numerosity=2)])
@@ -245,7 +250,7 @@ class ClassifierListTest(unittest.TestCase):
         population = ClassifiersList([cl_1, cl_2, cl_3, cl_4])
         action_set.delete_ga_classifiers(
             population, match_set, 2,
-            randomfunc=TestRandom(([0.5, 0.1] + [0.5] * 19) * 3))
+            randomfunc=RandomMock(([0.5, 0.1] + [0.5] * 19) * 3))
 
         expected_action_set = ClassifiersList(
             [cl_1, Classifier(action=2, numerosity=17)])
@@ -379,8 +384,8 @@ class ClassifierListTest(unittest.TestCase):
             ] + [0.5] * 12 + [0.2] + [0.5] * 8 + \
             [0.2] + [0.5] * 20 + [0.2] + [0.5] * 20
         action_set.apply_ga(101, population, match_set, None,
-                            randomfunc=TestRandom(random_sequence),
-                            samplefunc=TestSample([0, 4]))
+                            randomfunc=RandomMock(random_sequence),
+                            samplefunc=SampleMock([0, 4]))
 
         modified_parent1 = Classifier(Condition('#1#1#1#1'), numerosity=10,
                                       tga=101)
@@ -411,17 +416,17 @@ class ClassifierListTest(unittest.TestCase):
         # q3num= 0.125 for all
 
         p1, p2 = population.select_parents(
-            randomfunc=(TestRandom([0.7, 0.1])))
+            randomfunc=(RandomMock([0.7, 0.1])))
         self.assertEqual(c0, p1)
         # self.assertEqual(c2, p2)
 
         p1, p2 = population.select_parents(
-            randomfunc=(TestRandom([0.3, 0.6])))
+            randomfunc=(RandomMock([0.3, 0.6])))
         self.assertEqual(c1, p1)
         self.assertEqual(c2, p2)
 
         p1, p2 = population.select_parents(
-            randomfunc=(TestRandom([0.2, 0.8])))
+            randomfunc=(RandomMock([0.2, 0.8])))
         self.assertEqual(c0, p1)
         self.assertEqual(c3, p2)
 
@@ -435,12 +440,12 @@ class ClassifierListTest(unittest.TestCase):
         population.append(c2)  # q3num = 0.0625
 
         p1, p2 = population.select_parents(
-            randomfunc=(TestRandom([0.888, 0.999])))
+            randomfunc=(RandomMock([0.888, 0.999])))
         self.assertEqual(c1, p1)
         self.assertEqual(c2, p2)
 
         p1, p2 = population.select_parents(
-            randomfunc=(TestRandom([0.888, 0.777])))
+            randomfunc=(RandomMock([0.888, 0.777])))
         self.assertEqual(c0, p1)
         self.assertEqual(c1, p2)
 

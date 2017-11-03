@@ -3,7 +3,7 @@ import unittest
 from alcs.acs2 import Condition
 
 from alcs import Perception
-from alcs.acs2.testrandom import TestSample
+from .randommock import SampleMock
 
 
 class ConditionTest(unittest.TestCase):
@@ -140,13 +140,13 @@ class ConditionTest(unittest.TestCase):
     def test_crossover(self):
         c1 = Condition('0##10###')
         c2 = Condition('#10##0##')
-        c1.two_point_crossover(c2, samplefunc=TestSample([1, 4]))
+        c1.two_point_crossover(c2, samplefunc=SampleMock([1, 4]))
         self.assertEqual(Condition('010#0###'), c1)
         self.assertEqual(Condition('###1#0##'), c2)
 
     def test_crossover_allows_to_change_last_element(self):
         c1 = Condition('0##10###')
         c2 = Condition('#10##011')
-        c1.two_point_crossover(c2, samplefunc=TestSample([5, 8]))
+        c1.two_point_crossover(c2, samplefunc=SampleMock([5, 8]))
         self.assertEqual(Condition('0##10011'), c1)
         self.assertEqual(Condition('#10#####'), c2)

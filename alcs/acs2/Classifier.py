@@ -1,4 +1,4 @@
-from alcs.acs2 import Condition, Effect, PMark
+from alcs.acs2 import Condition, Effect, PMark, ACS2Configuration
 
 from alcs import Perception
 
@@ -19,15 +19,15 @@ class Classifier(object):
                  talp=None,
                  tga=0,
                  tav=0,
-                 cfg=default_configuration):
+                 cfg=None):
 
-        self.cfg = cfg
-        self.condition = Condition(condition, cfg=cfg) \
-            if condition is not None else Condition(cfg=cfg)
+        self.cfg = cfg or ACS2Configuration.default()
+        self.condition = Condition(condition, cfg=self.cfg) \
+            if condition is not None else Condition(cfg=self.cfg)
         self.action = action if action is not None else None
-        self.effect = Effect(effect, cfg=cfg) \
-            if effect is not None else Effect(cfg=cfg)
-        self.mark = PMark()
+        self.effect = Effect(effect, cfg=self.cfg) \
+            if effect is not None else Effect(cfg=self.cfg)
+        self.mark = PMark(cfg=self.cfg)
 
         # Quality - measures the accuracy of the anticipations
         self.q = quality
@@ -78,7 +78,6 @@ class Classifier(object):
         """
         new_cls = cls(
             condition=Condition(old_cls.condition),
-            #         ^^^^^^^^^ copy it, not just pass the reference!
             action=old_cls.action,
             effect=old_cls.effect,
             quality=old_cls.q,

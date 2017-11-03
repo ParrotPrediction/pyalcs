@@ -8,9 +8,9 @@ from alcs.acs2.ACS2Configuration import ACS2Configuration
 
 
 class PMark(list):
-    def __init__(self, cfg: ACS2Configuration = default_configuration):
-        self.cfg = default_configuration
-        list.__init__(self, [set() for _ in range(cfg.classifier_length)])
+    def __init__(self, cfg: ACS2Configuration = None):
+        self.cfg = cfg or ACS2Configuration.default()
+        list.__init__(self, [set() for _ in range(self.cfg.classifier_length)])
 
     def __len__(self):
         return sum(1 for m in self if len(m) > 0)
@@ -83,7 +83,7 @@ class PMark(list):
         if nr1 > 0:
             # One or more absolute differences detected -> specialize one
             # randomly chosen
-            condition = Condition()
+            condition = Condition(cfg=self.cfg)
 
             possible_idx = []
             for idx, item in enumerate(self):
@@ -94,7 +94,7 @@ class PMark(list):
             condition[rand_idx] = perception[rand_idx]
         elif nr2 > 0:
             # One or more equal differences detected -> specialize all of them
-            condition = Condition()
+            condition = Condition(cfg=self.cfg)
 
             for idx, item in enumerate(self):
                 if len(item) > 1:

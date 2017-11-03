@@ -3,7 +3,7 @@ import unittest
 from alcs.acs2 import Classifier, Condition, Effect, PMark, \
     default_configuration
 from alcs import Perception
-from alcs.acs2.testrandom import TestRandom
+from .randommock import RandomMock
 
 s = default_configuration.mu * 0.5  # less then MU
 b = 1 - (1 - default_configuration.mu) * 0.5  # more then MU
@@ -32,12 +32,12 @@ class ClassifierTest(unittest.TestCase):
 
     def test_mutate_1(self):
         cls = Classifier(Condition('##011###'))
-        cls.mutate(randomfunc=TestRandom([s, b, b]))
+        cls.mutate(randomfunc=RandomMock([s, b, b]))
         self.assertEqual(Condition('###11###'), cls.condition)
 
     def test_mutate_2(self):
         cls = Classifier(Condition('##011###'))
-        cls.mutate(randomfunc=TestRandom([b, b, s]))
+        cls.mutate(randomfunc=RandomMock([b, b, s]))
         self.assertEqual(Condition('##01####'), cls.condition)
 
     def test_should_calculate_fitness(self):
@@ -558,11 +558,11 @@ class ClassifierTest(unittest.TestCase):
 
         copied_cl = Classifier.copy_from(original_cl, operation_time)
 
-        copied_cl.mutate(TestRandom([s, b, b, b, b]))
+        copied_cl.mutate(RandomMock([s, b, b, b, b]))
         self.assertEqual(Condition('####1011'), copied_cl.condition)
         self.assertEqual(Condition('1###1011'), original_cl.condition)
 
-        original_cl.mutate(TestRandom([b, s, b, b, b]))
+        original_cl.mutate(RandomMock([b, s, b, b, b]))
         self.assertEqual(Condition('1####011'), original_cl.condition)
         self.assertEqual(Condition('####1011'), copied_cl.condition)
 

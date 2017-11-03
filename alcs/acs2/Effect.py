@@ -41,3 +41,19 @@ class Effect(AbstractCondition):
                     return False
 
         return True
+
+    def is_specializable(self, p0: Perception, p1: Perception) -> bool:
+        """
+        Determines if the effect part can be modified to anticipate
+        changes from `p0` to `p1` correctly by only specializing attributes.
+
+        :param p0: previous perception
+        :param p1: current perception
+        :return: True if specializable, false otherwise
+        """
+        for p0i, p1i, ei in zip(p0, p1, self):
+            if ei != self.cfg.classifier_wildcard:
+                if ei != p1i or p0i == p1i:
+                    return False
+
+        return True

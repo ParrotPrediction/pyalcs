@@ -5,16 +5,10 @@ DO_GA = True
 
 class ACS2:
     def __init__(self,
-                 configuration: ACS2Configuration = default_configuration,
+                 cfg: ACS2Configuration = None,
                  population=None):
-        if configuration:
-            self.cfg = configuration
-        else:
-            self.cfg = default_configuration
-        if population is not None:
-            self.population = population
-        else:
-            self.population = ClassifiersList()
+        self.cfg = cfg or ACS2Configuration.default()
+        self.population = population or ClassifiersList(cfg=self.cfg)
 
     def explore(self, env, max_trials):
         current_trial = 0
@@ -58,15 +52,11 @@ class ACS2:
         action = None
         reward = None
         prev_state = None
-        action_set = ClassifiersList()
+        action_set = ClassifiersList(cfg=self.cfg)
         done = False
 
         while not done:
-            print("population size: %d, numerosity=%d"
-                  % (len(self.population),
-                     self.population.overall_numerosity()))
             match_set = ClassifiersList.form_match_set(self.population, state)
-            # print("match_set size: %d" % len(match_set))
 
             if steps > 0:
                 # Apply learning in the last action set
@@ -121,12 +111,11 @@ class ACS2:
         state = env.reset()
 
         reward = None
-        action_set = ClassifiersList()
+        action_set = ClassifiersList(cfg=self.cfg)
         done = False
 
         while not done:
-            match_set = ClassifiersList.form_match_set(
-                self.population, state)
+            match_set = ClassifiersList.form_match_set(self.population, state)
 
             if steps > 0:
                 action_set.apply_reinforcement_learning(
@@ -158,23 +147,3 @@ class ACS2:
             'steps': steps,
             'total_steps': total_steps
         }
-
-    def calculate_knowledge(self, env):
-        transitions = env.unwrapped.unwrapped.get_all_possible_transitions()
-
-        # Take into consideration only reliable classifiers
-        reliable_classifiers = [c for c in self.population if c.is_reliable()]
-
-        # Count how many transitions are anticipated correctly
-        nr_correct = 0
-
-        # For all possible destinations from each path cell
-        for start, action, end in transitions:
-            p0 = env.maze.perception(*start)
-            p1 = env.maze.perception(*end)
-
-            if any([True for cl in reliable_classifiers
-                    if cl.predicts_successfully(p0, action, p1)]):
-                nr_correct += 1
-
-        return nr_correct / len(transitions) * 100.0

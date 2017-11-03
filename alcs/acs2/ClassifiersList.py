@@ -4,7 +4,7 @@ from random import random, randint, choice, sample
 
 from alcs.acs2 import Classifier
 
-from alcs.acs2 import default_configuration
+from alcs.acs2 import ACS2Configuration
 from alcs import Perception
 
 DO_SUBSUMPTION = True
@@ -17,8 +17,8 @@ class ClassifiersList(list):
     Represents overall population, match/action sets
     """
 
-    def __init__(self, seq=(), cfg=default_configuration):
-        self.cfg = cfg
+    def __init__(self, seq=(), cfg=None):
+        self.cfg = cfg or ACS2Configuration.default()
         list.__init__(self, seq or [])
 
     def append(self, item):
@@ -112,7 +112,7 @@ class ClassifiersList(list):
         """
         last_executed_cls = None
         number_of_cls_per_action = \
-            {i: 0 for i in range(self.cfg.number_of_posiible_actions)}
+            {i: 0 for i in range(self.cfg.number_of_possible_actions)}
 
         if len(self) > 0:
             last_executed_cls = min(self, key=lambda cl: cl.talp)
@@ -139,7 +139,7 @@ class ClassifiersList(list):
         :return: chosen action
         """
         knowledge_array = {i: 0
-                           for i in range(self.cfg.number_of_posiible_actions)}
+                           for i in range(self.cfg.number_of_possible_actions)}
         self.sort(key=lambda cl: cl.action)
 
         for _action, _clss in groupby(self, lambda cl: cl.action):
@@ -160,7 +160,7 @@ class ClassifiersList(list):
         Chooses one of the possible actions in the environment randomly
         :return: random action number
         """
-        return randint(0, self.cfg.number_of_posiible_actions - 1)
+        return randint(0, self.cfg.number_of_possible_actions - 1)
 
     def get_maximum_fitness(self) -> float:
         """
@@ -197,7 +197,7 @@ class ClassifiersList(list):
         :param population:
         :param match_set:
         """
-        new_list = ClassifiersList()
+        new_list = ClassifiersList(cfg=self.cfg)
         new_cl = None
         was_expected_case = False
         delete_count = 0
