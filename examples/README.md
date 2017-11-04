@@ -11,8 +11,8 @@ Files worth checking:
 - *Description of ACS2.ipynb* - mathematical explanation of the algorithm,
 - *ACS2 in Maze.ipynb* - how the algorithm is performing in maze environment.
 
-## Maze environments
+## Maze environment
 ...
 
-## GO environments
+## Go environment
 ...
