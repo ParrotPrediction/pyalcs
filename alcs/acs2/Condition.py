@@ -1,6 +1,6 @@
-from alcs import Perception
-from alcs.acs2 import AbstractCondition
 from random import sample
+
+from alcs.acs2 import AbstractCondition
 
 
 class Condition(AbstractCondition):

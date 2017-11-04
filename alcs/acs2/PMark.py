@@ -1,9 +1,7 @@
 from random import choice
 
-from alcs.acs2 import Condition
-
-from alcs.acs2 import default_configuration
 from alcs import Perception
+from alcs.acs2 import Condition
 from alcs.acs2.ACS2Configuration import ACS2Configuration
 
 

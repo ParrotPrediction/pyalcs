@@ -1,2 +1,6 @@
 pep8==1.7.0
 coverage==4.3.4
+jupyter==1.0.0
+matplotlib==2.1.0
+gym==0.9.4
+pandas==0.21.0

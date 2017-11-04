@@ -1,7 +1,8 @@
 import unittest
 from random import randint
 
-from alcs.acs2 import ClassifiersList, Condition, Effect, Classifier
+from alcs.acs2 import ACS2Configuration, ClassifiersList, \
+    Condition, Effect, Classifier
 
 from alcs import Perception
 from .randommock import RandomMock, SampleMock
@@ -9,6 +10,7 @@ from .randommock import RandomMock, SampleMock
 
 class ClassifierListTest(unittest.TestCase):
     def setUp(self):
+        self.cfg = ACS2Configuration.default()
         self.population = ClassifiersList()
 
     def test_find_subsumer_finds_single_subsumer(self):
@@ -161,7 +163,7 @@ class ClassifierListTest(unittest.TestCase):
              subsumer2, nonsubsumer])
 
         actual_old_classifier = ClassifiersList.find_old_classifier(
-            classifier, classifiers_list)
+            classifier, classifiers_list, self.cfg)
         self.assertEqual(most_general, actual_old_classifier)
 
     def test_find_old_classifier_only_similar(self):
@@ -171,7 +173,7 @@ class ClassifierListTest(unittest.TestCase):
             [classifier_1, Classifier(action=2), Classifier(action=3),
              classifier_2])
         actual_old_classifier = ClassifiersList.find_old_classifier(
-            Classifier(action=1), classifiers)
+            Classifier(action=1), classifiers, self.cfg)
         self.assertEqual(classifier_1, actual_old_classifier)
 
     def test_find_old_classifier_similar_and_subsumer_subsumer_returned(self):
@@ -185,13 +187,13 @@ class ClassifierListTest(unittest.TestCase):
         self.assertTrue(similar.is_similar(classifier))
 
         self.assertEqual(subsumer, ClassifiersList.find_old_classifier(
-            classifier, existing_classifiers))
+            classifier, existing_classifiers, self.cfg))
 
     def test_find_old_classifier_none(self):
         self.assertIsNone(ClassifiersList.find_old_classifier(
-            Classifier(), None))
+            Classifier(), None, self.cfg))
         self.assertIsNone(ClassifiersList.find_old_classifier(
-            Classifier(), ClassifiersList([])))
+            Classifier(), ClassifiersList([]), self.cfg))
 
     def test_select_classifier_to_delete(self):
         selected_first = Classifier(quality=0.5)

@@ -1,9 +1,7 @@
-from alcs.acs2 import Condition, Effect, PMark, ACS2Configuration
+from random import random, sample
 
 from alcs import Perception
-
-from random import random, sample
-from alcs.acs2 import default_configuration
+from alcs.acs2 import Condition, Effect, PMark, ACS2Configuration
 
 
 class Classifier(object):

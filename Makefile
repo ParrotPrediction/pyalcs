@@ -1,5 +1,5 @@
 install_deps:
-	pip install -r requirements.txt
+	pip3 install -r requirements.txt --ignore-installed six
 test:
 	python3 -m unittest -v tests
 coverage:
@@ -8,3 +8,5 @@ coverage:
 	rm .coverage
 pep8:
 	find . -name \*.py -exec pep8 --ignore=E129,E222,E402 {} +
+notebook:
+	jupyter notebook

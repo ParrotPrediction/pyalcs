@@ -7,8 +7,6 @@ from alcs.acs2 import Classifier
 from alcs.acs2 import ACS2Configuration
 from alcs import Perception
 
-DO_SUBSUMPTION = True
-
 logger = logging.getLogger(__name__)
 
 
@@ -301,7 +299,7 @@ class ClassifiersList(list):
         :return:
         """
         if child.condition.specificity != 0:
-            old_cl = self.find_old_classifier(child, match_set)
+            old_cl = self.find_old_classifier(child, match_set, cfg=self.cfg)
 
             if old_cl is None:
                 # TODO  need to add to self?
@@ -487,13 +485,15 @@ class ClassifiersList(list):
         return cl_to_delete
 
     @staticmethod
-    def find_old_classifier(cl: Classifier, existing_classifiers):
+    def find_old_classifier(cl: Classifier,
+                            existing_classifiers,
+                            cfg: ACS2Configuration):
         if existing_classifiers is None:
             return None
 
         old_cl = None
 
-        if DO_SUBSUMPTION:
+        if cfg.do_subsumption:
             old_cl = ClassifiersList.find_subsumer(cl, existing_classifiers)
 
         if old_cl is None:

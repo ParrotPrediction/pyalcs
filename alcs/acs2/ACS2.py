@@ -1,6 +1,4 @@
-from alcs.acs2 import ClassifiersList, default_configuration, ACS2Configuration
-
-DO_GA = True
+from alcs.acs2 import ClassifiersList, ACS2Configuration
 
 
 class ACS2:
@@ -70,7 +68,7 @@ class ACS2:
                 action_set.apply_reinforcement_learning(
                     reward,
                     match_set.get_maximum_fitness())
-                if DO_GA:
+                if self.cfg.do_ga:
                     action_set.apply_ga(
                         time + steps,
                         self.population,
@@ -94,7 +92,7 @@ class ACS2:
                 action_set.apply_reinforcement_learning(
                     reward,
                     0)
-            if DO_GA:
+            if self.cfg.do_ga:
                 action_set.apply_ga(
                     time + steps,
                     self.population,
@@ -142,7 +140,6 @@ class ACS2:
                              self.population if cl.is_reliable()]),
             'fitness': (sum(cl.fitness for cl in self.population) /
                         len(self.population)),
-            # 'knowledge': self.calculate_knowledge(env),
             'trial': trial,
             'steps': steps,
             'total_steps': total_steps
