@@ -3,15 +3,43 @@ import unittest
 from alcs.acs2 import Condition
 
 from alcs import Perception
+from .randommock import SampleMock
 
 
 class ConditionTest(unittest.TestCase):
     def setUp(self):
         self.c = Condition()
 
+    def test_equal(self):  # TODO remove
+        self.assertTrue(Condition('########') == (Condition('########')))
+        self.assertFalse(Condition('1#######') == (Condition('########')))
+        self.assertFalse(Condition('########') == (Condition('#######1')))
+        self.assertTrue(Condition('1111####') == (Condition('1111####')))
+        self.assertFalse(Condition('1111####') == (Condition('1011####')))
+        self.assertFalse(Condition('1101####') == (Condition('1111####')))
+        self.assertTrue(Condition('00001###') == (Condition('00001###')))
+
+    def test_should_generalize(self):
+        cond = "#1O##O##"
+        self.c = Condition(cond)
+        self.c.generalize(position=1)
+        expected_result = Condition("##O##O##")
+        self.assertEqual(expected_result, self.c)
+
+    def test_generalize_decrements_specificity(self):
+        self.c = Condition('#11#####')
+        self.assertEqual(2, self.c.specificity)
+        self.c.generalize(1)
+        self.assertEqual(1, self.c.specificity)
+
     def test_should_only_accept_strings(self):
         # Try to store an integer
         self.assertRaises(TypeError, self.c.__setitem__, 0, 1)
+
+    def test_should_initialize_two_times_the_same_way(self):
+        c1 = Condition("#1O##O##")
+        c2 = Condition("#1O##O##")
+        self.assertEqual(c1, c2)
 
     def test_should_return_number_of_specified_elements(self):
         self.assertEqual(0, self.c.specificity)
@@ -31,36 +59,36 @@ class ConditionTest(unittest.TestCase):
         self.assertRaises(ValueError, Condition, cond)
 
     def test_should_specialize_1(self):
-        c =    Condition()
-        diff =   Condition(['#', '0', '#', '#', '#', '1', '#', '1'])
+        c = Condition()
+        diff = Condition(['#', '0', '#', '#', '#', '1', '#', '1'])
         result = Condition(['#', '0', '#', '#', '#', '1', '#', '1'])
         c.specialize(new_condition=diff)
         self.assertEqual(result, c)
 
     def test_should_specialize_2(self):
-        c =      Condition(['#', '#', '#', '1', '0', '#', '1', '#'])
-        diff =   Condition(['0', '1', '0', '#', '#', '1', '#', '#'])
+        c = Condition(['#', '#', '#', '1', '0', '#', '1', '#'])
+        diff = Condition(['0', '1', '0', '#', '#', '1', '#', '#'])
         result = Condition(['0', '1', '0', '1', '0', '1', '1', '#'])
         c.specialize(new_condition=diff)
         self.assertEqual(result, c)
 
     def test_should_specialize_3(self):
-        c =      Condition(['#', '1', '0', '1', '#', '1', '0', '#'])
-        diff =   Condition(['#', '#', '#', '#', '1', '#', '#', '1'])
+        c = Condition(['#', '1', '0', '1', '#', '1', '0', '#'])
+        diff = Condition(['#', '#', '#', '#', '1', '#', '#', '1'])
         result = Condition(['#', '1', '0', '1', '1', '1', '0', '1'])
         c.specialize(new_condition=diff)
         self.assertEqual(result, c)
 
     def test_should_specialize_4(self):
-        c =      Condition(['#', '#', '#', '#', '0', '1', '#', '1'])
-        diff =   Condition(['2', '#', '0', '0', '#', '#', '#', '#'])
+        c = Condition(['#', '#', '#', '#', '0', '1', '#', '1'])
+        diff = Condition(['2', '#', '0', '0', '#', '#', '#', '#'])
         result = Condition(['2', '#', '0', '0', '0', '1', '#', '1'])
         c.specialize(new_condition=diff)
         self.assertEqual(result, c)
 
     def test_should_specialize_5(self):
-        c =      Condition(['#', '#', '#', '0', '1', '#', '0', '#'])
-        diff =   Condition(['1', '0', '1', '#', '#', '0', '#', '#'])
+        c = Condition(['#', '#', '#', '0', '1', '#', '0', '#'])
+        diff = Condition(['1', '0', '1', '#', '#', '0', '#', '#'])
         result = Condition(['1', '0', '1', '0', '1', '0', '0', '#'])
         c.specialize(new_condition=diff)
         self.assertEqual(result, c)
@@ -108,3 +136,17 @@ class ConditionTest(unittest.TestCase):
 
         # Then
         self.assertTrue(res)
+
+    def test_crossover(self):
+        c1 = Condition('0##10###')
+        c2 = Condition('#10##0##')
+        c1.two_point_crossover(c2, samplefunc=SampleMock([1, 4]))
+        self.assertEqual(Condition('010#0###'), c1)
+        self.assertEqual(Condition('###1#0##'), c2)
+
+    def test_crossover_allows_to_change_last_element(self):
+        c1 = Condition('0##10###')
+        c2 = Condition('#10##011')
+        c1.two_point_crossover(c2, samplefunc=SampleMock([5, 8]))
+        self.assertEqual(Condition('0##10011'), c1)
+        self.assertEqual(Condition('#10#####'), c2)

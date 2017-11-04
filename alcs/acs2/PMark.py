@@ -2,13 +2,15 @@ from random import choice
 
 from alcs.acs2 import Condition
 
-from alcs.acs2 import Constants as c
+from alcs.acs2 import default_configuration
 from alcs import Perception
+from alcs.acs2.ACS2Configuration import ACS2Configuration
 
 
 class PMark(list):
-    def __init__(self):
-        list.__init__(self, [set() for _ in range(c.CLASSIFIER_LENGTH)])
+    def __init__(self, cfg: ACS2Configuration = None):
+        self.cfg = cfg or ACS2Configuration.default()
+        list.__init__(self, [set() for _ in range(self.cfg.classifier_length)])
 
     def __len__(self):
         return sum(1 for m in self if len(m) > 0)
@@ -46,7 +48,7 @@ class PMark(list):
         changed = False
 
         for idx, item in enumerate(condition):
-            if item == c.CLASSIFIER_WILDCARD:
+            if item == self.cfg.classifier_wildcard:
                 self[idx] = perception[idx]
                 changed = True
 
@@ -68,7 +70,6 @@ class PMark(list):
         :param: perception
         :return: condition that specifies all the differences.
         """
-        condition = None
         nr1 = 0
         nr2 = 0
 
@@ -82,7 +83,7 @@ class PMark(list):
         if nr1 > 0:
             # One or more absolute differences detected -> specialize one
             # randomly chosen
-            condition = Condition()
+            condition = Condition(cfg=self.cfg)
 
             possible_idx = []
             for idx, item in enumerate(self):
@@ -93,7 +94,7 @@ class PMark(list):
             condition[rand_idx] = perception[rand_idx]
         elif nr2 > 0:
             # One or more equal differences detected -> specialize all of them
-            condition = Condition()
+            condition = Condition(cfg=self.cfg)
 
             for idx, item in enumerate(self):
                 if len(item) > 1:

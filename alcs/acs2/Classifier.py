@@ -1,9 +1,9 @@
-from alcs.acs2 import Condition, Effect, PMark
+from alcs.acs2 import Condition, Effect, PMark, ACS2Configuration
 
-from alcs.acs2 import Constants as c
 from alcs import Perception
 
-from random import random
+from random import random, sample
+from alcs.acs2 import default_configuration
 
 
 class Classifier(object):
@@ -18,13 +18,16 @@ class Classifier(object):
                  experience=1,
                  talp=None,
                  tga=0,
-                 tav=0):
+                 tav=0,
+                 cfg=None):
 
-        self.condition = Condition(
-            condition) if condition is not None else Condition()
+        self.cfg = cfg or ACS2Configuration.default()
+        self.condition = Condition(condition, cfg=self.cfg) \
+            if condition is not None else Condition(cfg=self.cfg)
         self.action = action if action is not None else None
-        self.effect = Effect(effect) if effect is not None else Effect()
-        self.mark = PMark()
+        self.effect = Effect(effect, cfg=self.cfg) \
+            if effect is not None else Effect(cfg=self.cfg)
+        self.mark = PMark(cfg=self.cfg)
 
         # Quality - measures the accuracy of the anticipations
         self.q = quality
@@ -53,6 +56,9 @@ class Classifier(object):
         # I don't know yet what it is
         self.ee = 0
 
+    def q3num(self):
+        return pow(self.q, 3) * self.num
+
     def __repr__(self):
         return "{}-{}-{} @ {}".format(self.condition,
                                       self.action,
@@ -71,7 +77,7 @@ class Classifier(object):
         :return: new classifier
         """
         new_cls = cls(
-            condition=old_cls.condition,
+            condition=Condition(old_cls.condition),
             action=old_cls.action,
             effect=old_cls.effect,
             quality=old_cls.q,
@@ -124,7 +130,8 @@ class Classifier(object):
         spec = 0
 
         for cpi, epi in zip(self.condition, self.effect):
-            if cpi != c.CLASSIFIER_WILDCARD and epi == c.CLASSIFIER_WILDCARD:
+            if cpi != self.cfg.classifier_wildcard and \
+                    epi == self.cfg.classifier_wildcard:
                 spec += 1
 
         return spec
@@ -140,17 +147,17 @@ class Classifier(object):
         return self.effect.number_of_specified_elements > 0
 
     def is_reliable(self):
-        return self.q > c.THETA_R
+        return self.q > self.cfg.theta_r
 
     def is_inadequate(self):
-        return self.q < c.THETA_I
+        return self.q < self.cfg.theta_i
 
     def update_reward(self, p: float) -> float:
-        self.r += c.BETA * (p - self.r)
+        self.r += self.cfg.beta * (p - self.r)
         return self.r
 
     def update_intermediate_reward(self, rho) -> float:
-        self.ir += c.BETA * (rho - self.ir)
+        self.ir += self.cfg.beta * (rho - self.ir)
         return self.ir
 
     def increase_experience(self) -> int:
@@ -158,11 +165,11 @@ class Classifier(object):
         return self.exp
 
     def increase_quality(self) -> float:
-        self.q += c.BETA * (1 - self.q)
+        self.q += self.cfg.beta * (1 - self.q)
         return self.q
 
     def decrease_quality(self) -> float:
-        self.q -= c.BETA * self.q
+        self.q -= self.cfg.beta * self.q
         return self.q
 
     def specialize(self,
@@ -230,11 +237,11 @@ class Classifier(object):
         :param time: current step
         """
         # TODO p5: write test
-        if 1. / self.exp > c.BETA:
+        if 1. / self.exp > self.cfg.beta:
             self.tav = (self.tav * self.exp + (time - self.talp)) / (
                 self.exp + 1)
         else:
-            self.tav += c.BETA * ((time - self.talp) - self.tav)
+            self.tav += self.cfg.beta * ((time - self.talp) - self.tav)
 
         self.talp = time
 
@@ -260,7 +267,7 @@ class Classifier(object):
         no_spec_new = diff.specificity
         child = self.copy_from(self, time)
 
-        if no_spec >= c.U_MAX:
+        if no_spec >= self.cfg.u_max:
             # TODO: p4: implement later
             # Code below won't get executed anyway because c.U_MAX is high
             pass
@@ -306,12 +313,13 @@ class Classifier(object):
 
         return child
 
-    def mutate(self):
+    def mutate(self, randomfunc=random):
         """
         Executes the generalizing mutation in the classifier.
         """
         for idx, cond in enumerate(self.condition):
-            if cond != c.CLASSIFIER_WILDCARD and random() < c.MU:
+            if cond != self.cfg.classifier_wildcard and \
+                    randomfunc() < self.cfg.mu:
                 self.condition.generalize(idx)
 
     def is_similar(self, other) -> bool:
@@ -326,8 +334,10 @@ class Classifier(object):
                 self.action == other.action and \
                 self.effect == other.effect:
             return True
-
         return False
+
+    def is_equally_general(self, other) -> bool:
+        return self.condition.specificity == other.condition.specificity
 
     def is_more_general(self, other) -> bool:
         """
@@ -363,12 +373,15 @@ class Classifier(object):
         :return: True is classifier can be considered as subsumer,
         False otherwise
         """
-        if self.exp > c.THETA_EXP:
+        if self.exp > self.cfg.theta_exp:
             if self.is_reliable():
                 if self.mark.is_empty():
                     return True
 
         return False
+
+    def is_unmarked(self):
+        return not self.is_marked()
 
     def is_marked(self):
         """
@@ -379,15 +392,32 @@ class Classifier(object):
 
         return True
 
-    def crossover(self, cl2):
+    def crossover(self, cl2, samplefunc=sample):
         """
         Executes crossover with other classifier
+        :param samplefunc:
         :param cl2: other classifier
         """
-        self.condition.two_point_crossover(cl2.condition)
+        self.condition.two_point_crossover(
+            cl2.condition, samplefunc=samplefunc)
 
         q = float(sum([self.q, cl2.q]) / 2)
         r = float(sum([self.r, cl2.r]) / 2)
 
         cl2.q = q
         cl2.r = r
+
+    def __eq__(self, other):
+        return self.condition == other.condition \
+            and self.effect == other.effect \
+            and self.action == other.action \
+            and self.num == other.num \
+            and self.r == other.r \
+            and self.q == other.q \
+            and self.talp == other.talp \
+            and self.tav == other.tav \
+            and self.tga == other.tga \
+            and self.exp == other.exp \
+            and self.ee == other.ee \
+            and self.mark == other.mark \
+            and self.ir == other.ir

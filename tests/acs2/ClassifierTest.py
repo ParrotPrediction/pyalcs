@@ -1,12 +1,44 @@
 import unittest
 
-from alcs.acs2 import Classifier, Condition, Effect, PMark
+from alcs.acs2 import Classifier, Condition, Effect, PMark, \
+    default_configuration
 from alcs import Perception
+from .randommock import RandomMock
+
+s = default_configuration.mu * 0.5  # less then MU
+b = 1 - (1 - default_configuration.mu) * 0.5  # more then MU
 
 
 class ClassifierTest(unittest.TestCase):
     def setUp(self):
         self.cls = Classifier()
+
+    def test_equality(self):
+        cl = Classifier(action=1, numerosity=2)
+        self.assertEqual(Classifier(action=1, numerosity=2), cl)
+
+    def test_is_equally_general(self):
+        c1 = Classifier(Condition('1#######'))
+        self.assertTrue(
+            c1.is_equally_general(Classifier(Condition('1#######'))))
+        self.assertTrue(
+            c1.is_equally_general(Classifier(Condition('0#######'))))
+        self.assertTrue(
+            c1.is_equally_general(Classifier(Condition('#0######'))))
+        self.assertFalse(
+            c1.is_equally_general(Classifier(Condition('#01#####'))))
+        self.assertFalse(
+            c1.is_equally_general(Classifier(Condition('########'))))
+
+    def test_mutate_1(self):
+        cls = Classifier(Condition('##011###'))
+        cls.mutate(randomfunc=RandomMock([s, b, b]))
+        self.assertEqual(Condition('###11###'), cls.condition)
+
+    def test_mutate_2(self):
+        cls = Classifier(Condition('##011###'))
+        cls.mutate(randomfunc=RandomMock([b, b, s]))
+        self.assertEqual(Condition('##01####'), cls.condition)
 
     def test_should_calculate_fitness(self):
         self.cls.r = 0.25
@@ -518,6 +550,38 @@ class ClassifierTest(unittest.TestCase):
         self.assertEqual(time, new_cls.tga)
         self.assertEqual(time, new_cls.talp)
 
+    def test_copy_from_and_mutate_does_not_influence_another_condition(self):
+        """ Verify that not just reference to Condition copied (changing which
+        will change the original - definitily not original C++ code did). """
+        operation_time = 123
+        original_cl = Classifier(condition=Condition('1###1011'))
+
+        copied_cl = Classifier.copy_from(original_cl, operation_time)
+
+        copied_cl.mutate(RandomMock([s, b, b, b, b]))
+        self.assertEqual(Condition('####1011'), copied_cl.condition)
+        self.assertEqual(Condition('1###1011'), original_cl.condition)
+
+        original_cl.mutate(RandomMock([b, s, b, b, b]))
+        self.assertEqual(Condition('1####011'), original_cl.condition)
+        self.assertEqual(Condition('####1011'), copied_cl.condition)
+
+    def test_copy_from_and_change_does_not_influence_another_effect(self):
+        """ Verify that not just reference to Condition copied (changing which
+        will change the original - definitily not original C++ code did). """
+        operation_time = 123
+        original_cl = Classifier(effect=Effect('10####1#'))
+
+        copied_cl = Classifier.copy_from(original_cl, operation_time)
+
+        copied_cl.effect[2] = '1'
+        self.assertEqual(Effect('101###1#'), copied_cl.effect)
+        self.assertEqual(Effect('10####1#'), original_cl.effect)
+
+        original_cl.effect[3] = '0'
+        self.assertEqual(Effect('101###1#'), copied_cl.effect)
+        self.assertEqual(Effect('10#0##1#'), original_cl.effect)
+
     def test_should_copy_classifier(self):
         operation_time = 123
         original_cl = Classifier(
@@ -566,6 +630,141 @@ class ClassifierTest(unittest.TestCase):
             effect=['1', '0', '#', '#', '#', '#', '1', '#']
         )
         self.assertTrue(base.is_similar(c1))
+
+    def test_similar_returns_true_if_differs_by_numbers(self):
+        original = Classifier(
+            condition=Condition('#01##10#'),
+            action=2,
+            effect=Effect('1##01##0'),
+            numerosity=1.1,
+            experience=0.9,
+            intermediate_reward=1.2,
+            quality=0.5,
+            reward=0.6,
+            talp=None,
+            tav=1,
+            tga=2
+        )
+        c_num = Classifier(
+            condition=Condition('#01##10#'),
+            action=2,
+            effect=Effect('1##01##0'),
+            numerosity=1.2,
+            experience=0.9,
+            intermediate_reward=1.2,
+            quality=0.5,
+            reward=0.6,
+            talp=None,
+            tav=1,
+            tga=2
+        )
+        c_exp = Classifier(
+            condition=Condition('#01##10#'),
+            action=2,
+            effect=Effect('1##01##0'),
+            numerosity=1.1,
+            experience=0.95,
+            intermediate_reward=1.2,
+            quality=0.5,
+            reward=0.6,
+            talp=None,
+            tav=1,
+            tga=2
+        )
+        c_inter = Classifier(
+            condition=Condition('#01##10#'),
+            action=2,
+            effect=Effect('1##01##0'),
+            numerosity=1.1,
+            experience=0.9,
+            intermediate_reward=1.3,
+            quality=0.5,
+            reward=0.6,
+            talp=None,
+            tav=1,
+            tga=2
+        )
+        c_qual = Classifier(
+            condition=Condition('#01##10#'),
+            action=2,
+            effect=Effect('1##01##0'),
+            numerosity=1.1,
+            experience=0.9,
+            intermediate_reward=1.2,
+            quality=1,
+            reward=0.6,
+            talp=None,
+            tav=1,
+            tga=2
+        )
+        c_rew = Classifier(
+            condition=Condition('#01##10#'),
+            action=2,
+            effect=Effect('1##01##0'),
+            numerosity=1.1,
+            experience=0.9,
+            intermediate_reward=1.2,
+            quality=0.5,
+            reward=0.5,
+            talp=None,
+            tav=1,
+            tga=2
+        )
+        c_talp = Classifier(
+            condition=Condition('#01##10#'),
+            action=2,
+            effect=Effect('1##01##0'),
+            numerosity=1.1,
+            experience=0.9,
+            intermediate_reward=1.2,
+            quality=0.5,
+            reward=0.6,
+            talp=1,
+            tav=1,
+            tga=2
+        )
+        c_tav = Classifier(
+            condition=Condition('#01##10#'),
+            action=2,
+            effect=Effect('1##01##0'),
+            numerosity=1.1,
+            experience=0.9,
+            intermediate_reward=1.2,
+            quality=0.5,
+            reward=0.6,
+            talp=None,
+            tav=2,
+            tga=2
+        )
+        c_tga = Classifier(
+            condition=Condition('#01##10#'),
+            action=2,
+            effect=Effect('1##01##0'),
+            numerosity=1.1,
+            experience=0.9,
+            intermediate_reward=1.2,
+            quality=0.5,
+            reward=0.6,
+            talp=None,
+            tav=1,
+            tga=0
+        )
+        self.assertTrue(c_num.is_similar(original))
+        self.assertTrue(c_exp.is_similar(original))
+        self.assertTrue(c_inter.is_similar(original))
+        self.assertTrue(c_qual.is_similar(original))
+        self.assertTrue(c_rew.is_similar(original))
+        self.assertTrue(c_talp.is_similar(original))
+        self.assertTrue(c_tav.is_similar(original))
+        self.assertTrue(c_tga.is_similar(original))
+        self.assertTrue(original.is_similar(c_num))
+        self.assertTrue(original.is_similar(c_exp))
+        self.assertTrue(original.is_similar(c_inter))
+        self.assertTrue(original.is_similar(c_qual))
+        self.assertTrue(original.is_similar(c_rew))
+        self.assertTrue(original.is_similar(c_talp))
+        self.assertTrue(original.is_similar(c_tav))
+        self.assertTrue(original.is_similar(c_tga))
 
     def test_should_detect_similar_classifiers_2(self):
         # Create baseline classifier

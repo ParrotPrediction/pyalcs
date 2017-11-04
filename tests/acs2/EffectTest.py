@@ -137,7 +137,7 @@ class EffectTest(unittest.TestCase):
         # Given
         p0 = Perception(['1', '1', '0', '0', '0', '0', '1', '0'])
         p1 = Perception(['1', '1', '1', '0', '1', '1', '0', '1'])
-        e =      Effect(['#', '#', '#', '#', '#', '#', '#', '#'])
+        e = Effect(['#', '#', '#', '#', '#', '#', '#', '#'])
 
         # When
         res = e.is_specializable(p0, p1)
@@ -149,7 +149,7 @@ class EffectTest(unittest.TestCase):
         # Given
         p0 = Perception(['0', '1', '1', '0', '0', '0', '1', '1'])
         p1 = Perception(['1', '1', '0', '0', '0', '0', '1', '0'])
-        e =      Effect(['#', '#', '#', '#', '#', '#', '#', '#'])
+        e = Effect(['#', '#', '#', '#', '#', '#', '#', '#'])
 
         # When
         res = e.is_specializable(p0, p1)
@@ -161,7 +161,7 @@ class EffectTest(unittest.TestCase):
         # Given
         p0 = Perception(['1', '1', '1', '1', '0', '1', '1', '1'])
         p1 = Perception(['1', '0', '0', '0', '0', '0', '0', '0'])
-        e =      Effect(['#', '#', '0', '0', '#', '0', '#', '#'])
+        e = Effect(['#', '#', '0', '0', '#', '0', '#', '#'])
 
         # When
         res = e.is_specializable(p0, p1)
@@ -173,7 +173,7 @@ class EffectTest(unittest.TestCase):
         # Given
         p0 = Perception(['1', '0', '0', '0', '0', '0', '0', '1'])
         p1 = Perception(['1', '0', '0', '0', '1', '0', '1', '1'])
-        e =      Effect(['0', '#', '#', '#', '#', '1', '#', '#'])
+        e = Effect(['0', '#', '#', '#', '#', '1', '#', '#'])
 
         # When
         res = e.is_specializable(p0, p1)
@@ -185,7 +185,7 @@ class EffectTest(unittest.TestCase):
         # Given
         p0 = Perception(['1', '1', '1', '1', '0', '1', '1', '1'])
         p1 = Perception(['1', '0', '1', '1', '1', '1', '1', '1'])
-        e =      Effect(['#', '0', '1', '0', '#', '0', '1', '0'])
+        e = Effect(['#', '0', '1', '0', '#', '0', '1', '0'])
 
         # When
         res = e.is_specializable(p0, p1)
@@ -197,7 +197,7 @@ class EffectTest(unittest.TestCase):
         # Given
         p0 = Perception(['0', '0', '1', '1', '0', '0', '0', '0'])
         p1 = Perception(['0', '0', '1', '1', '0', '0', '0', '0'])
-        e =      Effect(['#', '1', '0', '#', '#', '#', '1', '1'])
+        e = Effect(['#', '1', '0', '#', '#', '#', '1', '1'])
 
         # When
         res = e.is_specializable(p0, p1)
@@ -209,10 +209,14 @@ class EffectTest(unittest.TestCase):
         # Given
         p0 = Perception(['0', '1', '1', '0', '0', '0', '0', '0'])
         p1 = Perception(['1', '1', '0', '1', '1', '1', '0', '1'])
-        e =      Effect(['#', '#', '0', '#', '#', '1', '#', '#'])
+        e = Effect(['#', '#', '0', '#', '#', '1', '#', '#'])
 
         # When
         res = e.is_specializable(p0, p1)
 
         # Then
         self.assertTrue(res)
+
+    def testEq(self):
+        self.assertTrue(Effect('00001111') == Effect('00001111'))
+        self.assertFalse(Effect('00001111') == Effect('0000111#'))
