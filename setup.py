@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='gym_maze',
-      version='0.0.2',
+      version='0.0.3',
       description='Maze environments for OpenAI Gym Environment',
       keywords='acs lcs machine-learning reinforcement-learning openai',
       url='https://github.com/ParrotPrediction/openai-maze-envs',
