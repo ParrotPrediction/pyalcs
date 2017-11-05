@@ -10,7 +10,7 @@ from .randommock import RandomMock, SampleMock
 
 class ClassifierListTest(unittest.TestCase):
     def setUp(self):
-        self.cfg = ACS2Configuration.default()
+        self.cfg = ACS2Configuration(8, 8)
         self.population = ClassifiersList()
 
     def test_find_subsumer_finds_single_subsumer(self):

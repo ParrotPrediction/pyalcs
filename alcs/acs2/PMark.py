@@ -7,7 +7,9 @@ from alcs.acs2.ACS2Configuration import ACS2Configuration
 
 class PMark(list):
     def __init__(self, cfg: ACS2Configuration = None):
-        self.cfg = cfg or ACS2Configuration.default()
+        if cfg is None:
+            raise TypeError("Configuration should be passed to PMark")
+        self.cfg = cfg
         list.__init__(self, [set() for _ in range(self.cfg.classifier_length)])
 
     def __len__(self):

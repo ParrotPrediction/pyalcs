@@ -1,17 +1,14 @@
 import unittest
 
-from alcs.acs2 import Classifier, Condition, Effect, PMark, \
-    default_configuration
+from alcs.acs2 import ACS2Configuration, Classifier, Condition, Effect, PMark
 from alcs import Perception
 from .randommock import RandomMock
-
-s = default_configuration.mu * 0.5  # less then MU
-b = 1 - (1 - default_configuration.mu) * 0.5  # more then MU
 
 
 class ClassifierTest(unittest.TestCase):
     def setUp(self):
-        self.cls = Classifier()
+        self.cfg = ACS2Configuration(8, 8)
+        self.cls = Classifier(cfg=self.cfg)
 
     def test_equality(self):
         cl = Classifier(action=1, numerosity=2)
@@ -553,6 +550,10 @@ class ClassifierTest(unittest.TestCase):
     def test_copy_from_and_mutate_does_not_influence_another_condition(self):
         """ Verify that not just reference to Condition copied (changing which
         will change the original - definitily not original C++ code did). """
+        # given
+        s = self.cfg.mu * 0.5  # less then MU
+        b = 1 - (1 - self.cfg.mu) * 0.5  # more then MU
+
         operation_time = 123
         original_cl = Classifier(condition=Condition('1###1011'))
 

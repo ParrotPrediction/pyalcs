@@ -2,8 +2,12 @@ from alcs.acs2 import ACS2Configuration
 
 
 class AbstractCondition(list):
-    def __init__(self, seq=(), cfg=None):
-        self.cfg = cfg or ACS2Configuration.default()
+    def __init__(self, seq=(), cfg: ACS2Configuration=None):
+        if cfg is None:
+            raise TypeError("Configuration should be passed")
+
+        self.cfg = cfg
+
         if not seq:
             list.__init__(
                 self,

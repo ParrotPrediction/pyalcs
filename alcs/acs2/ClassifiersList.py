@@ -7,8 +7,6 @@ from alcs.acs2 import Classifier
 from alcs.acs2 import ACS2Configuration
 from alcs import Perception
 
-logger = logging.getLogger(__name__)
-
 
 class ClassifiersList(list):
     """
@@ -16,24 +14,31 @@ class ClassifiersList(list):
     """
 
     def __init__(self, seq=(), cfg=None):
-        self.cfg = cfg or ACS2Configuration.default()
+        if cfg is None:
+            raise TypeError("Configuration should be passed to ClassifierList")
+        self.cfg = cfg
         list.__init__(self, seq or [])
 
     def append(self, item):
         if not isinstance(item, Classifier):
             raise TypeError("Item should be a Classifier object")
-        # print(type(self))
         super(ClassifiersList, self).append(item)
 
     @classmethod
-    def form_match_set(cls, population, situation: Perception):
+    def form_match_set(cls,
+                       population,
+                       situation: Perception,
+                       cfg: ACS2Configuration):
         return cls([cl for cl in population
-                    if cl.condition.does_match(situation)])
+                    if cl.condition.does_match(situation)], cfg)
 
     @classmethod
-    def form_action_set(cls, population, action: int):
+    def form_action_set(cls,
+                        population,
+                        action: int,
+                        cfg: ACS2Configuration):
         return cls([cl for cl in population
-                    if cl.action == action])
+                    if cl.action == action], cfg)
 
     @staticmethod
     def _remove_classifier(population, cl: Classifier):
@@ -60,10 +65,10 @@ class ClassifiersList(list):
         :return: number of chosen action
         """
         if random() < epsilon:
-            logger.debug("Exploration path")
+            logging.debug("Exploration path")
             return self.choose_explore_action()
 
-        logger.debug("Exploitation path")
+        logging.debug("Exploitation path")
         return self.choose_best_fitness_action()
 
     def choose_explore_action(self, pb: float = 0.5) -> int:
@@ -230,7 +235,8 @@ class ClassifiersList(list):
             new_cl = Classifier.cover_triple(previous_situation,
                                              action,
                                              situation,
-                                             time)
+                                             time,
+                                             self.cfg)
             self.add_alp_classifier(new_cl, new_list)
 
         # Merge classifiers from new_list into self and population
@@ -372,13 +378,10 @@ class ClassifiersList(list):
         overall_time = sum(cl.tga * cl.num for cl in self)
         overall_num = self.overall_numerosity()
 
-        # print("Overall numerosity: %d" % overall_num)
-
         if overall_num == 0:
             return False
 
         if time - overall_time / overall_num > self.cfg.theta_ga:
-            # print("Shoud apply GA!")
             return True
 
         return False

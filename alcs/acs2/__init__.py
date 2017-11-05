@@ -1,4 +1,4 @@
-from .ACS2Configuration import ACS2Configuration, default_configuration
+from .ACS2Configuration import ACS2Configuration
 from .AbstractCondition import AbstractCondition
 from .Condition import Condition
 from .Effect import Effect

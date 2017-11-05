@@ -1,26 +1,26 @@
 import unittest
 
-from alcs.acs2 import Effect
+from alcs.acs2 import ACS2Configuration, Effect
 from alcs import Perception
 
 
 class EffectTest(unittest.TestCase):
 
     def setUp(self):
-        self.effect = Effect()
+        self.cfg = ACS2Configuration(8, 8)
+        self.effect = Effect(cfg=self.cfg)
 
     def test_should_initialize_correctly(self):
         self.assertTrue(len(self.effect) > 0)
 
     def test_should_get_initialized_with_str_1(self):
-        eff = "#1O##O##"
-        self.effect = Effect(eff)
-        self.assertEqual(8, len(self.effect))
+        effect = Effect("#1O##O##", self.cfg)
+        self.assertEqual(8, len(effect))
 
     def test_should_get_initialized_with_str_2(self):
         eff = "#1O##O#"
         # Too short effect
-        self.assertRaises(ValueError, Effect, eff)
+        self.assertRaises(ValueError, Effect, eff, self.cfg)
 
     def test_should_set_effect_with_non_string_char(self):
         self.assertRaises(TypeError, self.effect.__setitem__, 0, 1)
@@ -37,7 +37,7 @@ class EffectTest(unittest.TestCase):
         # should predict correctly
 
         # Given
-        self.effect = Effect('########')
+        self.effect = Effect('########', self.cfg)
         p0 = Perception('00001111')
         p1 = Perception('00001111')
 
@@ -52,7 +52,7 @@ class EffectTest(unittest.TestCase):
         # also predict correctly)
 
         # Given
-        self.effect = Effect(['#', '1', '#', '#', '#', '#', '0', '#'])
+        self.effect = Effect(['#', '1', '#', '#', '#', '#', '0', '#'], self.cfg)
         p0 = Perception(['0', '0', '0', '0', '1', '1', '1', '1'])
         p1 = Perception(['0', '1', '0', '0', '1', '1', '0', '1'])
 
@@ -66,7 +66,7 @@ class EffectTest(unittest.TestCase):
         # Case when effect predicts situation incorrectly
 
         # Given
-        self.effect = Effect(['#', '0', '#', '#', '#', '#', '#', '#'])
+        effect = Effect(['#', '0', '#', '#', '#', '#', '#', '#'], self.cfg)
         p0 = Perception(['0', '0', '0', '0', '1', '1', '1', '1'])
         p1 = Perception(['0', '1', '0', '0', '1', '1', '1', '1'])
 
@@ -80,12 +80,12 @@ class EffectTest(unittest.TestCase):
         # Case when effect predicts situation incorrectly
 
         # Given
-        self.effect = Effect(['#', '#', '0', '#', '#', '1', '#', '#'])
+        effect = Effect(['#', '#', '0', '#', '#', '1', '#', '#'], self.cfg)
         p0 = Perception(['1', '0', '1', '0', '1', '0', '0', '1'])
         p1 = Perception(['1', '0', '1', '0', '1', '0', '0', '1'])
 
         # When
-        res = self.effect.does_anticipate_correctly(p0, p1)
+        res = effect.does_anticipate_correctly(p0, p1)
 
         # Then
         self.assertFalse(res)
@@ -94,12 +94,12 @@ class EffectTest(unittest.TestCase):
         # Case when effect predicts situation incorrectly
 
         # Given
-        self.effect = Effect(['#', '#', '#', '#', '1', '#', '0', '#'])
+        effect = Effect(['#', '#', '#', '#', '1', '#', '0', '#'], self.cfg)
         p0 = Perception(['0', '1', '1', '0', '0', '0', '1', '1'])
         p1 = Perception(['1', '1', '1', '0', '1', '1', '0', '1'])
 
         # When
-        res = self.effect.does_anticipate_correctly(p0, p1)
+        res = effect.does_anticipate_correctly(p0, p1)
 
         # Then
         self.assertFalse(res)
@@ -108,12 +108,12 @@ class EffectTest(unittest.TestCase):
         # Case when effect predicts situation incorrectly
 
         # Given
-        self.effect = Effect(['#', '#', '1', '#', '0', '#', '0', '#'])
+        effect = Effect(['#', '#', '1', '#', '0', '#', '0', '#'], self.cfg)
         p0 = Perception(['0', '0', '0', '1', '1', '0', '1', '0'])
         p1 = Perception(['0', '0', '1', '1', '0', '0', '0', '0'])
 
         # When
-        res = self.effect.does_anticipate_correctly(p0, p1)
+        res = effect.does_anticipate_correctly(p0, p1)
 
         # Then
         self.assertTrue(res)
@@ -123,12 +123,12 @@ class EffectTest(unittest.TestCase):
         # pass-through symbol
 
         # Given
-        self.effect = Effect(['#', '0', '#', '#', '#', '#', '#', '#'])
+        effect = Effect(['#', '0', '#', '#', '#', '#', '#', '#'], self.cfg)
         p0 = Perception(['0', '0', '0', '0', '1', '1', '1', '1'])
         p1 = Perception(['0', '0', '0', '0', '1', '1', '1', '1'])
 
         # When
-        res = self.effect.does_anticipate_correctly(p0, p1)
+        res = effect.does_anticipate_correctly(p0, p1)
 
         # Then
         self.assertFalse(res)
@@ -137,7 +137,7 @@ class EffectTest(unittest.TestCase):
         # Given
         p0 = Perception(['1', '1', '0', '0', '0', '0', '1', '0'])
         p1 = Perception(['1', '1', '1', '0', '1', '1', '0', '1'])
-        e = Effect(['#', '#', '#', '#', '#', '#', '#', '#'])
+        e = Effect(['#', '#', '#', '#', '#', '#', '#', '#'], self.cfg)
 
         # When
         res = e.is_specializable(p0, p1)
@@ -149,7 +149,7 @@ class EffectTest(unittest.TestCase):
         # Given
         p0 = Perception(['0', '1', '1', '0', '0', '0', '1', '1'])
         p1 = Perception(['1', '1', '0', '0', '0', '0', '1', '0'])
-        e = Effect(['#', '#', '#', '#', '#', '#', '#', '#'])
+        e = Effect(['#', '#', '#', '#', '#', '#', '#', '#'], self.cfg)
 
         # When
         res = e.is_specializable(p0, p1)
@@ -161,7 +161,7 @@ class EffectTest(unittest.TestCase):
         # Given
         p0 = Perception(['1', '1', '1', '1', '0', '1', '1', '1'])
         p1 = Perception(['1', '0', '0', '0', '0', '0', '0', '0'])
-        e = Effect(['#', '#', '0', '0', '#', '0', '#', '#'])
+        e = Effect(['#', '#', '0', '0', '#', '0', '#', '#'], self.cfg)
 
         # When
         res = e.is_specializable(p0, p1)
@@ -173,7 +173,7 @@ class EffectTest(unittest.TestCase):
         # Given
         p0 = Perception(['1', '0', '0', '0', '0', '0', '0', '1'])
         p1 = Perception(['1', '0', '0', '0', '1', '0', '1', '1'])
-        e = Effect(['0', '#', '#', '#', '#', '1', '#', '#'])
+        e = Effect(['0', '#', '#', '#', '#', '1', '#', '#'], self.cfg)
 
         # When
         res = e.is_specializable(p0, p1)
@@ -185,7 +185,7 @@ class EffectTest(unittest.TestCase):
         # Given
         p0 = Perception(['1', '1', '1', '1', '0', '1', '1', '1'])
         p1 = Perception(['1', '0', '1', '1', '1', '1', '1', '1'])
-        e = Effect(['#', '0', '1', '0', '#', '0', '1', '0'])
+        e = Effect(['#', '0', '1', '0', '#', '0', '1', '0'], self.cfg)
 
         # When
         res = e.is_specializable(p0, p1)
@@ -197,7 +197,7 @@ class EffectTest(unittest.TestCase):
         # Given
         p0 = Perception(['0', '0', '1', '1', '0', '0', '0', '0'])
         p1 = Perception(['0', '0', '1', '1', '0', '0', '0', '0'])
-        e = Effect(['#', '1', '0', '#', '#', '#', '1', '1'])
+        e = Effect(['#', '1', '0', '#', '#', '#', '1', '1'], self.cfg)
 
         # When
         res = e.is_specializable(p0, p1)
@@ -209,7 +209,7 @@ class EffectTest(unittest.TestCase):
         # Given
         p0 = Perception(['0', '1', '1', '0', '0', '0', '0', '0'])
         p1 = Perception(['1', '1', '0', '1', '1', '1', '0', '1'])
-        e = Effect(['#', '#', '0', '#', '#', '1', '#', '#'])
+        e = Effect(['#', '#', '0', '#', '#', '1', '#', '#'], self.cfg)
 
         # When
         res = e.is_specializable(p0, p1)
@@ -218,5 +218,5 @@ class EffectTest(unittest.TestCase):
         self.assertTrue(res)
 
     def testEq(self):
-        self.assertTrue(Effect('00001111') == Effect('00001111'))
-        self.assertFalse(Effect('00001111') == Effect('0000111#'))
+        self.assertTrue(Effect('00001111', self.cfg) == Effect('00001111', self.cfg))
+        self.assertFalse(Effect('00001111', self.cfg) == Effect('0000111#', self.cfg))

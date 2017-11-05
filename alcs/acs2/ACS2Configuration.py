@@ -1,11 +1,11 @@
-from copy import copy
-
 
 class ACS2Configuration:
     def __init__(self,
                  classifier_length,
                  number_of_possible_actions,
                  classifier_wildcard='#',
+                 perception_mapper_fcn=None,
+                 action_mapper_fcn=None,
                  do_ga=False,
                  do_subsumption=True,
                  beta=0.05,
@@ -22,6 +22,8 @@ class ACS2Configuration:
         self.classifier_length = classifier_length
         self.number_of_possible_actions = number_of_possible_actions
         self.classifier_wildcard = classifier_wildcard
+        self.perception_mapper_fcn = perception_mapper_fcn
+        self.action_mapper_fcn = action_mapper_fcn
         self.do_ga = do_ga
         self.do_subsumption = do_subsumption
         self.theta_exp = theta_exp
@@ -41,6 +43,8 @@ class ACS2Configuration:
                "\n\t- Classifier length: [{}]" \
                "\n\t- Number of possible actions: [{}]" \
                "\n\t- Classifier wildcard: [{}]" \
+               "\n\t- Perception mapper function: [{}]" \
+               "\n\t- Action mapper function: [{}]" \
                "\n\t- Do GA: [{}]" \
                "\n\t- Do subsumption: [{}]" \
                "\n\t- Beta: [{}]" \
@@ -48,14 +52,8 @@ class ACS2Configuration:
             .format(self.classifier_length,
                     self.number_of_possible_actions,
                     self.classifier_wildcard,
+                    self.perception_mapper_fcn,
+                    self.action_mapper_fcn,
                     self.do_ga,
                     self.do_subsumption,
                     self.beta)
-
-    @staticmethod
-    def default():
-        return copy(default_configuration)
-
-
-default_configuration = ACS2Configuration(
-    classifier_length=8, number_of_possible_actions=8)

@@ -1,12 +1,13 @@
 import logging
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
 from alcs import ACS2, ACS2Configuration
 
 import gym
 import gym_maze
+
+
+# Configure logger
+logging.basicConfig(level=logging.INFO)
 
 
 def _calculate_knowledge(maze, population):
@@ -44,15 +45,15 @@ if __name__ == '__main__':
 
     # Configure and create the agent
     cfg = ACS2Configuration(8, 8, do_ga=True)
-    logger.info(cfg)
+    logging.info(cfg)
     agent = ACS2(cfg)
 
     # Explore the environment
-    logger.info("EXPLORE PHASE")
-    population, metrics = agent.explore(maze, 500)
+    logging.info("EXPLORE PHASE")
+    population, metrics = agent.explore(maze, 5)
 
     for metric in metrics:
-        logger.info(metric)
+        logging.info(metric)
 
-    logger.info("Knowledge obtained: {:.2f}%".format(
+    logging.info("Knowledge obtained: {:.2f}%".format(
         _calculate_knowledge(maze, population)))

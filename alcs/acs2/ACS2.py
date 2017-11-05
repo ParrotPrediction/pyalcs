@@ -1,11 +1,10 @@
+import logging
 from alcs.acs2 import ClassifiersList, ACS2Configuration
 
 
 class ACS2:
-    def __init__(self,
-                 cfg: ACS2Configuration = None,
-                 population=None):
-        self.cfg = cfg or ACS2Configuration.default()
+    def __init__(self, cfg: ACS2Configuration, population=None):
+        self.cfg = cfg
         self.population = population or ClassifiersList(cfg=self.cfg)
 
     def explore(self, env, max_trials):
@@ -43,9 +42,12 @@ class ACS2:
         return self.population, metrics
 
     def _run_trial_explore(self, env, time):
+        logging.debug("Running trial explore")
         # Initial conditions
         steps = 0
-        state = env.reset()
+        raw_state = env.reset()
+        state = self._parse_state(raw_state)
+        logging.debug("Initial state: [%s]", ''.join(state))
 
         action = None
         reward = None
@@ -54,7 +56,9 @@ class ACS2:
         done = False
 
         while not done:
-            match_set = ClassifiersList.form_match_set(self.population, state)
+            match_set = ClassifiersList.form_match_set(self.population,
+                                                       state,
+                                                       self.cfg)
 
             if steps > 0:
                 # Apply learning in the last action set
@@ -76,10 +80,14 @@ class ACS2:
                         state)
 
             action = match_set.choose_action(epsilon=1.0)
-            action_set = ClassifiersList.form_action_set(match_set, action)
+            logging.debug("Executing action: [%d]", action)
+            action_set = ClassifiersList.form_action_set(match_set,
+                                                         action,
+                                                         self.cfg)
 
             prev_state = state
-            state, reward, done, _ = env.step(action)
+            raw_state, reward, done, _ = env.step(self._parse_action(action))
+            state = self._parse_state(raw_state)
 
             if done:
                 action_set.apply_alp(
@@ -104,16 +112,20 @@ class ACS2:
         return steps
 
     def _run_trial_exploit(self, env):
+        logging.debug("Running trial explore")
         # Initial conditions
         steps = 0
-        state = env.reset()
+        raw_state = env.reset()
+        state = self._parse_state(raw_state)
 
         reward = None
         action_set = ClassifiersList(cfg=self.cfg)
         done = False
 
         while not done:
-            match_set = ClassifiersList.form_match_set(self.population, state)
+            match_set = ClassifiersList.form_match_set(self.population,
+                                                       state,
+                                                       self.cfg)
 
             if steps > 0:
                 action_set.apply_reinforcement_learning(
@@ -121,9 +133,12 @@ class ACS2:
                     match_set.get_maximum_fitness())
 
             action = match_set.choose_action(epsilon=0.0)
-            action_set = ClassifiersList.form_action_set(match_set, action)
+            action_set = ClassifiersList.form_action_set(match_set,
+                                                         action,
+                                                         self.cfg)
 
-            state, reward, done, _ = env.step(action)
+            raw_state, reward, done, _ = env.step(self._parse_action(action))
+            state = self._parse_state(raw_state)
 
             if done:
                 action_set.apply_reinforcement_learning(reward, 0)
@@ -131,6 +146,36 @@ class ACS2:
             steps += 1
 
         return steps
+
+    def _parse_state(self, raw_state):
+        """
+        Sometimes the environment state returned by the OpenAI
+        environment does not suit to the classifier representation
+        of data used by ACS2. If a mapping function is defined in
+        configuration - use it.
+
+        :param raw_state: state obtained from OpenAI gym
+        :return: state suitable for ACS2 (list)
+        """
+        if self.cfg.perception_mapper_fcn:
+            return self.cfg.perception_mapper_fcn(raw_state)
+
+        return raw_state
+
+    def _parse_action(self, action_idx):
+        """
+        Sometimes the step function from OpenAI Gym takes different
+        representation of actions than sequential range of integers.
+        There is a possiblity to provide custom mapping function for
+        suitable action values.
+
+        :param action_idx: action id, used in ACS2
+        :return: action id for the step function
+        """
+        if self.cfg.action_mapper_fcn:
+            return self.cfg.action_mapper_fcn(action_idx)
+
+        return action_idx
 
     def _collect_metrics(self, trial, steps, total_steps):
         return {

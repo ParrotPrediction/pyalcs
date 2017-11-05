@@ -19,7 +19,11 @@ class Classifier(object):
                  tav=0,
                  cfg=None):
 
-        self.cfg = cfg or ACS2Configuration.default()
+        if cfg is None:
+            raise TypeError("Configuration should be passed to Classifier")
+
+        self.cfg = cfg
+
         self.condition = Condition(condition, cfg=self.cfg) \
             if condition is not None else Condition(cfg=self.cfg)
         self.action = action if action is not None else None
@@ -75,12 +79,13 @@ class Classifier(object):
         :return: new classifier
         """
         new_cls = cls(
-            condition=Condition(old_cls.condition),
+            condition=Condition(old_cls.condition, old_cls.cfg),
             action=old_cls.action,
             effect=old_cls.effect,
             quality=old_cls.q,
             reward=old_cls.r,
-            intermediate_reward=old_cls.ir)
+            intermediate_reward=old_cls.ir,
+            cfg=old_cls.cfg)
 
         new_cls.tga = time
         new_cls.talp = time
@@ -93,7 +98,8 @@ class Classifier(object):
                      previous_situation: Perception,
                      action: int,
                      situation: Perception,
-                     time: int):
+                     time: int,
+                     cfg: ACS2Configuration=None):
         """
         Creates a classifier that anticipates a change correctly
 
@@ -101,10 +107,11 @@ class Classifier(object):
         :param action:
         :param situation:
         :param time:
+        :param cfg: configuration
 
         :return: new classifier
         """
-        new_cl = cls(action=action)  # TODO: p5 exp=0, r=0 (paper)
+        new_cl = cls(action=action, cfg=cfg)  # TODO: p5 exp=0, r=0 (paper)
         new_cl.tga = time
         new_cl.talp = time
 

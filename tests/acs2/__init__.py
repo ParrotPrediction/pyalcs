@@ -3,3 +3,4 @@ from .ClassifierTest import ClassifierTest
 from .ConditionTest import ConditionTest
 from .EffectTest import EffectTest
 from .PMarkTest import PMarkTest
+from .randommock_test import TestRandomTest

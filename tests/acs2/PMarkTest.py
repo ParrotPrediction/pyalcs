@@ -1,6 +1,6 @@
 import unittest
 
-from alcs.acs2 import PMark
+from alcs.acs2 import ACS2Configuration, PMark
 
 from alcs import Perception
 
@@ -8,7 +8,8 @@ from alcs import Perception
 class PMarkTest(unittest.TestCase):
 
     def setUp(self):
-        self.mark = PMark()
+        cfg = ACS2Configuration(8, 8)
+        self.mark = PMark(cfg)
 
     def test_should_initialize_mark(self):
         self.assertEqual(0, len(self.mark))
