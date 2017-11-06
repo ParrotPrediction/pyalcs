@@ -43,185 +43,185 @@ class TestEffect:
         # Classifier is not predicting any change, all pass-through effect
         # should predict correctly
 
-        # Given
+        # given
         effect = Effect('########', cfg)
         p0 = Perception('00001111')
         p1 = Perception('00001111')
 
-        # When
+        # when
         res = effect.does_anticipate_correctly(p0, p1)
 
-        # Then
+        # ghen
         assert res is True
 
     def test_should_detect_correct_anticipation_2(self, cfg):
         # Introduce two changes into situation and effect (should
         # also predict correctly)
 
-        # Given
+        # given
         effect = Effect(['#', '1', '#', '#', '#', '#', '0', '#'], cfg)
         p0 = Perception(['0', '0', '0', '0', '1', '1', '1', '1'])
         p1 = Perception(['0', '1', '0', '0', '1', '1', '0', '1'])
 
-        # When
+        # when
         res = effect.does_anticipate_correctly(p0, p1)
 
-        # Then
+        # then
         assert res is True
 
     def test_should_detect_correct_anticipation_3(self, cfg):
         # Case when effect predicts situation incorrectly
 
-        # Given
+        # given
         effect = Effect(['#', '0', '#', '#', '#', '#', '#', '#'], cfg)
         p0 = Perception(['0', '0', '0', '0', '1', '1', '1', '1'])
         p1 = Perception(['0', '1', '0', '0', '1', '1', '1', '1'])
 
-        # When
+        # when
         res = effect.does_anticipate_correctly(p0, p1)
 
-        # Then
+        # then
         assert res is False
 
     def test_should_detect_correct_anticipation_4(self, cfg):
         # Case when effect predicts situation incorrectly
 
-        # Given
+        # given
         effect = Effect(['#', '#', '0', '#', '#', '1', '#', '#'], cfg)
         p0 = Perception(['1', '0', '1', '0', '1', '0', '0', '1'])
         p1 = Perception(['1', '0', '1', '0', '1', '0', '0', '1'])
 
-        # When
+        # when
         res = effect.does_anticipate_correctly(p0, p1)
 
-        # Then
+        # then
         assert res is False
 
     def test_should_detect_correct_anticipation_5(self, cfg):
         # Case when effect predicts situation incorrectly
 
-        # Given
+        # given
         effect = Effect(['#', '#', '#', '#', '1', '#', '0', '#'], cfg)
         p0 = Perception(['0', '1', '1', '0', '0', '0', '1', '1'])
         p1 = Perception(['1', '1', '1', '0', '1', '1', '0', '1'])
 
-        # When
+        # when
         res = effect.does_anticipate_correctly(p0, p1)
 
-        # Then
+        # then
         assert res is False
 
     def test_should_detect_correct_anticipation_6(self, cfg):
         # Case when effect predicts situation incorrectly
 
-        # Given
+        # given
         effect = Effect(['#', '#', '1', '#', '0', '#', '0', '#'], cfg)
         p0 = Perception(['0', '0', '0', '1', '1', '0', '1', '0'])
         p1 = Perception(['0', '0', '1', '1', '0', '0', '0', '0'])
 
-        # When
+        # when
         res = effect.does_anticipate_correctly(p0, p1)
 
-        # Then
+        # then
         assert res is True
 
     def test_should_handle_pass_through_symbol(self, cfg):
         # A case when there was no change in perception but effect has no
         # pass-through symbol
 
-        # Given
+        # given
         effect = Effect(['#', '0', '#', '#', '#', '#', '#', '#'], cfg)
         p0 = Perception(['0', '0', '0', '0', '1', '1', '1', '1'])
         p1 = Perception(['0', '0', '0', '0', '1', '1', '1', '1'])
 
-        # When
+        # when
         res = effect.does_anticipate_correctly(p0, p1)
 
-        # Then
+        # then
         assert res is False
 
     def test_should_check_if_specializable_1(self, cfg):
-        # Given
+        # given
         p0 = Perception(['1', '1', '0', '0', '0', '0', '1', '0'])
         p1 = Perception(['1', '1', '1', '0', '1', '1', '0', '1'])
         effect = Effect(['#', '#', '#', '#', '#', '#', '#', '#'], cfg)
 
-        # When
+        # when
         res = effect.is_specializable(p0, p1)
 
-        # Then
+        # then
         assert res is True
 
     def test_should_check_if_specializable_2(self, cfg):
-        # Given
+        # given
         p0 = Perception(['0', '1', '1', '0', '0', '0', '1', '1'])
         p1 = Perception(['1', '1', '0', '0', '0', '0', '1', '0'])
         effect = Effect(['#', '#', '#', '#', '#', '#', '#', '#'], cfg)
 
-        # When
+        # when
         res = effect.is_specializable(p0, p1)
 
-        # Then
+        # then
         assert res is True
 
     def test_should_check_if_specializable_3(self, cfg):
-        # Given
+        # given
         p0 = Perception(['1', '1', '1', '1', '0', '1', '1', '1'])
         p1 = Perception(['1', '0', '0', '0', '0', '0', '0', '0'])
         effect = Effect(['#', '#', '0', '0', '#', '0', '#', '#'], cfg)
 
-        # When
+        # when
         res = effect.is_specializable(p0, p1)
 
-        # Then
+        # then
         assert res is True
 
     def test_should_check_if_specializable_4(self, cfg):
-        # Given
+        # given
         p0 = Perception(['1', '0', '0', '0', '0', '0', '0', '1'])
         p1 = Perception(['1', '0', '0', '0', '1', '0', '1', '1'])
         effect = Effect(['0', '#', '#', '#', '#', '1', '#', '#'], cfg)
 
-        # When
+        # when
         res = effect.is_specializable(p0, p1)
 
-        # Then
+        # then
         assert res is False
 
     def test_should_check_if_specializable_5(self, cfg):
-        # Given
+        # given
         p0 = Perception(['1', '1', '1', '1', '0', '1', '1', '1'])
         p1 = Perception(['1', '0', '1', '1', '1', '1', '1', '1'])
         effect = Effect(['#', '0', '1', '0', '#', '0', '1', '0'], cfg)
 
-        # When
+        # when
         res = effect.is_specializable(p0, p1)
 
-        # Then
+        # then
         assert res is False
 
     def test_should_check_if_specializable_6(self, cfg):
-        # Given
+        # given
         p0 = Perception(['0', '0', '1', '1', '0', '0', '0', '0'])
         p1 = Perception(['0', '0', '1', '1', '0', '0', '0', '0'])
         effect = Effect(['#', '1', '0', '#', '#', '#', '1', '1'], cfg)
 
-        # When
+        # when
         res = effect.is_specializable(p0, p1)
 
-        # Then
+        # then
         assert res is False
 
     def test_should_check_if_specializable_7(self, cfg):
-        # Given
+        # given
         p0 = Perception(['0', '1', '1', '0', '0', '0', '0', '0'])
         p1 = Perception(['1', '1', '0', '1', '1', '1', '0', '1'])
         effect = Effect(['#', '#', '0', '#', '#', '1', '#', '#'], cfg)
 
-        # When
+        # when
         res = effect.is_specializable(p0, p1)
 
-        # Then
+        # then
         assert res is True
 
     def test_eq(self, cfg):
