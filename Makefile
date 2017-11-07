@@ -1,7 +1,7 @@
 install_deps:
 	pip3 install -r requirements.txt --ignore-installed six
 test:
-	python3 -m unittest -v tests
+	pytest
 coverage:
 	coverage run -m unittest discover -v tests
 	coverage report -m
