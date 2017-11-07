@@ -4,6 +4,7 @@ import gym_maze
 
 from alcs.acs2 import ACS2Configuration
 from alcs.acs2.ACS2 import ACS2
+from examples.maze import calculate_knowledge
 
 
 class TestMaze:
@@ -18,7 +19,8 @@ class TestMaze:
         agent = ACS2(cfg)
 
         # when
-        population, metrics = agent.explore(env, 500)
+        population, metrics = agent.explore(env, 300)
 
         # then
         assert 100 < len(population) < 200
+        assert 100 == calculate_knowledge(env, population)
