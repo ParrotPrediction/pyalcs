@@ -99,7 +99,7 @@ class Classifier(object):
                      action: int,
                      situation: Perception,
                      time: int,
-                     cfg: ACS2Configuration=None):
+                     cfg: ACS2Configuration):
         """
         Creates a classifier that anticipates a change correctly
 

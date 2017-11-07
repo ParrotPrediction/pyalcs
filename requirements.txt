@@ -5,3 +5,4 @@ matplotlib==2.1.0
 gym[all]==0.9.4
 pandas==0.21.0
 pytest==3.2.3
+gym_maze==0.0.4

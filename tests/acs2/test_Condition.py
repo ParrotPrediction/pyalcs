@@ -53,7 +53,7 @@ class TestCondition:
     def test_should_initialize_two_times_the_same_way(self, cfg):
         # given
         c1 = Condition("#1O##O##", cfg)
-        c2 = Condition("#1O##O##", cfg)
+        c2 = Condition(['#', '1', 'O', '#', '#', 'O', '#', '#'], cfg)
 
         # then
         assert c1 == c2
@@ -80,45 +80,45 @@ class TestCondition:
     def test_should_get_initialized_with_str_2(self, cfg):
         with pytest.raises(ValueError):
             # Too short condition
-            Condition("#1O##O#", cfg=cfg)
+            Condition("#1O##O#", cfg)
 
     def test_should_specialize_1(self, cfg):
         # given
         cond = Condition(cfg=cfg)
-        diff = Condition(['#', '0', '#', '#', '#', '1', '#', '1'], cfg)
+        diff = Condition('#0###1#1', cfg)
 
         # when
         cond.specialize(new_condition=diff)
 
         # then
-        assert Condition(['#', '0', '#', '#', '#', '1', '#', '1'], cfg) == cond
+        assert Condition('#0###1#1', cfg) == cond
 
     def test_should_specialize_2(self, cfg):
         # given
-        c = Condition(['#', '#', '#', '1', '0', '#', '1', '#'], cfg)
-        diff = Condition(['0', '1', '0', '#', '#', '1', '#', '#'], cfg)
+        c = Condition('###10#1#', cfg)
+        diff = Condition('010##1##', cfg)
 
         # when
         c.specialize(new_condition=diff)
 
         # then
-        assert Condition(['0', '1', '0', '1', '0', '1', '1', '#'], cfg) == c
+        assert Condition('0101011#', cfg) == c
 
     def test_should_specialize_3(self, cfg):
         # given
-        c = Condition(['#', '1', '0', '1', '#', '1', '0', '#'], cfg)
-        diff = Condition(['#', '#', '#', '#', '1', '#', '#', '1'], cfg)
+        c = Condition('#101#10#', cfg)
+        diff = Condition('####1##1', cfg)
 
         # when
         c.specialize(new_condition=diff)
 
         # then
-        assert Condition(['#', '1', '0', '1', '1', '1', '0', '1'], cfg) == c
+        assert Condition('#1011101', cfg) == c
 
     def test_should_specialize_4(self, cfg):
         # given
-        c = Condition(['#', '#', '#', '#', '0', '1', '#', '1'], cfg)
-        diff = Condition(['2', '#', '0', '0', '#', '#', '#', '#'], cfg)
+        c = Condition('####01#1', cfg)
+        diff = Condition('2#00####', cfg)
 
         # when
         c.specialize(new_condition=diff)
