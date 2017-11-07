@@ -17,7 +17,7 @@ def get_all_possible_transitions(maze):
     g = _create_graph(maze)
 
     path_nodes = (node for node, data
-                  in g.nodes_iter(data=True) if data['type'] == 'path')
+                  in g.nodes(data=True) if data['type'] == 'path')
 
     for node in path_nodes:
         for neighbour in nx.all_neighbors(g, node):

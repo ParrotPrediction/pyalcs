@@ -5,6 +5,8 @@ python:
 
 script:
   - touch foo
+  - pip3 install -r requirements.txt
+  - pytest
 
 deploy:
   provider: pypi
