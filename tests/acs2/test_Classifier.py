@@ -211,3 +211,238 @@ class TestClassifier:
         assert time == new_cl.talp
         assert 1 == new_cl.num
         assert 1 == new_cl.exp
+
+    def test_should_specialize_1(self, cfg):
+        # given
+        cls = Classifier(cfg=cfg)
+        p0 = Perception('00001111')
+        p1 = Perception('00001111')
+
+        # when
+        cls.specialize(p0, p1)
+
+        # then
+        assert Condition('########', cfg) == cls.condition
+        assert Effect('########', cfg) == cls.effect
+
+    def test_should_specialize_2(self, cfg):
+        # given
+        cls = Classifier(cfg=cfg)
+        p0 = Perception('00001111')
+        p1 = Perception('00011111')
+
+        # when
+        cls.specialize(p0, p1)
+
+        # then
+        assert Condition('###0####', cfg) == cls.condition
+        assert Effect('###1####', cfg) == cls.effect
+
+    def test_should_specialize_3(self, cfg):
+        # given
+        cls = Classifier(
+            condition=Condition('01#####1', cfg),
+            effect=Effect('10#####0', cfg),
+            cfg=cfg)
+        p0 = Perception('01110111')
+        p1 = Perception('10101010')
+
+        # when
+        cls.specialize(p0, p1)
+
+        # then
+        assert 6 == cls.condition.specificity
+        assert Condition('01#101#1', cfg) == cls.condition
+
+        assert 6 == cls.effect.number_of_specified_elements
+        assert Effect('10#010#0', cfg) == cls.effect
+
+    def test_should_count_specified_unchanging_attributes_1(self, cfg):
+        # given
+        cls = Classifier(
+            condition=Condition('######0#', cfg),
+            effect=Effect('########', cfg),
+            cfg=cfg
+        )
+
+        # when & then
+        assert 1 == cls.specified_unchanging_attributes
+
+    def test_should_count_specified_unchanging_attributes_2(self, cfg):
+        # given
+        cls = Classifier(
+            condition=Condition('#####0#0', cfg),
+            effect=Effect('########', cfg),
+            cfg=cfg
+        )
+
+        # when & then
+        assert 2 == cls.specified_unchanging_attributes
+
+    def test_should_count_specified_unchanging_attributes_3(self, cfg):
+        # given
+        cls = Classifier(
+            condition=Condition('10000001', cfg),
+            effect=Effect('####1#1#', cfg),
+            cfg=cfg
+        )
+
+        # when & then
+        assert 6 == cls.specified_unchanging_attributes
+
+    def test_should_count_specified_unchanging_attributes_4(self, cfg):
+        # given
+        cls = Classifier(
+            condition=Condition('1#0#1011', cfg),
+            effect=Effect('0####1##', cfg),
+            cfg=cfg
+        )
+        # when & then
+        assert 4 == cls.specified_unchanging_attributes
+
+    def test_should_count_specified_unchanging_attributes_5(self, cfg):
+        # given
+        cls = Classifier(
+            condition=Condition('1###1011', cfg),
+            effect=Effect('0####1##', cfg),
+            cfg=cfg
+        )
+
+        # when & then
+        assert 3 == cls.specified_unchanging_attributes
+
+    def test_should_handle_expected_case_1(self, cfg):
+        # given
+        cls = Classifier(
+            condition=Condition('#######0', cfg),
+            quality=0.525,
+            cfg=cfg)
+        p0 = Perception('11111010')
+        time = 47
+
+        # when
+        new_cls = cls.expected_case(p0, time)
+
+        # then
+        assert new_cls is None
+        assert abs(0.54 - cls.q) < 0.01
+
+    def test_should_handle_expected_case_2(self, cfg):
+        # given
+        cls = Classifier(
+            condition=Condition('#0######', cfg),
+            quality=0.521,
+            cfg=cfg)
+        p0 = Perception('10101001')
+        time = 59
+
+        # when
+        new_cls = cls.expected_case(p0, time)
+
+        # then
+        assert new_cls is None
+        assert abs(0.54 - cls.q) < 0.01
+
+    def test_should_handle_expected_case_3(self, cfg):
+        # given
+        p0 = Perception('00110000')
+        time = 26
+        cls = Classifier(
+            action=5,
+            quality=0.46,
+            cfg=cfg
+        )
+        cls.mark[0] = '0'
+        cls.mark[1] = '1'
+        cls.mark[2] = '0'
+        cls.mark[3] = '1'
+        cls.mark[4] = '0'
+        cls.mark[5] = '1'
+        cls.mark[6] = '1'
+        cls.mark[7] = '1'
+
+        # when
+        new_cls = cls.expected_case(p0, time)
+
+        # then
+        assert new_cls is not None
+        # One `random` attribute gets specified
+        assert 1 == new_cls.condition.specificity
+        assert Effect('########', cfg) == new_cls.effect
+        assert 5 == new_cls.action
+        assert new_cls.mark.is_empty() is True
+        assert 0.5 == new_cls.q
+
+    def test_should_handle_expected_case_4(self, cfg):
+        # given
+        p0 = Perception('11101101')
+        time = 703
+        cls = Classifier(
+            condition=Condition('1##01#0#', cfg),
+            action=7,
+            effect=Effect('0##10#1#', cfg),
+            quality=0.47,
+            cfg=cfg
+        )
+        cls.mark[1].update(['0', '2'])
+        cls.mark[2].update(['1'])
+        cls.mark[5].update(['0', '1'])
+        cls.mark[7].update(['1'])
+
+        # when
+        new_cls = cls.expected_case(p0, time)
+
+        # then
+        assert new_cls is not None
+        # One `random` attribute gets specified
+        assert 5 == new_cls.condition.specificity
+        assert Effect('0##10#1#', cfg) == new_cls.effect
+        assert 7 == new_cls.action
+        assert new_cls.mark.is_empty() is True
+        assert 0.5 == new_cls.q
+
+    def test_should_handle_unexpected_case_1(self, cfg):
+        # given
+        cls = Classifier(action=2, cfg=cfg)
+
+        p0 = Perception('01100000')
+        p1 = Perception('10100010')
+        time = 14
+
+        new_cls = cls.unexpected_case(p0, p1, time)
+
+        # Quality should be decreased
+        assert 0.475 == cls.q
+
+        # Should be marked with previous perception
+        for mark_attrib in cls.mark:
+            assert 1 == len(mark_attrib)
+
+        assert '0' in cls.mark[0]
+        assert '1' in cls.mark[1]
+        assert '1' in cls.mark[2]
+        assert '0' in cls.mark[3]
+        assert '0' in cls.mark[4]
+        assert '0' in cls.mark[5]
+        assert '0' in cls.mark[6]
+        assert '0' in cls.mark[7]
+
+        # New classifier should not be the same object
+        assert cls is not new_cls
+
+        # Check attributes of a new classifier
+        assert Condition('01####0#', cfg) == new_cls.condition
+        assert 2 == new_cls.action
+        assert Effect('10####1#', cfg) == new_cls.effect
+
+        # There should be no mark
+        for mark_attrib in new_cls.mark:
+            assert 0 == len(mark_attrib)
+
+        assert 0.5 == new_cls.q
+        assert cls.r == new_cls.r
+        assert time == new_cls.tga
+        assert time == new_cls.talp
+
+# \['(.)', '(.)', '(.)', '(.)', '(.)', '(.)', '(.)', '(.)'\]
+# '$1$2$3$3$4$5$6$7$8'
