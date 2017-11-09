@@ -443,7 +443,7 @@ class TestClassifier:
         assert cls.r == new_cls.r
         assert time == new_cls.tga
         assert time == new_cls.talp
-    
+
     def test_should_handle_unexpected_case_2(self, cfg):
         # given
         cls = Classifier(
@@ -473,7 +473,7 @@ class TestClassifier:
         assert time == new_cl.tga
         assert time == new_cl.talp
         assert abs(cls.q - 0.38) < 0.01
-        
+
     def test_should_handle_unexpected_case_3(self, cfg):
         cls = Classifier(
             condition=Condition('#####1#0', cfg),
@@ -531,5 +531,87 @@ class TestClassifier:
         assert Condition('1####011', cfg) == original_cl.condition
         assert Condition('####1011', cfg) == copied_cl.condition
 
+    def test_should_handle_unexpected_case_5(self, cfg):
+        # given
+        cls = Classifier(
+            condition=Condition('00####1#', cfg),
+            action=2,
+            effect=Effect('########', cfg),
+            quality=0.129,
+            reward=341.967,
+            intermediate_reward=130.369,
+            experience=201,
+            tga=129,
+            talp=9628,
+            tav=25.08,
+            cfg=cfg
+        )
+        cls.mark[2] = '2'
+        cls.mark[3] = '1'
+        cls.mark[4] = '1'
+        cls.mark[5] = '0'
+        cls.mark[7] = '0'
+
+        p0 = Perception('00211010')
+        p1 = Perception('00001110')
+        time = 9628
+
+        # when
+        new_cls = cls.unexpected_case(p0, p1, time)
+
+        # then
+        assert new_cls is not None
+        assert Condition('0021#01#', cfg) == new_cls.condition
+        assert Effect('##00#1##', cfg) == new_cls.effect
+        assert abs(0.5 - new_cls.q) < 0.1
+        assert abs(341.967 - new_cls.r) < 0.1
+        assert abs(130.369 - new_cls.ir) < 0.1
+        assert abs(25.08 - new_cls.tav) < 0.1
+        assert 1 == new_cls.exp
+        assert 1 == new_cls.num
+        assert time == new_cls.tga
+        assert time == new_cls.talp
+
+    def test_should_handle_unexpected_case_6(self, cfg):
+        # given
+        cls = Classifier(
+            condition=Condition('0#1####1', cfg),
+            action=2,
+            effect=Effect('1#0####0', cfg),
+            quality=0.38505,
+            reward=1.20898,
+            intermediate_reward=0,
+            experience=11,
+            tga=95,
+            talp=873,
+            tav=71.3967,
+            cfg=cfg
+        )
+        cls.mark[1].update(['1'])
+        cls.mark[3].update(['1'])
+        cls.mark[4].update(['0', '1'])
+        cls.mark[5].update(['1'])
+        cls.mark[6].update(['0', '1'])
+
+        p0 = Perception('01111101')
+        p1 = Perception('11011110')
+        time = 873
+
+        # when
+        new_cls = cls.unexpected_case(p0, p1, time)
+
+        # then
+        assert new_cls is not None
+        assert Condition('0#1###01', cfg) == new_cls.condition
+        assert Effect('1#0###10', cfg) == new_cls.effect
+        assert abs(0.5 - new_cls.q) < 0.1
+        assert abs(1.20898 - new_cls.r) < 0.1
+        assert abs(0 - new_cls.ir) < 0.1
+        assert abs(71.3967 - new_cls.tav) < 0.1
+        assert 1 == new_cls.exp
+        assert 1 == new_cls.num
+        assert time == new_cls.tga
+        assert time == new_cls.talp
+
 # \['(.)', '(.)', '(.)', '(.)', '(.)', '(.)', '(.)', '(.)'\]
-# '$1$2$3$3$4$5$6$7$8'
+# '$1$2$3$4$5$6$7$8'
