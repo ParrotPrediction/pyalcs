@@ -443,6 +443,93 @@ class TestClassifier:
         assert cls.r == new_cls.r
         assert time == new_cls.tga
         assert time == new_cls.talp
+    
+    def test_should_handle_unexpected_case_2(self, cfg):
+        # given
+        cls = Classifier(
+            condition=Condition('#######0', cfg),
+            action=4,
+            quality=0.4,
+            cfg=cfg)
+        cls.mark[0].update([0, 1])
+        cls.mark[1].update([0, 1])
+        cls.mark[2].update([0, 1])
+        cls.mark[3].update([0, 1])
+        cls.mark[4].update([1])
+        cls.mark[5].update([0, 1])
+        cls.mark[6].update([0, 1])
+
+        p0 = Perception('11101010')
+        p1 = Perception('10011101')
+        time = 94
+
+        # when
+        new_cl = cls.unexpected_case(p0, p1, time)
+
+        # then
+        assert new_cl.condition == Condition('#110#010', cfg)
+        assert new_cl.effect == Effect('#001#101', cfg)
+        assert new_cl.mark.is_empty() is True
+        assert time == new_cl.tga
+        assert time == new_cl.talp
+        assert abs(cls.q - 0.38) < 0.01
+        
+    def test_should_handle_unexpected_case_3(self, cfg):
+        cls = Classifier(
+            condition=Condition('#####1#0', cfg),
+            effect=Effect('#####0#1', cfg),
+            quality=0.475,
+            cfg=cfg
+        )
+
+        cls.mark[0] = '1'
+        cls.mark[1] = '1'
+        cls.mark[2] = '0'
+        cls.mark[3] = '1'
+        cls.mark[5] = '1'
+        cls.mark[7] = '1'
+
+        p0 = Perception('11001110')
+        p1 = Perception('01110000')
+        time = 20
+
+        new_cls = cls.unexpected_case(p0, p1, time)
+
+        # Quality should be decreased
+        assert 0.45125 == cls.q
+
+        # No classifier should be generated here
+        assert new_cls is None
+
+    def test_copy_from_and_mutate_does_not_influence_another_condition(self,
+                                                                       cfg):
+        """ Verify that not just reference to Condition copied (changing which
+        will change the original - definitily not original C++ code did). """
+        # given
+        s = cfg.mu * 0.5  # less then MU
+        b = 1 - (1 - cfg.mu) * 0.5  # more then MU
+
+        operation_time = 123
+        original_cl = Classifier(
+            condition=Condition('1###1011', cfg),
+            cfg=cfg
+        )
+
+        copied_cl = Classifier.copy_from(original_cl, operation_time)
+
+        # when
+        copied_cl.mutate(RandomMock([s, b, b, b, b]))
+
+        # then
+        assert Condition('####1011', cfg) == copied_cl.condition
+        assert Condition('1###1011', cfg) == original_cl.condition
+
+        # when
+        original_cl.mutate(RandomMock([b, s, b, b, b]))
+
+        # then
+        assert Condition('1####011', cfg) == original_cl.condition
+        assert Condition('####1011', cfg) == copied_cl.condition
 
 # \['(.)', '(.)', '(.)', '(.)', '(.)', '(.)', '(.)', '(.)'\]
 # '$1$2$3$3$4$5$6$7$8'

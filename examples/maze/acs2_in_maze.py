@@ -1,6 +1,8 @@
 import logging
 
 import gym
+
+# noinspection PyUnresolvedReferences
 import gym_maze
 
 from alcs import ACS2, ACS2Configuration

@@ -1,69 +1,10 @@
 import unittest
 
-from alcs.acs2 import Classifier, Condition, Effect, PMark
 from alcs import Perception
-from .randommock import RandomMock
+from alcs.acs2 import Classifier, Condition, Effect, PMark
 
 
 class ClassifierTest(unittest.TestCase):
-
-    def test_should_handle_unexpected_case_2(self):
-        # Given
-        self.cls.condition = Condition(
-            ['#', '#', '#', '#', '#', '#', '#', '0'])
-        self.cls.action = 4
-        self.cls.effect = Effect()
-        self.cls.mark[0].update([0, 1])
-        self.cls.mark[1].update([0, 1])
-        self.cls.mark[2].update([0, 1])
-        self.cls.mark[3].update([0, 1])
-        self.cls.mark[4].update([1])
-        self.cls.mark[5].update([0, 1])
-        self.cls.mark[6].update([0, 1])
-        self.cls.q = 0.4
-
-        p0 = Perception(['1', '0', '1', '0', '1', '0', '1', '0'])
-        p1 = Perception(['1', '1', '0', '1', '1', '1', '0', '1'])
-        time = 94
-
-        # When
-        new_cl = self.cls.unexpected_case(p0, p1, time)
-
-        # Then
-        self.assertEqual(new_cl.condition,
-                         Condition(['#', '0', '1', '0', '#', '0', '1', '0']))
-        self.assertEqual(new_cl.effect,
-                         Effect(['#', '1', '0', '1', '#', '1', '0', '1']))
-        self.assertTrue(new_cl.mark.is_empty())
-        self.assertEqual(time, new_cl.tga)
-        self.assertEqual(time, new_cl.talp)
-        self.assertAlmostEqual(self.cls.q, 0.38, 1)
-
-    def test_should_handle_unexpected_case_3(self):
-        self.cls = Classifier(
-            condition=['#', '#', '#', '#', '1', '#', '0', '#'],
-            effect=Effect(['#', '#', '#', '#', '0', '#', '1', '#']),
-            quality=0.475
-        )
-
-        self.cls.mark[0] = '1'
-        self.cls.mark[1] = '1'
-        self.cls.mark[2] = '0'
-        self.cls.mark[3] = '1'
-        self.cls.mark[5] = '1'
-        self.cls.mark[7] = '1'
-
-        p0 = Perception(['1', '1', '0', '1', '1', '1', '0', '1'])
-        p1 = Perception(['0', '1', '1', '0', '0', '0', '0', '0'])
-        time = 20
-
-        new_cls = self.cls.unexpected_case(p0, p1, time)
-
-        # Quality should be decreased
-        self.assertEqual(0.45125, self.cls.q)
-
-        # No classifier should be generated here
-        self.assertIsNone(new_cls)
 
     def test_should_handle_unexpected_case_4(self):
         # Given
@@ -182,26 +123,6 @@ class ClassifierTest(unittest.TestCase):
         self.assertEqual(1, new_cls.num)
         self.assertEqual(time, new_cls.tga)
         self.assertEqual(time, new_cls.talp)
-
-    def test_copy_from_and_mutate_does_not_influence_another_condition(self):
-        """ Verify that not just reference to Condition copied (changing which
-        will change the original - definitily not original C++ code did). """
-        # given
-        s = self.cfg.mu * 0.5  # less then MU
-        b = 1 - (1 - self.cfg.mu) * 0.5  # more then MU
-
-        operation_time = 123
-        original_cl = Classifier(condition=Condition('1###1011'))
-
-        copied_cl = Classifier.copy_from(original_cl, operation_time)
-
-        copied_cl.mutate(RandomMock([s, b, b, b, b]))
-        self.assertEqual(Condition('####1011'), copied_cl.condition)
-        self.assertEqual(Condition('1###1011'), original_cl.condition)
-
-        original_cl.mutate(RandomMock([b, s, b, b, b]))
-        self.assertEqual(Condition('1####011'), original_cl.condition)
-        self.assertEqual(Condition('####1011'), copied_cl.condition)
 
     def test_copy_from_and_change_does_not_influence_another_effect(self):
         """ Verify that not just reference to Condition copied (changing which

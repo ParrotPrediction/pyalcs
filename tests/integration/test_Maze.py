@@ -1,5 +1,7 @@
 import pytest
 import gym
+
+# noinspection PyUnresolvedReferences
 import gym_maze
 
 from alcs.acs2 import ACS2Configuration
@@ -23,16 +25,17 @@ class TestMaze:
         population, metrics = agent.explore(env, 300)
 
         # then
-        assert 100 < len(population) < 200
+        assert 100 < self._count_macroclassifiers(population) < 200
 
-        knowledge = calculate_knowledge(env, population)
-        assert 100 == knowledge
+        assert 100 == self._get_knowledge(env, population)
 
-        reliable_count = len([cl for cl in population if cl.is_reliable()])
-        assert len(population) == reliable_count
+        assert self._count_macroclassifiers(population) \
+            == self._count_reliable(population)
 
-        total_cls = sum(cl.num for cl in population)
-        assert len(population) == total_cls
+        assert self._count_macroclassifiers(population)\
+            == self._count_microclassifiers(population)
+
+        assert self._get_total_steps(metrics) > 5000
 
     def test_should_traverse_with_ga(self, env):
         # given
@@ -43,13 +46,36 @@ class TestMaze:
         population, metrics = agent.explore(env, 300)
 
         # then
-        assert len(population) > 300  # should be ~300 (actually about 800)
+        # should be ~300 (actually about 800)
+        assert self._count_macroclassifiers(population) > 300
 
-        knowledge = calculate_knowledge(env, population)
-        assert 100 == knowledge
+        assert 100 == self._get_knowledge(env, population)
 
-        reliable_count = len([cl for cl in population if cl.is_reliable()])
-        assert len(population) > reliable_count
+        assert self._count_macroclassifiers(population) \
+            > self._count_reliable(population)
 
-        total_cls = sum(cl.num for cl in population)
-        assert len(population) < total_cls  # total_cls should be ~2000
+        # total_cls should be ~2000
+        assert self._count_macroclassifiers(population) \
+            < self._count_microclassifiers(population)
+
+        assert self._get_total_steps(metrics) > 5000
+
+    @staticmethod
+    def _count_macroclassifiers(population):
+        return len(population)
+
+    @staticmethod
+    def _count_microclassifiers(population):
+        return sum(cl.num for cl in population)
+
+    @staticmethod
+    def _count_reliable(population):
+        return len([cl for cl in population if cl.is_reliable()])
+
+    @staticmethod
+    def _get_knowledge(env, population):
+        return calculate_knowledge(env, population)
+
+    @staticmethod
+    def _get_total_steps(metrics):
+        return metrics[-1]['total_steps']
