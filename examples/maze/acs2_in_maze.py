@@ -18,7 +18,7 @@ if __name__ == '__main__':
     maze = gym.make('BMaze4-v0')
 
     # Configure and create the agent
-    cfg = ACS2Configuration(8, 8, do_ga=True)
+    cfg = ACS2Configuration(8, 8, epsilon=1.0, do_ga=True)
     logging.info(cfg)
     agent = ACS2(cfg)
 

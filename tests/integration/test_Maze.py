@@ -18,7 +18,7 @@ class TestMaze:
 
     def test_should_traverse(self, env):
         # given
-        cfg = ACS2Configuration(8, 8, do_ga=False)
+        cfg = ACS2Configuration(8, 8, epsilon=1.0, do_ga=False)
         agent = ACS2(cfg)
 
         # when
@@ -39,7 +39,7 @@ class TestMaze:
 
     def test_should_traverse_with_ga(self, env):
         # given
-        cfg = ACS2Configuration(8, 8, do_ga=True)
+        cfg = ACS2Configuration(8, 8, epsilon=1.0, do_ga=True)
         agent = ACS2(cfg)
 
         # when
@@ -59,6 +59,10 @@ class TestMaze:
             < self._count_microclassifiers(population)
 
         assert self._get_total_steps(metrics) > 5000
+
+    @pytest.mark.skip(reason="implement it")
+    def test_should_exploit_maze(self):
+        pass
 
     @staticmethod
     def _count_macroclassifiers(population):

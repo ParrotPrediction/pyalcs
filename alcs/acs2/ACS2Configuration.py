@@ -6,13 +6,14 @@ class ACS2Configuration:
                  classifier_wildcard='#',
                  perception_mapper_fcn=None,
                  action_mapper_fcn=None,
+                 environment_metrics_fcn=None,
                  do_ga=False,
                  do_subsumption=True,
                  beta=0.05,
                  gamma=0.95,
                  theta_i=0.1,
                  theta_r=0.9,
-                 epsilon=1.0,
+                 epsilon=0.5,
                  u_max=100000,
                  theta_exp=20,
                  thera_ga=100,
@@ -24,6 +25,7 @@ class ACS2Configuration:
         self.classifier_wildcard = classifier_wildcard
         self.perception_mapper_fcn = perception_mapper_fcn
         self.action_mapper_fcn = action_mapper_fcn
+        self.environment_metrics_fcn = environment_metrics_fcn
         self.do_ga = do_ga
         self.do_subsumption = do_subsumption
         self.theta_exp = theta_exp
@@ -45,15 +47,19 @@ class ACS2Configuration:
                "\n\t- Classifier wildcard: [{}]" \
                "\n\t- Perception mapper function: [{}]" \
                "\n\t- Action mapper function: [{}]" \
+               "\n\t- Environment metrics function: [{}]" \
                "\n\t- Do GA: [{}]" \
                "\n\t- Do subsumption: [{}]" \
                "\n\t- Beta: [{}]" \
-               "\n\t- ..."\
+               "\n\t- ..." \
+               "\n\t- Epsilon: [{}]"\
             .format(self.classifier_length,
                     self.number_of_possible_actions,
                     self.classifier_wildcard,
                     self.perception_mapper_fcn,
                     self.action_mapper_fcn,
+                    self.environment_metrics_fcn,
                     self.do_ga,
                     self.do_subsumption,
-                    self.beta)
+                    self.beta,
+                    self.epsilon)

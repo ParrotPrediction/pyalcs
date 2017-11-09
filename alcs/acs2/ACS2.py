@@ -17,8 +17,14 @@ class ACS2:
             steps += steps_in_trial
 
             # Collect metrics of trial
-            metrics.append(self._collect_metrics(
-                current_trial, steps_in_trial, steps))
+            agent_stats = self._collect_agent_metrics(
+                current_trial, steps_in_trial, steps)
+
+            if self.cfg.environment_metrics_fcn:
+                env_stats = self.cfg.environment_metrics_fcn(env)
+
+            # TODO: add env stats
+            metrics.append(agent_stats)
 
             current_trial += 1
 
@@ -34,7 +40,7 @@ class ACS2:
             steps += steps_in_trial
 
             # Collect metrics of trial
-            metrics.append(self._collect_metrics(
+            metrics.append(self._collect_agent_metrics(
                 current_trial, steps_in_trial, steps))
 
             current_trial += 1
@@ -79,7 +85,7 @@ class ACS2:
                         match_set,
                         state)
 
-            action = match_set.choose_action(epsilon=1.0)
+            action = match_set.choose_action(self.cfg.epsilon)
             logging.debug("Executing action: [%d]", action)
             action_set = ClassifiersList.form_action_set(match_set,
                                                          action,
@@ -177,7 +183,7 @@ class ACS2:
 
         return action_idx
 
-    def _collect_metrics(self, trial, steps, total_steps):
+    def _collect_agent_metrics(self, trial, steps, total_steps):
         return {
             'population': len(self.population),
             'numerosity': sum(cl.num for cl in self.population),
