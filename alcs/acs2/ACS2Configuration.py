@@ -5,7 +5,7 @@ class ACS2Configuration:
                  number_of_possible_actions,
                  classifier_wildcard='#',
                  perception_mapper_fcn=None,
-                 action_mapper_fcn=None,
+                 action_mapping_dict=None,
                  environment_metrics_fcn=None,
                  do_ga=False,
                  do_subsumption=True,
@@ -20,11 +20,37 @@ class ACS2Configuration:
                  theta_as=20,
                  mu=0.3,
                  chi=0.8):
+        """
+        Creates the configuration object used during training the ACS2 agent.
+
+        :param classifier_length: length of the condition and effect strings
+        :param number_of_possible_actions: number of possible actions to
+            be executed
+        :param classifier_wildcard: wildcard symbol
+        :param perception_mapper_fcn:
+        :param action_mapping_dict: dictionary where key is internal ID of
+            action (numbers from `0 .. number_of_possible_actions)` and value
+            is the environmental representation of the action.
+        :param environment_metrics_fcn:
+        :param do_ga: if *Genetic Generalization* module is enabled
+        :param do_subsumption:
+        :param beta:
+        :param gamma:
+        :param theta_i:
+        :param theta_r:
+        :param epsilon:
+        :param u_max:
+        :param theta_exp:
+        :param thera_ga:
+        :param theta_as:
+        :param mu:
+        :param chi:
+        """
         self.classifier_length = classifier_length
         self.number_of_possible_actions = number_of_possible_actions
         self.classifier_wildcard = classifier_wildcard
         self.perception_mapper_fcn = perception_mapper_fcn
-        self.action_mapper_fcn = action_mapper_fcn
+        self.action_mapping_dict = action_mapping_dict
         self.environment_metrics_fcn = environment_metrics_fcn
         self.do_ga = do_ga
         self.do_subsumption = do_subsumption
@@ -46,7 +72,7 @@ class ACS2Configuration:
                "\n\t- Number of possible actions: [{}]" \
                "\n\t- Classifier wildcard: [{}]" \
                "\n\t- Perception mapper function: [{}]" \
-               "\n\t- Action mapper function: [{}]" \
+               "\n\t- Action mapping dict: [{}]" \
                "\n\t- Environment metrics function: [{}]" \
                "\n\t- Do GA: [{}]" \
                "\n\t- Do subsumption: [{}]" \
@@ -57,7 +83,7 @@ class ACS2Configuration:
                     self.number_of_possible_actions,
                     self.classifier_wildcard,
                     self.perception_mapper_fcn,
-                    self.action_mapper_fcn,
+                    self.action_mapping_dict,
                     self.environment_metrics_fcn,
                     self.do_ga,
                     self.do_subsumption,

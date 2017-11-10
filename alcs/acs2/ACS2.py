@@ -178,8 +178,8 @@ class ACS2:
         :param action_idx: action id, used in ACS2
         :return: action id for the step function
         """
-        if self.cfg.action_mapper_fcn:
-            return self.cfg.action_mapper_fcn(action_idx)
+        if self.cfg.action_mapping_dict:
+            return self.cfg.action_mapping_dict[action_idx]
 
         return action_idx
 

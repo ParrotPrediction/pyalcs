@@ -1,4 +1,5 @@
 import logging
+from gym.envs.board_game import go
 
 
 def moves_9x9():
@@ -29,6 +30,13 @@ def process_state(state):
     board[board == '2'] = 'W'
 
     return list(board.flatten())
+
+
+def map_moves(env, move):
+    """
+    Maps moves with given cords (like 'C8') to Pachi representation.
+    """
+    return go.str_to_action(env._state.board, move)
 
 
 def calculate_bw_ratio(env):
