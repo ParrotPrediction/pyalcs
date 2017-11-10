@@ -7,54 +7,34 @@ class ACS2:
         self.cfg = cfg
         self.population = population or ClassifiersList(cfg=self.cfg)
 
-    def explore(self, env, max_trials):
+    def evaluate(self, env, max_trials, exploit=False):
         current_trial = 0
         steps = 0
 
         metrics = []
         while current_trial < max_trials:
-            steps_in_trial = self._run_trial_explore(env, steps)
+            if exploit:
+                steps_in_trial = self._run_trial_exploit(env)
+            else:
+                steps_in_trial = self._run_trial_explore(env, steps)
+
             steps += steps_in_trial
 
-            # Collect metrics of trial
-            agent_stats = self._collect_agent_metrics(
-                current_trial, steps_in_trial, steps)
-
-            if self.cfg.environment_metrics_fcn:
-                env_stats = self.cfg.environment_metrics_fcn(env)
-
-            # TODO: add env stats
-            metrics.append(agent_stats)
-
-            current_trial += 1
-
-        return self.population, metrics
-
-    def exploit(self, env, max_trials):
-        current_trial = 0
-        steps = 0
-
-        metrics = []
-        while current_trial < max_trials:
-            steps_in_trial = self._run_trial_exploit(env)
-            steps += steps_in_trial
-
-            # Collect metrics of trial
-            metrics.append(self._collect_agent_metrics(
-                current_trial, steps_in_trial, steps))
+            trial_metrics = self._collect_metrics(
+                env, current_trial, steps_in_trial, steps)
+            logging.info(trial_metrics)
+            metrics.append(trial_metrics)
 
             current_trial += 1
 
         return self.population, metrics
 
     def _run_trial_explore(self, env, time):
-        logging.debug("Running trial explore")
+        logging.debug("** Running trial explore ** ")
         # Initial conditions
         steps = 0
         raw_state = env.reset()
         state = self._parse_state(raw_state)
-        logging.debug("Initial state: [%s]", ''.join(state))
-
         action = None
         reward = None
         prev_state = None
@@ -86,7 +66,7 @@ class ACS2:
                         state)
 
             action = match_set.choose_action(self.cfg.epsilon)
-            logging.debug("Executing action: [%d]", action)
+            logging.debug("\tExecuting action: [%d]", action)
             action_set = ClassifiersList.form_action_set(match_set,
                                                          action,
                                                          self.cfg)
@@ -118,7 +98,7 @@ class ACS2:
         return steps
 
     def _run_trial_exploit(self, env):
-        logging.debug("Running trial explore")
+        logging.debug("** Running trial exploit **")
         # Initial conditions
         steps = 0
         raw_state = env.reset()
@@ -183,6 +163,16 @@ class ACS2:
 
         return action_idx
 
+    def _collect_metrics(self, env, current_trial, steps_in_trial, steps):
+        agent_stats = self._collect_agent_metrics(
+            current_trial, steps_in_trial, steps)
+        env_stats = self._collect_env_stats(env)
+
+        return {
+            'agent': agent_stats,
+            'environment': env_stats
+        }
+
     def _collect_agent_metrics(self, trial, steps, total_steps):
         return {
             'population': len(self.population),
@@ -195,3 +185,9 @@ class ACS2:
             'steps': steps,
             'total_steps': total_steps
         }
+
+    def _collect_env_stats(self, env):
+        if self.cfg.environment_metrics_fcn:
+            return self.cfg.environment_metrics_fcn(env)
+
+        return None

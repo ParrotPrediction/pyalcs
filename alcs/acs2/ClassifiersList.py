@@ -65,10 +65,10 @@ class ClassifiersList(list):
         :return: number of chosen action
         """
         if random() < epsilon:
-            logging.debug("Exploration path")
+            logging.debug("\t\tExploration path")
             return self.choose_explore_action()
 
-        logging.debug("Exploitation path")
+        logging.debug("\t\tExploitation path")
         return self.choose_best_fitness_action()
 
     def choose_explore_action(self, pb: float = 0.5) -> int:
