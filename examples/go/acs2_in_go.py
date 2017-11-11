@@ -1,4 +1,5 @@
 import logging
+import pickle
 
 import gym
 
@@ -45,6 +46,11 @@ if __name__ == '__main__':
     # Create the agent
     agent = ACS2(cfg)
 
-    population, metrics = agent.explore(env, 500)
+    population, metrics = agent.explore_exploit(env, 50)
+
+    # Store metrics in file
+    logging.info("Dumping data to files ...")
+    pickle.dump(population, open("go_population.pkl", "wb"))
+    pickle.dump(metrics, open("go_metrics.pkl", "wb"))
 
     logging.info("Done")

@@ -1,4 +1,5 @@
 import logging
+import pickle
 
 import gym
 
@@ -24,10 +25,15 @@ if __name__ == '__main__':
 
     # Explore the environment
     logging.info("EXPLORE PHASE")
-    population, metrics = agent.explore_exploit(maze, 500)
+    population, metrics = agent.explore_exploit(maze, 50)
 
     for metric in metrics:
         logging.info(metric)
 
     logging.info("Knowledge obtained: {:.2f}%".format(
         calculate_knowledge(maze, population)))
+
+    # Store metrics in file
+    logging.info("Dumping data to files ...")
+    pickle.dump(population, open("maze_population.pkl", "wb"))
+    pickle.dump(metrics, open("maze_metrics.pkl", "wb"))

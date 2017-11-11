@@ -90,6 +90,7 @@ ENV/
 
 .idea
 /examples/learning_progress.png
+*.pkl
 
 .DS_Store
 /assets/ACS2/cmake-build-debug/
