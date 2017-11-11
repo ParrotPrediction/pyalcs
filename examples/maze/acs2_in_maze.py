@@ -18,13 +18,13 @@ if __name__ == '__main__':
     maze = gym.make('BMaze4-v0')
 
     # Configure and create the agent
-    cfg = ACS2Configuration(8, 8, epsilon=1.0, do_ga=True)
+    cfg = ACS2Configuration(8, 8, epsilon=1.0, do_ga=False)
     logging.info(cfg)
     agent = ACS2(cfg)
 
     # Explore the environment
     logging.info("EXPLORE PHASE")
-    population, metrics = agent.explore(maze, 50)
+    population, metrics = agent.explore_exploit(maze, 500)
 
     for metric in metrics:
         logging.info(metric)

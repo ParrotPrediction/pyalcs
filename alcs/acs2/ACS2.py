@@ -8,18 +8,54 @@ class ACS2:
         self.population = population or ClassifiersList(cfg=self.cfg)
 
     def explore(self, env, max_trials):
+        """
+        Explores the environment in given set of trials.
+        :param env: environment
+        :param max_trials: number of trials
+        :return: population of classifiers and metrics
+        """
         return self._evaluate(env, max_trials, self._run_trial_explore)
 
     def exploit(self, env, max_trials):
+        """
+        Exploits the environments in given set of trials (always executing
+        best possible action - no exploration).
+        :param env: environment
+        :param max_trials: number of trials
+        :return: population of classifiers and metrics
+        """
         return self._evaluate(env, max_trials, self._run_trial_exploit)
 
+    def explore_exploit(self, env, max_trials):
+        """
+        Alternates between exploration and exploitation phases.
+        :param env: environment
+        :param max_trials: number of trials
+        :return: population of classifiers and metrics
+        """
+        def switch_phases(env, steps, current_trial):
+            if current_trial % 2 == 0:
+                return self._run_trial_explore(env, steps)
+            else:
+                return self._run_trial_exploit(env, None)
+
+        return self._evaluate(env, max_trials, switch_phases)
+
     def _evaluate(self, env, max_trials, func):
+        """
+        Runs the classifier in desired strategy (see `func`) and collects
+        metrics.
+        :param env: environment
+        :param max_trials: number of trials
+        :param func: three arguments: env, steps already made, current trial
+        :return: population of classifiers and metrics
+        """
         current_trial = 0
         steps = 0
 
         metrics = []
         while current_trial < max_trials:
-            steps_in_trial = func(env, steps)
+            steps_in_trial = func(env, steps, current_trial)
             steps += steps_in_trial
 
             trial_metrics = self._collect_metrics(
@@ -31,7 +67,7 @@ class ACS2:
 
         return self.population, metrics
 
-    def _run_trial_explore(self, env, time):
+    def _run_trial_explore(self, env, time, current_trial=None):
         logging.debug("** Running trial explore ** ")
         # Initial conditions
         steps = 0
@@ -99,7 +135,7 @@ class ACS2:
 
         return steps
 
-    def _run_trial_exploit(self, env, time):
+    def _run_trial_exploit(self, env, time=None, current_trial=None):
         logging.debug("** Running trial exploit **")
         # Initial conditions
         steps = 0

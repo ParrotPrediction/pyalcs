@@ -45,6 +45,6 @@ if __name__ == '__main__':
     # Create the agent
     agent = ACS2(cfg)
 
-    population, metrics = agent.evaluate(env, 500)
+    population, metrics = agent.explore(env, 500)
 
     logging.info("Done")
