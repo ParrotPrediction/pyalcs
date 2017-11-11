@@ -20,7 +20,7 @@ class TestMaze:
         agent = ACS2(cfg)
 
         # when
-        population, metrics = agent.evaluate(env, 300)
+        population, metrics = agent.explore(env, 300)
 
         # then
         assert 100 < self._count_macroclassifiers(population) < 200
@@ -41,7 +41,7 @@ class TestMaze:
         agent = ACS2(cfg)
 
         # when
-        population, metrics = agent.evaluate(env, 300)
+        population, metrics = agent.explore(env, 300)
 
         # then
         # should be ~300 (actually about 800)

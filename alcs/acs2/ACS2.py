@@ -7,17 +7,19 @@ class ACS2:
         self.cfg = cfg
         self.population = population or ClassifiersList(cfg=self.cfg)
 
-    def evaluate(self, env, max_trials, exploit=False):
+    def explore(self, env, max_trials):
+        return self._evaluate(env, max_trials, self._run_trial_explore)
+
+    def exploit(self, env, max_trials):
+        return self._evaluate(env, max_trials, self._run_trial_exploit)
+
+    def _evaluate(self, env, max_trials, func):
         current_trial = 0
         steps = 0
 
         metrics = []
         while current_trial < max_trials:
-            if exploit:
-                steps_in_trial = self._run_trial_exploit(env)
-            else:
-                steps_in_trial = self._run_trial_explore(env, steps)
-
+            steps_in_trial = func(env, steps)
             steps += steps_in_trial
 
             trial_metrics = self._collect_metrics(
@@ -97,7 +99,7 @@ class ACS2:
 
         return steps
 
-    def _run_trial_exploit(self, env):
+    def _run_trial_exploit(self, env, time):
         logging.debug("** Running trial exploit **")
         # Initial conditions
         steps = 0
@@ -118,6 +120,7 @@ class ACS2:
                     reward,
                     match_set.get_maximum_fitness())
 
+            # Here while exploiting always choose best action
             action = match_set.choose_action(epsilon=0.0)
             action_set = ClassifiersList.form_action_set(match_set,
                                                          action,
