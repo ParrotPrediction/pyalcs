@@ -1,4 +1,5 @@
 import gym
+# noinspection PyUnresolvedReferences
 import gym_maze
 
 

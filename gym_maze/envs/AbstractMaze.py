@@ -1,17 +1,13 @@
-import gym
-from gym import error, spaces, utils
-from gym.utils import seeding
-
-from gym_maze import Maze, WALL_MAPPING, ACTION_LOOKUP
-from gym_maze.utils import get_all_possible_transitions
-
-import numpy as np
 import logging
 import random
 import sys
 
+import gym
+import numpy as np
+from gym import spaces, utils
 
-logger = logging.getLogger(__name__)
+from gym_maze import Maze, WALL_MAPPING, ACTION_LOOKUP
+from gym_maze.utils import get_all_possible_transitions
 
 ANIMAT_MARKER = 5
 
@@ -38,7 +34,7 @@ class AbstractMaze(gym.Env):
         return observation, reward, episode_over, {}
 
     def _reset(self):
-        logger.debug("Resetting the environment")
+        logging.debug("Resetting the environment")
         self._insert_animat()
         return self._observe()
 

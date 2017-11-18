@@ -1,11 +1,7 @@
-import logging
-
 from gym.envs.registration import register
 
-from gym_maze.Maze import Maze
-from gym_maze.Maze import PATH_MAPPING, WALL_MAPPING, REWARD_MAPPING
-
-logger = logging.getLogger(__name__)
+# noinspection PyUnresolvedReferences
+from gym_maze.Maze import Maze, PATH_MAPPING, WALL_MAPPING, REWARD_MAPPING
 
 ACTION_LOOKUP = {
     0: 'N',

@@ -1,7 +1,3 @@
-import logging
-
-logger = logging.getLogger(__name__)
-
 PATH_MAPPING = 0
 WALL_MAPPING = 1
 REWARD_MAPPING = 9
