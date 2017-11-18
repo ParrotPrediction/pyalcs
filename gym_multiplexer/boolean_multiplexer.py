@@ -9,8 +9,8 @@ from gym.spaces import Discrete
 class BooleanMultiplexer(gym.Env):
 
     def __init__(self, control_bits=3) -> None:
-        self.metadata = {'render.modes': ['human']}
         self.control_bits = control_bits
+        self.metadata = {'render.modes': ['human']}
         self.observation_space = Discrete(len(self._observation_string_length))
         self.action_space = Discrete(2)
 
@@ -36,12 +36,13 @@ class BooleanMultiplexer(gym.Env):
             return
 
         if mode == 'human':
-            return self.control_bits + self._data_bits
+            return self._observation()
         else:
             super(BooleanMultiplexer, self).render(mode=mode)
 
-    def _observation(self):
-        return self.control_bits + self._data_bits
+    def _observation(self) -> str:
+        bit_array = self._ctrl_bits + self._data_bits
+        return bit_array.bin
 
     @property
     def _observation_string_length(self):

@@ -6,7 +6,8 @@ import gym
 import numpy as np
 from gym import spaces, utils
 
-from gym_maze import Maze, WALL_MAPPING, ACTION_LOOKUP
+from gym_maze import ACTION_LOOKUP
+from gym_maze.maze import Maze, WALL_MAPPING
 from gym_maze.utils import get_all_possible_transitions
 
 ANIMAT_MARKER = 5

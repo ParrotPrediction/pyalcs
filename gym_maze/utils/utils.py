@@ -1,7 +1,7 @@
 import networkx as nx
 
 from gym_maze import find_action_by_direction
-from gym_maze.Maze import Maze
+from gym_maze.maze import Maze
 
 
 def get_all_possible_transitions(maze):

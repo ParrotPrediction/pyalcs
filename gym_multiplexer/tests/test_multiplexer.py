@@ -32,6 +32,7 @@ class TestMultiplexer:
         # then
         assert state is not None
         assert 3 == len(state)
+        assert type(state) is str
 
     def test_should_execute_step(self):
         # given
@@ -44,6 +45,7 @@ class TestMultiplexer:
 
         # then
         assert state is not None
+        assert type(state) is str
         assert reward in [0, 1]
         assert done is True
 
