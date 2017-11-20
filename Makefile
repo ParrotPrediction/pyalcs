@@ -1,5 +1,5 @@
 install_deps:
-	pip3 install -r requirements.txt --ignore-installed six
+	pip install -r requirements.txt --ignore-installed six
 test:
 	pytest
 coverage:

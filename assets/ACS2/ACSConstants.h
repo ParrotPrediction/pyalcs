@@ -56,7 +56,7 @@
 #define DO_SUBSUMPTION 1
 
 /*andere Makros:*/
-#define ENVIRONMENT_CLASS MazeEnvironment
+#define ENVIRONMENT_CLASS MPEnvironment
 #define RESULT_FILE "ACS2_Maze4_5050B050.txt"
 
 #define MAX_STEPS 30000
