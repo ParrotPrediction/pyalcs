@@ -63,6 +63,20 @@ class TestMultiplexer:
         assert reward in [0, 1000]
         assert done is True
 
+    def test_execute_multiple_steps_and_keep_constant_perception_length(self):
+        # given
+        mp = gym.make('boolean-multiplexer-6bit-v0')
+        steps = 100
+
+        # when & then
+        for _ in range(0, steps):
+            p0 = mp.reset()
+            assert 7 == len(p0)
+
+            action = self._random_action()
+            p1, reward, done, _ = mp.step(action)
+            assert 7 == len(p1)
+
     @staticmethod
     def _random_action():
         return random.sample([0, 1], 1)[0]

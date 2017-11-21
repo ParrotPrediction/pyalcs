@@ -1,4 +1,4 @@
-from bitstring import BitString, BitArray
+from bitstring import BitString
 
 
 def get_correct_answer(bitstring: str, control_bits: int) -> int:

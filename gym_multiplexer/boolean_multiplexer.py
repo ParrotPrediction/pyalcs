@@ -19,24 +19,22 @@ class BooleanMultiplexer(gym.Env):
     def _reset(self):
         logging.debug("Resetting the environment")
         bits = BitArray([random.randint(0, 1) for _ in
-                         range(0, self._observation_string_length)])
-        bits[-1] = False  # set validation bit to False
+                         range(0, self._observation_string_length - 1)])
 
         self._ctrl_bits = bits[:self.control_bits]
         self._data_bits = bits[self.control_bits:]
-        self._validation_bit = bits[-1]
+        self._validation_bit = False
 
         return self._observation()
 
     def _step(self, action):
-        state = self._observation()
         reward = 0
 
         if action == self._answer:
-            state = state[:-1] + '1'  # set validation bit to True
+            self._validation_bit = True
             reward = self.REWARD
 
-        return state, reward, None, None
+        return self._observation(), reward, None, None
 
     def _render(self, mode='human', close=False):
         if close:
@@ -48,7 +46,8 @@ class BooleanMultiplexer(gym.Env):
             super(BooleanMultiplexer, self).render(mode=mode)
 
     def _observation(self) -> str:
-        return (self._ctrl_bits + self._data_bits + self._validation_bit).bin
+        return (self._ctrl_bits + self._data_bits
+                + BitArray([self._validation_bit])).bin
 
     @property
     def _observation_string_length(self):
