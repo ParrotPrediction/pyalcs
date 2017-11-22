@@ -678,8 +678,10 @@ class TestClassifierList:
         expected_population = ClassifiersList(
             [modified_parent1, modified_parent2, child1, child2], cfg)
 
+        # it might sometime fails because one function RNDG is not mocked
         assert expected_population == population
         assert expected_population == match_set
+        assert expected_population == action_set
 
     def test_should_select_parents1(self, cfg):
         # given

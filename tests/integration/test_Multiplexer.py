@@ -1,10 +1,11 @@
-import pytest
 import gym
+import pytest
 
 # noinspection PyUnresolvedReferences
 import gym_multiplexer
 from alcs.acs2 import ACS2Configuration
 from alcs.acs2.ACS2 import ACS2
+from .utils import count_macroclassifiers, count_microclassifiers
 
 
 class TestMultiplexer:
@@ -25,9 +26,8 @@ class TestMultiplexer:
         population, metrics = agent.explore(mp, 1000)
 
         # then
-        assert len(population) == len(set(population))
+        assert count_macroclassifiers(population) == len(set(population))
 
-    # @pytest.mark.skip(reason="inserting in GA phase is bad")
     def test_should_be_no_duplicated_classifiers_with_ga(self, mp):
         # given
         cfg = ACS2Configuration(mp.env.observation_space.n, 2, do_ga=True)
@@ -37,5 +37,6 @@ class TestMultiplexer:
         population, metrics = agent.explore(mp, 1000)
 
         # then
-        assert len(population) == len(set(population))
-        # maybe check numerosity
+        assert count_macroclassifiers(population) == len(set(population))
+        assert count_microclassifiers(population) \
+            > count_macroclassifiers(population)
