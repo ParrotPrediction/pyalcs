@@ -54,7 +54,7 @@ class TestMaze:
 
         # total_cls should be ~2000
         assert self._count_macroclassifiers(population) \
-            < self._count_microclassifiers(population)
+            <= self._count_microclassifiers(population)
 
         assert self._get_total_steps(metrics) > 5000
 

@@ -21,7 +21,8 @@ class AbstractCondition(list):
 
     def __setitem__(self, idx, value):
         if not isinstance(value, str):
-            raise TypeError('Perception should be composed of string objects')
+            raise TypeError('Perception element: [{}] should be '
+                            'a string object'.format(value))
 
         super(AbstractCondition, self).__setitem__(idx, value)
 

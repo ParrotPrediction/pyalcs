@@ -16,15 +16,26 @@ class TestMultiplexer:
     def test_should_initialize_multiplexer_environment(self, mp):
         assert mp is not None
 
-    def test_foo(self, mp):
+    def test_should_be_no_duplicated_classifiers_without_ga(self, mp):
         # given
-        cfg = ACS2Configuration(mp.env.observation_space.n, 2, do_ga=True)
-
+        cfg = ACS2Configuration(mp.env.observation_space.n, 2, do_ga=False)
         agent = ACS2(cfg)
 
         # when
-        population, metrics = agent.explore_exploit(mp, 50)
+        population, metrics = agent.explore(mp, 1000)
 
         # then
-        reliable = [cl for cl in population if cl.is_reliable()]
-        print(len(population))
+        assert len(population) == len(set(population))
+
+    @pytest.mark.skip(reason="inserting in GA phase is bad")
+    def test_should_be_no_duplicated_classifiers_with_ga(self, mp):
+        # given
+        cfg = ACS2Configuration(mp.env.observation_space.n, 2, do_ga=True)
+        agent = ACS2(cfg)
+
+        # when
+        population, metrics = agent.explore(mp, 1000)
+
+        # then
+        assert len(population) == len(set(population))
+        # maybe check numerosity

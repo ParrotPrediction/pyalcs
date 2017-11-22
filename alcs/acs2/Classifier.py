@@ -61,6 +61,12 @@ class Classifier(object):
     def q3num(self):
         return pow(self.q, 3) * self.num
 
+    def __eq__(self, other):
+        return self.is_similar(other)
+
+    def __hash__(self):
+        return hash((str(self.condition), self.action, str(self.effect)))
+
     def __repr__(self):
         return "{}-{}-{} @ {}".format(self.condition,
                                       self.action,
@@ -341,9 +347,6 @@ class Classifier(object):
             return True
         return False
 
-    def is_equally_general(self, other) -> bool:
-        return self.condition.specificity == other.condition.specificity
-
     def is_more_general(self, other) -> bool:
         """
         Checks if the classifier is formally more general than `other`.
@@ -411,18 +414,3 @@ class Classifier(object):
 
         cl2.q = q
         cl2.r = r
-
-    def __eq__(self, other):
-        return self.condition == other.condition \
-            and self.effect == other.effect \
-            and self.action == other.action \
-            and self.num == other.num \
-            and self.r == other.r \
-            and self.q == other.q \
-            and self.talp == other.talp \
-            and self.tav == other.tav \
-            and self.tga == other.tga \
-            and self.exp == other.exp \
-            and self.ee == other.ee \
-            and self.mark == other.mark \
-            and self.ir == other.ir

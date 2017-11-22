@@ -1,10 +1,10 @@
-import pytest
 from random import randint
 
-from alcs.acs2 import ACS2Configuration, ClassifiersList, \
-    Condition, Effect, Classifier
+import pytest
 
 from alcs import Perception
+from alcs.acs2 import ACS2Configuration, ClassifiersList, \
+    Condition, Effect, Classifier
 from .randommock import RandomMock, SampleMock
 
 
@@ -585,6 +585,7 @@ class TestClassifierList:
                           cfg=cfg)
         cl_3 = Classifier(action=3, cfg=cfg)
         cl_4 = Classifier(action=4, cfg=cfg)
+
         action_set = ClassifiersList([cl_1], cfg)
         match_set = ClassifiersList([cl_1], cfg)
         population = ClassifiersList([cl_1, cl_3, cl_4], cfg)

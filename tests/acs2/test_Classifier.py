@@ -18,24 +18,6 @@ class TestClassifier:
         # when & then
         assert Classifier(action=1, numerosity=2, cfg=cfg) == cl
 
-    def test_is_equally_general(self, cfg):
-        c1 = Classifier(Condition('1#######', cfg), cfg=cfg)
-
-        assert c1.is_equally_general(
-            Classifier(Condition('1#######', cfg), cfg=cfg)) is True
-
-        assert c1.is_equally_general(
-            Classifier(Condition('0#######', cfg), cfg=cfg)) is True
-
-        assert c1.is_equally_general(
-            Classifier(Condition('#0######', cfg), cfg=cfg)) is True
-
-        assert c1.is_equally_general(
-            Classifier(Condition('#01#####', cfg), cfg=cfg)) is False
-
-        assert c1.is_equally_general(
-            Classifier(Condition('########', cfg), cfg=cfg)) is False
-
     def test_mutate_1(self, cfg):
         # given
         cls = Classifier(Condition('##011###', cfg), cfg=cfg)

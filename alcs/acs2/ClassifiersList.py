@@ -524,7 +524,7 @@ class ClassifiersList(list):
                 elif classifier.is_more_general(subsumer):
                     subsumer = classifier
                     most_general_subsumers = [subsumer]
-                elif subsumer.is_equally_general(classifier):
+                elif not subsumer.is_more_general(classifier):
                     most_general_subsumers.append(classifier)  # !
 
         return choice_func(most_general_subsumers) \
