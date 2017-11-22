@@ -263,6 +263,7 @@ class ClassifiersList(list):
 
     def apply_ga(self, time, population, match_set, situation,
                  randomfunc=random, samplefunc=sample) -> None:
+
         if self.should_apply_ga(time):
             self.set_ga_timestamp(time)
 
@@ -285,8 +286,7 @@ class ClassifiersList(list):
                         if child.condition.specificity > 0]
 
             # if two classifiers are identical, leave only one
-            if len(children) == 2 and children[0].is_similar(children[1]):
-                children = [children[0]]
+            children = set(children)
 
             self.delete_ga_classifiers(population, match_set,
                                        len(children), randomfunc=randomfunc)
@@ -304,20 +304,16 @@ class ClassifiersList(list):
         :param population:
         :return:
         """
-        if child.condition.specificity != 0:
-            old_cl = self.find_old_classifier(child, match_set, cfg=self.cfg)
+        old_cl = self.find_old_classifier(child)
 
-            if old_cl is None:
-                # TODO  need to add to self?
-                # self.append(child)  # ?
-                population.append(child)
-                if match_set is not None:
-                    match_set.append(child)
-            else:
-                # TODO in C++ code, in case old_cl was found as subsumer,
-                # its numerosity is increased anyway
-                if not old_cl.is_marked():
-                    old_cl.num += 1
+        if old_cl is None:
+            self.append(child)
+            population.append(child)
+            if match_set is not None:
+                match_set.append(child)
+        else:
+            if not old_cl.is_marked():
+                old_cl.num += 1
 
     def add_alp_classifier(self, child, new_list):
         """
@@ -487,36 +483,25 @@ class ClassifiersList(list):
                     cl_to_delete = cl
         return cl_to_delete
 
-    @staticmethod
-    def find_old_classifier(cl: Classifier,
-                            existing_classifiers,
-                            cfg: ACS2Configuration):
-        if existing_classifiers is None:
-            return None
-
+    def find_old_classifier(self, cl: Classifier):
         old_cl = None
 
-        if cfg.do_subsumption:
-            old_cl = ClassifiersList.find_subsumer(cl, existing_classifiers)
+        if self.cfg.do_subsumption:
+            old_cl = self.find_subsumer(cl)
 
         if old_cl is None:
-            old_cl = ClassifiersList.find_similar_classifier(
-                cl, existing_classifiers)
+            old_cl = self.find_similar_classifier(cl)
 
         return old_cl
 
-    @staticmethod
-    def find_similar_classifier(cl: Classifier,
-                                existing_classifiers) -> Classifier:
-        return existing_classifiers.get_similar(cl)
+    def find_similar_classifier(self, cl: Classifier) -> Classifier:
+        return self.get_similar(cl)
 
-    @staticmethod
-    def find_subsumer(cl: Classifier,
-                      existing_classifiers,
-                      choice_func=choice) -> Classifier:
+    def find_subsumer(self, cl: Classifier, choice_func=choice) -> Classifier:
         subsumer = None
         most_general_subsumers = []
-        for classifier in existing_classifiers:
+
+        for classifier in self:
             if classifier.does_subsume(cl):
                 if subsumer is None:
                     subsumer = classifier

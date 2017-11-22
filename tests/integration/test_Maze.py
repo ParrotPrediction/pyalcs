@@ -44,15 +44,13 @@ class TestMaze:
         population, metrics = agent.explore(env, 300)
 
         # then
-        # should be ~300 (actually about 800)
-        assert self._count_macroclassifiers(population) > 300
+        assert abs(250 - self._count_macroclassifiers(population)) < 50
 
         assert 100 == self._get_knowledge(env, population)
 
         assert self._count_macroclassifiers(population) \
             > self._count_reliable(population)
 
-        # total_cls should be ~2000
         assert self._count_macroclassifiers(population) \
             <= self._count_microclassifiers(population)
 

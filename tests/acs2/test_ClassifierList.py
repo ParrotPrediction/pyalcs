@@ -16,46 +16,49 @@ class TestClassifierList:
 
     def test_find_subsumer_finds_single_subsumer(self, cfg):
         # given
-        subsumer = Classifier(condition=Condition('###0####', cfg),
+        subsumer = Classifier(condition='###0####',
                               action=3,
-                              effect=Effect('##1#####', cfg),
+                              effect='##1#####',
                               quality=0.93,
                               reward=1.35,
                               experience=23,
                               cfg=cfg)
+
         nonsubsumer = Classifier(cfg=cfg)
+
         classifiers_list = ClassifiersList(
             [nonsubsumer, subsumer, nonsubsumer], cfg)
 
-        classifier = Classifier(condition=Condition('1##0####', cfg),
+        classifier = Classifier(condition='1##0####',
                                 action=3,
-                                effect=Effect('##1#####', cfg),
+                                effect='##1#####',
                                 quality=0.5,
                                 reward=0.35,
                                 experience=1,
                                 cfg=cfg)
 
         # when
-        actual_subsumer = ClassifiersList.find_subsumer(
-            classifier, classifiers_list, choice_func=lambda l: l[0])
+        actual_subsumer = classifiers_list.find_subsumer(
+            classifier, choice_func=lambda l: l[0])
 
         # then
         assert subsumer == actual_subsumer
 
     def test_find_subsumer_finds_single_subsumer_among_nonsubsumers(self, cfg):
         # given
-        subsumer = Classifier(condition=Condition('###0####', cfg),
+        subsumer = Classifier(condition='###0####',
                               action=3,
-                              effect=Effect('##1#####', cfg),
+                              effect='##1#####',
                               quality=0.93,
                               reward=1.35,
                               experience=23,
                               cfg=cfg)
+
         nonsubsumer = Classifier(cfg=cfg)
 
-        classifier = Classifier(condition=Condition('1##0####', cfg),
+        classifier = Classifier(condition='1##0####',
                                 action=3,
-                                effect=Effect('##1#####', cfg),
+                                effect='##1#####',
                                 quality=0.5,
                                 reward=0.35,
                                 experience=1,
@@ -64,43 +67,45 @@ class TestClassifierList:
             [nonsubsumer, subsumer, nonsubsumer], cfg)
 
         # when
-        actual_subsumer = ClassifiersList.find_subsumer(
-            classifier, classifiers_list, choice_func=lambda l: l[0])
+        actual_subsumer = classifiers_list.find_subsumer(
+            classifier, choice_func=lambda l: l[0])
 
         # then
         assert actual_subsumer == subsumer
 
     def test_find_subsumer_finds_selects_more_general_subsumer1(self, cfg):
         # given
-        subsumer1 = Classifier(condition=Condition('1##0####', cfg),
+        subsumer1 = Classifier(condition='1##0####',
                                action=3,
-                               effect=Effect('##1#####', cfg),
+                               effect='##1#####',
                                quality=0.93,
                                reward=1.35,
                                experience=23,
                                cfg=cfg)
-        subsumer2 = Classifier(condition=Condition('###0####', cfg),
+        subsumer2 = Classifier(condition='###0####',
                                action=3,
-                               effect=Effect('##1#####', cfg),
+                               effect='##1#####',
                                quality=0.93,
                                reward=1.35,
                                experience=23,
                                cfg=cfg)
+
         nonsubsumer = Classifier(cfg=cfg)
 
-        classifier = Classifier(condition=Condition('11#0####', cfg),
+        classifier = Classifier(condition='11#0####',
                                 action=3,
-                                effect=Effect('##1#####', cfg),
+                                effect='##1#####',
                                 quality=0.5,
                                 reward=0.35,
                                 experience=1,
                                 cfg=cfg)
+
         classifiers_list = ClassifiersList(
             [nonsubsumer, subsumer2, subsumer1, nonsubsumer], cfg)
 
         # when
-        actual_subsumer = ClassifiersList.find_subsumer(
-            classifier, classifiers_list, choice_func=lambda l: l[0])
+        actual_subsumer = classifiers_list.find_subsumer(
+            classifier, choice_func=lambda l: l[0])
 
         # then
         assert actual_subsumer == subsumer2
@@ -108,37 +113,39 @@ class TestClassifierList:
     def test_find_subsumer_finds_selects_more_general_subsumer2(self, cfg):
         # given
         subsumer1 = Classifier(
-            condition=Condition('1##0####', cfg),
+            condition='1##0####',
             action=3,
-            effect=Effect('##1#####', cfg),
+            effect='##1#####',
             quality=0.93,
             reward=1.35,
             experience=23,
             cfg=cfg)
         subsumer2 = Classifier(
-            condition=Condition('###0####', cfg),
+            condition='###0####',
             action=3,
-            effect=Effect('##1#####', cfg),
+            effect='##1#####',
             quality=0.93,
             reward=1.35,
             experience=23,
             cfg=cfg)
+
         nonsubsumer = Classifier(cfg=cfg)
 
         classifier = Classifier(
-            condition=Condition('11#0####', cfg),
+            condition='11#0####',
             action=3,
-            effect=Effect('##1#####', cfg),
+            effect='##1#####',
             quality=0.5,
             reward=0.35,
             experience=1,
             cfg=cfg)
+
         classifiers_list = ClassifiersList(
             [nonsubsumer, subsumer1, subsumer2, nonsubsumer], cfg)
 
         # when
-        actual_subsumer = ClassifiersList.find_subsumer(
-            classifier, classifiers_list, choice_func=lambda l: l[0])
+        actual_subsumer = classifiers_list.find_subsumer(
+            classifier, choice_func=lambda l: l[0])
 
         # then
         assert actual_subsumer == subsumer2
@@ -146,42 +153,45 @@ class TestClassifierList:
     def test_find_subsumer_random_select_one_of_equally_general_sbsmers(self,
                                                                         cfg):
         # given
-        subsumer1 = Classifier(condition=Condition('1##0####', cfg),
+        subsumer1 = Classifier(condition='1##0####',
                                action=3,
-                               effect=Effect('##1#####', cfg),
+                               effect='##1#####',
                                quality=0.93,
                                reward=1.35,
                                experience=23,
                                cfg=cfg)
-        subsumer2 = Classifier(condition=Condition('#1#0####', cfg),
+
+        subsumer2 = Classifier(condition='#1#0####',
                                action=3,
-                               effect=Effect('##1#####', cfg),
+                               effect='##1#####',
                                quality=0.93,
                                reward=1.35,
                                experience=23,
                                cfg=cfg)
+
         nonsubsumer = Classifier(cfg=cfg)
 
-        classifier = Classifier(condition=Condition('11#0####', cfg),
+        classifier = Classifier(condition='11#0####',
                                 action=3,
-                                effect=Effect('##1#####', cfg),
+                                effect='##1#####',
                                 quality=0.5,
                                 reward=0.35,
                                 experience=1,
                                 cfg=cfg)
+
         classifiers_list = ClassifiersList(
             [nonsubsumer, subsumer1, subsumer2, nonsubsumer], cfg)
 
         # when
-        actual_subsumer = ClassifiersList.find_subsumer(
-            classifier, classifiers_list, choice_func=lambda l: l[0])
+        actual_subsumer = classifiers_list.find_subsumer(
+            classifier, choice_func=lambda l: l[0])
 
         # then
         assert actual_subsumer == subsumer1
 
         # when
-        actual_subsumer = ClassifiersList.find_subsumer(
-            classifier, classifiers_list, choice_func=lambda l: l[1])
+        actual_subsumer = classifiers_list.find_subsumer(
+            classifier, choice_func=lambda l: l[1])
 
         # then
         assert actual_subsumer == subsumer2
@@ -189,45 +199,49 @@ class TestClassifierList:
     def test_find_subsumer_selects_most_general_subsumer(self, cfg):
         # given
         subsumer1 = Classifier(
-            condition=Condition('1##0####', cfg),
+            condition='1##0####',
             action=3,
-            effect=Effect('##1#####', cfg),
+            effect='##1#####',
             quality=0.93,
             reward=1.35,
             experience=23,
             cfg=cfg)
+
         subsumer2 = Classifier(
-            condition=Condition('#1#0####', cfg),
+            condition='#1#0####',
             action=3,
-            effect=Effect('##1#####', cfg),
+            effect='##1#####',
             quality=0.93,
             reward=1.35, experience=23,
             cfg=cfg)
+
         most_general = Classifier(
-            condition=Condition('###0####', cfg),
+            condition='###0####',
             action=3,
-            effect=Effect('##1#####', cfg),
+            effect='##1#####',
             quality=0.93,
             reward=1.35,
             experience=23,
             cfg=cfg)
+
         nonsubsumer = Classifier(cfg=cfg)
 
         classifier = Classifier(
-            condition=Condition('11#0####', cfg),
+            condition='11#0####',
             action=3,
-            effect=Effect('##1#####', cfg),
+            effect='##1#####',
             quality=0.5,
             reward=0.35,
             experience=1,
             cfg=cfg)
+
         classifiers_list = ClassifiersList(
             [nonsubsumer, subsumer1, nonsubsumer, most_general,
              subsumer2, nonsubsumer], cfg)
 
         # when
-        actual_subsumer = ClassifiersList.find_subsumer(
-            classifier, classifiers_list, choice_func=lambda l: l[0])
+        actual_subsumer = classifiers_list.find_subsumer(
+            classifier, choice_func=lambda l: l[0])
 
         # then
         assert actual_subsumer == most_general
@@ -235,46 +249,50 @@ class TestClassifierList:
     def test_find_old_classifier_only_subsumer(self, cfg):
         # given
         subsumer1 = Classifier(
-            condition=Condition('1##0####', cfg),
+            condition='1##0####',
             action=3,
-            effect=Effect('##1#####', cfg),
+            effect='##1#####',
             quality=0.93,
             reward=1.35,
             experience=23,
             cfg=cfg)
+
         subsumer2 = Classifier(
-            condition=Condition('#1#0####', cfg),
+            condition='#1#0####',
             action=3,
-            effect=Effect('##1#####', cfg),
+            effect='##1#####',
             quality=0.93,
             reward=1.35,
             experience=23,
             cfg=cfg)
+
         most_general = Classifier(
-            condition=Condition('###0####', cfg),
+            condition='###0####',
             action=3,
-            effect=Effect('##1#####', cfg),
+            effect='##1#####',
             quality=0.93,
             reward=1.35,
             experience=23,
             cfg=cfg)
+
         nonsubsumer = Classifier(cfg=cfg)
 
         classifier = Classifier(
-            condition=Condition('11#0####', cfg),
+            condition='11#0####',
             action=3,
-            effect=Effect('##1#####', cfg),
+            effect='##1#####',
             quality=0.5,
             reward=0.35,
             experience=1,
             cfg=cfg)
+
         classifiers_list = ClassifiersList(
             [nonsubsumer, subsumer1, nonsubsumer, most_general,
              subsumer2, nonsubsumer], cfg)
 
         # when
-        actual_old_classifier = ClassifiersList.find_old_classifier(
-            classifier, classifiers_list, cfg)
+        actual_old_classifier = classifiers_list.find_old_classifier(
+            classifier)
 
         # then
         assert most_general == actual_old_classifier
@@ -290,8 +308,8 @@ class TestClassifierList:
              classifier_2], cfg)
 
         # when
-        actual_old_classifier = ClassifiersList.find_old_classifier(
-            Classifier(action=1, cfg=cfg), classifiers, cfg)
+        actual_old_classifier = classifiers.find_old_classifier(
+            Classifier(action=1, cfg=cfg))
 
         # then
         assert classifier_1 == actual_old_classifier
@@ -299,34 +317,39 @@ class TestClassifierList:
     def test_find_old_classifier_similar_and_subsumer_subsumer_returned(self,
                                                                         cfg):
         # given
-        subsumer = Classifier(condition=Condition('1#######', cfg),
+        subsumer = Classifier(condition='1#######',
                               action=1,
                               experience=21,
                               quality=0.95,
                               cfg=cfg)
-        similar = Classifier(condition=Condition('10######', cfg),
+
+        similar = Classifier(condition='10######',
                              action=1,
                              cfg=cfg)
 
         existing_classifiers = ClassifiersList([similar, subsumer], cfg)
-        classifier = Classifier(condition=Condition('10######', cfg),
+
+        classifier = Classifier(condition='10######',
                                 action=1,
                                 cfg=cfg)
 
         # when
-        old_cls = ClassifiersList.find_old_classifier(classifier,
-                                                      existing_classifiers,
-                                                      cfg)
+        old_cls = existing_classifiers.find_old_classifier(classifier)
+
         # then
         assert subsumer.does_subsume(classifier) is True
         assert similar.is_similar(classifier)
         assert subsumer == old_cls
 
     def test_find_old_classifier_none(self, cfg):
-        assert ClassifiersList.find_old_classifier(
-            Classifier(cfg=cfg), None, cfg) is None
-        assert ClassifiersList.find_old_classifier(
-            Classifier(cfg=cfg), ClassifiersList([], cfg=cfg), cfg) is None
+        # given
+        classifier_list = ClassifiersList([], cfg=cfg)
+        cl = Classifier(cfg=cfg)
+
+        # when
+        old_cl = classifier_list.find_old_classifier(cl)
+
+        assert old_cl is None
 
     def test_select_classifier_to_delete(self, cfg):
         # given
@@ -560,7 +583,7 @@ class TestClassifierList:
         # given
         cl_1 = Classifier(action=1, cfg=cfg)
         cl_2 = Classifier(action=2,
-                          condition=Condition('1#######', cfg),
+                          condition='1#######',
                           cfg=cfg)
         cl_3 = Classifier(action=3, cfg=cfg)
         cl_4 = Classifier(action=4, cfg=cfg)
@@ -578,10 +601,10 @@ class TestClassifierList:
     def test_add_ga_classifier_increase_numerosity(self, cfg):
         # given
         cl_1 = Classifier(action=2,
-                          condition=Condition('1#######', cfg),
+                          condition='1#######',
                           cfg=cfg)
         cl_2 = Classifier(action=2,
-                          condition=Condition('1#######', cfg),
+                          condition='1#######',
                           cfg=cfg)
         cl_3 = Classifier(action=3, cfg=cfg)
         cl_4 = Classifier(action=4, cfg=cfg)
@@ -603,8 +626,14 @@ class TestClassifierList:
 
     def test_apply_ga(self, cfg):
         # given
-        cl_1 = Classifier(Condition('#1#1#1#1', cfg), numerosity=12, cfg=cfg)
-        cl_2 = Classifier(Condition('0#0#0#0#', cfg), numerosity=9, cfg=cfg)
+        cl_1 = Classifier(
+            condition='#1#1#1#1',
+            numerosity=12,
+            cfg=cfg)
+        cl_2 = Classifier(
+            condition='0#0#0#0#',
+            numerosity=9,
+            cfg=cfg)
         action_set = ClassifiersList([cl_1, cl_2], cfg=cfg)
         match_set = ClassifiersList([cl_1, cl_2], cfg=cfg)
         population = ClassifiersList([cl_1, cl_2], cfg=cfg)
@@ -624,50 +653,48 @@ class TestClassifierList:
                             samplefunc=SampleMock([0, 4]))
 
         # then
-        modified_parent1 = Classifier(Condition('#1#1#1#1', cfg),
+        modified_parent1 = Classifier(condition='#1#1#1#1',
                                       numerosity=10,
                                       tga=101,
                                       cfg=cfg)
-        modified_parent2 = Classifier(Condition('0#0#0#0#', cfg),
+
+        modified_parent2 = Classifier(condition='0#0#0#0#',
                                       numerosity=8,
                                       tga=101,
                                       cfg=cfg)
-        child1 = Classifier(Condition('0####1#1', cfg),
+
+        child1 = Classifier(condition='0####1#1',
                             quality=0.25,
                             talp=101,
                             tga=101,
                             cfg=cfg)
-        child2 = Classifier(Condition('###10#0#', cfg),
+
+        child2 = Classifier(condition='###10#0#',
                             quality=0.25,
                             talp=101,
                             tga=101,
                             cfg=cfg)
-        expected_population = ClassifiersList([modified_parent1,
-                                               modified_parent2,
-                                               child1, child2],
-                                              cfg)
+
+        expected_population = ClassifiersList(
+            [modified_parent1, modified_parent2, child1, child2], cfg)
 
         assert expected_population == population
         assert expected_population == match_set
-        assert ClassifiersList(
-            [modified_parent1, modified_parent2], cfg) == action_set
 
     def test_should_select_parents1(self, cfg):
         # given
         population = ClassifiersList(cfg=cfg)
-        c0 = Classifier(Condition('######00', cfg), cfg=cfg)
-        c1 = Classifier(Condition('######01', cfg), cfg=cfg)
-        c2 = Classifier(Condition('######10', cfg), cfg=cfg)
-        c3 = Classifier(Condition('######11', cfg), cfg=cfg)
+        c0 = Classifier(condition='######00', cfg=cfg)
+        c1 = Classifier(condition='######01', cfg=cfg)
+        c2 = Classifier(condition='######10', cfg=cfg)
+        c3 = Classifier(condition='######11', cfg=cfg)
         population.append(c0)
         population.append(c1)
         population.append(c2)
         population.append(c3)
-        # q3num= 0.125 for all
 
         # when
-        p1, p2 = population.select_parents(
-            randomfunc=(RandomMock([0.7, 0.1])))
+        p1, p2 = population.select_parents(randomfunc=(RandomMock([0.7, 0.1])))
 
         # then
         assert c0 == p1
@@ -691,12 +718,12 @@ class TestClassifierList:
     def test_quality_and_numerosity_influence_parent_selection(self, cfg):
         # given
         population = ClassifiersList(cfg=cfg)
-        c0 = Classifier(Condition('######00', cfg),
+        c0 = Classifier(condition='######00',
                         quality=1,
                         numerosity=1,
                         cfg=cfg)
-        c1 = Classifier(Condition('######01', cfg), cfg=cfg)
-        c2 = Classifier(Condition('######10', cfg), cfg=cfg)
+        c1 = Classifier(condition='######01', cfg=cfg)
+        c2 = Classifier(condition='######10', cfg=cfg)
         population.append(c0)  # q3num = 1
         population.append(c1)  # q3num = 0.0625
         population.append(c2)  # q3num = 0.0625
@@ -743,10 +770,10 @@ class TestClassifierList:
         c1 = Classifier(cfg=cfg)
 
         # C2 - matching condition
-        c2 = Classifier(Condition('1###0###', cfg), cfg=cfg)
+        c2 = Classifier(condition='1###0###', cfg=cfg)
 
         # C3 - non-matching condition
-        c3 = Classifier(Condition('0###1###', cfg), cfg=cfg)
+        c3 = Classifier(condition='0###1###', cfg=cfg)
 
         population.append(c1)
         population.append(c2)
@@ -815,7 +842,7 @@ class TestClassifierList:
 
         # when & then
         # C2 - does anticipate some change
-        c2 = Classifier(effect=Effect('1###0###', cfg),
+        c2 = Classifier(effect='1###0###',
                         reward=0.25,
                         cfg=cfg)
         population.append(c2)
@@ -823,7 +850,7 @@ class TestClassifierList:
 
         # when & then
         # C3 - does anticipate change and is quite good
-        c3 = Classifier(effect=Effect('1#######', cfg),
+        c3 = Classifier(effect='1#######',
                         quality=0.8,
                         reward=5,
                         cfg=cfg)
@@ -859,7 +886,7 @@ class TestClassifierList:
         # when & then
         # C2 - does anticipate some change
         c2 = Classifier(action=2,
-                        effect=Effect('1###0###', cfg),
+                        effect='1###0###',
                         reward=0.25,
                         cfg=cfg)
         population.append(c2)
@@ -871,7 +898,7 @@ class TestClassifierList:
         # when & then
         # C3 - does anticipate change and is quite good
         c3 = Classifier(action=3,
-                        effect=Effect('1#######', cfg),
+                        effect='1#######',
                         quality=0.8,
                         reward=5,
                         cfg=cfg)
@@ -999,9 +1026,9 @@ class TestClassifierList:
         new_list = ClassifiersList(cfg=cfg)
 
         child = Classifier(
-            condition=Condition('1##1#010', cfg),
+            condition='1##1#010',
             action=0,
-            effect=Effect('0####101', cfg),
+            effect='0####101',
             quality=0.5,
             reward=8.96245,
             intermediate_reward=0,
@@ -1013,9 +1040,9 @@ class TestClassifierList:
         )
 
         c1 = Classifier(
-            condition=Condition('1##1#010', cfg),
+            condition='1##1#010',
             action=0,
-            effect=Effect('0####101', cfg),
+            effect='0####101',
             quality=0.571313,
             reward=7.67011,
             intermediate_reward=0,
@@ -1027,9 +1054,9 @@ class TestClassifierList:
         )
 
         c2 = Classifier(
-            condition=Condition('1####010', cfg),
+            condition='1####010',
             action=0,
-            effect=Effect('0####101', cfg),
+            effect='0####101',
             quality=0.462151,
             reward=8.96245,
             intermediate_reward=0,
@@ -1041,9 +1068,9 @@ class TestClassifierList:
         )
 
         c3 = Classifier(
-            condition=Condition('1####0##', cfg),
+            condition='1####0##',
             action=0,
-            effect=Effect('0####1##', cfg),
+            effect='0####1##',
             quality=0.31452,
             reward=9.04305,
             intermediate_reward=0,
@@ -1073,7 +1100,7 @@ class TestClassifierList:
         new_list = ClassifiersList(cfg=cfg)
 
         child = Classifier(
-            condition=Condition('#1O##O##', cfg),
+            condition='#1O##O##',
             action=0,
             quality=0.5,
             reward=18.206,
@@ -1086,7 +1113,7 @@ class TestClassifierList:
         )
 
         c1 = Classifier(
-            condition=Condition('#1O#O###', cfg),
+            condition='#1O#O###',
             action=0,
             quality=0.650831,
             reward=14.8323,
@@ -1099,7 +1126,7 @@ class TestClassifierList:
         )
 
         c2 = Classifier(
-            condition=Condition('##O#O###', cfg),
+            condition='##O#O###',
             action=0,
             quality=0.79094,
             reward=9.97782,
@@ -1112,9 +1139,9 @@ class TestClassifierList:
         )
 
         c3 = Classifier(
-            condition=Condition('#1O###1O', cfg),
+            condition='#1O###1O',
             action=0,
-            effect=Effect('#O1####1', cfg),
+            effect='#O1####1',
             quality=0.515369,
             reward=8.3284,
             intermediate_reward=0,
@@ -1131,7 +1158,7 @@ class TestClassifierList:
         c3.mark[5].update(['0'])
 
         c4 = Classifier(
-            condition=Condition('####O###', cfg),
+            condition='####O###',
             action=0,
             quality=0.903144,
             reward=14.8722,
@@ -1144,9 +1171,9 @@ class TestClassifierList:
         )
 
         c5 = Classifier(
-            condition=Condition('#1O####O', cfg),
+            condition='#1O####O',
             action=0,
-            effect=Effect('#O1####1', cfg),
+            effect='#O1####1',
             quality=0.647915,
             reward=9.24712,
             intermediate_reward=0,
@@ -1163,7 +1190,7 @@ class TestClassifierList:
         c5.mark[6].update(['0', '1'])
 
         c6 = Classifier(
-            condition=Condition('#1O#####', cfg),
+            condition='#1O#####',
             action=0,
             quality=0.179243,
             reward=18.206,
@@ -1182,7 +1209,7 @@ class TestClassifierList:
         c6.mark[7].update(['0', '1'])
 
         c7 = Classifier(
-            condition=Condition('##O#####', cfg),
+            condition='##O#####',
             action=0,
             quality=0.100984,
             reward=15.91,

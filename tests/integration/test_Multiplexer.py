@@ -27,7 +27,7 @@ class TestMultiplexer:
         # then
         assert len(population) == len(set(population))
 
-    @pytest.mark.skip(reason="inserting in GA phase is bad")
+    # @pytest.mark.skip(reason="inserting in GA phase is bad")
     def test_should_be_no_duplicated_classifiers_with_ga(self, mp):
         # given
         cfg = ACS2Configuration(mp.env.observation_space.n, 2, do_ga=True)
