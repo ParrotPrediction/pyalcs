@@ -1,4 +1,4 @@
-from random import random, sample
+from random import random, sample, randint
 
 from alcs import Perception
 from alcs.acs2 import Condition, Effect, PMark, ACS2Configuration
@@ -279,12 +279,23 @@ class Classifier(object):
         child = self.copy_from(self, time)
 
         if no_spec >= self.cfg.u_max:
-            # TODO: p4: implement later
-            # Code below won't get executed anyway because c.U_MAX is high
-            pass
+            while no_spec >= self.cfg.u_max:
+                assert self.generalize_unchanging_condition_attribute(no_spec) is True
+                no_spec -= 1
+
+            while no_spec + no_spec_new > self.cfg.u_max:
+                if random() < 0.5:
+                    diff_idx = randint(0, no_spec_new)
+                    diff.generalize(diff_idx)
+                    no_spec_new -= 1
+                else:
+                    if self.generalize_unchanging_condition_attribute(no_spec):
+                        no_spec -= 1
         else:
-            # TODO: p4: implement later
-            pass
+            while no_spec + no_spec_new > self.cfg.u_max:
+                diff_idx = randint(0, no_spec_new)
+                diff.generalize(diff_idx)
+                no_spec_new -= 1
 
         child.condition.specialize(new_condition=diff)
 
@@ -356,6 +367,35 @@ class Classifier(object):
         """
         if self.condition.specificity < other.condition.specificity:
             return True
+
+        return False
+
+    def generalize_unchanging_condition_attribute(
+            self, no_spec, randomfunc=randint) -> bool:
+        """
+        Generalizes one randomly unchanging attribute in the condition.
+        An unchanging attribute is one that is anticipated not to change
+        in the effect part.
+        :param no_spec: number of unchanging attributes
+        :param randomfunc: specifies random function for distinguishing
+        which attribute to generalize
+        :return: True if attribute was generalized, False otherwise
+        """
+        if no_spec == 0:
+            return False  # nothing to generalize
+
+        att_idx = randomfunc(0, no_spec - 1)  # id of attribute to generalize
+        pos = 0  # current unchanging attribute id
+
+        for idx, (cpi, epi) in enumerate(zip(self.condition, self.effect)):
+            if cpi != self.cfg.classifier_wildcard and \
+                    epi == self.cfg.classifier_wildcard:
+
+                if att_idx == pos:
+                    self.condition.generalize(idx)
+                    return True
+                else:
+                    pos += 1
 
         return False
 

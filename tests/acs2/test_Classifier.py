@@ -1080,3 +1080,73 @@ class TestClassifier:
 
         # then
         assert cls.predicts_successfully(p0, action, p1) is True
+
+    def test_should_not_generalize_random_attributes(self, cfg):
+        # given
+        cls = Classifier(
+            condition='#####0#0',
+            effect='#####1#1',
+            cfg=cfg)
+
+        no_spec = cls.specified_unchanging_attributes
+        assert 0 == no_spec
+
+        # when
+        generalized = cls.generalize_unchanging_condition_attribute(no_spec)
+
+        # then
+        assert generalized is False
+        assert 0 == cls.specified_unchanging_attributes
+
+    def test_should_generalize_random_attribute(self, cfg):
+        # given
+        cls = Classifier(
+            condition='#####0#0',
+            effect='#######1',
+            cfg=cfg)
+
+        no_spec = cls.specified_unchanging_attributes
+        assert 1 == no_spec
+
+        # when
+        generalized = cls.generalize_unchanging_condition_attribute(no_spec)
+
+        # then
+        assert generalized is True
+        assert 0 == cls.specified_unchanging_attributes
+
+    def test_should_generalize_one_random_attribute(self, cfg):
+        # given
+        cls = Classifier(
+            condition='#####0#0',
+            effect='########',
+            cfg=cfg)
+
+        no_spec = cls.specified_unchanging_attributes
+        assert 2 == no_spec
+
+        # when
+        generalized = cls.generalize_unchanging_condition_attribute(no_spec)
+
+        # then
+        assert generalized is True
+        assert 1 == cls.specified_unchanging_attributes
+
+    def test_should_generalize_second_unchanging_attribute(self, cfg):
+        # given
+        cls = Classifier(
+            condition='#####0#0',
+            effect='########',
+            cfg=cfg)
+
+        no_spec = cls.specified_unchanging_attributes
+        assert 2 == no_spec
+
+        # when
+        generalized = cls.generalize_unchanging_condition_attribute(
+            no_spec, lambda x, y: 1)
+
+        # then
+        assert generalized is True
+        assert 1 == cls.specified_unchanging_attributes
+        assert Condition('#####0##', cfg) == cls.condition
