@@ -5,7 +5,7 @@ import pytest
 import gym_maze
 from alcs.acs2 import ACS2Configuration
 from alcs.acs2.ACS2 import ACS2
-from examples.maze import calculate_knowledge
+from integration.maze.utils import calculate_performance
 from .utils import count_microclassifiers, \
     count_macroclassifiers, \
     count_reliable
@@ -19,7 +19,10 @@ class TestMaze:
 
     def test_should_traverse(self, env):
         # given
-        cfg = ACS2Configuration(8, 8, epsilon=1.0, do_ga=False)
+        cfg = ACS2Configuration(8, 8,
+                                epsilon=1.0,
+                                do_ga=False,
+                                performance_fcn=calculate_performance)
         agent = ACS2(cfg)
 
         # when
@@ -28,7 +31,7 @@ class TestMaze:
         # then
         assert 100 < count_macroclassifiers(population) < 200
 
-        assert 100 == self._get_knowledge(env, population)
+        assert 100 == self._get_knowledge(metrics)
 
         assert count_macroclassifiers(population) == count_reliable(population)
 
@@ -39,7 +42,10 @@ class TestMaze:
 
     def test_should_traverse_with_ga(self, env):
         # given
-        cfg = ACS2Configuration(8, 8, epsilon=1.0, do_ga=True)
+        cfg = ACS2Configuration(8, 8,
+                                epsilon=1.0,
+                                do_ga=True,
+                                performance_fcn=calculate_performance)
         agent = ACS2(cfg)
 
         # when
@@ -48,7 +54,7 @@ class TestMaze:
         # then
         assert abs(250 - count_macroclassifiers(population)) < 50
 
-        assert 100 == self._get_knowledge(env, population)
+        assert 100 == self._get_knowledge(metrics)
 
         assert count_macroclassifiers(population) \
             > count_reliable(population)
@@ -63,8 +69,8 @@ class TestMaze:
         pass
 
     @staticmethod
-    def _get_knowledge(env, population):
-        return calculate_knowledge(env, population)
+    def _get_knowledge(metrics):
+        return metrics[-1]['performance']['knowledge']
 
     @staticmethod
     def _get_total_steps(metrics):

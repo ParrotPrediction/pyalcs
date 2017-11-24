@@ -206,10 +206,12 @@ class ACS2:
         agent_stats = self._collect_agent_metrics(
             current_trial, steps_in_trial, steps)
         env_stats = self._collect_env_stats(env)
+        performance_stats = self._calculate_performance(env)
 
         return {
             'agent': agent_stats,
-            'environment': env_stats
+            'environment': env_stats,
+            'performance': performance_stats
         }
 
     def _collect_agent_metrics(self, trial, steps, total_steps):
@@ -228,5 +230,12 @@ class ACS2:
     def _collect_env_stats(self, env):
         if self.cfg.environment_metrics_fcn:
             return self.cfg.environment_metrics_fcn(env)
+
+        return None
+
+    def _calculate_performance(self, env):
+        if self.cfg.performance_fcn:
+            return self.cfg.performance_fcn(
+                env, self.population, **self.cfg.performance_fcn_params)
 
         return None

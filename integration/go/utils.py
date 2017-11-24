@@ -1,4 +1,3 @@
-import logging
 from gym.envs.board_game import go
 
 
@@ -55,3 +54,9 @@ def calculate_bw_ratio(env):
         pass
 
     return ratio
+
+
+def calculate_environment_metrics(env):
+    return {
+        'bw_ratio': calculate_bw_ratio(env)
+    }

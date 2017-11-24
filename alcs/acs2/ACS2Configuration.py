@@ -7,6 +7,8 @@ class ACS2Configuration:
                  perception_mapper_fcn=None,
                  action_mapping_dict=None,
                  environment_metrics_fcn=None,
+                 performance_fcn=None,
+                 performance_fcn_params={},
                  do_ga=False,
                  do_subsumption=True,
                  beta=0.05,
@@ -32,7 +34,10 @@ class ACS2Configuration:
             action (numbers from `0 .. number_of_possible_actions)` and value
             is the environmental representation of the action.
         :param environment_metrics_fcn:
-        :param do_ga: if *Genetic Generalization* module is enabled
+        :param performance_fcn: function for estimating agent performance
+        :param performance_fcn_params: optional parameters needed for
+            calculating agent performance
+        :param do_ga: switch *Genetic Generalization* module
         :param do_subsumption:
         :param beta:
         :param gamma:
@@ -46,12 +51,16 @@ class ACS2Configuration:
         :param mu:
         :param chi:
         """
+        if performance_fcn_params is None:
+            performance_fcn_params = {}
         self.classifier_length = classifier_length
         self.number_of_possible_actions = number_of_possible_actions
         self.classifier_wildcard = classifier_wildcard
         self.perception_mapper_fcn = perception_mapper_fcn
         self.action_mapping_dict = action_mapping_dict
         self.environment_metrics_fcn = environment_metrics_fcn
+        self.performance_fcn = performance_fcn
+        self.performance_fcn_params = performance_fcn_params
         self.do_ga = do_ga
         self.do_subsumption = do_subsumption
         self.theta_exp = theta_exp
@@ -74,18 +83,22 @@ class ACS2Configuration:
                "\n\t- Perception mapper function: [{}]" \
                "\n\t- Action mapping dict: [{}]" \
                "\n\t- Environment metrics function: [{}]" \
+               "\n\t- Performance calculation function: [{}] " \
                "\n\t- Do GA: [{}]" \
                "\n\t- Do subsumption: [{}]" \
                "\n\t- Beta: [{}]" \
                "\n\t- ..." \
-               "\n\t- Epsilon: [{}]"\
+               "\n\t- Epsilon: [{}]" \
+               "\n\t- U_max: [{}]" \
             .format(self.classifier_length,
                     self.number_of_possible_actions,
                     self.classifier_wildcard,
                     self.perception_mapper_fcn,
                     self.action_mapping_dict,
                     self.environment_metrics_fcn,
+                    self.performance_fcn,
                     self.do_ga,
                     self.do_subsumption,
                     self.beta,
-                    self.epsilon)
+                    self.epsilon,
+                    self.u_max)

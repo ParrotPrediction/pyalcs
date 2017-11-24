@@ -280,7 +280,8 @@ class Classifier(object):
 
         if no_spec >= self.cfg.u_max:
             while no_spec >= self.cfg.u_max:
-                assert self.generalize_unchanging_condition_attribute(no_spec) is True
+                res = self.generalize_unchanging_condition_attribute(no_spec)
+                assert res is True
                 no_spec -= 1
 
             while no_spec + no_spec_new > self.cfg.u_max:
@@ -329,7 +330,6 @@ class Classifier(object):
         # TODO: p5 maybe also take into consideration cl.E = # (paper)
         child.specialize(previous_perception, perception)
 
-        # TODO: p5 cl.q? (paper)
         if child.q < 0.5:
             child.q = 0.5
 

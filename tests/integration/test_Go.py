@@ -1,7 +1,7 @@
 import gym
 import pytest
 
-from examples.go.utils import moves_9x9, process_state, calculate_bw_ratio
+from integration.go.utils import moves_9x9, process_state, calculate_bw_ratio
 
 
 class TestGo:

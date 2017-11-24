@@ -1,4 +1,4 @@
-def calculate_knowledge(maze, population):
+def calculate_performance(maze, population):
     """
     Analyzes all possible transition in maze environment and checks if there
     is a reliable classifier for it.
@@ -24,4 +24,6 @@ def calculate_knowledge(maze, population):
                 if cl.predicts_successfully(p0, action, p1)]):
             nr_correct += 1
 
-    return nr_correct / len(transitions) * 100.0
+    return {
+        'knowledge': nr_correct / len(transitions) * 100.0
+    }
