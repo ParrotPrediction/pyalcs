@@ -256,9 +256,7 @@ class Classifier(object):
 
         self.talp = time
 
-    def expected_case(self,
-                      perception: Perception,
-                      time: int):
+    def expected_case(self, perception: Perception, time: int):
         """
         Controls the expected case of a classifier. If the classifier
         is to specific it tries to add some randomness to it by

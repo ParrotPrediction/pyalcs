@@ -26,5 +26,3 @@ if __name__ == '__main__':
     # See how it went
     for metric in metrics:
         print(metric)
-
-
