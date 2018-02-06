@@ -6,4 +6,4 @@ gym[all]==0.9.4
 pandas==0.21.0
 pytest==3.2.3
 
--e git+https://github.com/ParrotPrediction/openai-maze-envs.git#egg=parrot_envs
+-e git+https://github.com/ParrotPrediction/openai-envs.git#egg=parrotprediction-openai-envs

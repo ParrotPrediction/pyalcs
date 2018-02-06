@@ -10,7 +10,7 @@ ALCS are is an extension to basic LCS compromising the notation of anticipations
 
 
 ## Deep dive
-Before working with code please install few required dependencies (code is running on Python 3)
+Before working with code please install few required dependencies (code is running on Python 3). Make sure Swig binary is installed (required to compile OpenAI Gym environments)
 
     make install_deps
 
