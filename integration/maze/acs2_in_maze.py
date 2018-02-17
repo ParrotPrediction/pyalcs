@@ -22,10 +22,14 @@ if __name__ == '__main__':
                             do_ga=False,
                             performance_fcn=calculate_performance)
     logging.info(cfg)
-    agent = ACS2(cfg)
 
     # Explore the environment
-    population, metrics = agent.explore_exploit(maze, 50)
+    agent = ACS2(cfg)
+    population, explore_metrics = agent.explore(maze, 50)
 
-    for metric in metrics:
+    # Exploit the environment
+    agent = ACS2(cfg, population)
+    population, exploit_metric = agent.exploit(maze, 10)
+
+    for metric in exploit_metric:
         logging.info(metric)
