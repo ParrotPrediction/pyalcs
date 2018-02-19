@@ -49,8 +49,22 @@ register(
 )
 
 register(
+    id='Maze4-v0',
+    entry_point='gym_maze.envs:Maze4',
+    max_episode_steps=50,
+    nondeterministic=False
+)
+
+register(
     id='Maze5-v0',
     entry_point='gym_maze.envs:Maze5',
+    max_episode_steps=50,
+    nondeterministic=False
+)
+
+register(
+    id='Maze6-v0',
+    entry_point='gym_maze.envs:Maze6',
     max_episode_steps=50,
     nondeterministic=True
 )
@@ -65,6 +79,13 @@ register(
 register(
     id='Woods1-v0',
     entry_point='gym_maze.envs:Woods1',
+    max_episode_steps=50,
+    nondeterministic=False
+)
+
+register(
+    id='Woods14-v0',
+    entry_point='gym_maze.envs:Woods14',
     max_episode_steps=50,
     nondeterministic=False
 )
