@@ -101,3 +101,7 @@ ENV/
 # C++ byproducts
 *.o
 *.out
+
+# Not wanted, EPS graphics, serialized pickle dumps
+*.eps
+*.p
