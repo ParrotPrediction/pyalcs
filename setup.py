@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='pyalcs',
-      version='1.2',
+      version='1.3',
       description='Implementation of Anticipatory Learning Classifiers',
       keywords='acs lcs machine-learning reinforcement-learning openai',
       url='https://github.com/ParrotPrediction/pyalcs',
