@@ -55,7 +55,7 @@ def perform_experiment(agent, env, trials=50):
 
 
 # Run experiment
-TRIALS = 10
+TRIALS = 250_000
 population, metrics = perform_experiment(*get_actors(), trials=TRIALS)
 
 # Dump data to file
