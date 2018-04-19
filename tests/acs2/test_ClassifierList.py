@@ -624,6 +624,7 @@ class TestClassifierList:
         # then
         assert ClassifiersList([new_classifier, cl_3, cl_4], cfg) == population
 
+    @pytest.mark.skip(reason="todo: test with deterministic RNG")
     def test_apply_ga(self, cfg):
         # given
         cl_1 = Classifier(

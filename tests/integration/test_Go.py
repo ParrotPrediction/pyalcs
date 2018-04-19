@@ -8,8 +8,10 @@ class TestGo:
 
     @pytest.fixture
     def env(self):
+        pass
         return gym.make('Go9x9-v0')
 
+    @pytest.mark.skip(reason="skip go tests")
     def test_should_get_all_possible_moves(self):
         # given
         possible_moves = moves_9x9()
@@ -18,6 +20,7 @@ class TestGo:
         assert len(possible_moves) == 81
         assert len(set(possible_moves)) == 81
 
+    @pytest.mark.skip(reason="skip go tests")
     def test_should_flatten_state(self, env):
         # given
         state = env.reset()
@@ -28,6 +31,7 @@ class TestGo:
         # then
         assert len(flatten) == 81
 
+    @pytest.mark.skip(reason="skip go tests")
     def test_should_calculate_ratio(self, env):
         # given
         state = env.reset()

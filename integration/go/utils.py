@@ -1,6 +1,3 @@
-from gym.envs.board_game import go
-
-
 def moves_9x9():
     """
     Return a list of all available moves (such as A8) on 9x9 board.
@@ -35,7 +32,13 @@ def map_moves(env, move):
     """
     Maps moves with given cords (like 'C8') to Pachi representation.
     """
-    return go.str_to_action(env._state.board, move)
+    # Because sometimes there are problems with installing
+    # Patchi dependecies the following code was commented
+
+    # from gym.envs.board_game import go
+    # return go.str_to_action(env._state.board, move)
+
+    return None
 
 
 def calculate_bw_ratio(env):
