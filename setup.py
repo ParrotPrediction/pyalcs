@@ -19,7 +19,6 @@ setup(name='pyalcs',
       project_urls={
           'Source': 'https://github.com/ParrotPrediction/pyalcs',
           'Tracking': 'https://github.com/ParrotPrediction/pyalcs/issues',
-          'Notebooks': 'https://github.com/ParrotPrediction/pyalcs/tree/master/notebooks'
       },
       python_requires='>=3.5',
       packages=find_packages(),
