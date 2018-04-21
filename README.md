@@ -13,7 +13,10 @@ ALCS are is an extension to basic LCS compromising the notation of anticipations
 
 ### Project setup
 
-First, create a [virtualenv](https://virtualenv.pypa.io/) for the project:
+It is recommended to use a Python environment for development
+(virtualenv/virtualenvwrapper/conda).
+
+For a [virtualenv](https://virtualenv.pypa.io/), create it:
 (only needs to be run once)
 
     virtualenv venv
