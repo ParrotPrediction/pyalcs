@@ -10,9 +10,36 @@ ALCS are is an extension to basic LCS compromising the notation of anticipations
 
 
 ## Deep dive
+
+### Project setup
+
+It is recommended to use a Python environment for development
+(virtualenv/virtualenvwrapper/conda).
+
+For a [virtualenv](https://virtualenv.pypa.io/), create it:
+(only needs to be run once)
+
+    virtualenv venv
+
+Then, every time you want to work on a project from the shell, type the
+following to activate the virtual environment:
+
+    source venv/bin/activate
+
 Before working with code please install few required dependencies (code is running on Python 3). Make sure Swig binary is installed (required to compile OpenAI Gym environments)
 
     make install_deps
+
+### Launching example integrations
+
+I assuming you are inside the virtual environment created before.
+In order to run the integrations from the console you need to
+specify Python PATH to use the currently checked-out version
+of `alcs` library:
+
+    PYTHONPATH=/Users/khozzy/Projects/pyalcs python integration/maze/acs2_in_maze.py
+
+PyCharm IDE appends the path automatically.
 
 ## Original code
 The original author's code is located in `assets/original` directory.
