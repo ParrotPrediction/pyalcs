@@ -64,6 +64,21 @@ For example:
 ACS2 is derived from the original ACS framework. The most important change is that it embodies genetic generalization mechanism. Implementation based on *"An Algorithmic Description of ACS2"* by Martin V. Butz and Wolfgang Stolzmann.
 
 ## Contribution
+
+### Citation
+If you want to use the library in your project please cite the following:
+
+    @inbook{
+    title = "Integrating Anticipatory Classifier Systems with OpenAI Gym",
+    keywords = "Aniticipatory Learning Classifier Systems, OpenAI Gym",
+    author = "Norbert Kozlowski, Olgierd Unold",
+    year = "2018",
+    doi = "10.1145/3205651.3208241",
+    isbn = "978-1-4503-5764-7/18/07",
+    booktitle = "Proceedings of the Genetic and Evolutionary Computation Conference (GECCO '18)",
+    publisher = "Association for Computing Machinery",
+    }
+
 Prior to PR please execute to check if standards are holding:
 
     make test
