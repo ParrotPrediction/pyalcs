@@ -11,6 +11,7 @@ class Configuration:
                  environment_adapter=EnvironmentAdapter,
                  user_metrics_collector_fcn: Callable = None,
                  metrics_trial_frequency: int = 5,
+                 do_pee: bool=False,
                  do_ga: bool=False,
                  do_subsumption: bool=True,
                  do_action_planning: bool=False,
@@ -35,6 +36,12 @@ class Configuration:
         :param classifier_wildcard: wildcard symbol
         :param environment_adapter: EnvironmentAdapter class ACS2 needs to use
             to interact with the environment
+        :param do_pee: switch *Probability-Enhanced Effects*.
+            This is the mechanism described and implemented in C++
+            in Martin V. Butz, David E. Goldberg, Wolfgang Stolzmann,
+            "Probability-Enhanced Predictions in the Anticipatory Classifier
+             System", University of Illinois at Urbana-Champaign:
+            Illinois Genetic Algorithms Laboratory, Urbana, 2000.
         :param do_ga: switch *Genetic Generalization* module
         :param do_subsumption:
         :param do_action_planning: switch Action Planning phase
@@ -57,6 +64,7 @@ class Configuration:
         self.environment_adapter = environment_adapter
         self.metrics_trial_frequency = metrics_trial_frequency
         self.user_metrics_collector_fcn = user_metrics_collector_fcn
+        self.do_pee = do_pee
         self.do_ga = do_ga
         self.do_subsumption = do_subsumption
         self.do_action_planning = do_action_planning
@@ -79,6 +87,7 @@ class Configuration:
                "\n\t- Number of possible actions: [{}]" \
                "\n\t- Classifier wildcard: [{}]" \
                "\n\t- Environment adapter function: [{}]" \
+               "\n\t- Do PEE: [{}]" \
                "\n\t- Do GA: [{}]" \
                "\n\t- Do subsumption: [{}]" \
                "\n\t- Do Action Planning: [{}]" \
@@ -90,6 +99,7 @@ class Configuration:
                     self.number_of_possible_actions,
                     self.classifier_wildcard,
                     self.environment_adapter,
+                    self.do_pee,
                     self.do_ga,
                     self.do_subsumption,
                     self.do_action_planning,
