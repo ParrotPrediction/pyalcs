@@ -10,7 +10,7 @@ import gym_multiplexer
 logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
 
 
-class TestMultiplexer:
+class TestBooleanMultiplexer:
     def test_should_initialize_multiplexer(self):
         # when
         mp = gym.make('boolean-multiplexer-6bit-v0')
@@ -29,9 +29,9 @@ class TestMultiplexer:
 
         # then
         assert state is not None
-        assert state[-1] == '0'
+        assert state[-1] == 0
         assert 7 == len(state)
-        assert type(state) is str
+        assert type(state) is list
 
     def test_should_render_state(self):
         # given
@@ -43,9 +43,9 @@ class TestMultiplexer:
 
         # then
         assert state is not None
-        assert state[-1] == '0'
+        assert state[-1] == 0
         assert 4 == len(state)
-        assert type(state) is str
+        assert type(state) is list
 
     def test_should_execute_step(self):
         # given
@@ -58,8 +58,8 @@ class TestMultiplexer:
 
         # then
         assert state is not None
-        assert state[-1] in ['0', '1']
-        assert type(state) is str
+        assert state[-1] in [0, 1]
+        assert type(state) is list
         assert reward in [0, 1000]
         assert done is True
 

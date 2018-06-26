@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='parrotprediction-openai-envs',
-      version='1.0.0',
+      version='2.0.0',
       description='Custom environments for OpenAI Gym',
       keywords='acs lcs machine-learning reinforcement-learning openai',
       url='https://github.com/ParrotPrediction/openai-envs',
