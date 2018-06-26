@@ -9,6 +9,7 @@ class Multiplexer(gym.Env):
 
   REWARD = 1000
 
+  def _generate_state(self): raise NotImplementedError
   def _internal_state(self): raise NotImplementedError
 
   def __init__(self, control_bits=3) -> None:
@@ -19,8 +20,7 @@ class Multiplexer(gym.Env):
     self._validation_bit = 0
 
   def _reset(self):
-      self._state = [random.random() for _ in
-                     range(0, self._observation_string_length - 1)]
+      self._state = self._generate_state()
       self._validation_bit = 0
       return self._observation
 
