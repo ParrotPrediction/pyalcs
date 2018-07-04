@@ -19,6 +19,21 @@ class ClassifiersList(list):
         self.cfg = cfg
         list.__init__(self, seq or [])
 
+    #TODO possibly new constructor needed?????
+    # /**
+    #  * Constructor for match set generation. (Does not copy classifiers.)
+    #  */
+    # ClassifierList::ClassifierList(ClassifierList *pop, Perception *percept) {
+    #     list = 0;
+    #     size = 0;
+    #     env = pop->env;
+    #     for (PureClassifierList *listp = pop->list; listp != 0; listp = listp->next) {
+    #         if (listp->cl->doesMatch(percept)) {
+    #             addClassifier(listp->cl);
+    #         }
+    #     }
+    # }
+
     def append(self, item):
         if not isinstance(item, Classifier):
             raise TypeError("Item should be a Classifier object")
@@ -514,3 +529,7 @@ class ClassifiersList(list):
 
         return choice_func(most_general_subsumers) \
             if most_general_subsumers else None
+
+    def search_goal_sequence(self, start, goal):
+        #TODO: Action **ClassifierList::searchGoalSequence(Perception *start, Perception *goal) {
+        pass
