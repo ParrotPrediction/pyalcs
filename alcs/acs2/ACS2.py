@@ -33,6 +33,7 @@ class ACS2:
         :param max_trials: number of trials
         :return: population of classifiers and metrics
         """
+
         def switch_phases(env, steps, current_trial):
             if current_trial % 2 == 0:
                 return self._run_trial_explore(env, steps)
@@ -169,6 +170,26 @@ class ACS2:
                 action_set.apply_reinforcement_learning(reward, 0)
 
             steps += 1
+
+        return steps
+
+    def _run_action_planning(self, env, time, situation,
+                             previous_situation, actionSet, act, rho0):
+        steps = 0
+        matchSet = 0  # TODO ClassifierList *matchSet = 0;
+        done = False
+        goal_situation = 0  # TODO env->getGoalState(goalSituation)
+
+        while not done:
+            # TODO if (!env->getGoalState(goalSituation)) {break;
+            act_sequence = self.population.search_goal_sequence(situation, goal_situation)
+            i = 0
+            while act_sequence[i] != 0:
+                matchSet = ClassifiersList() #TODO new constructor???
+
+                i += 1
+                pass
+            pass
 
         return steps
 
