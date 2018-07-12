@@ -1,3 +1,6 @@
+from lcs import Perception
+
+
 class EnvironmentAdapter:
     """
     Sometimes the observation returned by the OpenAI Gym environment
@@ -30,7 +33,7 @@ class EnvironmentAdapter:
         Converts environment representation of a state to LCS
         representation.
         """
-        return phenotype
+        return Perception(phenotype)
 
     @staticmethod
     def to_env_action(lcs_action):
