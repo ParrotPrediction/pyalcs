@@ -189,10 +189,7 @@ class Classifier(object):
                    leave_specialized=False) -> None:
         """
         Specializes the effect part where necessary to correctly anticipate
-        the changes from p0 to p1 and returns a condition which specifies
-        the attributes which must be specified in the condition part.
-        The specific attributes in the returned conditions are set to
-        the necessary values.
+        the changes from p0 to p1.
 
         Parameters
         ----------
