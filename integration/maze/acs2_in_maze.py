@@ -4,7 +4,7 @@ import gym
 
 # noinspection PyUnresolvedReferences
 import gym_maze
-from alcs import ACS2, ACS2Configuration
+from lcs import ACS2, ACS2Configuration
 from integration.maze.utils import calculate_performance
 
 # Configure logger

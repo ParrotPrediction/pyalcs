@@ -5,7 +5,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 # Load PyALCS module
-from alcs import ACS2, ACS2Configuration
+from lcs import ACS2, ACS2Configuration
 
 # Load environments
 import gym

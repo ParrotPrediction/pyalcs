@@ -1,6 +1,6 @@
 # import logging
-from alcs import ACS2Configuration
-from alcs.acs2 import ClassifiersList
+from lcs import ACS2Configuration
+from lcs.acs2 import ClassifiersList
 from integration.go_self_play.environment import GoBoard
 
 # Configure logger

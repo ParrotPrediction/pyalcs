@@ -1,8 +1,8 @@
 from random import choice
 
-from alcs import Perception
-from alcs.acs2 import Condition
-from alcs.acs2.ACS2Configuration import ACS2Configuration
+from lcs import Perception
+from lcs.acs2 import Condition
+from lcs.acs2.ACS2Configuration import ACS2Configuration
 
 
 class PMark(list):

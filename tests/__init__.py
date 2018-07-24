@@ -1,1 +1,1 @@
-from .acs2 import *
+from tests.lcs.acs2 import *

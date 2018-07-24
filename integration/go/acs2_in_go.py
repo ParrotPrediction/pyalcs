@@ -3,7 +3,7 @@ import pickle
 
 import gym
 
-from alcs import ACS2, ACS2Configuration
+from lcs import ACS2, ACS2Configuration
 from integration.go.utils import moves_9x9, process_state, \
     calculate_environment_metrics, map_moves
 

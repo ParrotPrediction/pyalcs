@@ -2,10 +2,10 @@ from random import randint
 
 import pytest
 
-from alcs import Perception
-from alcs.acs2 import ACS2Configuration, ClassifiersList, \
-    Condition, Effect, Classifier
-from .randommock import RandomMock, SampleMock
+from lcs import Perception
+from lcs.acs2 import ACS2Configuration, ClassifiersList, \
+    Condition, Classifier
+from tests.randommock import RandomMock, SampleMock
 
 
 class TestClassifierList:
@@ -683,69 +683,6 @@ class TestClassifierList:
         assert expected_population == population
         assert expected_population == match_set
         assert expected_population == action_set
-
-    def test_should_select_parents1(self, cfg):
-        # given
-        population = ClassifiersList(cfg=cfg)
-        c0 = Classifier(condition='######00', cfg=cfg)
-        c1 = Classifier(condition='######01', cfg=cfg)
-        c2 = Classifier(condition='######10', cfg=cfg)
-        c3 = Classifier(condition='######11', cfg=cfg)
-        population.append(c0)
-        population.append(c1)
-        population.append(c2)
-        population.append(c3)
-
-        # when
-        p1, p2 = population.select_parents(randomfunc=(RandomMock([0.7, 0.1])))
-
-        # then
-        assert c0 == p1
-
-        # when
-        p1, p2 = population.select_parents(
-            randomfunc=(RandomMock([0.3, 0.6])))
-
-        # then
-        assert c1 == p1
-        assert c2 == p2
-
-        # when
-        p1, p2 = population.select_parents(
-            randomfunc=(RandomMock([0.2, 0.8])))
-
-        # then
-        assert c0 == p1
-        assert c3 == p2
-
-    def test_quality_and_numerosity_influence_parent_selection(self, cfg):
-        # given
-        population = ClassifiersList(cfg=cfg)
-        c0 = Classifier(condition='######00',
-                        quality=1,
-                        numerosity=1,
-                        cfg=cfg)
-        c1 = Classifier(condition='######01', cfg=cfg)
-        c2 = Classifier(condition='######10', cfg=cfg)
-        population.append(c0)  # q3num = 1
-        population.append(c1)  # q3num = 0.0625
-        population.append(c2)  # q3num = 0.0625
-
-        # when
-        p1, p2 = population.select_parents(
-            randomfunc=(RandomMock([0.888, 0.999])))
-
-        # then
-        assert c1 == p1
-        assert c2 == p2
-
-        # when
-        p1, p2 = population.select_parents(
-            randomfunc=(RandomMock([0.888, 0.777])))
-
-        # then
-        assert c0 == p1
-        assert c1 == p2
 
     def test_should_insert_classifier_1(self, cfg):
         population = ClassifiersList(cfg=cfg)

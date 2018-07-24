@@ -1,8 +1,7 @@
 import pytest
 
-from alcs import Perception
-from alcs.acs2 import ACS2Configuration, Classifier, Condition, Effect
-from .randommock import RandomMock
+from lcs import Perception
+from lcs.acs2 import ACS2Configuration, Classifier, Condition, Effect
 
 
 class TestClassifier:
@@ -17,30 +16,6 @@ class TestClassifier:
 
         # when & then
         assert Classifier(action=1, numerosity=2, cfg=cfg) == cl
-
-    def test_mutate_1(self, cfg):
-        # given
-        cls = Classifier(Condition('##011###', cfg), cfg=cfg)
-        s = cfg.mu * 0.5  # less then MU
-        b = 1 - (1 - cfg.mu) * 0.5  # more then MU
-
-        # when
-        cls.mutate(randomfunc=RandomMock([s, b, b]))
-
-        # then
-        assert Condition('###11###', cfg) == cls.condition
-
-    def test_mutate_2(self, cfg):
-        # given
-        cls = Classifier(Condition('##011###', cfg), cfg=cfg)
-        s = cfg.mu * 0.5  # less then MU
-        b = 1 - (1 - cfg.mu) * 0.5  # more then MU
-
-        # when
-        cls.mutate(randomfunc=RandomMock([b, b, s]))
-
-        # then
-        assert Condition('##01####', cfg) == cls.condition
 
     def test_should_calculate_fitness(self, cfg):
         # given
@@ -482,36 +457,6 @@ class TestClassifier:
 
         # No classifier should be generated here
         assert new_cls is None
-
-    def test_copy_from_and_mutate_does_not_influence_another_condition(self,
-                                                                       cfg):
-        """ Verify that not just reference to Condition copied (changing which
-        will change the original - definitily not original C++ code did). """
-        # given
-        s = cfg.mu * 0.5  # less then MU
-        b = 1 - (1 - cfg.mu) * 0.5  # more then MU
-
-        operation_time = 123
-        original_cl = Classifier(
-            condition=Condition('1###1011', cfg),
-            cfg=cfg
-        )
-
-        copied_cl = Classifier.copy_from(original_cl, operation_time)
-
-        # when
-        copied_cl.mutate(RandomMock([s, b, b, b, b]))
-
-        # then
-        assert Condition('####1011', cfg) == copied_cl.condition
-        assert Condition('1###1011', cfg) == original_cl.condition
-
-        # when
-        original_cl.mutate(RandomMock([b, s, b, b, b]))
-
-        # then
-        assert Condition('1####011', cfg) == original_cl.condition
-        assert Condition('####1011', cfg) == copied_cl.condition
 
     def test_should_handle_unexpected_case_5(self, cfg):
         # given

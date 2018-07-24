@@ -1,9 +1,7 @@
 import pytest
 
-from alcs.acs2 import ACS2Configuration, Condition
-
-from alcs import Perception
-from .randommock import SampleMock
+from lcs import Perception
+from lcs.acs2 import ACS2Configuration, Condition
 
 
 class TestCondition:
@@ -182,27 +180,3 @@ class TestCondition:
 
         # Then
         assert res is True
-
-    def test_crossover(self, cfg):
-        # given
-        c1 = Condition('0##10###', cfg)
-        c2 = Condition('#10##0##', cfg)
-
-        # when
-        c1.two_point_crossover(c2, samplefunc=SampleMock([1, 4]))
-
-        # then
-        assert Condition('010#0###', cfg) == c1
-        assert Condition('###1#0##', cfg) == c2
-
-    def test_crossover_allows_to_change_last_element(self, cfg):
-        # given
-        c1 = Condition('0##10###', cfg)
-        c2 = Condition('#10##011', cfg)
-
-        # when
-        c1.two_point_crossover(c2, samplefunc=SampleMock([5, 8]))
-
-        # then
-        assert Condition('0##10011', cfg) == c1
-        assert Condition('#10#####', cfg) == c2

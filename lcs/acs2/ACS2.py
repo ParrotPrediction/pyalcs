@@ -1,5 +1,5 @@
 import logging
-from alcs.acs2 import ClassifiersList, ACS2Configuration
+from lcs.acs2 import ClassifiersList, ACS2Configuration
 
 
 class ACS2:

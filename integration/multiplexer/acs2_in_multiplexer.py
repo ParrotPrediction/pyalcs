@@ -2,7 +2,7 @@ import gym
 
 # noinspection PyUnresolvedReferences
 import gym_multiplexer
-from alcs import ACS2, ACS2Configuration
+from lcs import ACS2, ACS2Configuration
 from integration.multiplexer.utils import calculate_performance
 
 if __name__ == '__main__':

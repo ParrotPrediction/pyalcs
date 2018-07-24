@@ -1,5 +1,5 @@
 from integration.go_self_play.environment import GoBoard
-from alcs import ACS2, ACS2Configuration
+from lcs import ACS2, ACS2Configuration
 
 import logging
 

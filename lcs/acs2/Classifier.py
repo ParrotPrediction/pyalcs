@@ -1,7 +1,7 @@
-from random import random, sample, randint
+from random import random, randint
 
-from alcs import Perception
-from alcs.acs2 import Condition, Effect, PMark, ACS2Configuration
+from lcs import Perception
+from lcs.acs2 import Condition, Effect, PMark, ACS2Configuration
 
 
 class Classifier(object):
@@ -333,15 +333,6 @@ class Classifier(object):
 
         return child
 
-    def mutate(self, randomfunc=random):
-        """
-        Executes the generalizing mutation in the classifier.
-        """
-        for idx, cond in enumerate(self.condition):
-            if cond != self.cfg.classifier_wildcard and \
-                    randomfunc() < self.cfg.mu:
-                self.condition.generalize(idx)
-
     def is_similar(self, other) -> bool:
         """
         Check if classifier is equals to `other` classifier in condition,
@@ -437,18 +428,3 @@ class Classifier(object):
             return False
 
         return True
-
-    def crossover(self, cl2, samplefunc=sample):
-        """
-        Executes crossover with other classifier
-        :param samplefunc:
-        :param cl2: other classifier
-        """
-        self.condition.two_point_crossover(
-            cl2.condition, samplefunc=samplefunc)
-
-        q = float(sum([self.q, cl2.q]) / 2)
-        r = float(sum([self.r, cl2.r]) / 2)
-
-        cl2.q = q
-        cl2.r = r

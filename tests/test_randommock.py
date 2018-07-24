@@ -1,4 +1,4 @@
-from .randommock import RandomMock, SampleMock
+from tests.randommock import RandomMock, SampleMock
 
 
 class TestRandomTest:

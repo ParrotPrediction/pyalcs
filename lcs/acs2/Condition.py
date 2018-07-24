@@ -1,6 +1,4 @@
-from random import sample
-
-from alcs.acs2 import AbstractCondition
+from lcs.acs2 import AbstractCondition
 
 
 class Condition(AbstractCondition):
@@ -54,23 +52,3 @@ class Condition(AbstractCondition):
                 return False
 
         return True
-
-    def two_point_crossover(self, other, samplefunc=sample):
-        """
-        Executes two-point crossover
-        :param samplefunc:
-        :param other: other condition given as list
-        """
-        left, right = samplefunc(range(0, self.cfg.classifier_length + 1), 2)
-
-        if left > right:
-            left, right = right, left
-
-        # Extract chromosomes
-        chromosome1 = self[left:right]
-        chromosome2 = other[left:right]
-
-        # Flip them
-        for idx, el in enumerate(range(left, right)):
-            self[el] = chromosome2[idx]
-            other[el] = chromosome1[idx]

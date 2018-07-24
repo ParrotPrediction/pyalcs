@@ -2,10 +2,11 @@ import logging
 from itertools import groupby, chain
 from random import random, randint, choice, sample
 
-from alcs.acs2 import Classifier
-
-from alcs.acs2 import ACS2Configuration
-from alcs import Perception
+from lcs import Perception
+from lcs.acs2 import ACS2Configuration
+from lcs.acs2 import Classifier
+from lcs.components.genetic_algorithm \
+    import roulette_wheel_parents_selection, mutate, two_point_crossover
 
 
 class ClassifiersList(list):
@@ -266,18 +267,23 @@ class ClassifiersList(list):
 
         if self.should_apply_ga(time):
             self.set_ga_timestamp(time)
-
-            parent1, parent2 = self.select_parents(randomfunc=randomfunc)
+            parent1, parent2 = roulette_wheel_parents_selection(
+                self, randomfunc=randomfunc)
 
             child1 = Classifier.copy_from(parent1, time)
             child2 = Classifier.copy_from(parent2, time)
 
-            child1.mutate(randomfunc=randomfunc)
-            child2.mutate(randomfunc=randomfunc)
+            mutate(child1, randomfunc=randomfunc)
+            mutate(child2, randomfunc=randomfunc)
 
             if randomfunc() < self.cfg.chi:
                 if child1.effect == child2.effect:
-                    child1.crossover(child2, samplefunc=samplefunc)
+                    two_point_crossover(child1, child2, samplefunc=samplefunc)
+
+                    # Update quality and reward
+                    # TODO: check if needed
+                    child2.q = float(sum([child1.q, child2.q]) / 2)
+                    child2.r = float(sum([child1.r, child2.r]) / 2)
 
             child1.q /= 2
             child2.q /= 2
@@ -394,30 +400,6 @@ class ClassifiersList(list):
         """
         for cl in self:
             cl.tga = time
-
-    def select_parents(self, randomfunc=random):
-        """
-        Select two parents for the GA with roulette-wheel selection.
-        """
-        parent1, parent2 = None, None
-
-        q_sum = sum(cl.q3num() for cl in self)
-
-        q_sel1 = randomfunc() * q_sum
-        q_sel2 = randomfunc() * q_sum
-
-        q_sel1, q_sel2 = sorted([q_sel2, q_sel1])
-
-        q_counter = 0.0
-        for cl in self:
-            q_counter += cl.q3num()
-            if parent1 is None and q_counter > q_sel1:
-                parent1 = cl
-            if q_counter > q_sel2:
-                parent2 = cl
-                break
-
-        return parent1, parent2
 
     def delete_ga_classifiers(self, population, match_set, child_no,
                               randomfunc=random):

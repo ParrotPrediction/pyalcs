@@ -1,8 +1,8 @@
 import pytest
 
-from alcs.acs2 import ACS2Configuration, PMark
+from lcs.acs2 import ACS2Configuration, PMark
 
-from alcs import Perception
+from lcs import Perception
 
 
 class TestPMark:
