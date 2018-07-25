@@ -1,7 +1,7 @@
 from random import randint
 
 from lcs import Perception
-from lcs.acs2 import Condition, Effect, PMark, ACS2Configuration
+from lcs.acs2 import Condition, Effect, PMark
 
 
 class Classifier(object):
@@ -98,32 +98,6 @@ class Classifier(object):
         new_cls.tav = old_cls.tav
 
         return new_cls
-
-    @classmethod
-    def cover_triple(cls,
-                     previous_situation: Perception,
-                     action: int,
-                     situation: Perception,
-                     time: int,
-                     cfg: ACS2Configuration):
-        """
-        Creates a classifier that anticipates a change correctly
-
-        :param previous_situation:
-        :param action:
-        :param situation:
-        :param time:
-        :param cfg: configuration
-
-        :return: new classifier
-        """
-        new_cl = cls(action=action, cfg=cfg)  # TODO: p5 exp=0, r=0 (paper)
-        new_cl.tga = time
-        new_cl.talp = time
-
-        new_cl.specialize(previous_situation, situation)
-
-        return new_cl
 
     @property
     def fitness(self):

@@ -2,7 +2,7 @@ import pytest
 
 from lcs import Perception
 from lcs.acs2 import ACS2Configuration, Classifier, Condition, Effect
-from lcs.components.alp import expected_case, unexpected_case
+from lcs.components.alp import expected_case, unexpected_case, cover
 
 
 class TestALP:
@@ -282,3 +282,26 @@ class TestALP:
         assert 1 == new_cls.num
         assert time == new_cls.tga
         assert time == new_cls.talp
+
+    def test_should_create_new_classifier_using_covering(self, cfg):
+        # given
+        action_no = 2
+        time = 123
+        p0 = Perception('01001101')
+        p1 = Perception('00011111')
+
+        # when
+        new_cl = cover(p0, action_no, p1, time, cfg)
+
+        # then
+        assert Condition('#1#0##0#', cfg) == new_cl.condition
+        assert 2 == new_cl.action
+        assert Effect('#0#1##1#', cfg) == new_cl.effect
+        assert 0.5 == new_cl.q
+        assert 0.5 == new_cl.r
+        assert 0 == new_cl.ir
+        assert 0 == new_cl.tav
+        assert time == new_cl.tga
+        assert time == new_cl.talp
+        assert 1 == new_cl.num
+        assert 1 == new_cl.exp

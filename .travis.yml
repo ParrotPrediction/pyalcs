@@ -5,7 +5,6 @@ before_install:
 - sudo apt-get install swig
 - make install_deps
 script:
-- make pep8
 - make test
 deploy:
   provider: pypi

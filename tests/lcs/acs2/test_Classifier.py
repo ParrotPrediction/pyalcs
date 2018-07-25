@@ -146,29 +146,6 @@ class TestClassifier:
         # then
         assert abs(0.45 - cls.q) < 0.01
 
-    def test_should_cover_triple(self, cfg):
-        # given
-        action_no = 2
-        time = 123
-        p0 = Perception('01001101')
-        p1 = Perception('00011111')
-
-        # when
-        new_cl = Classifier.cover_triple(p0, action_no, p1, time, cfg)
-
-        # then
-        assert Condition('#1#0##0#', cfg) == new_cl.condition
-        assert 2 == new_cl.action
-        assert Effect('#0#1##1#', cfg) == new_cl.effect
-        assert 0.5 == new_cl.q
-        assert 0.5 == new_cl.r
-        assert 0 == new_cl.ir
-        assert 0 == new_cl.tav
-        assert time == new_cl.tga
-        assert time == new_cl.talp
-        assert 1 == new_cl.num
-        assert 1 == new_cl.exp
-
     def test_should_specialize_1(self, cfg):
         # given
         cls = Classifier(cfg=cfg)

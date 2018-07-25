@@ -1,7 +1,7 @@
 from random import random, randint
 
 from lcs import Perception
-from ..acs2 import Classifier
+from ..acs2 import Classifier, ACS2Configuration
 
 
 def expected_case(cl: Classifier,
@@ -85,3 +85,28 @@ def unexpected_case(cl: Classifier,
         child.q = 0.5
 
     return child
+
+
+def cover(previous_situation: Perception,
+          action: int,
+          situation: Perception,
+          time: int,
+          cfg: ACS2Configuration) -> Classifier:
+    """
+    Covering - creates a classifier that anticipates a change correctly.
+
+    :param previous_situation:
+    :param action:
+    :param situation:
+    :param time: current epoch
+    :param cfg: configuration
+
+    :return: new classifier
+    """
+    new_cl = Classifier(action=action, cfg=cfg)  # TODO: p5 exp=0, r=0 (paper)
+    new_cl.tga = time
+    new_cl.talp = time
+
+    new_cl.specialize(previous_situation, situation)
+
+    return new_cl
