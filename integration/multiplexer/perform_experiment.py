@@ -1,17 +1,14 @@
+import logging
 import pickle
 
-# Logger
-import logging
-logging.basicConfig(level=logging.INFO)
+import gym
+# noinspection PyUnresolvedReferences
+import gym_multiplexer
+from gym_multiplexer.utils import get_correct_answer
 
-# Load PyALCS module
 from lcs import ACS2, ACS2Configuration
 
-# Load environments
-import gym
-import gym_multiplexer
-
-from gym_multiplexer.utils import get_correct_answer
+logging.basicConfig(level=logging.INFO)
 
 
 def evaluate_performance(env, population, ctrl_bits):

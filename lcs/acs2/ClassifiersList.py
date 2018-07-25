@@ -5,6 +5,7 @@ from random import random, randint, choice, sample
 from lcs import Perception
 from lcs.acs2 import ACS2Configuration
 from lcs.acs2 import Classifier
+from lcs.components.alp import expected_case, unexpected_case
 from lcs.components.genetic_algorithm \
     import roulette_wheel_parents_selection, mutate, two_point_crossover
 
@@ -213,12 +214,13 @@ class ClassifiersList(list):
             cl.set_alp_timestamp(time)
 
             if cl.does_anticipate_correctly(previous_situation, situation):
-                new_cl = cl.expected_case(previous_situation, time)
+                new_cl = expected_case(cl, previous_situation, time)
                 was_expected_case = True
             else:
-                new_cl = cl.unexpected_case(previous_situation,
-                                            situation,
-                                            time)
+                new_cl = unexpected_case(cl,
+                                         previous_situation,
+                                         situation,
+                                         time)
 
                 if cl.is_inadequate():
                     # Removes classifier from population, match set
