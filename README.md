@@ -5,29 +5,35 @@ Repository containing code implementation for various *Anticipatory Learning Cla
 
 ALCS are is an extension to basic LCS compromising the notation of anticipations. Doing that the systems predominantly are able to **anticipate perceptual consequences of actions** independent of a reinforcement predictions.
  
- ALCS are able to form complete anticipatory representation (build environment model) which allows faster
- and more intelligent adaptation of behaviour or problem classification.
+ ALCS are able to form complete anticipatory representation (build environment model) which allows faster and more intelligent adaptation of behaviour or problem classification.
 
 ## Deep dive
 
 ### Project setup
 
-It is recommended to use a Python environment for development
-(virtualenv/virtualenvwrapper/conda).
+It is recommended to use a **Python 3.7** environment for development (virtualenv/virtualenvwrapper/conda).
 
-For a [virtualenv](https://virtualenv.pypa.io/), create it:
-(only needs to be run once)
+#### Conda (recommended)
+Having a Conda distribution (i.e. Anacoda, Minicoda etc) create environment like:
+
+    conda create --name pyalcs python=3.7
+
+Then activate it with:
+
+    source activate pyalcs
+
+#### Virtualenv
+Create dedicated environment [virtualenv](https://virtualenv.pypa.io/) (only needs to be run once)
 
     virtualenv venv
 
-Then, every time you want to work on a project from the shell, type the
-following to activate the virtual environment:
+Then, every time you want to work on a project from the shell, type the following to activate the virtual environment:
 
     source venv/bin/activate
 
-Before working with code please install few required dependencies (code is running on Python 3). Make sure Swig binary is installed (required to compile OpenAI Gym environments)
 
-    make install_deps
+#### Dependencies
+Before working with code please install few required dependencies (code is running on Python 3). Make sure Swig binary is installed (required to compile OpenAI Gym environments) - just look at [TravisCI build file](.travis.yml).
 
 ### Launching example integrations
 

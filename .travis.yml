@@ -1,11 +1,12 @@
 language: python
 python:
-- '3.6'
+  - '3.7-dev'
 before_install:
-- sudo apt-get install swig
-- make install_deps
+  - sudo apt-get install swig
+install:
+  - pip install -r requirements.txt --ignore-installed six
 script:
-- make test
+  - make test
 deploy:
   provider: pypi
   user: khozzy
