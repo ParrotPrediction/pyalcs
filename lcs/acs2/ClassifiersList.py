@@ -182,8 +182,8 @@ class ClassifiersList(list):
             child1 = Classifier.copy_from(parent1, time)
             child2 = Classifier.copy_from(parent2, time)
 
-            mutate(child1, randomfunc=randomfunc)
-            mutate(child2, randomfunc=randomfunc)
+            mutate(child1, child1.cfg.mu, randomfunc=randomfunc)
+            mutate(child2, child2.cfg.mu, randomfunc=randomfunc)
 
             if randomfunc() < self.cfg.chi:
                 if child1.effect == child2.effect:

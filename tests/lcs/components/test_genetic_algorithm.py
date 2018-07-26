@@ -83,7 +83,7 @@ class TestGeneticAlgorithm:
         b = 1 - (1 - cfg.mu) * 0.5  # more then MU
 
         # when
-        mutate(cl, randomfunc=RandomMock([s, b, b]))
+        mutate(cl, cfg.mu,  randomfunc=RandomMock([s, b, b]))
 
         # then
         assert Condition('###11###', cfg) == cl.condition
@@ -95,7 +95,7 @@ class TestGeneticAlgorithm:
         b = 1 - (1 - cfg.mu) * 0.5  # more then MU
 
         # when
-        mutate(cl, randomfunc=RandomMock([b, b, s]))
+        mutate(cl, cfg.mu, randomfunc=RandomMock([b, b, s]))
 
         # then
         assert Condition('##01####', cfg) == cl.condition
@@ -117,14 +117,14 @@ class TestGeneticAlgorithm:
         copied_cl = Classifier.copy_from(original_cl, operation_time)
 
         # when
-        mutate(copied_cl, RandomMock([s, b, b, b, b]))
+        mutate(copied_cl, cfg.mu, RandomMock([s, b, b, b, b]))
 
         # then
         assert Condition('####1011', cfg) == copied_cl.condition
         assert Condition('1###1011', cfg) == original_cl.condition
 
         # when
-        mutate(original_cl, RandomMock([b, s, b, b, b]))
+        mutate(original_cl, cfg.mu, RandomMock([b, s, b, b, b]))
 
         # then
         assert Condition('1####011', cfg) == original_cl.condition

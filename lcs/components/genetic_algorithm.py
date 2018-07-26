@@ -29,35 +29,36 @@ def roulette_wheel_parents_selection(pop: ClassifiersList, randomfunc=random):
     return parent1, parent2
 
 
-def mutate(cl: Classifier, randomfunc=random):
+def mutate(cl: Classifier, mu: float, randomfunc=random):
     """
     Executes the generalizing mutation in the classifier.
     Specified attributes in classifier conditions are randomly
     generalized with `mu` probability.
     """
     for idx, cond in enumerate(cl.condition):
-        if cond != cl.cfg.classifier_wildcard and \
-                randomfunc() < cl.cfg.mu:
+        if cond != cl.cfg.classifier_wildcard and randomfunc() < mu:
             cl.condition.generalize(idx)
 
 
-def two_point_crossover(cl1: Classifier, cl2: Classifier, samplefunc=sample):
+def two_point_crossover(parent: Classifier,
+                        donor: Classifier,
+                        samplefunc=sample):
     """
     Executes two-point crossover using condition parts of two classifiers.
-    :param cl1: first classifier
-    :param cl2: second classifier
+    :param parent: first classifier
+    :param donor: second classifier
     :param samplefunc:
     """
-    left, right = samplefunc(range(0, cl1.cfg.classifier_length + 1), 2)
+    left, right = samplefunc(range(0, parent.cfg.classifier_length + 1), 2)
 
     if left > right:
         left, right = right, left
 
     # Extract chromosomes from condition parts
-    chromosome1 = cl1.condition[left:right]
-    chromosome2 = cl2.condition[left:right]
+    chromosome1 = parent.condition[left:right]
+    chromosome2 = donor.condition[left:right]
 
     # Flip them
     for idx, el in enumerate(range(left, right)):
-        cl1.condition[el] = chromosome2[idx]
-        cl2.condition[el] = chromosome1[idx]
+        parent.condition[el] = chromosome2[idx]
+        donor.condition[el] = chromosome1[idx]
