@@ -83,7 +83,7 @@ class TestGeneticAlgorithm:
         b = 1 - (1 - cfg.mu) * 0.5  # more then MU
 
         # when
-        mutate(cl, cfg.mu,  randomfunc=RandomMock([s, b, b]))
+        mutate(cl, cfg.mu, randomfunc=RandomMock([s, b, b]))
 
         # then
         assert Condition('###11###', cfg) == cl.condition

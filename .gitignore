@@ -106,3 +106,4 @@ ENV/
 # Not wanted, EPS graphics, serialized pickle dumps
 *.eps
 *.p
+/.mypy_cache/

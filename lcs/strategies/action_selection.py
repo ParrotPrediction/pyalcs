@@ -1,6 +1,7 @@
 from itertools import groupby
 from random import random, randint
 
+from lcs.acs2 import Classifier
 from ..acs2 import ClassifiersList
 
 
@@ -8,9 +9,17 @@ def explore(cll: ClassifiersList, pb: float = 0.5) -> int:
     """
     Chooses action according to current exploration policy
 
-    :param cll: classifier list
-    :param pb: probability of biased exploration
-    :return: action to be executed
+    Parameters
+    ----------
+    cll: ClassifiersList
+        classifier list
+    pb: float
+        probability of biased exploration
+
+    Returns
+    -------
+    int
+        action to be executed
     """
     if random() < pb:
         # We are in the biased exploration
@@ -27,8 +36,15 @@ def exploit(cll: ClassifiersList) -> int:
     Chooses best action according to fitness. If there is no classifier
     in list (or none is predicting change) than a random action is returned
 
-    :type cll: classifier list
-    :return: action from the best classifier
+    Parameters
+    ----------
+    cll: ClassifiersList
+        classifier list
+
+    Returns
+    -------
+    int
+        action from the best classifier
     """
     best_classifier = None
     anticipated_change_cls = [cl for cl in cll
@@ -58,6 +74,7 @@ def choose_latest_action(cll: ClassifiersList) -> int:
     int
         chosen action number
     """
+    last_executed_cls: Classifier
     number_of_cls_per_action = \
         {i: 0 for i in range(cll.cfg.number_of_possible_actions)}
 
@@ -84,11 +101,19 @@ def choose_action_from_knowledge_array(cll: ClassifiersList) -> int:
     anticipation for each action in the current list. Chosen is
     the action, ACS2 knows least about the consequences.
 
-    :type cll: classifier list
-    :return: chosen action
+    Parameters
+    ----------
+    cll: ClassifiersList
+        classifier list
+
+    Returns
+    -------
+    int
+        chosen action
     """
     knowledge_array = {i: 0.0
                        for i in range(cll.cfg.number_of_possible_actions)}
+
     cll.sort(key=lambda cl: cl.action)
 
     for _action, _clss in groupby(cll, lambda cl: cl.action):
@@ -108,7 +133,16 @@ def choose_action_from_knowledge_array(cll: ClassifiersList) -> int:
 def choose_random_action(cll: ClassifiersList) -> int:
     """
     Chooses one of the possible actions in the environment randomly
-    :type cll: classifier list
-    :return: random action number
+
+    Parameters
+    ----------
+    cll: ClassifiersList
+        classifier list
+
+    Returns
+    -------
+    int
+        random action number
+
     """
     return randint(0, cll.cfg.number_of_possible_actions - 1)

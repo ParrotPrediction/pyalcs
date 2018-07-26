@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import logging
 from itertools import chain
 from random import random, choice, sample
-from typing import Optional
+from typing import Optional, List
 
 from lcs import Perception
 from lcs.acs2 import ACS2Configuration
@@ -17,9 +19,10 @@ class ClassifiersList(list):
     Represents overall population, match/action sets
     """
 
-    def __init__(self, seq=(), cfg=None):
+    def __init__(self, seq=(), cfg: ACS2Configuration = None) -> None:
         if cfg is None:
             raise TypeError("Configuration should be passed to ClassifierList")
+
         self.cfg = cfg
         list.__init__(self, seq or [])
 
@@ -30,7 +33,7 @@ class ClassifiersList(list):
 
     @classmethod
     def form_match_set(cls,
-                       population: "ClassifiersList",
+                       population: ClassifiersList,
                        situation: Perception,
                        cfg: ACS2Configuration):
         return cls([cl for cl in population
@@ -38,14 +41,14 @@ class ClassifiersList(list):
 
     @classmethod
     def form_action_set(cls,
-                        population: "ClassifiersList",
+                        population: ClassifiersList,
                         action: int,
                         cfg: ACS2Configuration):
         return cls([cl for cl in population
                     if cl.action == action], cfg)
 
     @staticmethod
-    def _remove_classifier(population: "ClassifiersList", cl: Classifier):
+    def _remove_classifier(population: ClassifiersList, cl: Classifier):
         """
         Searches the list and removes classifier
         :param cl: classifier to remove
@@ -96,8 +99,8 @@ class ClassifiersList(list):
                   action: int,
                   situation: Perception,
                   time: int,
-                  population: "ClassifiersList",
-                  match_set) -> None:
+                  population: ClassifiersList,
+                  match_set: ClassifiersList) -> None:
         """
         The Anticipatory Learning Process. Handles all updates by the ALP,
         insertion of new classifiers in pop and possibly matchSet, and
@@ -159,7 +162,7 @@ class ClassifiersList(list):
                             cl.condition.does_match(situation)]
             match_set.extend(new_matching)
 
-    def apply_reinforcement_learning(self, rho, p) -> None:
+    def apply_reinforcement_learning(self, rho: int, p) -> None:
         """
         Reinforcement Learning. Applies RL according to
         current reinforcement `reward` and back-propagated reinforcement
@@ -172,8 +175,13 @@ class ClassifiersList(list):
             cl.update_reward(rho + self.cfg.gamma * p)
             cl.update_intermediate_reward(rho)
 
-    def apply_ga(self, time, population, match_set, situation,
-                 randomfunc=random, samplefunc=sample) -> None:
+    def apply_ga(self,
+                 time: int,
+                 population: ClassifiersList,
+                 match_set: ClassifiersList,
+                 situation: Perception,
+                 randomfunc=random,
+                 samplefunc=sample) -> None:
 
         if self.should_apply_ga(time):
             self.set_ga_timestamp(time)
@@ -202,16 +210,20 @@ class ClassifiersList(list):
                         if child.condition.specificity > 0]
 
             # if two classifiers are identical, leave only one
-            children = set(children)
+            unique_children = set(children)
 
             self.delete_ga_classifiers(population, match_set,
-                                       len(children), randomfunc=randomfunc)
+                                       len(unique_children),
+                                       randomfunc=randomfunc)
 
             # check for subsumers / similar classifiers
-            for child in children:
+            for child in unique_children:
                 self.add_ga_classifier(child, match_set, population)
 
-    def add_ga_classifier(self, child, match_set, population):
+    def add_ga_classifier(self,
+                          child: Classifier,
+                          match_set: ClassifiersList,
+                          population: ClassifiersList):
         """
         Find subsumer/similar classifier, if present - increase its numerosity,
         else add this new classifier
@@ -233,7 +245,7 @@ class ClassifiersList(list):
 
     def add_alp_classifier(self,
                            child: Classifier,
-                           new_list: "ClassifiersList"):
+                           new_list: ClassifiersList):
         """
         Looks for subsuming / similar classifiers in the current set.
         If no appropriate classifier was found, the `child_cl` is added to
@@ -272,7 +284,7 @@ class ClassifiersList(list):
         else:
             old_cl.increase_quality()
 
-    def get_similar(self, other: Classifier) -> Optional[Classifier]:
+    def get_similar(self, other: Classifier):
         """
         Searches for the first similar classifier `other` and returns it.
 
@@ -313,7 +325,10 @@ class ClassifiersList(list):
         for cl in self:
             cl.tga = time
 
-    def delete_ga_classifiers(self, population, match_set, child_no,
+    def delete_ga_classifiers(self,
+                              population: ClassifiersList,
+                              match_set: ClassifiersList,
+                              child_no: int,
                               randomfunc=random):
         """
         Deletes classifiers in the set to keep the size THETA_AS.
@@ -334,7 +349,10 @@ class ClassifiersList(list):
             self.delete_a_classifier(
                 match_set, population, randomfunc=randomfunc)
 
-    def delete_a_classifier(self, match_set, population, randomfunc=random):
+    def delete_a_classifier(self,
+                            match_set: ClassifiersList,
+                            population: ClassifiersList,
+                            randomfunc=random):
         """ Delete one classifier from a population """
         if len(population) == 0:   # Nothing to remove
             return None
@@ -347,11 +365,13 @@ class ClassifiersList(list):
                 # and current list
                 for lst in [self, population, match_set]:
                     if lst is not None:
-                        __class__._remove_classifier(lst, cl_del)
+                        ClassifiersList._remove_classifier(lst, cl_del)
 
-    def select_classifier_to_delete(self, randomfunc=random):
+    def select_classifier_to_delete(self,
+                                    randomfunc=random) -> Optional[Classifier]:
         if len(self) == 0:
             return None
+
         cl_del = None
         while cl_del is None:  # We must delete at least one
             for cl in self.expand():
@@ -384,16 +404,13 @@ class ClassifiersList(list):
             old_cl = self.find_subsumer(cl)
 
         if old_cl is None:
-            old_cl = self.find_similar_classifier(cl)
+            old_cl = self.get_similar(cl)
 
         return old_cl
 
-    def find_similar_classifier(self, cl: Classifier) -> Optional[Classifier]:
-        return self.get_similar(cl)
-
     def find_subsumer(self, cl: Classifier, choice_func=choice) -> Classifier:
         subsumer = None
-        most_general_subsumers = []
+        most_general_subsumers: List[Classifier] = []
 
         for classifier in self:
             if classifier.does_subsume(cl):
