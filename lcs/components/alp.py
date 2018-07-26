@@ -1,4 +1,5 @@
 from random import random, randint
+from typing import Optional
 
 from lcs import Perception
 from ..acs2 import Classifier, ACS2Configuration
@@ -6,7 +7,7 @@ from ..acs2 import Classifier, ACS2Configuration
 
 def expected_case(cl: Classifier,
                   perception: Perception,
-                  time: int) -> Classifier:
+                  time: int) -> Optional[Classifier]:
     """
     Controls the expected case of a classifier. If the classifier
     is to specific it tries to add some randomness to it by
@@ -58,7 +59,7 @@ def expected_case(cl: Classifier,
 def unexpected_case(cl: Classifier,
                     previous_perception: Perception,
                     perception: Perception,
-                    time: int) -> Classifier:
+                    time: int) -> Optional[Classifier]:
     """
     Controls the unexpected case of the classifier.
 

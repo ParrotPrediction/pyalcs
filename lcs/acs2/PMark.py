@@ -1,4 +1,5 @@
 from random import choice
+from typing import Optional
 
 from lcs import Perception
 from lcs.acs2 import Condition
@@ -6,7 +7,7 @@ from lcs.acs2.ACS2Configuration import ACS2Configuration
 
 
 class PMark(list):
-    def __init__(self, cfg: ACS2Configuration = None):
+    def __init__(self, cfg: ACS2Configuration = None) -> None:
         if cfg is None:
             raise TypeError("Configuration should be passed to PMark")
         self.cfg = cfg
@@ -62,7 +63,7 @@ class PMark(list):
         """
         return not len(self) > 0
 
-    def get_differences(self, perception: Perception) -> Condition:
+    def get_differences(self, perception: Perception) -> Optional[Condition]:
         """
         Determines the strongest differences in between the mark
         and perception.

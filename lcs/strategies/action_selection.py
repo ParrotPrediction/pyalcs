@@ -48,10 +48,16 @@ def choose_latest_action(cll: ClassifiersList) -> int:
     """
     Chooses latest executed action ("action delay bias")
 
-    :type cll: classifier list
-    :return: chosen action number
+    Parameters
+    ----------
+    cll: ClassifiersList
+        classifier list
+
+    Returns
+    -------
+    int
+        chosen action number
     """
-    last_executed_cls = None
     number_of_cls_per_action = \
         {i: 0 for i in range(cll.cfg.number_of_possible_actions)}
 
@@ -81,7 +87,7 @@ def choose_action_from_knowledge_array(cll: ClassifiersList) -> int:
     :type cll: classifier list
     :return: chosen action
     """
-    knowledge_array = {i: 0
+    knowledge_array = {i: 0.0
                        for i in range(cll.cfg.number_of_possible_actions)}
     cll.sort(key=lambda cl: cl.action)
 

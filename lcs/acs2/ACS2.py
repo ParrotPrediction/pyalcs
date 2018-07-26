@@ -3,7 +3,7 @@ from lcs.acs2 import ClassifiersList, ACS2Configuration
 
 
 class ACS2:
-    def __init__(self, cfg: ACS2Configuration, population=None):
+    def __init__(self, cfg: ACS2Configuration, population=None) -> None:
         self.cfg = cfg
         self.population = population or ClassifiersList(cfg=self.cfg)
 

@@ -1,6 +1,7 @@
 import logging
 from itertools import chain
 from random import random, choice, sample
+from typing import Optional
 
 from lcs import Perception
 from lcs.acs2 import ACS2Configuration
@@ -29,7 +30,7 @@ class ClassifiersList(list):
 
     @classmethod
     def form_match_set(cls,
-                       population,
+                       population: "ClassifiersList",
                        situation: Perception,
                        cfg: ACS2Configuration):
         return cls([cl for cl in population
@@ -37,14 +38,14 @@ class ClassifiersList(list):
 
     @classmethod
     def form_action_set(cls,
-                        population,
+                        population: "ClassifiersList",
                         action: int,
                         cfg: ACS2Configuration):
         return cls([cl for cl in population
                     if cl.action == action], cfg)
 
     @staticmethod
-    def _remove_classifier(population, cl: Classifier):
+    def _remove_classifier(population: "ClassifiersList", cl: Classifier):
         """
         Searches the list and removes classifier
         :param cl: classifier to remove
@@ -95,7 +96,7 @@ class ClassifiersList(list):
                   action: int,
                   situation: Perception,
                   time: int,
-                  population,
+                  population: "ClassifiersList",
                   match_set) -> None:
         """
         The Anticipatory Learning Process. Handles all updates by the ALP,
@@ -134,7 +135,7 @@ class ClassifiersList(list):
                     # and current list
                     delete_count += 1
                     for lst in [population, match_set, self]:
-                        __class__._remove_classifier(lst, cl)
+                        ClassifiersList._remove_classifier(lst, cl)
 
             if new_cl is not None:
                 new_cl.tga = time
@@ -230,7 +231,9 @@ class ClassifiersList(list):
             if not old_cl.is_marked():
                 old_cl.num += 1
 
-    def add_alp_classifier(self, child, new_list):
+    def add_alp_classifier(self,
+                           child: Classifier,
+                           new_list: "ClassifiersList"):
         """
         Looks for subsuming / similar classifiers in the current set.
         If no appropriate classifier was found, the `child_cl` is added to
@@ -269,7 +272,7 @@ class ClassifiersList(list):
         else:
             old_cl.increase_quality()
 
-    def get_similar(self, other: Classifier) -> Classifier:
+    def get_similar(self, other: Classifier) -> Optional[Classifier]:
         """
         Searches for the first similar classifier `other` and returns it.
 
@@ -278,7 +281,7 @@ class ClassifiersList(list):
         """
         return next(filter(lambda cl: cl.is_similar(other), self), None)
 
-    def should_apply_ga(self, time):
+    def should_apply_ga(self, time: int):
         """
         Checks the average last GA application to determine if a GA
         should be applied.If no classifier is in the current set,
@@ -300,7 +303,7 @@ class ClassifiersList(list):
     def overall_numerosity(self):
         return sum(cl.num for cl in self)
 
-    def set_ga_timestamp(self, time):
+    def set_ga_timestamp(self, time: int):
         """
         Sets the GA time stamps to the current time to control
         the GA application frequency.
@@ -385,7 +388,7 @@ class ClassifiersList(list):
 
         return old_cl
 
-    def find_similar_classifier(self, cl: Classifier) -> Classifier:
+    def find_similar_classifier(self, cl: Classifier) -> Optional[Classifier]:
         return self.get_similar(cl)
 
     def find_subsumer(self, cl: Classifier, choice_func=choice) -> Classifier:

@@ -1,22 +1,32 @@
 class RealValueEncoder:
-    """
-    Assumes that provided values are in range [0,1].
+    r"""
+    Real-value encoder.
+
+    Assumes that provided values are already in range [0,1].
 
     This min-max normalization can be done as a prior step using the following
     formula:
 
-    x' = (x - min(x)) / (max(x) - min(x))
+    .. math::
+        x\prime = \frac{x - \textrm{min}(x)} {\textrm{max}(x)-\textrm{min}(x)}
     """
-    def __init__(self, resolution_bits: int):
+    def __init__(self, resolution_bits: int) -> None:
         self.resolution = pow(2, resolution_bits)
 
-    def encode(self, val: float):
+    def encode(self, val: float) -> int:
         """
-        Encodes the float value into [0, 2^bits] states.
-        This results in 2^bits + 1 different states
+        Encodes the float value into `[0, 2^bits]` states.
+        This results in `2^bits + 1` different states
 
-        :param val: real-valued number in range [0,1]
-        :return: discrete state within resolution
+        Parameters
+        ----------
+        val : float
+            real-valued number in range [0,1]
+
+        Returns
+        -------
+        int
+            discrete state within resolution
         """
         if val < 0 or val > 1:
             raise ValueError("Value is not normalized within [0,1] range")
@@ -28,8 +38,16 @@ class RealValueEncoder:
         Decodes a discrete value to real-valued representation (still [0,1]
         range)
 
-        :param encoded_val: encoded value
-        :return: real-valued number from [0,1] range
+        Parameters
+        ----------
+        encoded_val : int
+            encoded value
+
+        Returns
+        -------
+        float
+            real-valued number from [0,1] range
+
         """
         if encoded_val < 0 or encoded_val > self.resolution:
             raise ValueError("Value is not from possible resolution range")

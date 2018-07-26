@@ -2,7 +2,7 @@ from lcs.acs2 import ACS2Configuration
 
 
 class AbstractCondition(list):
-    def __init__(self, seq=(), cfg: ACS2Configuration=None):
+    def __init__(self, seq=(), cfg: ACS2Configuration=None) -> None:
         if cfg is None:
             raise TypeError("Configuration should be passed")
 
