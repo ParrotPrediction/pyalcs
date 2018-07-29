@@ -1,7 +1,6 @@
 # import logging
-from lcs import ACS2Configuration
-from lcs.agents.acs2 import ClassifiersList
-from integration.go_self_play.environment import GoBoard
+from examples.acs2.go_self_play.environment import GoBoard
+from lcs.agents.acs2 import ACS2Configuration, ClassifiersList
 
 # Configure logger
 # logging.basicConfig(level=logging.INFO)

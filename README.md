@@ -42,7 +42,7 @@ In order to run the integrations from the console you need to
 specify Python PATH to use the currently checked-out version
 of `alcs` library:
 
-    PYTHONPATH=/Users/khozzy/Projects/pyalcs python integration/maze/acs2_in_maze.py
+    PYTHONPATH=/Users/khozzy/Projects/pyalcs python examples/maze/acs2_in_maze.py
 
 PyCharm IDE appends the path automatically.
 

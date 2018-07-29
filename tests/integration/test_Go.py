@@ -1,14 +1,13 @@
 import gym
 import pytest
 
-from integration.go.utils import moves_9x9, process_state, calculate_bw_ratio
+from examples.acs2.go.utils import moves_9x9, process_state, calculate_bw_ratio
 
 
 class TestGo:
 
     @pytest.fixture
     def env(self):
-        pass
         return gym.make('Go9x9-v0')
 
     @pytest.mark.skip(reason="skip go tests")

@@ -3,9 +3,9 @@ import pickle
 
 import gym
 
-from lcs import ACS2, ACS2Configuration
-from integration.go.utils import moves_9x9, process_state, \
+from examples.acs2.go.utils import moves_9x9, process_state, \
     calculate_environment_metrics, map_moves
+from lcs.agents.acs2 import ACS2, ACS2Configuration
 
 logging.basicConfig(
     level=logging.INFO,
@@ -15,7 +15,7 @@ logging.basicConfig(
 )
 
 if __name__ == '__main__':
-    env = gym.make('Go9x9-v0')
+    env = gym.make('Go9x9-v0')  # TODO: removed from GYM after 0.9 :(
     state = env.reset()
 
     # Create a mapping dictionary of moves

@@ -1,11 +1,11 @@
 import logging
 
 import gym
-
 # noinspection PyUnresolvedReferences
 import gym_maze
-from lcs import ACS2, ACS2Configuration
-from integration.maze.utils import calculate_performance
+
+from examples.acs2.maze.utils import calculate_performance
+from lcs.agents.acs2 import ACS2, ACS2Configuration
 
 # Configure logger
 logging.basicConfig(level=logging.INFO)

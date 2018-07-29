@@ -1,4 +1,4 @@
-from integration.go_self_play.environment import GoBoard
+from examples.acs2.go_self_play.environment import GoBoard
 from lcs import ACS2, ACS2Configuration
 
 import logging

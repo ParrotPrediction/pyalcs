@@ -6,7 +6,7 @@ import gym
 import gym_multiplexer
 from gym_multiplexer.utils import get_correct_answer
 
-from lcs import ACS2, ACS2Configuration
+from lcs.agents.acs2 import ACS2, ACS2Configuration
 
 logging.basicConfig(level=logging.INFO)
 
