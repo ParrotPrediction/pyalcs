@@ -1,6 +1,6 @@
 # import logging
 from examples.acs2.go_self_play.environment import GoBoard
-from lcs.agents.acs2 import ACS2Configuration, ClassifiersList
+from lcs.agents.acs2 import Configuration, ClassifiersList
 
 # Configure logger
 # logging.basicConfig(level=logging.INFO)
@@ -10,7 +10,7 @@ ALL_MOVES = 0
 
 # Commons
 board = GoBoard()  # Initialize board of size 9x9
-cfg = ACS2Configuration(81, 81, epsilon=0.6, do_ga=True)
+cfg = Configuration(81, 81, epsilon=0.6, do_ga=True)
 population = ClassifiersList(cfg=cfg)
 
 

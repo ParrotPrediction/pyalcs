@@ -2,11 +2,11 @@ from random import choice
 from typing import Optional
 
 from lcs import Perception
-from . import ACS2Configuration, Condition
+from . import Configuration, Condition
 
 
 class PMark(list):
-    def __init__(self, cfg: ACS2Configuration = None) -> None:
+    def __init__(self, cfg: Configuration = None) -> None:
         if cfg is None:
             raise TypeError("Configuration should be passed to PMark")
         self.cfg = cfg

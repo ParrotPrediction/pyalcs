@@ -2,7 +2,7 @@ from random import randint
 
 import pytest
 
-from lcs.agents.acs2 import ACS2Configuration, ACS2Classifier, ClassifiersList
+from lcs.agents.acs2 import Configuration, Classifier, ClassifiersList
 from lcs.strategies.action_selection import exploit, choose_random_action, \
     choose_latest_action, choose_action_from_knowledge_array
 
@@ -11,7 +11,7 @@ class TestActionSelection:
 
     @pytest.fixture
     def cfg(self):
-        return ACS2Configuration(8, 8)
+        return Configuration(8, 8)
 
     def test_should_return_best_fitness_action(self, cfg):
         # given
@@ -19,7 +19,7 @@ class TestActionSelection:
 
         # when & then
         # C1 - does not anticipate change
-        c1 = ACS2Classifier(action=1, cfg=cfg)
+        c1 = Classifier(action=1, cfg=cfg)
         population.append(c1)
 
         # Some random action should be selected here
@@ -28,10 +28,10 @@ class TestActionSelection:
 
         # when & then
         # C2 - does anticipate some change
-        c2 = ACS2Classifier(action=2,
-                            effect='1###0###',
-                            reward=0.25,
-                            cfg=cfg)
+        c2 = Classifier(action=2,
+                        effect='1###0###',
+                        reward=0.25,
+                        cfg=cfg)
         population.append(c2)
 
         # Here C2 action should be selected
@@ -40,11 +40,11 @@ class TestActionSelection:
 
         # when & then
         # C3 - does anticipate change and is quite good
-        c3 = ACS2Classifier(action=3,
-                            effect='1#######',
-                            quality=0.8,
-                            reward=5,
-                            cfg=cfg)
+        c3 = Classifier(action=3,
+                        effect='1#######',
+                        quality=0.8,
+                        reward=5,
+                        cfg=cfg)
         population.append(c3)
 
         # Here C3 has the biggest fitness score
@@ -70,7 +70,7 @@ class TestActionSelection:
     def test_should_return_latest_action(self, cfg):
         # given
         population = ClassifiersList(cfg=cfg)
-        c0 = ACS2Classifier(action=0, cfg=cfg)
+        c0 = Classifier(action=0, cfg=cfg)
         c0.talp = 1
 
         # when
@@ -80,13 +80,13 @@ class TestActionSelection:
         assert 1 == choose_latest_action(population)
 
         # Add rest of classifiers
-        population.append(ACS2Classifier(action=3, cfg=cfg))
-        population.append(ACS2Classifier(action=7, cfg=cfg))
-        population.append(ACS2Classifier(action=5, cfg=cfg))
-        population.append(ACS2Classifier(action=1, cfg=cfg))
-        population.append(ACS2Classifier(action=4, cfg=cfg))
-        population.append(ACS2Classifier(action=2, cfg=cfg))
-        population.append(ACS2Classifier(action=6, cfg=cfg))
+        population.append(Classifier(action=3, cfg=cfg))
+        population.append(Classifier(action=7, cfg=cfg))
+        population.append(Classifier(action=5, cfg=cfg))
+        population.append(Classifier(action=1, cfg=cfg))
+        population.append(Classifier(action=4, cfg=cfg))
+        population.append(Classifier(action=2, cfg=cfg))
+        population.append(Classifier(action=6, cfg=cfg))
 
         # Assign each classifier random talp from certain range
         for cl in population:
@@ -101,32 +101,32 @@ class TestActionSelection:
     def test_should_return_worst_quality_action(self, cfg):
         # given
         population = ClassifiersList(cfg=cfg)
-        c0 = ACS2Classifier(action=0, cfg=cfg)
+        c0 = Classifier(action=0, cfg=cfg)
         population.append(c0)
 
         # Should return C1 (because it's first not mentioned)
         assert 1 == choose_action_from_knowledge_array(population)
 
         # Add rest of classifiers
-        c1 = ACS2Classifier(action=1, numerosity=31, quality=0.72, cfg=cfg)
+        c1 = Classifier(action=1, numerosity=31, quality=0.72, cfg=cfg)
         population.append(c1)
 
-        c2 = ACS2Classifier(action=2, numerosity=2, quality=0.6, cfg=cfg)
+        c2 = Classifier(action=2, numerosity=2, quality=0.6, cfg=cfg)
         population.append(c2)
 
-        c3 = ACS2Classifier(action=3, numerosity=2, quality=0.63, cfg=cfg)
+        c3 = Classifier(action=3, numerosity=2, quality=0.63, cfg=cfg)
         population.append(c3)
 
-        c4 = ACS2Classifier(action=4, numerosity=7, quality=0.75, cfg=cfg)
+        c4 = Classifier(action=4, numerosity=7, quality=0.75, cfg=cfg)
         population.append(c4)
 
-        c5 = ACS2Classifier(action=5, numerosity=1, quality=0.63, cfg=cfg)
+        c5 = Classifier(action=5, numerosity=1, quality=0.63, cfg=cfg)
         population.append(c5)
 
-        c6 = ACS2Classifier(action=6, numerosity=6, quality=0.52, cfg=cfg)
+        c6 = Classifier(action=6, numerosity=6, quality=0.52, cfg=cfg)
         population.append(c6)
 
-        c7 = ACS2Classifier(action=7, numerosity=10, quality=0.36, cfg=cfg)
+        c7 = Classifier(action=7, numerosity=10, quality=0.36, cfg=cfg)
         population.append(c7)
 
         # then

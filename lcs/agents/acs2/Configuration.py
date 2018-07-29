@@ -1,4 +1,4 @@
-class ACS2Configuration:
+class Configuration:
     def __init__(self,
                  classifier_length,
                  number_of_possible_actions,

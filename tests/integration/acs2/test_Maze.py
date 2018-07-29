@@ -3,7 +3,7 @@ import pytest
 
 # noinspection PyUnresolvedReferences
 import gym_maze
-from lcs.agents.acs2 import ACS2, ACS2Configuration
+from lcs.agents.acs2 import ACS2, Configuration
 from examples.acs2.maze.utils import calculate_performance
 from .utils import count_microclassifiers, \
     count_macroclassifiers, \
@@ -18,17 +18,17 @@ class TestMaze:
 
     def test_should_traverse(self, env):
         # given
-        cfg = ACS2Configuration(8, 8,
-                                epsilon=1.0,
-                                do_ga=False,
-                                performance_fcn=calculate_performance)
+        cfg = Configuration(8, 8,
+                            epsilon=1.0,
+                            do_ga=False,
+                            performance_fcn=calculate_performance)
         agent = ACS2(cfg)
 
         # when
         population, metrics = agent.explore(env, 300)
 
         # then
-        assert 100 < count_macroclassifiers(population) < 200
+        assert 90 < count_macroclassifiers(population) < 200
 
         assert 100 == self._get_knowledge(metrics)
 
@@ -41,10 +41,10 @@ class TestMaze:
 
     def test_should_traverse_with_ga(self, env):
         # given
-        cfg = ACS2Configuration(8, 8,
-                                epsilon=1.0,
-                                do_ga=True,
-                                performance_fcn=calculate_performance)
+        cfg = Configuration(8, 8,
+                            epsilon=1.0,
+                            do_ga=True,
+                            performance_fcn=calculate_performance)
         agent = ACS2(cfg)
 
         # when

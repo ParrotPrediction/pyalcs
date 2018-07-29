@@ -1,0 +1,2 @@
+class ClassifierList(list):
+    pass

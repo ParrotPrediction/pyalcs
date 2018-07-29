@@ -2,7 +2,7 @@ from itertools import groupby
 from random import random, randint
 from typing import Optional
 
-from lcs.agents.acs2 import ACS2Classifier, ClassifiersList
+from lcs.agents.acs2 import Classifier, ClassifiersList
 
 
 def explore(cll: ClassifiersList, pb: float = 0.5) -> Optional[int]:
@@ -74,7 +74,7 @@ def choose_latest_action(cll: ClassifiersList) -> Optional[int]:
     int
         chosen action number
     """
-    last_executed_cls: ACS2Classifier
+    last_executed_cls: Classifier
     number_of_cls_per_action = \
         {i: 0 for i in range(cll.cfg.number_of_possible_actions)}
 

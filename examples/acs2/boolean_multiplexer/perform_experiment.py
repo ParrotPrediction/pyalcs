@@ -6,7 +6,7 @@ import gym
 import gym_multiplexer
 from gym_multiplexer.utils import get_correct_answer
 
-from lcs.agents.acs2 import ACS2, ACS2Configuration
+from lcs.agents.acs2 import ACS2, Configuration
 
 logging.basicConfig(level=logging.INFO)
 
@@ -25,7 +25,7 @@ def evaluate_performance(env, population, ctrl_bits):
 
 def get_actors():
     mp = gym.make('boolean-multiplexer-37bit-v0')
-    cfg = ACS2Configuration(
+    cfg = Configuration(
         mp.env.observation_space.n,
         2,
         performance_fcn=evaluate_performance,

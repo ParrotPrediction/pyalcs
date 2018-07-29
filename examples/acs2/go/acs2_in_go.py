@@ -5,7 +5,7 @@ import gym
 
 from examples.acs2.go.utils import moves_9x9, process_state, \
     calculate_environment_metrics, map_moves
-from lcs.agents.acs2 import ACS2, ACS2Configuration
+from lcs.agents.acs2 import ACS2, Configuration
 
 logging.basicConfig(
     level=logging.INFO,
@@ -26,7 +26,7 @@ if __name__ == '__main__':
     CLASSIFIER_LENGTH = env._state.board.size ** 2
     NUMBER_OF_POSSIBLE_ACTIONS = len(moves)
 
-    cfg = ACS2Configuration(
+    cfg = Configuration(
         classifier_length=CLASSIFIER_LENGTH,
         number_of_possible_actions=NUMBER_OF_POSSIBLE_ACTIONS,
         perception_mapper_fcn=process_state,

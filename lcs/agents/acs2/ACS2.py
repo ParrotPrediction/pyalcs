@@ -1,11 +1,13 @@
 import logging
+from typing import Optional
 
-from . import ClassifiersList, ACS2Configuration
+from . import ClassifiersList, Configuration
 from ...agents import Agent
+from ...agents.Agent import Metric
 
 
 class ACS2(Agent):
-    def __init__(self, cfg: ACS2Configuration, population=None) -> None:
+    def __init__(self, cfg: Configuration, population=None) -> None:
         self.cfg = cfg
         self.population = population or ClassifiersList(cfg=self.cfg)
 
@@ -204,19 +206,7 @@ class ACS2(Agent):
 
         return action_idx
 
-    def _collect_metrics(self, env, current_trial, steps_in_trial, steps):
-        agent_stats = self._collect_agent_metrics(
-            current_trial, steps_in_trial, steps)
-        env_stats = self._collect_env_stats(env)
-        performance_stats = self._calculate_performance(env)
-
-        return {
-            'agent': agent_stats,
-            'environment': env_stats,
-            'performance': performance_stats
-        }
-
-    def _collect_agent_metrics(self, trial, steps, total_steps):
+    def _collect_agent_metrics(self, trial, steps, total_steps) -> Metric:
         return {
             'population': len(self.population),
             'numerosity': sum(cl.num for cl in self.population),
@@ -229,13 +219,13 @@ class ACS2(Agent):
             'total_steps': total_steps
         }
 
-    def _collect_env_stats(self, env):
+    def _collect_environment_metrics(self, env) -> Optional[Metric]:
         if self.cfg.environment_metrics_fcn:
             return self.cfg.environment_metrics_fcn(env)
 
         return None
 
-    def _calculate_performance(self, env):
+    def _collect_performance_metrics(self, env) -> Optional[Metric]:
         if self.cfg.performance_fcn:
             return self.cfg.performance_fcn(
                 env, self.population, **self.cfg.performance_fcn_params)

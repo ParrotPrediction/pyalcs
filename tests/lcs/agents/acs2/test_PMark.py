@@ -1,14 +1,14 @@
 import pytest
 
 from lcs import Perception
-from lcs.agents.acs2 import ACS2Configuration, PMark
+from lcs.agents.acs2 import Configuration, PMark
 
 
 class TestPMark:
 
     @pytest.fixture
     def cfg(self):
-        return ACS2Configuration(8, 8)
+        return Configuration(8, 8)
 
     def test_should_initialize_mark(self, cfg):
         mark = PMark(cfg)

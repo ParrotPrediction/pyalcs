@@ -4,10 +4,10 @@ from random import randint
 from typing import Optional, Union, Callable
 
 from lcs import Perception
-from . import ACS2Configuration, Condition, Effect, PMark
+from . import Configuration, Condition, Effect, PMark
 
 
-class ACS2Classifier(object):
+class Classifier(object):
     def __init__(self,
                  condition: Union[Condition, str, None]=None,
                  action: Optional[int]=None,
@@ -20,7 +20,7 @@ class ACS2Classifier(object):
                  talp=None,
                  tga: int=0,
                  tav: float=0.0,
-                 cfg: Optional[ACS2Configuration] = None) -> None:
+                 cfg: Optional[Configuration] = None) -> None:
 
         if cfg is None:
             raise TypeError("Configuration should be passed to Classifier")
@@ -77,7 +77,7 @@ class ACS2Classifier(object):
                                       hex(id(self)))
 
     @classmethod
-    def copy_from(cls, old_cls: ACS2Classifier, time: int):
+    def copy_from(cls, old_cls: Classifier, time: int):
         """
         Copies old classifier with given time (tga, talp).
         Old tav gets replaced with new value.
@@ -85,14 +85,14 @@ class ACS2Classifier(object):
 
         Parameters
         ----------
-        old_cls: ACS2Classifier
+        old_cls: Classifier
             classifier to copy from
         time: int
             time of creation / current epoch
 
         Returns
         -------
-        ACS2Classifier
+        Classifier
             copied classifier
         """
         new_cls = cls(
@@ -265,14 +265,14 @@ class ACS2Classifier(object):
 
         self.talp = time
 
-    def is_similar(self, other: ACS2Classifier) -> bool:
+    def is_similar(self, other: Classifier) -> bool:
         """
         Check if classifier is equals to `other` classifier in condition,
         action and effect part.
 
         Parameters
         ----------
-        other: ACS2Classifier
+        other: Classifier
             other classifier
         Returns
         -------
@@ -285,13 +285,13 @@ class ACS2Classifier(object):
             return True
         return False
 
-    def is_more_general(self, other: ACS2Classifier) -> bool:
+    def is_more_general(self, other: Classifier) -> bool:
         """
         Checks if the classifier is formally more general than `other`.
 
         Parameters
         ----------
-        other: ACS2Classifier
+        other: Classifier
             other classifier to compare
 
         Returns
@@ -341,13 +341,13 @@ class ACS2Classifier(object):
 
         return False
 
-    def does_subsume(self, other: ACS2Classifier) -> bool:
+    def does_subsume(self, other: Classifier) -> bool:
         """
         Returns if a classifier subsumes `other` classifier
 
         Parameters
         ----------
-        other: ACS2Classifier
+        other: Classifier
             other classifier
 
         Returns

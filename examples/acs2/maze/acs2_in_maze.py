@@ -5,7 +5,7 @@ import gym
 import gym_maze
 
 from examples.acs2.maze.utils import calculate_performance
-from lcs.agents.acs2 import ACS2, ACS2Configuration
+from lcs.agents.acs2 import ACS2, Configuration
 
 # Configure logger
 logging.basicConfig(level=logging.INFO)
@@ -17,10 +17,10 @@ if __name__ == '__main__':
     maze = gym.make('BMaze4-v0')
 
     # Configure and create the agent
-    cfg = ACS2Configuration(8, 8,
-                            epsilon=1.0,
-                            do_ga=False,
-                            performance_fcn=calculate_performance)
+    cfg = Configuration(8, 8,
+                        epsilon=1.0,
+                        do_ga=False,
+                        performance_fcn=calculate_performance)
     logging.info(cfg)
 
     # Explore the environment

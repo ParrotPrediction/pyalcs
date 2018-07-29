@@ -1,7 +1,7 @@
 import pytest
 
 from lcs import Perception
-from lcs.agents.acs2 import ACS2Configuration, ACS2Classifier,\
+from lcs.agents.acs2 import Configuration, Classifier,\
     Condition, Effect
 
 
@@ -9,25 +9,25 @@ class TestClassifier:
 
     @pytest.fixture
     def cfg(self):
-        return ACS2Configuration(8, 8)
+        return Configuration(8, 8)
 
     def test_equality(self, cfg):
         # given
-        cl = ACS2Classifier(action=1, numerosity=2, cfg=cfg)
+        cl = Classifier(action=1, numerosity=2, cfg=cfg)
 
         # when & then
-        assert ACS2Classifier(action=1, numerosity=2, cfg=cfg) == cl
+        assert Classifier(action=1, numerosity=2, cfg=cfg) == cl
 
     def test_should_calculate_fitness(self, cfg):
         # given
-        cls = ACS2Classifier(reward=0.25, cfg=cfg)
+        cls = Classifier(reward=0.25, cfg=cfg)
 
         # then
         assert 0.125 == cls.fitness
 
     def test_should_anticipate_change(self, cfg):
         # given
-        cls = ACS2Classifier(cfg=cfg)
+        cls = Classifier(cfg=cfg)
         assert cls.does_anticipate_change() is False
 
         # when
@@ -38,7 +38,7 @@ class TestClassifier:
 
     def test_should_anticipate_correctly(self, cfg):
         # given
-        cls = ACS2Classifier(
+        cls = Classifier(
             effect=Effect('#1####0#', cfg),
             cfg=cfg)
         p0 = Perception('00001111')
@@ -48,12 +48,12 @@ class TestClassifier:
         assert cls.does_anticipate_correctly(p0, p1) is True
 
     def test_should_calculate_specificity_1(self, cfg):
-        cls = ACS2Classifier(cfg=cfg)
+        cls = Classifier(cfg=cfg)
         assert 0 == cls.specificity
 
     def test_should_calculate_specificity_2(self, cfg):
         # given
-        cls = ACS2Classifier(
+        cls = Classifier(
             condition=Condition('#1#01#0#', cfg),
             cfg=cfg)
 
@@ -62,7 +62,7 @@ class TestClassifier:
 
     def test_should_calculate_specificity_3(self, cfg):
         # given
-        cls = ACS2Classifier(
+        cls = Classifier(
             condition=Condition('11101001', cfg),
             cfg=cfg)
 
@@ -71,35 +71,35 @@ class TestClassifier:
 
     def test_should_be_considered_as_reliable_1(self, cfg):
         # given
-        cls = ACS2Classifier(quality=0.89, cfg=cfg)
+        cls = Classifier(quality=0.89, cfg=cfg)
 
         # then
         assert cls.is_reliable() is False
 
     def test_should_be_considered_as_reliable_2(self, cfg):
         # given
-        cls = ACS2Classifier(quality=0.91, cfg=cfg)
+        cls = Classifier(quality=0.91, cfg=cfg)
 
         # then
         assert cls.is_reliable() is True
 
     def test_should_be_considered_as_inadequate_1(self, cfg):
         # given
-        cls = ACS2Classifier(quality=0.50, cfg=cfg)
+        cls = Classifier(quality=0.50, cfg=cfg)
 
         # then
         assert cls.is_reliable() is False
 
     def test_should_be_considered_as_inadequate_2(self, cfg):
         # given
-        cls = ACS2Classifier(quality=0.09, cfg=cfg)
+        cls = Classifier(quality=0.09, cfg=cfg)
 
         # then
         assert cls.is_inadequate() is True
 
     def test_should_update_reward(self, cfg):
         # given
-        cls = ACS2Classifier(cfg=cfg)
+        cls = Classifier(cfg=cfg)
 
         # when
         cls.update_reward(1000)
@@ -109,7 +109,7 @@ class TestClassifier:
 
     def test_should_update_intermediate_reward(self, cfg):
         # given
-        cls = ACS2Classifier(cfg=cfg)
+        cls = Classifier(cfg=cfg)
 
         # when
         cls.update_intermediate_reward(1000)
@@ -119,7 +119,7 @@ class TestClassifier:
 
     def test_should_increase_experience(self, cfg):
         # given
-        cls = ACS2Classifier(experience=5, cfg=cfg)
+        cls = Classifier(experience=5, cfg=cfg)
 
         # when
         cls.increase_experience()
@@ -129,7 +129,7 @@ class TestClassifier:
 
     def test_should_increase_quality(self, cfg):
         # given
-        cls = ACS2Classifier(quality=0.5, cfg=cfg)
+        cls = Classifier(quality=0.5, cfg=cfg)
 
         # when
         cls.increase_quality()
@@ -139,7 +139,7 @@ class TestClassifier:
 
     def test_should_decrease_quality(self, cfg):
         # given
-        cls = ACS2Classifier(quality=0.47, cfg=cfg)
+        cls = Classifier(quality=0.47, cfg=cfg)
 
         # when
         cls.decrease_quality()
@@ -149,7 +149,7 @@ class TestClassifier:
 
     def test_should_specialize_1(self, cfg):
         # given
-        cls = ACS2Classifier(cfg=cfg)
+        cls = Classifier(cfg=cfg)
         p0 = Perception('00001111')
         p1 = Perception('00001111')
 
@@ -162,7 +162,7 @@ class TestClassifier:
 
     def test_should_specialize_2(self, cfg):
         # given
-        cls = ACS2Classifier(cfg=cfg)
+        cls = Classifier(cfg=cfg)
         p0 = Perception('00001111')
         p1 = Perception('00011111')
 
@@ -175,7 +175,7 @@ class TestClassifier:
 
     def test_should_specialize_3(self, cfg):
         # given
-        cls = ACS2Classifier(
+        cls = Classifier(
             condition=Condition('01#####1', cfg),
             effect=Effect('10#####0', cfg),
             cfg=cfg)
@@ -194,7 +194,7 @@ class TestClassifier:
 
     def test_should_count_specified_unchanging_attributes_1(self, cfg):
         # given
-        cls = ACS2Classifier(
+        cls = Classifier(
             condition=Condition('######0#', cfg),
             effect=Effect('########', cfg),
             cfg=cfg
@@ -205,7 +205,7 @@ class TestClassifier:
 
     def test_should_count_specified_unchanging_attributes_2(self, cfg):
         # given
-        cls = ACS2Classifier(
+        cls = Classifier(
             condition=Condition('#####0#0', cfg),
             effect=Effect('########', cfg),
             cfg=cfg
@@ -216,7 +216,7 @@ class TestClassifier:
 
     def test_should_count_specified_unchanging_attributes_3(self, cfg):
         # given
-        cls = ACS2Classifier(
+        cls = Classifier(
             condition=Condition('10000001', cfg),
             effect=Effect('####1#1#', cfg),
             cfg=cfg
@@ -227,7 +227,7 @@ class TestClassifier:
 
     def test_should_count_specified_unchanging_attributes_4(self, cfg):
         # given
-        cls = ACS2Classifier(
+        cls = Classifier(
             condition=Condition('1#0#1011', cfg),
             effect=Effect('0####1##', cfg),
             cfg=cfg
@@ -237,7 +237,7 @@ class TestClassifier:
 
     def test_should_count_specified_unchanging_attributes_5(self, cfg):
         # given
-        cls = ACS2Classifier(
+        cls = Classifier(
             condition=Condition('1###1011', cfg),
             effect=Effect('0####1##', cfg),
             cfg=cfg
@@ -251,12 +251,12 @@ class TestClassifier:
         will change the original - definitily not original C++ code did). """
         # given
         operation_time = 123
-        original_cl = ACS2Classifier(
+        original_cl = Classifier(
             effect=Effect('10####1#', cfg),
             cfg=cfg)
 
         # when
-        copied_cl = ACS2Classifier.copy_from(original_cl, operation_time)
+        copied_cl = Classifier.copy_from(original_cl, operation_time)
 
         # when & then
         copied_cl.effect[2] = '1'
@@ -271,7 +271,7 @@ class TestClassifier:
     def test_should_copy_classifier(self, cfg):
         # given
         operation_time = 123
-        original_cl = ACS2Classifier(
+        original_cl = Classifier(
             condition='1###1011',
             action=1,
             effect='10####1#',
@@ -281,7 +281,7 @@ class TestClassifier:
         )
 
         # when
-        copied_cl = ACS2Classifier.copy_from(original_cl, operation_time)
+        copied_cl = Classifier.copy_from(original_cl, operation_time)
 
         # Assert that we are dealing with different object
         assert original_cl is not copied_cl
@@ -306,14 +306,14 @@ class TestClassifier:
 
     def test_should_detect_similar_classifiers_1(self, cfg):
         # given
-        base = ACS2Classifier(
+        base = Classifier(
             condition='1###1011',
             action=1,
             effect='10####1#',
             cfg=cfg
         )
 
-        c1 = ACS2Classifier(
+        c1 = Classifier(
             condition='1###1011',
             action=1,
             effect='10####1#',
@@ -325,7 +325,7 @@ class TestClassifier:
 
     def test_similar_returns_true_if_differs_by_numbers(self, cfg):
         # given
-        original = ACS2Classifier(
+        original = Classifier(
             condition='#01##10#',
             action=2,
             effect='1##01##0',
@@ -340,7 +340,7 @@ class TestClassifier:
             cfg=cfg
         )
 
-        c_num = ACS2Classifier(
+        c_num = Classifier(
             condition='#01##10#',
             action=2,
             effect='1##01##0',
@@ -355,7 +355,7 @@ class TestClassifier:
             cfg=cfg
         )
 
-        c_exp = ACS2Classifier(
+        c_exp = Classifier(
             condition='#01##10#',
             action=2,
             effect='1##01##0',
@@ -370,7 +370,7 @@ class TestClassifier:
             cfg=cfg
         )
 
-        c_inter = ACS2Classifier(
+        c_inter = Classifier(
             condition='#01##10#',
             action=2,
             effect='1##01##0',
@@ -385,7 +385,7 @@ class TestClassifier:
             cfg=cfg
         )
 
-        c_qual = ACS2Classifier(
+        c_qual = Classifier(
             condition='#01##10#',
             action=2,
             effect='1##01##0',
@@ -400,7 +400,7 @@ class TestClassifier:
             cfg=cfg
         )
 
-        c_rew = ACS2Classifier(
+        c_rew = Classifier(
             condition='#01##10#',
             action=2,
             effect='1##01##0',
@@ -415,7 +415,7 @@ class TestClassifier:
             cfg=cfg
         )
 
-        c_talp = ACS2Classifier(
+        c_talp = Classifier(
             condition='#01##10#',
             action=2,
             effect='1##01##0',
@@ -430,7 +430,7 @@ class TestClassifier:
             cfg=cfg
         )
 
-        c_tav = ACS2Classifier(
+        c_tav = Classifier(
             condition='#01##10#',
             action=2,
             effect='1##01##0',
@@ -445,7 +445,7 @@ class TestClassifier:
             cfg=cfg
         )
 
-        c_tga = ACS2Classifier(
+        c_tga = Classifier(
             condition='#01##10#',
             action=2,
             effect='1##01##0',
@@ -468,7 +468,7 @@ class TestClassifier:
 
     def test_should_detect_similar_classifiers_2(self, cfg):
         # given
-        base = ACS2Classifier(
+        base = Classifier(
             condition='1###1011',
             action=1,
             effect='10####1#',
@@ -478,7 +478,7 @@ class TestClassifier:
         # when & then
         # Changed condition part
         assert base.is_similar(
-            ACS2Classifier(
+            Classifier(
                 condition='1#1#1011',
                 action=1,
                 effect='10####1#',
@@ -488,7 +488,7 @@ class TestClassifier:
         # when & then
         # changed action part
         assert base.is_similar(
-            ACS2Classifier(
+            Classifier(
                 condition='1###1011',
                 action=2,
                 effect='10####1#',
@@ -498,7 +498,7 @@ class TestClassifier:
         # when & then
         # changed effect part
         assert base.is_similar(
-            ACS2Classifier(
+            Classifier(
                 condition='1###1011',
                 action=1,
                 effect='10####11',
@@ -507,8 +507,8 @@ class TestClassifier:
 
     def test_should_detect_more_general_classifier_1(self, cfg):
         # given
-        cls = ACS2Classifier(cfg=cfg)
-        c = ACS2Classifier(cfg=cfg)
+        cls = Classifier(cfg=cfg)
+        c = Classifier(cfg=cfg)
 
         # when & then
         # no specified elements - should not be more general
@@ -516,8 +516,8 @@ class TestClassifier:
 
     def test_should_detect_more_general_classifier_2(self, cfg):
         # given
-        cls = ACS2Classifier(cfg=cfg)
-        c = ACS2Classifier(condition='1###1011', cfg=cfg)
+        cls = Classifier(cfg=cfg)
+        c = Classifier(condition='1###1011', cfg=cfg)
 
         # when & then
         # Should be more general
@@ -525,8 +525,8 @@ class TestClassifier:
 
     def test_should_detect_more_general_classifier_3(self, cfg):
         # given
-        cls = ACS2Classifier(condition='1#1#1011', cfg=cfg)
-        c = ACS2Classifier(condition='1###1###', cfg=cfg)
+        cls = Classifier(condition='1#1#1011', cfg=cfg)
+        c = Classifier(condition='1###1###', cfg=cfg)
 
         # when & then
         # shouldn't be more general
@@ -534,7 +534,7 @@ class TestClassifier:
 
     def test_should_distinguish_classifier_as_subsumer_1(self, cfg):
         # given
-        cls = ACS2Classifier(cfg=cfg)
+        cls = Classifier(cfg=cfg)
 
         # when & then
         # general classifier should not be considered as subsumer
@@ -543,7 +543,7 @@ class TestClassifier:
     def test_should_distinguish_classifier_as_subsumer_2(self, cfg):
         # given
         # let's assign enough experience and quality
-        cls = ACS2Classifier(experience=30, quality=0.92, cfg=cfg)
+        cls = Classifier(experience=30, quality=0.92, cfg=cfg)
 
         # when & then
         assert cls._is_subsumer()
@@ -551,7 +551,7 @@ class TestClassifier:
     def test_should_distinguish_classifier_as_subsumer_3(self, cfg):
         # given
         # let's reduce experience below threshold
-        cls = ACS2Classifier(experience=15, quality=0.92, cfg=cfg)
+        cls = Classifier(experience=15, quality=0.92, cfg=cfg)
 
         # when & then
         assert cls._is_subsumer() is False
@@ -560,7 +560,7 @@ class TestClassifier:
         # given
         # Now check if the fact that classifier is marked will block
         # it from being considered as a subsumer
-        cls = ACS2Classifier(experience=30, quality=0.92, cfg=cfg)
+        cls = Classifier(experience=30, quality=0.92, cfg=cfg)
         cls.mark[3] = '1'
 
         # when & then
@@ -568,12 +568,12 @@ class TestClassifier:
 
     def test_should_subsume_another_classifier_1(self, cfg):
         # given
-        cls = ACS2Classifier(quality=0.93, reward=1.35, experience=23, cfg=cfg)
+        cls = Classifier(quality=0.93, reward=1.35, experience=23, cfg=cfg)
         cls.condition[3] = '0'
         cls.action = 3
         cls.effect[2] = '1'
 
-        other = ACS2Classifier(quality=0.5, reward=0.35, experience=1, cfg=cfg)
+        other = Classifier(quality=0.5, reward=0.35, experience=1, cfg=cfg)
         other.condition[0] = '1'
         other.condition[3] = '0'
         other.action = 3
@@ -584,7 +584,7 @@ class TestClassifier:
 
     def test_should_subsume_another_classifier_2(self, cfg):
         # given
-        cls = ACS2Classifier(quality=0.84, reward=0.33, experience=3, cfg=cfg)
+        cls = Classifier(quality=0.84, reward=0.33, experience=3, cfg=cfg)
         cls.condition[0] = '1'
         cls.condition[1] = '0'
         cls.condition[4] = '0'
@@ -594,7 +594,7 @@ class TestClassifier:
         cls.effect[1] = '1'
         cls.effect[6] = '0'
 
-        other = ACS2Classifier(quality=0.5, reward=0.41, experience=1, cfg=cfg)
+        other = Classifier(quality=0.5, reward=0.41, experience=1, cfg=cfg)
         other.condition[0] = '1'
         other.condition[1] = '0'
         other.condition[6] = '2'
@@ -608,11 +608,11 @@ class TestClassifier:
 
     def test_should_subsume_another_classifier_3(self, cfg):
         # Given
-        cls = ACS2Classifier(quality=0.99, reward=11.4, experience=32, cfg=cfg)
+        cls = Classifier(quality=0.99, reward=11.4, experience=32, cfg=cfg)
         cls.condition[6] = '0'
         cls.action = 6
 
-        other = ACS2Classifier(quality=0.5, reward=9.89, experience=1, cfg=cfg)
+        other = Classifier(quality=0.5, reward=9.89, experience=1, cfg=cfg)
         other.condition[3] = '1'
         other.condition[6] = '0'
         other.action = 6
@@ -623,7 +623,7 @@ class TestClassifier:
     def test_should_set_mark_from_condition_1(self, cfg):
         # given
         p0 = Perception('00001111')
-        cls = ACS2Classifier(condition='##0#1#1#', cfg=cfg)
+        cls = Classifier(condition='##0#1#1#', cfg=cfg)
         cls.mark[0] = '0'
         cls.mark[1] = '0'
         cls.mark[3] = '0'
@@ -647,7 +647,7 @@ class TestClassifier:
     def test_should_set_mark_from_condition_2(self, cfg):
         # given
         p0 = Perception('12101101')
-        cls = ACS2Classifier(condition='###0#101', cfg=cfg)
+        cls = Classifier(condition='###0#101', cfg=cfg)
 
         # when
         cls.set_mark(p0)
@@ -670,7 +670,7 @@ class TestClassifier:
     def test_should_set_mark_from_condition_3(self, cfg):
         # given
         p0 = Perception('11111010')
-        cls = ACS2Classifier(condition='11#11##0', cfg=cfg)
+        cls = Classifier(condition='11#11##0', cfg=cfg)
 
         # when
         cls.set_mark(p0)
@@ -690,7 +690,7 @@ class TestClassifier:
     def test_should_set_mark_from_condition_4(self, cfg):
         # given
         p0 = Perception('01100000')
-        cls = ACS2Classifier(condition='###0###0', cfg=cfg)
+        cls = Classifier(condition='###0###0', cfg=cfg)
 
         # when
         cls.set_mark(p0)
@@ -719,7 +719,7 @@ class TestClassifier:
     def test_should_predict_successfully_1(self, cfg):
         # given
         action = 5
-        cls = ACS2Classifier(
+        cls = Classifier(
             condition='1#0111#1',
             action=action,
             effect='0#1000#0',
@@ -734,7 +734,7 @@ class TestClassifier:
 
     def test_should_not_generalize_random_attributes(self, cfg):
         # given
-        cls = ACS2Classifier(
+        cls = Classifier(
             condition='#####0#0',
             effect='#####1#1',
             cfg=cfg)
@@ -751,7 +751,7 @@ class TestClassifier:
 
     def test_should_generalize_random_attribute(self, cfg):
         # given
-        cls = ACS2Classifier(
+        cls = Classifier(
             condition='#####0#0',
             effect='#######1',
             cfg=cfg)
@@ -768,7 +768,7 @@ class TestClassifier:
 
     def test_should_generalize_one_random_attribute(self, cfg):
         # given
-        cls = ACS2Classifier(
+        cls = Classifier(
             condition='#####0#0',
             effect='########',
             cfg=cfg)
@@ -785,7 +785,7 @@ class TestClassifier:
 
     def test_should_generalize_second_unchanging_attribute(self, cfg):
         # given
-        cls = ACS2Classifier(
+        cls = Classifier(
             condition='#####0#0',
             effect='########',
             cfg=cfg)

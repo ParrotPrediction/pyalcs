@@ -1,7 +1,7 @@
 from random import random, sample
 from typing import Callable
 
-from lcs.agents.acs2 import ACS2Classifier, ClassifiersList
+from lcs.agents.acs2 import Classifier, ClassifiersList
 
 
 def roulette_wheel_parents_selection(pop: ClassifiersList,
@@ -31,7 +31,7 @@ def roulette_wheel_parents_selection(pop: ClassifiersList,
     return parent1, parent2
 
 
-def mutate(cl: ACS2Classifier,
+def mutate(cl: Classifier,
            mu: float,
            randomfunc: Callable=random):
     """
@@ -44,8 +44,8 @@ def mutate(cl: ACS2Classifier,
             cl.condition.generalize(idx)
 
 
-def two_point_crossover(parent: ACS2Classifier,
-                        donor: ACS2Classifier,
+def two_point_crossover(parent: Classifier,
+                        donor: Classifier,
                         samplefunc: Callable=sample):
     """
     Executes two-point crossover using condition parts of two classifiers.

@@ -1,14 +1,14 @@
 import pytest
 
 from lcs import Perception
-from lcs.agents.acs2 import ACS2Configuration, Condition
+from lcs.agents.acs2 import Configuration, Condition
 
 
 class TestCondition:
 
     @pytest.fixture
     def cfg(self):
-        return ACS2Configuration(8, 8)
+        return Configuration(8, 8)
 
     def test_equal(self, cfg):
         assert Condition('########', cfg) == Condition('########', cfg)

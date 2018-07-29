@@ -1,14 +1,14 @@
 import pytest
 
 from lcs import Perception
-from lcs.agents.acs2 import ACS2Configuration, Effect
+from lcs.agents.acs2 import Configuration, Effect
 
 
 class TestEffect:
 
     @pytest.fixture
     def cfg(self):
-        return ACS2Configuration(8, 8)
+        return Configuration(8, 8)
 
     def test_should_initialize_correctly(self, cfg):
         effect = Effect(cfg=cfg)
