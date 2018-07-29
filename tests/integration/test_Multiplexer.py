@@ -4,7 +4,7 @@ import gym_multiplexer
 import pytest
 
 from integration.multiplexer.utils import calculate_performance
-from lcs.acs2 import ACS2, ACS2Configuration
+from lcs.agents.acs2 import ACS2, ACS2Configuration
 from .utils import count_macroclassifiers, count_microclassifiers
 
 

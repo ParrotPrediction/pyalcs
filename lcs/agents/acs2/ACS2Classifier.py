@@ -4,7 +4,7 @@ from random import randint
 from typing import Optional, Union, Callable
 
 from lcs import Perception
-from lcs.acs2 import ACS2Configuration, Condition, Effect, PMark
+from . import ACS2Configuration, Condition, Effect, PMark
 
 
 class ACS2Classifier(object):

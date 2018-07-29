@@ -6,11 +6,11 @@ from random import random, choice, sample
 from typing import Optional, List
 
 from lcs import Perception
-from lcs.acs2 import ACS2Classifier, ACS2Configuration
 from lcs.components.alp import expected_case, unexpected_case, cover
 from lcs.components.genetic_algorithm \
     import roulette_wheel_parents_selection, mutate, two_point_crossover
 from lcs.strategies.action_selection import explore, exploit
+from . import ACS2Classifier, ACS2Configuration
 
 
 class ClassifiersList(list):

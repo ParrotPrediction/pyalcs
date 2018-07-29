@@ -1,7 +1,7 @@
 import pytest
 
 from lcs import Perception
-from lcs.acs2 import ACS2Configuration, ClassifiersList, \
+from lcs.agents.acs2 import ACS2Configuration, ClassifiersList, \
     Condition, ACS2Classifier
 from tests.randommock import RandomMock, SampleMock
 

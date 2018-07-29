@@ -1,4 +1,4 @@
-from lcs.acs2 import ACS2Configuration
+from . import ACS2Configuration
 
 
 class AbstractCondition(list):

@@ -2,7 +2,7 @@ from random import random, randint
 from typing import Optional
 
 from lcs import Perception
-from ..acs2 import ACS2Classifier, ACS2Configuration
+from lcs.agents.acs2 import ACS2Classifier, ACS2Configuration
 
 
 def expected_case(cl: ACS2Classifier,

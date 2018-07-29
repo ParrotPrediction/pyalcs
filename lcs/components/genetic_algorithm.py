@@ -1,7 +1,7 @@
 from random import random, sample
 from typing import Callable
 
-from ..acs2 import ACS2Classifier, ClassifiersList
+from lcs.agents.acs2 import ACS2Classifier, ClassifiersList
 
 
 def roulette_wheel_parents_selection(pop: ClassifiersList,

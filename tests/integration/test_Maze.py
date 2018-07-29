@@ -3,7 +3,7 @@ import pytest
 
 # noinspection PyUnresolvedReferences
 import gym_maze
-from lcs.acs2 import ACS2, ACS2Configuration
+from lcs.agents.acs2 import ACS2, ACS2Configuration
 from integration.maze.utils import calculate_performance
 from .utils import count_microclassifiers, \
     count_macroclassifiers, \

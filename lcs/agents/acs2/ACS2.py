@@ -1,7 +1,7 @@
 import logging
 
-from lcs import Agent
-from lcs.acs2 import ClassifiersList, ACS2Configuration
+from . import ClassifiersList, ACS2Configuration
+from ...agents import Agent
 
 
 class ACS2(Agent):

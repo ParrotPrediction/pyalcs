@@ -1,7 +1,7 @@
 import pytest
 
-from lcs.acs2 import ACS2Configuration, ACS2Classifier, ClassifiersList, \
-    Condition
+from lcs.agents.acs2 import ACS2Configuration, ACS2Classifier, \
+    ClassifiersList, Condition
 from lcs.components.genetic_algorithm \
     import roulette_wheel_parents_selection, mutate, two_point_crossover
 from tests.randommock import RandomMock, SampleMock
