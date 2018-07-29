@@ -1,7 +1,7 @@
 import pytest
 
-from lcs.acs2 import ACS2Configuration, Effect
 from lcs import Perception
+from lcs.acs2 import ACS2Configuration, Effect
 
 
 class TestEffect:

@@ -1,9 +1,11 @@
 from random import random, sample
+from typing import Callable
 
-from ..acs2 import ClassifiersList, Classifier
+from ..acs2 import ACS2Classifier, ClassifiersList
 
 
-def roulette_wheel_parents_selection(pop: ClassifiersList, randomfunc=random):
+def roulette_wheel_parents_selection(pop: ClassifiersList,
+                                     randomfunc: Callable=random):
     """
     Select two classifiers from population according
     to roulette-wheel selection.
@@ -29,7 +31,9 @@ def roulette_wheel_parents_selection(pop: ClassifiersList, randomfunc=random):
     return parent1, parent2
 
 
-def mutate(cl: Classifier, mu: float, randomfunc=random):
+def mutate(cl: ACS2Classifier,
+           mu: float,
+           randomfunc: Callable=random):
     """
     Executes the generalizing mutation in the classifier.
     Specified attributes in classifier conditions are randomly
@@ -40,9 +44,9 @@ def mutate(cl: Classifier, mu: float, randomfunc=random):
             cl.condition.generalize(idx)
 
 
-def two_point_crossover(parent: Classifier,
-                        donor: Classifier,
-                        samplefunc=sample):
+def two_point_crossover(parent: ACS2Classifier,
+                        donor: ACS2Classifier,
+                        samplefunc: Callable=sample):
     """
     Executes two-point crossover using condition parts of two classifiers.
     :param parent: first classifier

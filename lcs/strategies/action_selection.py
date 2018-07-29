@@ -1,11 +1,11 @@
 from itertools import groupby
 from random import random, randint
+from typing import Optional
 
-from lcs.acs2 import Classifier
-from ..acs2 import ClassifiersList
+from ..acs2 import ACS2Classifier, ClassifiersList
 
 
-def explore(cll: ClassifiersList, pb: float = 0.5) -> int:
+def explore(cll: ClassifiersList, pb: float = 0.5) -> Optional[int]:
     """
     Chooses action according to current exploration policy
 
@@ -60,7 +60,7 @@ def exploit(cll: ClassifiersList) -> int:
     return choose_random_action(cll)
 
 
-def choose_latest_action(cll: ClassifiersList) -> int:
+def choose_latest_action(cll: ClassifiersList) -> Optional[int]:
     """
     Chooses latest executed action ("action delay bias")
 
@@ -74,7 +74,7 @@ def choose_latest_action(cll: ClassifiersList) -> int:
     int
         chosen action number
     """
-    last_executed_cls: Classifier
+    last_executed_cls: ACS2Classifier
     number_of_cls_per_action = \
         {i: 0 for i in range(cll.cfg.number_of_possible_actions)}
 

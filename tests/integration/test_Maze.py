@@ -3,8 +3,7 @@ import pytest
 
 # noinspection PyUnresolvedReferences
 import gym_maze
-from lcs.acs2 import ACS2Configuration
-from lcs.acs2.ACS2 import ACS2
+from lcs.acs2 import ACS2, ACS2Configuration
 from integration.maze.utils import calculate_performance
 from .utils import count_microclassifiers, \
     count_macroclassifiers, \
@@ -52,7 +51,7 @@ class TestMaze:
         population, metrics = agent.explore(env, 300)
 
         # then
-        assert abs(250 - count_macroclassifiers(population)) < 50
+        assert abs(250 - count_macroclassifiers(population)) < 55
 
         assert 100 == self._get_knowledge(metrics)
 

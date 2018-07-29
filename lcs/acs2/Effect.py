@@ -1,5 +1,5 @@
 from lcs import Perception
-from lcs.acs2.AbstractCondition import AbstractCondition
+from lcs.acs2 import AbstractCondition
 
 
 class Effect(AbstractCondition):

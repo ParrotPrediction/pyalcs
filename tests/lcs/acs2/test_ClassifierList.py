@@ -2,7 +2,7 @@ import pytest
 
 from lcs import Perception
 from lcs.acs2 import ACS2Configuration, ClassifiersList, \
-    Condition, Classifier
+    Condition, ACS2Classifier
 from tests.randommock import RandomMock, SampleMock
 
 
@@ -14,26 +14,26 @@ class TestClassifierList:
 
     def test_find_subsumer_finds_single_subsumer(self, cfg):
         # given
-        subsumer = Classifier(condition='###0####',
-                              action=3,
-                              effect='##1#####',
-                              quality=0.93,
-                              reward=1.35,
-                              experience=23,
-                              cfg=cfg)
+        subsumer = ACS2Classifier(condition='###0####',
+                                  action=3,
+                                  effect='##1#####',
+                                  quality=0.93,
+                                  reward=1.35,
+                                  experience=23,
+                                  cfg=cfg)
 
-        nonsubsumer = Classifier(cfg=cfg)
+        nonsubsumer = ACS2Classifier(cfg=cfg)
 
         classifiers_list = ClassifiersList(
             [nonsubsumer, subsumer, nonsubsumer], cfg)
 
-        classifier = Classifier(condition='1##0####',
-                                action=3,
-                                effect='##1#####',
-                                quality=0.5,
-                                reward=0.35,
-                                experience=1,
-                                cfg=cfg)
+        classifier = ACS2Classifier(condition='1##0####',
+                                    action=3,
+                                    effect='##1#####',
+                                    quality=0.5,
+                                    reward=0.35,
+                                    experience=1,
+                                    cfg=cfg)
 
         # when
         actual_subsumer = classifiers_list.find_subsumer(
@@ -44,23 +44,23 @@ class TestClassifierList:
 
     def test_find_subsumer_finds_single_subsumer_among_nonsubsumers(self, cfg):
         # given
-        subsumer = Classifier(condition='###0####',
-                              action=3,
-                              effect='##1#####',
-                              quality=0.93,
-                              reward=1.35,
-                              experience=23,
-                              cfg=cfg)
+        subsumer = ACS2Classifier(condition='###0####',
+                                  action=3,
+                                  effect='##1#####',
+                                  quality=0.93,
+                                  reward=1.35,
+                                  experience=23,
+                                  cfg=cfg)
 
-        nonsubsumer = Classifier(cfg=cfg)
+        nonsubsumer = ACS2Classifier(cfg=cfg)
 
-        classifier = Classifier(condition='1##0####',
-                                action=3,
-                                effect='##1#####',
-                                quality=0.5,
-                                reward=0.35,
-                                experience=1,
-                                cfg=cfg)
+        classifier = ACS2Classifier(condition='1##0####',
+                                    action=3,
+                                    effect='##1#####',
+                                    quality=0.5,
+                                    reward=0.35,
+                                    experience=1,
+                                    cfg=cfg)
         classifiers_list = ClassifiersList(
             [nonsubsumer, subsumer, nonsubsumer], cfg)
 
@@ -73,30 +73,30 @@ class TestClassifierList:
 
     def test_find_subsumer_finds_selects_more_general_subsumer1(self, cfg):
         # given
-        subsumer1 = Classifier(condition='1##0####',
-                               action=3,
-                               effect='##1#####',
-                               quality=0.93,
-                               reward=1.35,
-                               experience=23,
-                               cfg=cfg)
-        subsumer2 = Classifier(condition='###0####',
-                               action=3,
-                               effect='##1#####',
-                               quality=0.93,
-                               reward=1.35,
-                               experience=23,
-                               cfg=cfg)
+        subsumer1 = ACS2Classifier(condition='1##0####',
+                                   action=3,
+                                   effect='##1#####',
+                                   quality=0.93,
+                                   reward=1.35,
+                                   experience=23,
+                                   cfg=cfg)
+        subsumer2 = ACS2Classifier(condition='###0####',
+                                   action=3,
+                                   effect='##1#####',
+                                   quality=0.93,
+                                   reward=1.35,
+                                   experience=23,
+                                   cfg=cfg)
 
-        nonsubsumer = Classifier(cfg=cfg)
+        nonsubsumer = ACS2Classifier(cfg=cfg)
 
-        classifier = Classifier(condition='11#0####',
-                                action=3,
-                                effect='##1#####',
-                                quality=0.5,
-                                reward=0.35,
-                                experience=1,
-                                cfg=cfg)
+        classifier = ACS2Classifier(condition='11#0####',
+                                    action=3,
+                                    effect='##1#####',
+                                    quality=0.5,
+                                    reward=0.35,
+                                    experience=1,
+                                    cfg=cfg)
 
         classifiers_list = ClassifiersList(
             [nonsubsumer, subsumer2, subsumer1, nonsubsumer], cfg)
@@ -110,7 +110,7 @@ class TestClassifierList:
 
     def test_find_subsumer_finds_selects_more_general_subsumer2(self, cfg):
         # given
-        subsumer1 = Classifier(
+        subsumer1 = ACS2Classifier(
             condition='1##0####',
             action=3,
             effect='##1#####',
@@ -118,7 +118,7 @@ class TestClassifierList:
             reward=1.35,
             experience=23,
             cfg=cfg)
-        subsumer2 = Classifier(
+        subsumer2 = ACS2Classifier(
             condition='###0####',
             action=3,
             effect='##1#####',
@@ -127,9 +127,9 @@ class TestClassifierList:
             experience=23,
             cfg=cfg)
 
-        nonsubsumer = Classifier(cfg=cfg)
+        nonsubsumer = ACS2Classifier(cfg=cfg)
 
-        classifier = Classifier(
+        classifier = ACS2Classifier(
             condition='11#0####',
             action=3,
             effect='##1#####',
@@ -151,31 +151,31 @@ class TestClassifierList:
     def test_find_subsumer_random_select_one_of_equally_general_sbsmers(self,
                                                                         cfg):
         # given
-        subsumer1 = Classifier(condition='1##0####',
-                               action=3,
-                               effect='##1#####',
-                               quality=0.93,
-                               reward=1.35,
-                               experience=23,
-                               cfg=cfg)
+        subsumer1 = ACS2Classifier(condition='1##0####',
+                                   action=3,
+                                   effect='##1#####',
+                                   quality=0.93,
+                                   reward=1.35,
+                                   experience=23,
+                                   cfg=cfg)
 
-        subsumer2 = Classifier(condition='#1#0####',
-                               action=3,
-                               effect='##1#####',
-                               quality=0.93,
-                               reward=1.35,
-                               experience=23,
-                               cfg=cfg)
+        subsumer2 = ACS2Classifier(condition='#1#0####',
+                                   action=3,
+                                   effect='##1#####',
+                                   quality=0.93,
+                                   reward=1.35,
+                                   experience=23,
+                                   cfg=cfg)
 
-        nonsubsumer = Classifier(cfg=cfg)
+        nonsubsumer = ACS2Classifier(cfg=cfg)
 
-        classifier = Classifier(condition='11#0####',
-                                action=3,
-                                effect='##1#####',
-                                quality=0.5,
-                                reward=0.35,
-                                experience=1,
-                                cfg=cfg)
+        classifier = ACS2Classifier(condition='11#0####',
+                                    action=3,
+                                    effect='##1#####',
+                                    quality=0.5,
+                                    reward=0.35,
+                                    experience=1,
+                                    cfg=cfg)
 
         classifiers_list = ClassifiersList(
             [nonsubsumer, subsumer1, subsumer2, nonsubsumer], cfg)
@@ -196,7 +196,7 @@ class TestClassifierList:
 
     def test_find_subsumer_selects_most_general_subsumer(self, cfg):
         # given
-        subsumer1 = Classifier(
+        subsumer1 = ACS2Classifier(
             condition='1##0####',
             action=3,
             effect='##1#####',
@@ -205,7 +205,7 @@ class TestClassifierList:
             experience=23,
             cfg=cfg)
 
-        subsumer2 = Classifier(
+        subsumer2 = ACS2Classifier(
             condition='#1#0####',
             action=3,
             effect='##1#####',
@@ -213,7 +213,7 @@ class TestClassifierList:
             reward=1.35, experience=23,
             cfg=cfg)
 
-        most_general = Classifier(
+        most_general = ACS2Classifier(
             condition='###0####',
             action=3,
             effect='##1#####',
@@ -222,9 +222,9 @@ class TestClassifierList:
             experience=23,
             cfg=cfg)
 
-        nonsubsumer = Classifier(cfg=cfg)
+        nonsubsumer = ACS2Classifier(cfg=cfg)
 
-        classifier = Classifier(
+        classifier = ACS2Classifier(
             condition='11#0####',
             action=3,
             effect='##1#####',
@@ -246,7 +246,7 @@ class TestClassifierList:
 
     def test_find_old_classifier_only_subsumer(self, cfg):
         # given
-        subsumer1 = Classifier(
+        subsumer1 = ACS2Classifier(
             condition='1##0####',
             action=3,
             effect='##1#####',
@@ -255,7 +255,7 @@ class TestClassifierList:
             experience=23,
             cfg=cfg)
 
-        subsumer2 = Classifier(
+        subsumer2 = ACS2Classifier(
             condition='#1#0####',
             action=3,
             effect='##1#####',
@@ -264,7 +264,7 @@ class TestClassifierList:
             experience=23,
             cfg=cfg)
 
-        most_general = Classifier(
+        most_general = ACS2Classifier(
             condition='###0####',
             action=3,
             effect='##1#####',
@@ -273,9 +273,9 @@ class TestClassifierList:
             experience=23,
             cfg=cfg)
 
-        nonsubsumer = Classifier(cfg=cfg)
+        nonsubsumer = ACS2Classifier(cfg=cfg)
 
-        classifier = Classifier(
+        classifier = ACS2Classifier(
             condition='11#0####',
             action=3,
             effect='##1#####',
@@ -297,17 +297,17 @@ class TestClassifierList:
 
     def test_find_old_classifier_only_similar(self, cfg):
         # given
-        classifier_1 = Classifier(action=1, experience=32, cfg=cfg)
-        classifier_2 = Classifier(action=1, cfg=cfg)
+        classifier_1 = ACS2Classifier(action=1, experience=32, cfg=cfg)
+        classifier_2 = ACS2Classifier(action=1, cfg=cfg)
         classifiers = ClassifiersList(
             [classifier_1,
-             Classifier(action=2, cfg=cfg),
-             Classifier(action=3, cfg=cfg),
+             ACS2Classifier(action=2, cfg=cfg),
+             ACS2Classifier(action=3, cfg=cfg),
              classifier_2], cfg)
 
         # when
         actual_old_classifier = classifiers.find_old_classifier(
-            Classifier(action=1, cfg=cfg))
+            ACS2Classifier(action=1, cfg=cfg))
 
         # then
         assert classifier_1 == actual_old_classifier
@@ -315,21 +315,21 @@ class TestClassifierList:
     def test_find_old_classifier_similar_and_subsumer_subsumer_returned(self,
                                                                         cfg):
         # given
-        subsumer = Classifier(condition='1#######',
-                              action=1,
-                              experience=21,
-                              quality=0.95,
-                              cfg=cfg)
+        subsumer = ACS2Classifier(condition='1#######',
+                                  action=1,
+                                  experience=21,
+                                  quality=0.95,
+                                  cfg=cfg)
 
-        similar = Classifier(condition='10######',
-                             action=1,
-                             cfg=cfg)
+        similar = ACS2Classifier(condition='10######',
+                                 action=1,
+                                 cfg=cfg)
 
         existing_classifiers = ClassifiersList([similar, subsumer], cfg)
 
-        classifier = Classifier(condition='10######',
-                                action=1,
-                                cfg=cfg)
+        classifier = ACS2Classifier(condition='10######',
+                                    action=1,
+                                    cfg=cfg)
 
         # when
         old_cls = existing_classifiers.find_old_classifier(classifier)
@@ -342,7 +342,7 @@ class TestClassifierList:
     def test_find_old_classifier_none(self, cfg):
         # given
         classifier_list = ClassifiersList([], cfg=cfg)
-        cl = Classifier(cfg=cfg)
+        cl = ACS2Classifier(cfg=cfg)
 
         # when
         old_cl = classifier_list.find_old_classifier(cl)
@@ -351,16 +351,16 @@ class TestClassifierList:
 
     def test_select_classifier_to_delete(self, cfg):
         # given
-        selected_first = Classifier(quality=0.5, cfg=cfg)
-        much_worse = Classifier(quality=0.2, cfg=cfg)
-        yet_another_to_consider = Classifier(quality=0.2, cfg=cfg)
+        selected_first = ACS2Classifier(quality=0.5, cfg=cfg)
+        much_worse = ACS2Classifier(quality=0.2, cfg=cfg)
+        yet_another_to_consider = ACS2Classifier(quality=0.2, cfg=cfg)
         classifiers = ClassifiersList(
-            [Classifier(cfg=cfg),
+            [ACS2Classifier(cfg=cfg),
              selected_first,
-             Classifier(cfg=cfg),
+             ACS2Classifier(cfg=cfg),
              much_worse,
              yet_another_to_consider,
-             Classifier(cfg=cfg)],
+             ACS2Classifier(cfg=cfg)],
             cfg=cfg)
 
         # when
@@ -372,10 +372,10 @@ class TestClassifierList:
 
     def test_delete_a_classifier_delete(self, cfg):
         # given
-        cl_1 = Classifier(action=1, cfg=cfg)
-        cl_2 = Classifier(action=2, cfg=cfg)
-        cl_3 = Classifier(action=3, cfg=cfg)
-        cl_4 = Classifier(action=4, cfg=cfg)
+        cl_1 = ACS2Classifier(action=1, cfg=cfg)
+        cl_2 = ACS2Classifier(action=2, cfg=cfg)
+        cl_3 = ACS2Classifier(action=3, cfg=cfg)
+        cl_4 = ACS2Classifier(action=4, cfg=cfg)
         action_set = ClassifiersList([cl_1, cl_2], cfg=cfg)
         match_set = ClassifiersList([cl_2], cfg=cfg)
         population = ClassifiersList([cl_1, cl_2, cl_3, cl_4], cfg=cfg)
@@ -391,10 +391,10 @@ class TestClassifierList:
 
     def test_delete_a_classifier_decrease_numerosity(self, cfg):
         # given
-        cl_1 = Classifier(action=1, cfg=cfg)
-        cl_2 = Classifier(action=2, numerosity=3, cfg=cfg)
-        cl_3 = Classifier(action=3, cfg=cfg)
-        cl_4 = Classifier(action=4, cfg=cfg)
+        cl_1 = ACS2Classifier(action=1, cfg=cfg)
+        cl_2 = ACS2Classifier(action=2, numerosity=3, cfg=cfg)
+        cl_3 = ACS2Classifier(action=3, cfg=cfg)
+        cl_4 = ACS2Classifier(action=4, cfg=cfg)
         action_set = ClassifiersList([cl_1, cl_2], cfg=cfg)
         match_set = ClassifiersList([cl_2], cfg=cfg)
         population = ClassifiersList([cl_1, cl_2, cl_3, cl_4], cfg=cfg)
@@ -404,13 +404,14 @@ class TestClassifierList:
             match_set, population, randomfunc=RandomMock([0.5, 0.1, 0.5, 0.5]))
 
         expected_action_set = ClassifiersList(
-            [cl_1, Classifier(action=2, numerosity=2, cfg=cfg)],
+            [cl_1, ACS2Classifier(action=2, numerosity=2, cfg=cfg)],
             cfg=cfg)
         expected_match_set = ClassifiersList(
-            [Classifier(action=2, numerosity=2, cfg=cfg)],
+            [ACS2Classifier(action=2, numerosity=2, cfg=cfg)],
             cfg=cfg)
         expected_population = ClassifiersList(
-            [cl_1, Classifier(action=2, numerosity=2, cfg=cfg), cl_3, cl_4],
+            [cl_1, ACS2Classifier(action=2, numerosity=2, cfg=cfg),
+             cl_3, cl_4],
             cfg=cfg)
 
         # then
@@ -420,10 +421,10 @@ class TestClassifierList:
 
     def test_delete_ga_classifiers(self, cfg):
         # given
-        cl_1 = Classifier(action=1, cfg=cfg)
-        cl_2 = Classifier(action=2, numerosity=20, cfg=cfg)
-        cl_3 = Classifier(action=3, cfg=cfg)
-        cl_4 = Classifier(action=4, cfg=cfg)
+        cl_1 = ACS2Classifier(action=1, cfg=cfg)
+        cl_2 = ACS2Classifier(action=2, numerosity=20, cfg=cfg)
+        cl_3 = ACS2Classifier(action=3, cfg=cfg)
+        cl_4 = ACS2Classifier(action=4, cfg=cfg)
         action_set = ClassifiersList([cl_1, cl_2], cfg=cfg)
         match_set = ClassifiersList([cl_2], cfg=cfg)
         population = ClassifiersList([cl_1, cl_2, cl_3, cl_4], cfg=cfg)
@@ -434,14 +435,14 @@ class TestClassifierList:
             randomfunc=RandomMock(([0.5, 0.1] + [0.5] * 19) * 3))
 
         expected_action_set = ClassifiersList(
-            [cl_1, Classifier(action=2, numerosity=17, cfg=cfg)],
+            [cl_1, ACS2Classifier(action=2, numerosity=17, cfg=cfg)],
             cfg=cfg)
         expected_match_set = ClassifiersList(
-            [Classifier(action=2, numerosity=17, cfg=cfg)],
+            [ACS2Classifier(action=2, numerosity=17, cfg=cfg)],
             cfg=cfg)
         expected_population = ClassifiersList(
-            [cl_1, Classifier(action=2, numerosity=17, cfg=cfg), cl_3, cl_4],
-            cfg=cfg)
+            [cl_1, ACS2Classifier(action=2, numerosity=17, cfg=cfg),
+             cl_3, cl_4], cfg=cfg)
 
         # then
         assert expected_action_set == action_set
@@ -450,8 +451,8 @@ class TestClassifierList:
 
     def test_other_preferred_to_delete_if_significantly_worse(self, cfg):
         # given
-        cl = Classifier(quality=0.5, cfg=cfg)
-        cl_del = Classifier(quality=0.8, cfg=cfg)
+        cl = ACS2Classifier(quality=0.5, cfg=cfg)
+        cl_del = ACS2Classifier(quality=0.8, cfg=cfg)
 
         # when
         selected_cl = ClassifiersList(cfg=cfg)\
@@ -462,8 +463,8 @@ class TestClassifierList:
 
     def test_other_not_preferred_to_delete_if_significantly_better(self, cfg):
         # given
-        cl = Classifier(quality=0.8, cfg=cfg)
-        cl_del = Classifier(quality=0.5, cfg=cfg)
+        cl = ACS2Classifier(quality=0.8, cfg=cfg)
+        cl_del = ACS2Classifier(quality=0.5, cfg=cfg)
 
         # when
         selected_cl = ClassifiersList(cfg=cfg)\
@@ -474,9 +475,9 @@ class TestClassifierList:
 
     def test_if_selected_somewhat_close_to_other_marked_considered1(self, cfg):
         # given
-        cl = Classifier(quality=0.8, cfg=cfg)
+        cl = ACS2Classifier(quality=0.8, cfg=cfg)
         cl.mark[0] = '0'
-        cl_del = Classifier(quality=0.85, cfg=cfg)
+        cl_del = ACS2Classifier(quality=0.85, cfg=cfg)
 
         # when
         selected_cl = ClassifiersList(cfg=cfg)\
@@ -489,8 +490,8 @@ class TestClassifierList:
 
     def test_if_selected_somewhat_close_to_other_marked_considered2(self, cfg):
         # given
-        cl = Classifier(quality=0.8, cfg=cfg)
-        cl_del = Classifier(quality=0.85, cfg=cfg)
+        cl = ACS2Classifier(quality=0.8, cfg=cfg)
+        cl_del = ACS2Classifier(quality=0.85, cfg=cfg)
         cl_del.mark[0] = '0'
 
         # when
@@ -505,8 +506,8 @@ class TestClassifierList:
     def test_if_selected_close_to_other_both_umarked_tav_considered1(self,
                                                                      cfg):
         # given
-        cl = Classifier(quality=0.8, tav=0.2, cfg=cfg)
-        cl_del = Classifier(quality=0.85, tav=0.1, cfg=cfg)
+        cl = ACS2Classifier(quality=0.8, tav=0.2, cfg=cfg)
+        cl_del = ACS2Classifier(quality=0.85, tav=0.1, cfg=cfg)
 
         # when
         selected_cl = ClassifiersList(cfg=cfg)\
@@ -520,8 +521,8 @@ class TestClassifierList:
     def test_if_selected_close_to_other_both_umarked_tav_considered2(self,
                                                                      cfg):
         # given
-        cl = Classifier(quality=0.8, tav=0.1, cfg=cfg)
-        cl_del = Classifier(quality=0.85, tav=0.1, cfg=cfg)
+        cl = ACS2Classifier(quality=0.8, tav=0.1, cfg=cfg)
+        cl_del = ACS2Classifier(quality=0.85, tav=0.1, cfg=cfg)
 
         # when
         selected_cl = ClassifiersList(cfg=cfg)\
@@ -534,9 +535,9 @@ class TestClassifierList:
 
     def test_if_selected_close_to_other_both_marked_tav_considered1(self, cfg):
         # given
-        cl = Classifier(quality=0.85, tav=0.2, cfg=cfg)
+        cl = ACS2Classifier(quality=0.85, tav=0.2, cfg=cfg)
         cl.mark[0] = '0'
-        cl_del = Classifier(quality=0.8, tav=0.1, cfg=cfg)
+        cl_del = ACS2Classifier(quality=0.8, tav=0.1, cfg=cfg)
         cl_del.mark[0] = '0'
 
         # when
@@ -550,9 +551,9 @@ class TestClassifierList:
 
     def test_if_selected_close_to_other_both_marked_tav_considered2(self, cfg):
         # given
-        cl = Classifier(quality=0.8, tav=0.1, cfg=cfg)
+        cl = ACS2Classifier(quality=0.8, tav=0.1, cfg=cfg)
         cl.mark[0] = '0'
-        cl_del = Classifier(quality=0.85, tav=0.1, cfg=cfg)
+        cl_del = ACS2Classifier(quality=0.85, tav=0.1, cfg=cfg)
         cl_del.mark[0] = '0'
 
         # when
@@ -568,23 +569,23 @@ class TestClassifierList:
         population = ClassifiersList(cfg=cfg)
         assert 0 == population.overall_numerosity()
 
-        population.append(Classifier(numerosity=2, cfg=cfg))
+        population.append(ACS2Classifier(numerosity=2, cfg=cfg))
         assert 2 == population.overall_numerosity()
 
-        population.append(Classifier(numerosity=1, cfg=cfg))
+        population.append(ACS2Classifier(numerosity=1, cfg=cfg))
         assert 3 == population.overall_numerosity()
 
-        population.append(Classifier(numerosity=3, cfg=cfg))
+        population.append(ACS2Classifier(numerosity=3, cfg=cfg))
         assert 6 == population.overall_numerosity()
 
     def test_add_ga_classifier_add(self, cfg):
         # given
-        cl_1 = Classifier(action=1, cfg=cfg)
-        cl_2 = Classifier(action=2,
-                          condition='1#######',
-                          cfg=cfg)
-        cl_3 = Classifier(action=3, cfg=cfg)
-        cl_4 = Classifier(action=4, cfg=cfg)
+        cl_1 = ACS2Classifier(action=1, cfg=cfg)
+        cl_2 = ACS2Classifier(action=2,
+                              condition='1#######',
+                              cfg=cfg)
+        cl_3 = ACS2Classifier(action=3, cfg=cfg)
+        cl_4 = ACS2Classifier(action=4, cfg=cfg)
         action_set = ClassifiersList([cl_1], cfg=cfg)
         match_set = ClassifiersList([], cfg=cfg)
         population = ClassifiersList([cl_1, cl_3, cl_4], cfg)
@@ -598,14 +599,14 @@ class TestClassifierList:
 
     def test_add_ga_classifier_increase_numerosity(self, cfg):
         # given
-        cl_1 = Classifier(action=2,
-                          condition='1#######',
-                          cfg=cfg)
-        cl_2 = Classifier(action=2,
-                          condition='1#######',
-                          cfg=cfg)
-        cl_3 = Classifier(action=3, cfg=cfg)
-        cl_4 = Classifier(action=4, cfg=cfg)
+        cl_1 = ACS2Classifier(action=2,
+                              condition='1#######',
+                              cfg=cfg)
+        cl_2 = ACS2Classifier(action=2,
+                              condition='1#######',
+                              cfg=cfg)
+        cl_3 = ACS2Classifier(action=3, cfg=cfg)
+        cl_4 = ACS2Classifier(action=4, cfg=cfg)
 
         action_set = ClassifiersList([cl_1], cfg)
         match_set = ClassifiersList([cl_1], cfg)
@@ -613,7 +614,7 @@ class TestClassifierList:
 
         # when
         action_set.add_ga_classifier(cl_2, match_set, population)
-        new_classifier = Classifier(
+        new_classifier = ACS2Classifier(
             action=2,
             condition=Condition('1#######', cfg=cfg),
             numerosity=2,
@@ -625,11 +626,11 @@ class TestClassifierList:
     @pytest.mark.skip(reason="todo: test with deterministic RNG")
     def test_apply_ga(self, cfg):
         # given
-        cl_1 = Classifier(
+        cl_1 = ACS2Classifier(
             condition='#1#1#1#1',
             numerosity=12,
             cfg=cfg)
-        cl_2 = Classifier(
+        cl_2 = ACS2Classifier(
             condition='0#0#0#0#',
             numerosity=9,
             cfg=cfg)
@@ -652,27 +653,27 @@ class TestClassifierList:
                             samplefunc=SampleMock([0, 4]))
 
         # then
-        modified_parent1 = Classifier(condition='#1#1#1#1',
-                                      numerosity=10,
-                                      tga=101,
-                                      cfg=cfg)
+        modified_parent1 = ACS2Classifier(condition='#1#1#1#1',
+                                          numerosity=10,
+                                          tga=101,
+                                          cfg=cfg)
 
-        modified_parent2 = Classifier(condition='0#0#0#0#',
-                                      numerosity=8,
-                                      tga=101,
-                                      cfg=cfg)
+        modified_parent2 = ACS2Classifier(condition='0#0#0#0#',
+                                          numerosity=8,
+                                          tga=101,
+                                          cfg=cfg)
 
-        child1 = Classifier(condition='0####1#1',
-                            quality=0.25,
-                            talp=101,
-                            tga=101,
-                            cfg=cfg)
+        child1 = ACS2Classifier(condition='0####1#1',
+                                quality=0.25,
+                                talp=101,
+                                tga=101,
+                                cfg=cfg)
 
-        child2 = Classifier(condition='###10#0#',
-                            quality=0.25,
-                            talp=101,
-                            tga=101,
-                            cfg=cfg)
+        child2 = ACS2Classifier(condition='###10#0#',
+                                quality=0.25,
+                                talp=101,
+                                tga=101,
+                                cfg=cfg)
 
         expected_population = ClassifiersList(
             [modified_parent1, modified_parent2, child1, child2], cfg)
@@ -694,7 +695,7 @@ class TestClassifierList:
         population = ClassifiersList(cfg=cfg)
 
         # when
-        population.append(Classifier(cfg=cfg))
+        population.append(ACS2Classifier(cfg=cfg))
 
         # then
         assert 1 == len(population)
@@ -705,13 +706,13 @@ class TestClassifierList:
         situation = Perception('11110000')
 
         # C1 - general condition
-        c1 = Classifier(cfg=cfg)
+        c1 = ACS2Classifier(cfg=cfg)
 
         # C2 - matching condition
-        c2 = Classifier(condition='1###0###', cfg=cfg)
+        c2 = ACS2Classifier(condition='1###0###', cfg=cfg)
 
         # C3 - non-matching condition
-        c3 = Classifier(condition='0###1###', cfg=cfg)
+        c3 = ACS2Classifier(condition='0###1###', cfg=cfg)
 
         population.append(c1)
         population.append(c2)
@@ -729,9 +730,9 @@ class TestClassifierList:
     def test_should_form_action_set(self, cfg):
         # given
         population = ClassifiersList(cfg=cfg)
-        c0 = Classifier(action=0, cfg=cfg)
-        c01 = Classifier(action=0, cfg=cfg)
-        c1 = Classifier(action=1, cfg=cfg)
+        c0 = ACS2Classifier(action=0, cfg=cfg)
+        c01 = ACS2Classifier(action=0, cfg=cfg)
+        c1 = ACS2Classifier(action=1, cfg=cfg)
 
         population.append(c0)
         population.append(c01)
@@ -751,9 +752,9 @@ class TestClassifierList:
     def test_should_expand(self, cfg):
         # given
         population = ClassifiersList(cfg=cfg)
-        c0 = Classifier(action=0, cfg=cfg)
-        c1 = Classifier(action=1, numerosity=2, cfg=cfg)
-        c2 = Classifier(action=2, numerosity=3, cfg=cfg)
+        c0 = ACS2Classifier(action=0, cfg=cfg)
+        c1 = ACS2Classifier(action=1, numerosity=2, cfg=cfg)
+        c2 = ACS2Classifier(action=2, numerosity=3, cfg=cfg)
 
         population.append(c0)
         population.append(c1)
@@ -774,24 +775,24 @@ class TestClassifierList:
 
         # when & then
         # C1 - does not anticipate change
-        c1 = Classifier(cfg=cfg)
+        c1 = ACS2Classifier(cfg=cfg)
         population.append(c1)
         assert 0.0 == population.get_maximum_fitness()
 
         # when & then
         # C2 - does anticipate some change
-        c2 = Classifier(effect='1###0###',
-                        reward=0.25,
-                        cfg=cfg)
+        c2 = ACS2Classifier(effect='1###0###',
+                            reward=0.25,
+                            cfg=cfg)
         population.append(c2)
         assert 0.125 == population.get_maximum_fitness()
 
         # when & then
         # C3 - does anticipate change and is quite good
-        c3 = Classifier(effect='1#######',
-                        quality=0.8,
-                        reward=5,
-                        cfg=cfg)
+        c3 = ACS2Classifier(effect='1#######',
+                            quality=0.8,
+                            reward=5,
+                            cfg=cfg)
         population.append(c3)
         assert 4 == population.get_maximum_fitness()
 
@@ -811,22 +812,22 @@ class TestClassifierList:
     def test_should_get_similar_classifier(self, cfg):
         # given
         pop = ClassifiersList(cfg=cfg)
-        pop.append(Classifier(action=1, cfg=cfg))
-        pop.append(Classifier(action=2, cfg=cfg))
-        pop.append(Classifier(action=3, cfg=cfg))
+        pop.append(ACS2Classifier(action=1, cfg=cfg))
+        pop.append(ACS2Classifier(action=2, cfg=cfg))
+        pop.append(ACS2Classifier(action=3, cfg=cfg))
 
         # when & then
         # No similar classifiers exist
-        assert pop.get_similar(Classifier(action=4, cfg=cfg)) is None
+        assert pop.get_similar(ACS2Classifier(action=4, cfg=cfg)) is None
 
         # when & then
         # Should find similar classifier
-        assert pop.get_similar(Classifier(action=2, cfg=cfg)) is not None
+        assert pop.get_similar(ACS2Classifier(action=2, cfg=cfg)) is not None
 
     def test_should_apply_reinforcement_learning(self, cfg):
         # given
         population = ClassifiersList(cfg=cfg)
-        c1 = Classifier(cfg=cfg)
+        c1 = ACS2Classifier(cfg=cfg)
         c1.r = 34.29
         c1.ir = 11.29
         population.append(c1)
@@ -843,7 +844,7 @@ class TestClassifierList:
         population = ClassifiersList(cfg=cfg)
         new_list = ClassifiersList(cfg=cfg)
 
-        child = Classifier(
+        child = ACS2Classifier(
             condition='1##1#010',
             action=0,
             effect='0####101',
@@ -857,7 +858,7 @@ class TestClassifierList:
             cfg=cfg
         )
 
-        c1 = Classifier(
+        c1 = ACS2Classifier(
             condition='1##1#010',
             action=0,
             effect='0####101',
@@ -871,7 +872,7 @@ class TestClassifierList:
             cfg=cfg
         )
 
-        c2 = Classifier(
+        c2 = ACS2Classifier(
             condition='1####010',
             action=0,
             effect='0####101',
@@ -885,7 +886,7 @@ class TestClassifierList:
             cfg=cfg
         )
 
-        c3 = Classifier(
+        c3 = ACS2Classifier(
             condition='1####0##',
             action=0,
             effect='0####1##',
@@ -917,7 +918,7 @@ class TestClassifierList:
         population = ClassifiersList(cfg=cfg)
         new_list = ClassifiersList(cfg=cfg)
 
-        child = Classifier(
+        child = ACS2Classifier(
             condition='#1O##O##',
             action=0,
             quality=0.5,
@@ -930,7 +931,7 @@ class TestClassifierList:
             cfg=cfg
         )
 
-        c1 = Classifier(
+        c1 = ACS2Classifier(
             condition='#1O#O###',
             action=0,
             quality=0.650831,
@@ -943,7 +944,7 @@ class TestClassifierList:
             cfg=cfg
         )
 
-        c2 = Classifier(
+        c2 = ACS2Classifier(
             condition='##O#O###',
             action=0,
             quality=0.79094,
@@ -956,7 +957,7 @@ class TestClassifierList:
             cfg=cfg
         )
 
-        c3 = Classifier(
+        c3 = ACS2Classifier(
             condition='#1O###1O',
             action=0,
             effect='#O1####1',
@@ -975,7 +976,7 @@ class TestClassifierList:
         c3.mark[4].update(['0'])
         c3.mark[5].update(['0'])
 
-        c4 = Classifier(
+        c4 = ACS2Classifier(
             condition='####O###',
             action=0,
             quality=0.903144,
@@ -988,7 +989,7 @@ class TestClassifierList:
             cfg=cfg
         )
 
-        c5 = Classifier(
+        c5 = ACS2Classifier(
             condition='#1O####O',
             action=0,
             effect='#O1####1',
@@ -1007,7 +1008,7 @@ class TestClassifierList:
         c5.mark[5].update(['0', '1'])
         c5.mark[6].update(['0', '1'])
 
-        c6 = Classifier(
+        c6 = ACS2Classifier(
             condition='#1O#####',
             action=0,
             quality=0.179243,
@@ -1026,7 +1027,7 @@ class TestClassifierList:
         c6.mark[6].update(['0', '1'])
         c6.mark[7].update(['0', '1'])
 
-        c7 = Classifier(
+        c7 = ACS2Classifier(
             condition='##O#####',
             action=0,
             quality=0.100984,

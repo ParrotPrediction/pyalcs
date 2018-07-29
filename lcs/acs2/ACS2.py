@@ -1,36 +1,38 @@
 import logging
+
+from lcs import Agent
 from lcs.acs2 import ClassifiersList, ACS2Configuration
 
 
-class ACS2:
+class ACS2(Agent):
     def __init__(self, cfg: ACS2Configuration, population=None) -> None:
         self.cfg = cfg
         self.population = population or ClassifiersList(cfg=self.cfg)
 
-    def explore(self, env, max_trials):
+    def explore(self, env, trials):
         """
         Explores the environment in given set of trials.
         :param env: environment
-        :param max_trials: number of trials
+        :param trials: number of trials
         :return: population of classifiers and metrics
         """
-        return self._evaluate(env, max_trials, self._run_trial_explore)
+        return self._evaluate(env, trials, self._run_trial_explore)
 
-    def exploit(self, env, max_trials):
+    def exploit(self, env, trials):
         """
         Exploits the environments in given set of trials (always executing
         best possible action - no exploration).
         :param env: environment
-        :param max_trials: number of trials
+        :param trials: number of trials
         :return: population of classifiers and metrics
         """
-        return self._evaluate(env, max_trials, self._run_trial_exploit)
+        return self._evaluate(env, trials, self._run_trial_exploit)
 
-    def explore_exploit(self, env, max_trials):
+    def explore_exploit(self, env, trials):
         """
         Alternates between exploration and exploitation phases.
         :param env: environment
-        :param max_trials: number of trials
+        :param trials: number of trials
         :return: population of classifiers and metrics
         """
         def switch_phases(env, steps, current_trial):
@@ -39,7 +41,7 @@ class ACS2:
             else:
                 return self._run_trial_exploit(env, None)
 
-        return self._evaluate(env, max_trials, switch_phases)
+        return self._evaluate(env, trials, switch_phases)
 
     def _evaluate(self, env, max_trials, func):
         """

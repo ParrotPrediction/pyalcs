@@ -1,12 +1,11 @@
 import gym
-import pytest
-
 # noinspection PyUnresolvedReferences
 import gym_multiplexer
-from lcs.acs2 import ACS2Configuration
-from lcs.acs2.ACS2 import ACS2
-from .utils import count_macroclassifiers, count_microclassifiers
+import pytest
+
 from integration.multiplexer.utils import calculate_performance
+from lcs.acs2 import ACS2, ACS2Configuration
+from .utils import count_macroclassifiers, count_microclassifiers
 
 
 def _map_perception(perception):

@@ -1,23 +1,26 @@
+from __future__ import annotations
+
 from random import randint
+from typing import Optional, Union, Callable
 
 from lcs import Perception
-from lcs.acs2 import Condition, Effect, PMark
+from lcs.acs2 import ACS2Configuration, Condition, Effect, PMark
 
 
-class Classifier(object):
+class ACS2Classifier(object):
     def __init__(self,
-                 condition=None,
-                 action=None,
-                 effect=None,
-                 quality=0.5,
-                 reward=0.5,
-                 intermediate_reward=0,
-                 numerosity=1,
-                 experience=1,
+                 condition: Union[Condition, str, None]=None,
+                 action: Optional[int]=None,
+                 effect: Union[Effect, str, None]=None,
+                 quality: float=0.5,
+                 reward: float=0.5,
+                 intermediate_reward: float=0.0,
+                 numerosity: int=1,
+                 experience: int=1,
                  talp=None,
-                 tga=0,
-                 tav=0,
-                 cfg=None):
+                 tga: int=0,
+                 tav: float=0.0,
+                 cfg: Optional[ACS2Configuration] = None) -> None:
 
         if cfg is None:
             raise TypeError("Configuration should be passed to Classifier")
@@ -74,15 +77,23 @@ class Classifier(object):
                                       hex(id(self)))
 
     @classmethod
-    def copy_from(cls, old_cls, time):
+    def copy_from(cls, old_cls: ACS2Classifier, time: int):
         """
         Copies old classifier with given time (tga, talp).
         Old tav gets replaced with new value.
         New classifier also has no mark.
 
-        :param old_cls: classifier to copy from
-        :param time: time of creation
-        :return: new classifier
+        Parameters
+        ----------
+        old_cls: ACS2Classifier
+            classifier to copy from
+        time: int
+            time of creation / current epoch
+
+        Returns
+        -------
+        ACS2Classifier
+            copied classifier
         """
         new_cls = cls(
             condition=Condition(old_cls.condition, old_cls.cfg),
@@ -104,13 +115,16 @@ class Classifier(object):
         return self.q * self.r
 
     @property
-    def specified_unchanging_attributes(self):
+    def specified_unchanging_attributes(self) -> int:
         """
         Determines the number of specified unchanging attributes in
         the classifier. An unchanging attribute is one that is anticipated
         not to change in the effect part.
 
-        :return: number of specified unchanging attributes
+        Returns
+        -------
+        int
+            number of specified unchanging attributes
         """
         spec = 0
 
@@ -127,7 +141,12 @@ class Classifier(object):
 
     def does_anticipate_change(self) -> bool:
         """
-        :return: true if the effect part contains any specified attributes
+        Checks whether any change in environment is anticipated
+
+        Returns
+        -------
+        bool
+            true if the effect part contains any specified attributes
         """
         return self.effect.number_of_specified_elements > 0
 
@@ -159,7 +178,7 @@ class Classifier(object):
 
     def specialize(self,
                    previous_situation: Perception,
-                   situation: Perception):
+                   situation: Perception) -> None:
         """
         Specializes the effect part where necessary to correctly anticipate
         the changes from p0 to p1 and returns a condition which specifies
@@ -167,8 +186,10 @@ class Classifier(object):
         The specific attributes in the returned conditions are set to
         the necessary values.
 
-        :param previous_situation:
-        :param situation:
+        Parameters
+        ----------
+        previous_situation: Perception
+        situation: Perception
         """
         for idx, item in enumerate(situation):
             if previous_situation[idx] != situation[idx]:
@@ -183,11 +204,19 @@ class Classifier(object):
         Check if classifier matches previous situation `p0`,
         has action `action` and predicts the effect `p1`
 
-        :param p0: previous situation
-        :param action:
-        :param p1: anticipated situation after execution action
-        :return: True if classifier makes successful predictions,
-        False otherwise
+        Parameters
+        ----------
+        p0: Perception
+            previous situation
+        action: int
+            action
+        p1: Perception
+            anticipated situation after execution action
+
+        Returns
+        -------
+        bool
+            True if classifier makes successful predictions, False otherwise
         """
         if self.condition.does_match(p0):
             if self.action == action:
@@ -210,7 +239,10 @@ class Classifier(object):
         Specializes the mark in all attributes which are not specified
         in the conditions, yet
 
-        :param perception: current situation
+        Parameters
+        ----------
+        perception: Perception
+            current situation
         """
         if self.mark.set_mark_using_condition(self.condition, perception):
             self.ee = 0
@@ -219,7 +251,10 @@ class Classifier(object):
         """
         Sets the ALP time stamp and the application average parameter.
 
-        :param time: current step
+        Parameters
+        ----------
+        time: int
+            current step
         """
         # TODO p5: write test
         if 1. / self.exp > self.cfg.beta:
@@ -230,13 +265,19 @@ class Classifier(object):
 
         self.talp = time
 
-    def is_similar(self, other) -> bool:
+    def is_similar(self, other: ACS2Classifier) -> bool:
         """
         Check if classifier is equals to `other` classifier in condition,
         action and effect part.
 
-        :param other: other classifier
-        :return: True if equals, False otherwise
+        Parameters
+        ----------
+        other: ACS2Classifier
+            other classifier
+        Returns
+        -------
+        bool
+            True if equals, False otherwise
         """
         if self.condition == other.condition and \
                 self.action == other.action and \
@@ -244,12 +285,19 @@ class Classifier(object):
             return True
         return False
 
-    def is_more_general(self, other) -> bool:
+    def is_more_general(self, other: ACS2Classifier) -> bool:
         """
         Checks if the classifier is formally more general than `other`.
 
-        :param other: other classifier to compare
-        :return: True if `other` classifier is more general
+        Parameters
+        ----------
+        other: ACS2Classifier
+            other classifier to compare
+
+        Returns
+        -------
+        bool
+            True if `other` classifier is more general
         """
         if self.condition.specificity < other.condition.specificity:
             return True
@@ -257,15 +305,23 @@ class Classifier(object):
         return False
 
     def generalize_unchanging_condition_attribute(
-            self, no_spec, randomfunc=randint) -> bool:
+            self, no_spec: int, randomfunc: Callable=randint) -> bool:
         """
         Generalizes one randomly unchanging attribute in the condition.
         An unchanging attribute is one that is anticipated not to change
         in the effect part.
-        :param no_spec: number of unchanging attributes
-        :param randomfunc: specifies random function for distinguishing
-        which attribute to generalize
-        :return: True if attribute was generalized, False otherwise
+
+        Parameters
+        ----------
+        no_spec: int
+            number of unchanging attributes
+        randomfunc: Callable
+            specifies random function for distinguishing
+            which attribute to generalize
+        Returns
+        -------
+        bool
+            True if attribute was generalized, False otherwise
         """
         if no_spec == 0:
             return False  # nothing to generalize
@@ -285,12 +341,19 @@ class Classifier(object):
 
         return False
 
-    def does_subsume(self, other) -> bool:
+    def does_subsume(self, other: ACS2Classifier) -> bool:
         """
         Returns if a classifier subsumes `other` classifier
 
-        :param other: other classifiers
-        :return: True if `other` classifier is subsumed, False otherwise
+        Parameters
+        ----------
+        other: ACS2Classifier
+            other classifier
+
+        Returns
+        -------
+        bool
+            True if `other` classifier is subsumed, False otherwise
         """
         if self._is_subsumer() and \
             self.is_more_general(other) and \
@@ -304,8 +367,11 @@ class Classifier(object):
         """
         Controls if the classifier satisfies the subsumer criteria.
 
-        :return: True is classifier can be considered as subsumer,
-        False otherwise
+        Returns
+        -------
+        bool
+            True is classifier can be considered as subsumer,
+            False otherwise
         """
         if self.exp > self.cfg.theta_exp:
             if self.is_reliable():
@@ -314,12 +380,17 @@ class Classifier(object):
 
         return False
 
-    def is_unmarked(self):
+    def is_unmarked(self) -> bool:
         return not self.is_marked()
 
-    def is_marked(self):
+    def is_marked(self) -> bool:
         """
-        Returns if classifier is marked
+        Checks if classifier is marked.
+
+        Returns
+        -------
+        bool
+            True if classifier is marked, False otherwise
         """
         if self.mark.is_empty():
             return False

@@ -2,8 +2,7 @@ from random import choice
 from typing import Optional
 
 from lcs import Perception
-from lcs.acs2 import Condition
-from lcs.acs2.ACS2Configuration import ACS2Configuration
+from lcs.acs2 import ACS2Configuration, Condition
 
 
 class PMark(list):

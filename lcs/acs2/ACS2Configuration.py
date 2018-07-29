@@ -1,4 +1,3 @@
-
 class ACS2Configuration:
     def __init__(self,
                  classifier_length,

@@ -1,7 +1,7 @@
 import pytest
 
 from lcs import Perception
-from lcs.acs2 import ACS2Configuration, Classifier, Condition, Effect
+from lcs.acs2 import ACS2Configuration, ACS2Classifier, Condition, Effect
 from lcs.components.alp import expected_case, unexpected_case, cover
 
 
@@ -13,7 +13,7 @@ class TestALP:
 
     def test_should_handle_expected_case_1(self, cfg):
         # given
-        cls = Classifier(
+        cls = ACS2Classifier(
             condition=Condition('#######0', cfg),
             quality=0.525,
             cfg=cfg)
@@ -29,7 +29,7 @@ class TestALP:
 
     def test_should_handle_expected_case_2(self, cfg):
         # given
-        cls = Classifier(
+        cls = ACS2Classifier(
             condition=Condition('#0######', cfg),
             quality=0.521,
             cfg=cfg)
@@ -47,7 +47,7 @@ class TestALP:
         # given
         p0 = Perception('00110000')
         time = 26
-        cls = Classifier(
+        cls = ACS2Classifier(
             action=5,
             quality=0.46,
             cfg=cfg
@@ -77,7 +77,7 @@ class TestALP:
         # given
         p0 = Perception('11101101')
         time = 703
-        cls = Classifier(
+        cls = ACS2Classifier(
             condition=Condition('1##01#0#', cfg),
             action=7,
             effect=Effect('0##10#1#', cfg),
@@ -103,7 +103,7 @@ class TestALP:
 
     def test_should_handle_unexpected_case_1(self, cfg):
         # given
-        cls = Classifier(action=2, cfg=cfg)
+        cls = ACS2Classifier(action=2, cfg=cfg)
 
         p0 = Perception('01100000')
         p1 = Perception('10100010')
@@ -146,7 +146,7 @@ class TestALP:
 
     def test_should_handle_unexpected_case_2(self, cfg):
         # given
-        cls = Classifier(
+        cls = ACS2Classifier(
             condition=Condition('#######0', cfg),
             action=4,
             quality=0.4,
@@ -175,7 +175,7 @@ class TestALP:
         assert abs(cls.q - 0.38) < 0.01
 
     def test_should_handle_unexpected_case_3(self, cfg):
-        cls = Classifier(
+        cls = ACS2Classifier(
             condition=Condition('#####1#0', cfg),
             effect=Effect('#####0#1', cfg),
             quality=0.475,
@@ -203,7 +203,7 @@ class TestALP:
 
     def test_should_handle_unexpected_case_5(self, cfg):
         # given
-        cls = Classifier(
+        cls = ACS2Classifier(
             condition=Condition('00####1#', cfg),
             action=2,
             effect=Effect('########', cfg),
@@ -244,7 +244,7 @@ class TestALP:
 
     def test_should_handle_unexpected_case_6(self, cfg):
         # given
-        cls = Classifier(
+        cls = ACS2Classifier(
             condition=Condition('0#1####1', cfg),
             action=2,
             effect=Effect('1#0####0', cfg),

@@ -6,8 +6,7 @@ from random import random, choice, sample
 from typing import Optional, List
 
 from lcs import Perception
-from lcs.acs2 import ACS2Configuration
-from lcs.acs2 import Classifier
+from lcs.acs2 import ACS2Classifier, ACS2Configuration
 from lcs.components.alp import expected_case, unexpected_case, cover
 from lcs.components.genetic_algorithm \
     import roulette_wheel_parents_selection, mutate, two_point_crossover
@@ -27,7 +26,7 @@ class ClassifiersList(list):
         list.__init__(self, seq or [])
 
     def append(self, item):
-        if not isinstance(item, Classifier):
+        if not isinstance(item, ACS2Classifier):
             raise TypeError("Item should be a Classifier object")
         super(ClassifiersList, self).append(item)
 
@@ -48,7 +47,7 @@ class ClassifiersList(list):
                     if cl.action == action], cfg)
 
     @staticmethod
-    def _remove_classifier(population: ClassifiersList, cl: Classifier):
+    def _remove_classifier(population: ClassifiersList, cl: ACS2Classifier):
         """
         Searches the list and removes classifier
         :param cl: classifier to remove
@@ -65,7 +64,7 @@ class ClassifiersList(list):
         list2d = [[cl] * cl.num for cl in self]
         return list(chain.from_iterable(list2d))
 
-    def choose_action(self, epsilon: float) -> int:
+    def choose_action(self, epsilon: float) -> Optional[int]:
         """
         Chooses action according to epsilon greedy policy
         :param epsilon: probability of executing exploration path
@@ -188,8 +187,8 @@ class ClassifiersList(list):
             parent1, parent2 = roulette_wheel_parents_selection(
                 self, randomfunc=randomfunc)
 
-            child1 = Classifier.copy_from(parent1, time)
-            child2 = Classifier.copy_from(parent2, time)
+            child1 = ACS2Classifier.copy_from(parent1, time)
+            child2 = ACS2Classifier.copy_from(parent2, time)
 
             mutate(child1, child1.cfg.mu, randomfunc=randomfunc)
             mutate(child2, child2.cfg.mu, randomfunc=randomfunc)
@@ -221,7 +220,7 @@ class ClassifiersList(list):
                 self.add_ga_classifier(child, match_set, population)
 
     def add_ga_classifier(self,
-                          child: Classifier,
+                          child: ACS2Classifier,
                           match_set: ClassifiersList,
                           population: ClassifiersList):
         """
@@ -244,7 +243,7 @@ class ClassifiersList(list):
                 old_cl.num += 1
 
     def add_alp_classifier(self,
-                           child: Classifier,
+                           child: ACS2Classifier,
                            new_list: ClassifiersList):
         """
         Looks for subsuming / similar classifiers in the current set.
@@ -284,7 +283,7 @@ class ClassifiersList(list):
         else:
             old_cl.increase_quality()
 
-    def get_similar(self, other: Classifier):
+    def get_similar(self, other: ACS2Classifier):
         """
         Searches for the first similar classifier `other` and returns it.
 
@@ -367,8 +366,9 @@ class ClassifiersList(list):
                     if lst is not None:
                         ClassifiersList._remove_classifier(lst, cl_del)
 
-    def select_classifier_to_delete(self,
-                                    randomfunc=random) -> Optional[Classifier]:
+    def select_classifier_to_delete(self, randomfunc=random) -> \
+            Optional[ACS2Classifier]:
+
         if len(self) == 0:
             return None
 
@@ -383,8 +383,10 @@ class ClassifiersList(list):
         return cl_del
 
     @staticmethod
-    def select_preferred_to_delete(cl: Classifier,
-                                   cl_to_delete: Classifier) -> Classifier:
+    def select_preferred_to_delete(cl: ACS2Classifier,
+                                   cl_to_delete: ACS2Classifier) -> \
+            ACS2Classifier:
+
         if cl.q - cl_to_delete.q < -0.1:
             cl_to_delete = cl
             return cl_to_delete
@@ -397,7 +399,7 @@ class ClassifiersList(list):
                     cl_to_delete = cl
         return cl_to_delete
 
-    def find_old_classifier(self, cl: Classifier):
+    def find_old_classifier(self, cl: ACS2Classifier):
         old_cl = None
 
         if self.cfg.do_subsumption:
@@ -408,9 +410,11 @@ class ClassifiersList(list):
 
         return old_cl
 
-    def find_subsumer(self, cl: Classifier, choice_func=choice) -> Classifier:
+    def find_subsumer(self, cl: ACS2Classifier, choice_func=choice) -> \
+            ACS2Classifier:
+
         subsumer = None
-        most_general_subsumers: List[Classifier] = []
+        most_general_subsumers: List[ACS2Classifier] = []
 
         for classifier in self:
             if classifier.does_subsume(cl):

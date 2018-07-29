@@ -2,12 +2,12 @@ from random import random, randint
 from typing import Optional
 
 from lcs import Perception
-from ..acs2 import Classifier, ACS2Configuration
+from ..acs2 import ACS2Classifier, ACS2Configuration
 
 
-def expected_case(cl: Classifier,
+def expected_case(cl: ACS2Classifier,
                   perception: Perception,
-                  time: int) -> Optional[Classifier]:
+                  time: int) -> Optional[ACS2Classifier]:
     """
     Controls the expected case of a classifier. If the classifier
     is to specific it tries to add some randomness to it by
@@ -56,10 +56,10 @@ def expected_case(cl: Classifier,
     return child
 
 
-def unexpected_case(cl: Classifier,
+def unexpected_case(cl: ACS2Classifier,
                     previous_perception: Perception,
                     perception: Perception,
-                    time: int) -> Optional[Classifier]:
+                    time: int) -> Optional[ACS2Classifier]:
     """
     Controls the unexpected case of the classifier.
 
@@ -92,7 +92,7 @@ def cover(previous_situation: Perception,
           action: int,
           situation: Perception,
           time: int,
-          cfg: ACS2Configuration) -> Classifier:
+          cfg: ACS2Configuration) -> ACS2Classifier:
     """
     Covering - creates a classifier that anticipates a change correctly.
 
@@ -104,7 +104,8 @@ def cover(previous_situation: Perception,
 
     :return: new classifier
     """
-    new_cl = Classifier(action=action, cfg=cfg)  # TODO: p5 exp=0, r=0 (paper)
+    new_cl = ACS2Classifier(action=action, cfg=cfg)
+    # TODO: p5 exp=0, r=0 (paper)
     new_cl.tga = time
     new_cl.talp = time
 
