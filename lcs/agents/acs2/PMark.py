@@ -83,7 +83,9 @@ class PMark(list):
         if nr1 > 0:
             # One or more absolute differences detected -> specialize one
             # randomly chosen
-            condition = Condition(cfg=self.cfg)
+            condition = Condition.empty(
+                wildcard=self.cfg.classifier_wildcard,
+                length=self.cfg.classifier_length)
 
             possible_idx = []
             for idx, item in enumerate(self):
@@ -94,7 +96,9 @@ class PMark(list):
             condition[rand_idx] = perception[rand_idx]
         elif nr2 > 0:
             # One or more equal differences detected -> specialize all of them
-            condition = Condition(cfg=self.cfg)
+            condition = Condition.empty(
+                wildcard=self.cfg.classifier_wildcard,
+                length=self.cfg.classifier_length)
 
             for idx, item in enumerate(self):
                 if len(item) > 1:

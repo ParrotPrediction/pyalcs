@@ -616,7 +616,7 @@ class TestClassifierList:
         action_set.add_ga_classifier(cl_2, match_set, population)
         new_classifier = Classifier(
             action=2,
-            condition=Condition('1#######', cfg=cfg),
+            condition=Condition('1#######'),
             numerosity=2,
             cfg=cfg)
 

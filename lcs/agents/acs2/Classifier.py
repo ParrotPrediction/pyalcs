@@ -27,8 +27,12 @@ class Classifier(object):
 
         self.cfg = cfg
 
-        self.condition = Condition(condition, cfg=self.cfg) \
-            if condition is not None else Condition(cfg=self.cfg)
+        self.condition = Condition(condition,
+                                   wildcard=self.cfg.classifier_wildcard) \
+            if condition is not None else Condition.empty(
+            wildcard=self.cfg.classifier_wildcard,
+            length=self.cfg.classifier_length)
+
         self.action = action if action is not None else None
         self.effect = Effect(effect, cfg=self.cfg) \
             if effect is not None else Effect(cfg=self.cfg)

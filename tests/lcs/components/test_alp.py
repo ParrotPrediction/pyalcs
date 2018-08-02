@@ -15,7 +15,7 @@ class TestALP:
     def test_should_handle_expected_case_1(self, cfg):
         # given
         cls = Classifier(
-            condition=Condition('#######0', cfg),
+            condition='#######0',
             quality=0.525,
             cfg=cfg)
         p0 = Perception('11111010')
@@ -31,7 +31,7 @@ class TestALP:
     def test_should_handle_expected_case_2(self, cfg):
         # given
         cls = Classifier(
-            condition=Condition('#0######', cfg),
+            condition='#0######',
             quality=0.521,
             cfg=cfg)
         p0 = Perception('10101001')
@@ -79,7 +79,7 @@ class TestALP:
         p0 = Perception('11101101')
         time = 703
         cls = Classifier(
-            condition=Condition('1##01#0#', cfg),
+            condition='1##01#0#',
             action=7,
             effect=Effect('0##10#1#', cfg),
             quality=0.47,
@@ -132,7 +132,7 @@ class TestALP:
         assert cls is not new_cls
 
         # Check attributes of a new classifier
-        assert Condition('01####0#', cfg) == new_cls.condition
+        assert Condition('01####0#') == new_cls.condition
         assert 2 == new_cls.action
         assert Effect('10####1#', cfg) == new_cls.effect
 
@@ -148,7 +148,7 @@ class TestALP:
     def test_should_handle_unexpected_case_2(self, cfg):
         # given
         cls = Classifier(
-            condition=Condition('#######0', cfg),
+            condition='#######0',
             action=4,
             quality=0.4,
             cfg=cfg)
@@ -168,7 +168,7 @@ class TestALP:
         new_cl = unexpected_case(cls, p0, p1, time)
 
         # then
-        assert new_cl.condition == Condition('#110#010', cfg)
+        assert new_cl.condition == Condition('#110#010')
         assert new_cl.effect == Effect('#001#101', cfg)
         assert new_cl.mark.is_empty() is True
         assert time == new_cl.tga
@@ -177,7 +177,7 @@ class TestALP:
 
     def test_should_handle_unexpected_case_3(self, cfg):
         cls = Classifier(
-            condition=Condition('#####1#0', cfg),
+            condition='#####1#0',
             effect=Effect('#####0#1', cfg),
             quality=0.475,
             cfg=cfg
@@ -205,7 +205,7 @@ class TestALP:
     def test_should_handle_unexpected_case_5(self, cfg):
         # given
         cls = Classifier(
-            condition=Condition('00####1#', cfg),
+            condition='00####1#',
             action=2,
             effect=Effect('########', cfg),
             quality=0.129,
@@ -232,7 +232,7 @@ class TestALP:
 
         # then
         assert new_cls is not None
-        assert Condition('0021#01#', cfg) == new_cls.condition
+        assert Condition('0021#01#') == new_cls.condition
         assert Effect('##00#1##', cfg) == new_cls.effect
         assert abs(0.5 - new_cls.q) < 0.1
         assert abs(341.967 - new_cls.r) < 0.1
@@ -246,7 +246,7 @@ class TestALP:
     def test_should_handle_unexpected_case_6(self, cfg):
         # given
         cls = Classifier(
-            condition=Condition('0#1####1', cfg),
+            condition='0#1####1',
             action=2,
             effect=Effect('1#0####0', cfg),
             quality=0.38505,
@@ -273,7 +273,7 @@ class TestALP:
 
         # then
         assert new_cls is not None
-        assert Condition('0#1###01', cfg) == new_cls.condition
+        assert Condition('0#1###01') == new_cls.condition
         assert Effect('1#0###10', cfg) == new_cls.effect
         assert abs(0.5 - new_cls.q) < 0.1
         assert abs(1.20898 - new_cls.r) < 0.1
@@ -295,7 +295,7 @@ class TestALP:
         new_cl = cover(p0, action_no, p1, time, cfg)
 
         # then
-        assert Condition('#1#0##0#', cfg) == new_cl.condition
+        assert Condition('#1#0##0#') == new_cl.condition
         assert 2 == new_cl.action
         assert Effect('#0#1##1#', cfg) == new_cl.effect
         assert 0.5 == new_cl.q

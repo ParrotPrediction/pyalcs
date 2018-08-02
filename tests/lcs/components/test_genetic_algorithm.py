@@ -87,11 +87,11 @@ class TestGeneticAlgorithm:
         mutate(cl, cfg.mu, randomfunc=RandomMock([s, b, b]))
 
         # then
-        assert Condition('###11###', cfg) == cl.condition
+        assert Condition('###11###') == cl.condition
 
     def test_mutate_2(self, cfg):
         # given
-        cl = Classifier(Condition('##011###', cfg), cfg=cfg)
+        cl = Classifier(Condition('##011###'), cfg=cfg)
         s = cfg.mu * 0.5  # less then MU
         b = 1 - (1 - cfg.mu) * 0.5  # more then MU
 
@@ -99,7 +99,7 @@ class TestGeneticAlgorithm:
         mutate(cl, cfg.mu, randomfunc=RandomMock([b, b, s]))
 
         # then
-        assert Condition('##01####', cfg) == cl.condition
+        assert Condition('##01####') == cl.condition
 
     def test_copy_from_and_mutate_does_not_influence_another_condition(self,
                                                                        cfg):
@@ -111,7 +111,7 @@ class TestGeneticAlgorithm:
 
         operation_time = 123
         original_cl = Classifier(
-            condition=Condition('1###1011', cfg),
+            condition='1###1011',
             cfg=cfg
         )
 
@@ -121,36 +121,36 @@ class TestGeneticAlgorithm:
         mutate(copied_cl, cfg.mu, RandomMock([s, b, b, b, b]))
 
         # then
-        assert Condition('####1011', cfg) == copied_cl.condition
-        assert Condition('1###1011', cfg) == original_cl.condition
+        assert Condition('####1011') == copied_cl.condition
+        assert Condition('1###1011') == original_cl.condition
 
         # when
         mutate(original_cl, cfg.mu, RandomMock([b, s, b, b, b]))
 
         # then
-        assert Condition('1####011', cfg) == original_cl.condition
-        assert Condition('####1011', cfg) == copied_cl.condition
+        assert Condition('1####011') == original_cl.condition
+        assert Condition('####1011') == copied_cl.condition
 
     def test_crossover(self, cfg):
         # given
-        cl1 = Classifier(Condition('0##10###', cfg), cfg=cfg)
-        cl2 = Classifier(Condition('#10##0##', cfg), cfg=cfg)
+        cl1 = Classifier(condition='0##10###', cfg=cfg)
+        cl2 = Classifier(condition='#10##0##', cfg=cfg)
 
         # when
         two_point_crossover(cl1, cl2, samplefunc=SampleMock([1, 4]))
 
         # then
-        assert Condition('010#0###', cfg) == cl1.condition
-        assert Condition('###1#0##', cfg) == cl2.condition
+        assert Condition('010#0###') == cl1.condition
+        assert Condition('###1#0##') == cl2.condition
 
     def test_crossover_allows_to_change_last_element(self, cfg):
         # given
-        cl1 = Classifier(Condition('0##10###', cfg), cfg=cfg)
-        cl2 = Classifier(Condition('#10##011', cfg), cfg=cfg)
+        cl1 = Classifier(condition='0##10###', cfg=cfg)
+        cl2 = Classifier(condition='#10##011', cfg=cfg)
 
         # when
         two_point_crossover(cl1, cl2, samplefunc=SampleMock([5, 8]))
 
         # then
-        assert Condition('0##10011', cfg) == cl1.condition
-        assert Condition('#10#####', cfg) == cl2.condition
+        assert Condition('0##10011') == cl1.condition
+        assert Condition('#10#####') == cl2.condition

@@ -54,7 +54,7 @@ class TestClassifier:
     def test_should_calculate_specificity_2(self, cfg):
         # given
         cls = Classifier(
-            condition=Condition('#1#01#0#', cfg),
+            condition=Condition('#1#01#0#'),
             cfg=cfg)
 
         # then
@@ -63,7 +63,7 @@ class TestClassifier:
     def test_should_calculate_specificity_3(self, cfg):
         # given
         cls = Classifier(
-            condition=Condition('11101001', cfg),
+            condition=Condition('11101001'),
             cfg=cfg)
 
         # then
@@ -157,7 +157,7 @@ class TestClassifier:
         cls.specialize(p0, p1)
 
         # then
-        assert Condition('########', cfg) == cls.condition
+        assert Condition('########') == cls.condition
         assert Effect('########', cfg) == cls.effect
 
     def test_should_specialize_2(self, cfg):
@@ -170,13 +170,13 @@ class TestClassifier:
         cls.specialize(p0, p1)
 
         # then
-        assert Condition('###0####', cfg) == cls.condition
+        assert Condition('###0####') == cls.condition
         assert Effect('###1####', cfg) == cls.effect
 
     def test_should_specialize_3(self, cfg):
         # given
         cls = Classifier(
-            condition=Condition('01#####1', cfg),
+            condition=Condition('01#####1'),
             effect=Effect('10#####0', cfg),
             cfg=cfg)
         p0 = Perception('01110111')
@@ -187,7 +187,7 @@ class TestClassifier:
 
         # then
         assert 6 == cls.condition.specificity
-        assert Condition('01#101#1', cfg) == cls.condition
+        assert Condition('01#101#1') == cls.condition
 
         assert 6 == cls.effect.number_of_specified_elements
         assert Effect('10#010#0', cfg) == cls.effect
@@ -195,7 +195,7 @@ class TestClassifier:
     def test_should_count_specified_unchanging_attributes_1(self, cfg):
         # given
         cls = Classifier(
-            condition=Condition('######0#', cfg),
+            condition=Condition('######0#'),
             effect=Effect('########', cfg),
             cfg=cfg
         )
@@ -206,7 +206,7 @@ class TestClassifier:
     def test_should_count_specified_unchanging_attributes_2(self, cfg):
         # given
         cls = Classifier(
-            condition=Condition('#####0#0', cfg),
+            condition=Condition('#####0#0'),
             effect=Effect('########', cfg),
             cfg=cfg
         )
@@ -217,7 +217,7 @@ class TestClassifier:
     def test_should_count_specified_unchanging_attributes_3(self, cfg):
         # given
         cls = Classifier(
-            condition=Condition('10000001', cfg),
+            condition=Condition('10000001'),
             effect=Effect('####1#1#', cfg),
             cfg=cfg
         )
@@ -228,7 +228,7 @@ class TestClassifier:
     def test_should_count_specified_unchanging_attributes_4(self, cfg):
         # given
         cls = Classifier(
-            condition=Condition('1#0#1011', cfg),
+            condition=Condition('1#0#1011'),
             effect=Effect('0####1##', cfg),
             cfg=cfg
         )
@@ -238,7 +238,7 @@ class TestClassifier:
     def test_should_count_specified_unchanging_attributes_5(self, cfg):
         # given
         cls = Classifier(
-            condition=Condition('1###1011', cfg),
+            condition=Condition('1###1011'),
             effect=Effect('0####1##', cfg),
             cfg=cfg
         )
@@ -800,4 +800,4 @@ class TestClassifier:
         # then
         assert generalized is True
         assert 1 == cls.specified_unchanging_attributes
-        assert Condition('#####0##', cfg) == cls.condition
+        assert Condition('#####0##') == cls.condition

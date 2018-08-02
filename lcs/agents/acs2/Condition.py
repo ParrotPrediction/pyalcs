@@ -1,7 +1,7 @@
-from . import AbstractCondition
+from .. import PerceptionString
 
 
-class Condition(AbstractCondition):
+class Condition(PerceptionString):
     """
     Specifies the set of situations (perceptions) in which the classifier
     can be applied.
@@ -14,7 +14,7 @@ class Condition(AbstractCondition):
 
         :return: number of non-general elements
         """
-        return sum(1 for comp in self if comp != self.cfg.classifier_wildcard)
+        return sum(1 for comp in self if comp != self.wildcard)
 
     def specialize(self,
                    position: int = None,
@@ -26,11 +26,11 @@ class Condition(AbstractCondition):
 
         if new_condition is not None:
             for idx, (oi, ni) in enumerate(zip(self, new_condition)):
-                if ni != self.cfg.classifier_wildcard:
+                if ni != self.wildcard:
                     self[idx] = ni
 
     def generalize(self, position=None):
-        self[position] = self.cfg.classifier_wildcard
+        self[position] = self.wildcard
 
     def does_match(self, lst) -> bool:
         """
@@ -46,8 +46,8 @@ class Condition(AbstractCondition):
 
         # TODO zip can be used instead
         for idx, attrib in enumerate(self):
-            if attrib != self.cfg.classifier_wildcard \
-                    and lst[idx] != self.cfg.classifier_wildcard \
+            if attrib != self.wildcard \
+                    and lst[idx] != self.wildcard \
                     and attrib != lst[idx]:
                 return False
 
