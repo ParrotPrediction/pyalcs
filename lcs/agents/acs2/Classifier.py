@@ -27,20 +27,18 @@ class Classifier(object):
 
         self.cfg = cfg
 
-        cl_wildcard = self.cfg.classifier_wildcard
-        cl_length = self.cfg.classifier_length
+        def build_perception_string(cls, initial,
+                                    length=self.cfg.classifier_length,
+                                    wildcard=self.cfg.classifier_wildcard):
+            if initial:
+                return cls(initial, wildcard=wildcard)
 
-        self.condition = Condition(condition,
-                                   wildcard=cl_wildcard) \
-            if condition is not None else Condition.empty(
-            wildcard=cl_wildcard,
-            length=cl_length)
+            return cls.empty(wildcard=wildcard, length=length)
 
-        self.action = action if action is not None else None
-        self.effect = Effect(effect, wildcard=cl_wildcard) \
-            if effect is not None else Effect.empty(
-            wildcard=cl_wildcard,
-            length=cl_length)
+        self.condition = build_perception_string(Condition, condition)
+        self.action = action
+        self.effect = build_perception_string(Effect, effect)
+
         self.mark = PMark(cfg=self.cfg)
 
         # Quality - measures the accuracy of the anticipations
