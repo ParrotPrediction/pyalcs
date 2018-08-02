@@ -5,6 +5,7 @@ from ...agents.Agent import Metric
 
 
 class RACS(Agent):
+    """ACS2 agent operating on real-valued (floating) number"""
 
     def explore(self, env, trials):
         pass

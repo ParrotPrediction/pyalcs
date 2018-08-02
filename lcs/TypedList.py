@@ -1,9 +1,6 @@
 import collections.abc
 
-
-def _check_types(oktypes, o):
-    if not isinstance(o, oktypes):
-        raise TypeError("Wrong element type", o)
+from . import check_types
 
 
 class TypedList(collections.abc.MutableSequence):
@@ -13,16 +10,16 @@ class TypedList(collections.abc.MutableSequence):
         self.oktypes = oktypes
 
         for el in args:
-            _check_types(oktypes, el)
+            check_types(oktypes, el)
 
         self._items.extend(list(args))
 
     def insert(self, index: int, o) -> None:
-        _check_types(self.oktypes, o)
+        check_types(self.oktypes, o)
         self._items.insert(index, o)
 
     def __setitem__(self, i, o):
-        _check_types(self.oktypes, o)
+        check_types(self.oktypes, o)
         self._items[i] = o
 
     def __delitem__(self, i):

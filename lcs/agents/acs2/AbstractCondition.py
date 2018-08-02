@@ -1,5 +1,8 @@
 from . import Configuration
 
+# TODO: generalize.
+# Only cfg.length and cfg.wildcard are needed
+
 
 class AbstractCondition(list):
     def __init__(self, seq=(), cfg: Configuration=None) -> None:

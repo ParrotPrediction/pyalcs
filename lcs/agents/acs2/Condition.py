@@ -32,7 +32,7 @@ class Condition(AbstractCondition):
     def generalize(self, position=None):
         self[position] = self.cfg.classifier_wildcard
 
-    def does_match(self, lst: list) -> bool:
+    def does_match(self, lst) -> bool:
         """
         Check if condition match other list such as perception or another
         condition.
