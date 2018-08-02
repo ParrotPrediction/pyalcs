@@ -27,15 +27,20 @@ class Classifier(object):
 
         self.cfg = cfg
 
+        cl_wildcard = self.cfg.classifier_wildcard
+        cl_length = self.cfg.classifier_length
+
         self.condition = Condition(condition,
-                                   wildcard=self.cfg.classifier_wildcard) \
+                                   wildcard=cl_wildcard) \
             if condition is not None else Condition.empty(
-            wildcard=self.cfg.classifier_wildcard,
-            length=self.cfg.classifier_length)
+            wildcard=cl_wildcard,
+            length=cl_length)
 
         self.action = action if action is not None else None
-        self.effect = Effect(effect, cfg=self.cfg) \
-            if effect is not None else Effect(cfg=self.cfg)
+        self.effect = Effect(effect, wildcard=cl_wildcard) \
+            if effect is not None else Effect.empty(
+            wildcard=cl_wildcard,
+            length=cl_length)
         self.mark = PMark(cfg=self.cfg)
 
         # Quality - measures the accuracy of the anticipations

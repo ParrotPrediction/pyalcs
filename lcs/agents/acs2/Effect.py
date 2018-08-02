@@ -1,8 +1,8 @@
 from lcs import Perception
-from . import AbstractCondition
+from .. import PerceptionString
 
 
-class Effect(AbstractCondition):
+class Effect(PerceptionString):
     """
     Anticipates the effects that the classifier 'believes'
     to be caused by the specified action.
@@ -13,7 +13,7 @@ class Effect(AbstractCondition):
         """
         :return: number of specified components
         """
-        return sum(1 for comp in self if comp != self.cfg.classifier_wildcard)
+        return sum(1 for comp in self if comp != self.wildcard)
 
     def does_anticipate_correctly(self,
                                   previous_situation: Perception,
@@ -32,7 +32,7 @@ class Effect(AbstractCondition):
         """
         # TODO p1: write some tests
         for idx, item in enumerate(self):
-            if item == self.cfg.classifier_wildcard:
+            if item == self.wildcard:
                 if previous_situation[idx] != situation[idx]:
                     return False
             else:
@@ -52,7 +52,7 @@ class Effect(AbstractCondition):
         :return: True if specializable, false otherwise
         """
         for p0i, p1i, ei in zip(p0, p1, self):
-            if ei != self.cfg.classifier_wildcard:
+            if ei != self.wildcard:
                 if ei != p1i or p0i == p1i:
                     return False
 

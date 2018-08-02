@@ -69,7 +69,7 @@ class TestALP:
         assert new_cls is not None
         # One `random` attribute gets specified
         assert 1 == new_cls.condition.specificity
-        assert Effect('########', cfg) == new_cls.effect
+        assert Effect('########') == new_cls.effect
         assert 5 == new_cls.action
         assert new_cls.mark.is_empty() is True
         assert 0.5 == new_cls.q
@@ -81,7 +81,7 @@ class TestALP:
         cls = Classifier(
             condition='1##01#0#',
             action=7,
-            effect=Effect('0##10#1#', cfg),
+            effect='0##10#1#',
             quality=0.47,
             cfg=cfg
         )
@@ -97,7 +97,7 @@ class TestALP:
         assert new_cls is not None
         # One `random` attribute gets specified
         assert 5 == new_cls.condition.specificity
-        assert Effect('0##10#1#', cfg) == new_cls.effect
+        assert Effect('0##10#1#') == new_cls.effect
         assert 7 == new_cls.action
         assert new_cls.mark.is_empty() is True
         assert 0.5 == new_cls.q
@@ -134,7 +134,7 @@ class TestALP:
         # Check attributes of a new classifier
         assert Condition('01####0#') == new_cls.condition
         assert 2 == new_cls.action
-        assert Effect('10####1#', cfg) == new_cls.effect
+        assert Effect('10####1#') == new_cls.effect
 
         # There should be no mark
         for mark_attrib in new_cls.mark:
@@ -169,7 +169,7 @@ class TestALP:
 
         # then
         assert new_cl.condition == Condition('#110#010')
-        assert new_cl.effect == Effect('#001#101', cfg)
+        assert new_cl.effect == Effect('#001#101')
         assert new_cl.mark.is_empty() is True
         assert time == new_cl.tga
         assert time == new_cl.talp
@@ -178,7 +178,7 @@ class TestALP:
     def test_should_handle_unexpected_case_3(self, cfg):
         cls = Classifier(
             condition='#####1#0',
-            effect=Effect('#####0#1', cfg),
+            effect='#####0#1',
             quality=0.475,
             cfg=cfg
         )
@@ -207,7 +207,7 @@ class TestALP:
         cls = Classifier(
             condition='00####1#',
             action=2,
-            effect=Effect('########', cfg),
+            effect='########',
             quality=0.129,
             reward=341.967,
             intermediate_reward=130.369,
@@ -233,7 +233,7 @@ class TestALP:
         # then
         assert new_cls is not None
         assert Condition('0021#01#') == new_cls.condition
-        assert Effect('##00#1##', cfg) == new_cls.effect
+        assert Effect('##00#1##') == new_cls.effect
         assert abs(0.5 - new_cls.q) < 0.1
         assert abs(341.967 - new_cls.r) < 0.1
         assert abs(130.369 - new_cls.ir) < 0.1
@@ -248,7 +248,7 @@ class TestALP:
         cls = Classifier(
             condition='0#1####1',
             action=2,
-            effect=Effect('1#0####0', cfg),
+            effect='1#0####0',
             quality=0.38505,
             reward=1.20898,
             intermediate_reward=0,
@@ -274,7 +274,7 @@ class TestALP:
         # then
         assert new_cls is not None
         assert Condition('0#1###01') == new_cls.condition
-        assert Effect('1#0###10', cfg) == new_cls.effect
+        assert Effect('1#0###10') == new_cls.effect
         assert abs(0.5 - new_cls.q) < 0.1
         assert abs(1.20898 - new_cls.r) < 0.1
         assert abs(0 - new_cls.ir) < 0.1
@@ -297,7 +297,7 @@ class TestALP:
         # then
         assert Condition('#1#0##0#') == new_cl.condition
         assert 2 == new_cl.action
-        assert Effect('#0#1##1#', cfg) == new_cl.effect
+        assert Effect('#0#1##1#') == new_cl.effect
         assert 0.5 == new_cl.q
         assert 0.5 == new_cl.r
         assert 0 == new_cl.ir
