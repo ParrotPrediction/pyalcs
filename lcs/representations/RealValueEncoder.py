@@ -1,3 +1,6 @@
+from typing import Tuple
+
+
 class RealValueEncoder:
     r"""
     Real-value encoder.
@@ -12,6 +15,18 @@ class RealValueEncoder:
     """
     def __init__(self, resolution_bits: int) -> None:
         self.resolution = pow(2, resolution_bits)
+
+    @property
+    def range(self) -> Tuple[int, int]:
+        """
+        Range the range (min,max) of available encoded values.
+
+        Returns
+        -------
+        Tuple[int, int]
+            Min, max values
+        """
+        return 0, self.resolution
 
     def encode(self, val: float) -> int:
         """

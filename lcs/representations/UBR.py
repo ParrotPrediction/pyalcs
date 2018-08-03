@@ -17,6 +17,9 @@ class UBR:
     def upper_bound(self):
         return max(self.x1, self.x2)
 
+    def contains(self, val: int) -> bool:
+        return self.lower_bound < val <= self.upper_bound
+
     def __eq__(self, o) -> bool:
         return self.lower_bound == o.lower_bound \
             and self.upper_bound == o.upper_bound

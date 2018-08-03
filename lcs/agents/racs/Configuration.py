@@ -1,7 +1,16 @@
+from lcs.representations import UBR
+from lcs.representations.RealValueEncoder import RealValueEncoder
+
+
 class Configuration:
     def __init__(self,
-                 classifier_length: int) -> None:
-        self.classifier_length = classifier_length
+                 classifier_length: int,
+                 number_of_possible_actions: int,
+                 encoder_bits: int) -> None:
 
-        # encoder bits
-        # wildcard: [0.0, 1.0]
+        self.oktypes = (UBR,)
+        self.encoder = RealValueEncoder(encoder_bits)
+
+        self.classifier_length = classifier_length
+        self.number_of_possible_actions = number_of_possible_actions
+        self.classifier_wildcard = UBR(*self.encoder.range)

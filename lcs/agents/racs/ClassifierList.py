@@ -9,10 +9,6 @@ class ClassifierList(TypedList):
     def __init__(self, *args) -> None:
         super().__init__((Classifier,), *args)
 
-    @classmethod
-    def form_match_set(cls,
-                       population: ClassifierList,
-                       situation: Perception,
-                       cfg) -> ClassifierList:
-        return cls([cl for cl in population
-                    if cl.condition.does_match(situation)], cfg)
+    def form_match_set(self, situation: Perception) -> ClassifierList:
+        matching = [cl for cl in self if cl.condition.does_match(situation)]
+        return ClassifierList(*matching)

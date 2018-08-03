@@ -69,3 +69,14 @@ class TestRealValueEncoder:
 
         # then
         assert abs(observation - decoded) < epsilon
+
+    def test_should_return_min_max_range(self):
+        # given
+        encoder = RealValueEncoder(8)
+
+        # when
+        min_val, max_val = encoder.range
+
+        # then
+        assert min_val == 0
+        assert max_val == 256
