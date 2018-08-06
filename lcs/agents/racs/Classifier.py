@@ -7,6 +7,7 @@ class Classifier:
 
     def __init__(self,
                  condition: Optional[Condition] = None,
+                 action: Optional[int] = None,
                  cfg: Optional[Configuration] = None) -> None:
 
         if cfg is None:
@@ -21,3 +22,4 @@ class Classifier:
             return Condition.generic(cfg=cfg)
 
         self.condition = build_condition(condition)
+        self.action = action

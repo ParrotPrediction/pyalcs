@@ -18,6 +18,7 @@ def parse_state(raw_state, perception_mapper_fcn=None):
         function mapping state
     Returns
     -------
+    Perception
         state suitable for an agent (list)
     """
     if perception_mapper_fcn:

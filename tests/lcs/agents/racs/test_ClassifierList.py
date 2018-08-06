@@ -50,3 +50,20 @@ class TestClassifierList:
         assert cl1 in match_set
         assert cl2 not in match_set
         assert cl3 in match_set
+
+    def test_should_form_action_set(self, cfg):
+        # given
+        cl1 = Classifier(action=0, cfg=cfg)
+        cl2 = Classifier(action=0, cfg=cfg)
+        cl3 = Classifier(action=1, cfg=cfg)
+
+        population = ClassifierList(*[cl1, cl2, cl3])
+
+        # when
+        action_set = population.form_action_set(0)
+
+        # then
+        assert len(action_set) == 2
+        assert cl1 in action_set
+        assert cl2 in action_set
+        assert cl3 not in action_set
