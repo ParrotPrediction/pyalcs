@@ -1,8 +1,34 @@
+import logging
+
 from itertools import groupby
 from random import random, randint
 from typing import Optional
 
 from lcs.agents.acs2 import Classifier, ClassifiersList
+
+
+def choose_action(cll, epsilon: float) -> Optional[int]:
+    """
+    Chooses which action to execute given classifier list (match set).
+
+    Parameters
+    ----------
+    cll: ClassifiersList
+        Population of classifiers
+    epsilon: float
+        Probability of executing exploration path
+
+    Returns
+    -------
+    Optional[int]
+        number of chosen action
+    """
+    if random() < epsilon:
+        logging.debug("\t\tExploration path")
+        return explore(cll)
+
+    logging.debug("\t\tExploitation path")
+    return exploit(cll)
 
 
 def explore(cll: ClassifiersList, pb: float = 0.5) -> Optional[int]:

@@ -4,7 +4,7 @@ import pytest
 
 from lcs.agents.acs2 import Configuration, Classifier, ClassifiersList
 from lcs.strategies.action_selection import exploit, choose_random_action, \
-    choose_latest_action, choose_action_from_knowledge_array
+    choose_latest_action, choose_action_from_knowledge_array, choose_action
 
 
 class TestActionSelection:
@@ -12,6 +12,19 @@ class TestActionSelection:
     @pytest.fixture
     def cfg(self):
         return Configuration(8, 8)
+
+    def test_should_return_all_possible_actions(self, cfg):
+        # given
+        population = ClassifiersList(cfg=cfg)
+        actions = set()
+
+        # when
+        for _ in range(1000):
+            act = choose_action(population, epsilon=1.0)
+            actions.add(act)
+
+        # then
+        assert 8 == len(actions)
 
     def test_should_return_best_fitness_action(self, cfg):
         # given

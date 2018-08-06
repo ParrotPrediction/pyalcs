@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import logging
 from itertools import chain
 from random import random, choice, sample
 from typing import Optional, List
@@ -9,7 +8,6 @@ from lcs import Perception
 from lcs.components.alp import expected_case, unexpected_case, cover
 from lcs.components.genetic_algorithm \
     import roulette_wheel_parents_selection, mutate, two_point_crossover
-from lcs.strategies.action_selection import explore, exploit
 from . import Classifier, Configuration
 
 
@@ -63,19 +61,6 @@ class ClassifiersList(list):
         """
         list2d = [[cl] * cl.num for cl in self]
         return list(chain.from_iterable(list2d))
-
-    def choose_action(self, epsilon: float) -> Optional[int]:
-        """
-        Chooses action according to epsilon greedy policy
-        :param epsilon: probability of executing exploration path
-        :return: number of chosen action
-        """
-        if random() < epsilon:
-            logging.debug("\t\tExploration path")
-            return explore(self)
-
-        logging.debug("\t\tExploitation path")
-        return exploit(self)
 
     def get_maximum_fitness(self) -> float:
         """

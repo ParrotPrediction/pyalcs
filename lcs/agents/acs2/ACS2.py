@@ -4,6 +4,8 @@ from typing import Optional
 from . import ClassifiersList, Configuration
 from ...agents import Agent
 from ...agents.Agent import Metric
+from ...strategies.action_selection import choose_action
+from ...utils import parse_state
 
 
 class ACS2(Agent):
@@ -76,7 +78,7 @@ class ACS2(Agent):
         # Initial conditions
         steps = 0
         raw_state = env.reset()
-        state = self._parse_state(raw_state)
+        state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
         action = None
         reward = None
         prev_state = None
@@ -107,7 +109,7 @@ class ACS2(Agent):
                         match_set,
                         state)
 
-            action = match_set.choose_action(self.cfg.epsilon)
+            action = choose_action(match_set, self.cfg.epsilon)
             logging.debug("\tExecuting action: [%d]", action)
             action_set = ClassifiersList.form_action_set(match_set,
                                                          action,
@@ -115,7 +117,7 @@ class ACS2(Agent):
 
             prev_state = state
             raw_state, reward, done, _ = env.step(self._parse_action(action))
-            state = self._parse_state(raw_state)
+            state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
 
             if done:
                 action_set.apply_alp(
@@ -144,7 +146,7 @@ class ACS2(Agent):
         # Initial conditions
         steps = 0
         raw_state = env.reset()
-        state = self._parse_state(raw_state)
+        state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
 
         reward = None
         action_set = ClassifiersList(cfg=self.cfg)
@@ -161,13 +163,13 @@ class ACS2(Agent):
                     match_set.get_maximum_fitness())
 
             # Here while exploiting always choose best action
-            action = match_set.choose_action(epsilon=0.0)
+            action = choose_action(match_set, epsilon=0.0)
             action_set = ClassifiersList.form_action_set(match_set,
                                                          action,
                                                          self.cfg)
 
             raw_state, reward, done, _ = env.step(self._parse_action(action))
-            state = self._parse_state(raw_state)
+            state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
 
             if done:
                 action_set.apply_reinforcement_learning(reward, 0)
@@ -175,21 +177,6 @@ class ACS2(Agent):
             steps += 1
 
         return steps
-
-    def _parse_state(self, raw_state):
-        """
-        Sometimes the environment state returned by the OpenAI
-        environment does not suit to the classifier representation
-        of data used by ACS2. If a mapping function is defined in
-        configuration - use it.
-
-        :param raw_state: state obtained from OpenAI gym
-        :return: state suitable for ACS2 (list)
-        """
-        if self.cfg.perception_mapper_fcn:
-            return self.cfg.perception_mapper_fcn(raw_state)
-
-        return raw_state
 
     def _parse_action(self, action_idx):
         """

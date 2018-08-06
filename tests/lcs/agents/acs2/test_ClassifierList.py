@@ -796,19 +796,6 @@ class TestClassifierList:
         population.append(c3)
         assert 4 == population.get_maximum_fitness()
 
-    def test_should_return_all_possible_actions(self, cfg):
-        # given
-        population = ClassifiersList(cfg=cfg)
-        actions = set()
-
-        # when
-        for _ in range(1000):
-            act = population.choose_action(epsilon=1.0)
-            actions.add(act)
-
-        # then
-        assert 8 == len(actions)
-
     def test_should_get_similar_classifier(self, cfg):
         # given
         pop = ClassifiersList(cfg=cfg)
