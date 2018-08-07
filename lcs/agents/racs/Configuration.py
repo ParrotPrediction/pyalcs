@@ -6,7 +6,8 @@ class Configuration:
     def __init__(self,
                  classifier_length: int,
                  number_of_possible_actions: int,
-                 encoder_bits: int) -> None:
+                 encoder_bits: int,
+                 beta=0.05) -> None:
 
         self.oktypes = (UBR,)
         self.encoder = RealValueEncoder(encoder_bits)
@@ -14,3 +15,5 @@ class Configuration:
         self.classifier_length = classifier_length
         self.number_of_possible_actions = number_of_possible_actions
         self.classifier_wildcard = UBR(*self.encoder.range)
+
+        self.beta = beta

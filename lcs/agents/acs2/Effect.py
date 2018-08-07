@@ -15,33 +15,6 @@ class Effect(PerceptionString):
         """
         return sum(1 for comp in self if comp != self.wildcard)
 
-    def does_anticipate_correctly(self,
-                                  previous_situation: Perception,
-                                  situation: Perception) -> bool:
-        """
-        Checks anticipation. While the pass-through symbols in the effect part
-        of a classifier directly anticipate that these attributes stay the same
-        after the execution of an action, the specified attributes anticipate
-        a change to the specified value. Thus, if the perceived value did not
-        change to the anticipated but actually stayed at the value, the
-        classifier anticipates incorrectly.
-
-        :param previous_situation:
-        :param situation:
-        :return: True if classifier anticipates correctly, False otherwise
-        """
-        # TODO p1: write some tests
-        for idx, item in enumerate(self):
-            if item == self.wildcard:
-                if previous_situation[idx] != situation[idx]:
-                    return False
-            else:
-                if (item != situation[idx] or
-                        previous_situation[idx] == situation[idx]):
-                    return False
-
-        return True
-
     def is_specializable(self, p0: Perception, p1: Perception) -> bool:
         """
         Determines if the effect part can be modified to anticipate

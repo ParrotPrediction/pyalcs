@@ -1,7 +1,7 @@
 import pytest
 
 from lcs import Perception
-from lcs.agents.acs2 import Configuration, Classifier,\
+from lcs.agents.acs2 import Configuration, Classifier, \
     Condition, Effect
 
 
@@ -146,6 +146,98 @@ class TestClassifier:
 
         # then
         assert abs(0.45 - cls.q) < 0.01
+
+    def test_should_detect_correct_anticipation_1(self, cfg):
+        # Classifier is not predicting any change, all pass-through effect
+        # should predict correctly
+
+        # given
+        cls = Classifier(effect=Effect('########'), cfg=cfg)
+        p0 = Perception('00001111')
+        p1 = Perception('00001111')
+
+        # then
+        assert cls.does_anticipate_correctly(p0, p1) is True
+
+    def test_should_detect_correct_anticipation_2(self, cfg):
+        # Introduce two changes into situation and effect (should
+        # also predict correctly)
+
+        # given
+        cls = Classifier(
+            effect=Effect(['#', '1', '#', '#', '#', '#', '0', '#']),
+            cfg=cfg)
+        p0 = Perception(['0', '0', '0', '0', '1', '1', '1', '1'])
+        p1 = Perception(['0', '1', '0', '0', '1', '1', '0', '1'])
+
+        # then
+        assert cls.does_anticipate_correctly(p0, p1) is True
+
+    def test_should_detect_correct_anticipation_3(self, cfg):
+        # Case when effect predicts situation incorrectly
+
+        # given
+        cls = Classifier(
+            effect=Effect(['#', '0', '#', '#', '#', '#', '#', '#']),
+            cfg=cfg)
+        p0 = Perception(['0', '0', '0', '0', '1', '1', '1', '1'])
+        p1 = Perception(['0', '1', '0', '0', '1', '1', '1', '1'])
+
+        # then
+        assert cls.does_anticipate_correctly(p0, p1) is False
+
+    def test_should_detect_correct_anticipation_4(self, cfg):
+        # Case when effect predicts situation incorrectly
+
+        # given
+        cls = Classifier(
+            effect=Effect(['#', '#', '0', '#', '#', '1', '#', '#']),
+            cfg=cfg)
+        p0 = Perception(['1', '0', '1', '0', '1', '0', '0', '1'])
+        p1 = Perception(['1', '0', '1', '0', '1', '0', '0', '1'])
+
+        # then
+        assert cls.does_anticipate_correctly(p0, p1) is False
+
+    def test_should_detect_correct_anticipation_5(self, cfg):
+        # Case when effect predicts situation incorrectly
+
+        # given
+        cls = Classifier(
+            effect=Effect(['#', '#', '#', '#', '1', '#', '0', '#']),
+            cfg=cfg)
+        p0 = Perception(['0', '1', '1', '0', '0', '0', '1', '1'])
+        p1 = Perception(['1', '1', '1', '0', '1', '1', '0', '1'])
+
+        # then
+        assert cls.does_anticipate_correctly(p0, p1) is False
+
+    def test_should_detect_correct_anticipation_6(self, cfg):
+        # Case when effect predicts situation incorrectly
+
+        # given
+        cls = Classifier(
+            effect=Effect(['#', '#', '1', '#', '0', '#', '0', '#']),
+            cfg=cfg)
+        p0 = Perception(['0', '0', '0', '1', '1', '0', '1', '0'])
+        p1 = Perception(['0', '0', '1', '1', '0', '0', '0', '0'])
+
+        # then
+        assert cls.does_anticipate_correctly(p0, p1) is True
+
+    def test_should_handle_pass_through_symbol(self, cfg):
+        # A case when there was no change in perception but effect has no
+        # pass-through symbol
+
+        # given
+        cls = Classifier(
+            effect=Effect(['#', '0', '#', '#', '#', '#', '#', '#']),
+            cfg=cfg)
+        p0 = Perception(['0', '0', '0', '0', '1', '1', '1', '1'])
+        p1 = Perception(['0', '0', '0', '0', '1', '1', '1', '1'])
+
+        # then
+        assert cls.does_anticipate_correctly(p0, p1) is False
 
     def test_should_specialize_1(self, cfg):
         # given

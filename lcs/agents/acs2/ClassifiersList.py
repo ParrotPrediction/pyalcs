@@ -98,7 +98,7 @@ class ClassifiersList(list):
         :param match_set:
         """
         new_list = ClassifiersList(cfg=self.cfg)
-        new_cl = None
+        new_cl: Optional[Classifier] = None
         was_expected_case = False
         delete_count = 0
 
@@ -146,18 +146,18 @@ class ClassifiersList(list):
                             cl.condition.does_match(situation)]
             match_set.extend(new_matching)
 
-    def apply_reinforcement_learning(self, rho: int, p) -> None:
+    def apply_reinforcement_learning(self, reward: int, p) -> None:
         """
         Reinforcement Learning. Applies RL according to
         current reinforcement `reward` and back-propagated reinforcement
         `maximum_fitness`.
 
-        :param rho: current reward
+        :param reward: current reward
         :param p: maximum fitness - back-propagated reinforcement
         """
         for cl in self:
-            cl.update_reward(rho + self.cfg.gamma * p)
-            cl.update_intermediate_reward(rho)
+            cl.update_reward(reward + self.cfg.gamma * p)
+            cl.update_intermediate_reward(reward)
 
     def apply_ga(self,
                  time: int,

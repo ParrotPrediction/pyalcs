@@ -235,8 +235,37 @@ class Classifier(object):
     def does_anticipate_correctly(self,
                                   previous_situation: Perception,
                                   situation: Perception) -> bool:
-        return self.effect.does_anticipate_correctly(
-            previous_situation, situation)
+        """
+        Checks anticipation. While the pass-through symbols in the effect part
+        of a classifier directly anticipate that these attributes stay the same
+        after the execution of an action, the specified attributes anticipate
+        a change to the specified value. Thus, if the perceived value did not
+        change to the anticipated but actually stayed at the value, the
+        classifier anticipates incorrectly.
+
+        Parameters
+        ----------
+        previous_situation: Perception
+            Previous situation
+        situation: Perception
+            Current situation
+
+        Returns
+        -------
+        bool
+            True if classifier's effect pat anticipates correctly,
+            False otherwise
+        """
+        for idx, item in enumerate(self.effect):
+            if item == self.cfg.classifier_wildcard:
+                if previous_situation[idx] != situation[idx]:
+                    return False
+            else:
+                if item != situation[idx] \
+                        or previous_situation[idx] == situation[idx]:
+                    return False
+
+        return True
 
     def set_mark(self, perception: Perception) -> None:
         """
