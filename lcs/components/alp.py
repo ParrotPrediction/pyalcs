@@ -5,12 +5,38 @@ from lcs import Perception
 from lcs.agents.acs2 import Classifier, Configuration
 
 
+def cover(previous_situation: Perception,
+          action: int,
+          situation: Perception,
+          time: int,
+          cfg: Configuration) -> Classifier:
+    """
+    Covering - creates a classifier that anticipates a change correctly.
+
+    :param previous_situation:
+    :param action:
+    :param situation:
+    :param time: current epoch
+    :param cfg: configuration
+
+    :return: new classifier
+    """
+    new_cl = Classifier(action=action, cfg=cfg)
+    # TODO: p5 exp=0, r=0 (paper)
+    new_cl.tga = time
+    new_cl.talp = time
+
+    new_cl.specialize(previous_situation, situation)
+
+    return new_cl
+
+
 def expected_case(cl: Classifier,
                   perception: Perception,
                   time: int) -> Optional[Classifier]:
     """
     Controls the expected case of a classifier. If the classifier
-    is to specific it tries to add some randomness to it by
+    is too specific it tries to add some randomness to it by
     generalizing some attributes.
 
     :param cl:
@@ -86,29 +112,3 @@ def unexpected_case(cl: Classifier,
         child.q = 0.5
 
     return child
-
-
-def cover(previous_situation: Perception,
-          action: int,
-          situation: Perception,
-          time: int,
-          cfg: Configuration) -> Classifier:
-    """
-    Covering - creates a classifier that anticipates a change correctly.
-
-    :param previous_situation:
-    :param action:
-    :param situation:
-    :param time: current epoch
-    :param cfg: configuration
-
-    :return: new classifier
-    """
-    new_cl = Classifier(action=action, cfg=cfg)
-    # TODO: p5 exp=0, r=0 (paper)
-    new_cl.tga = time
-    new_cl.talp = time
-
-    new_cl.specialize(previous_situation, situation)
-
-    return new_cl

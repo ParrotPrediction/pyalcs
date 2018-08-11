@@ -56,3 +56,14 @@ class TestClassifier:
 
         # then
         assert c.does_anticipate_correctly(p0, p1) is True
+
+    def test_should_decrease_quality(self, cfg):
+        # given
+        cl = Classifier(cfg=cfg)
+        assert cl.q == 0.5
+
+        # when
+        cl.decrease_quality()
+
+        # then
+        assert cl.q == 0.475

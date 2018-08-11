@@ -6,6 +6,22 @@ from lcs import TypedList, Perception
 from . import Classifier
 
 
+def unexpected_case(cl: Classifier,
+                    previous_perception: Perception,
+                    perception: Perception,
+                    time: int) -> Optional[Classifier]:
+
+    cl.decrease_quality()
+    cl.set_mark(previous_perception)
+
+    if not cl.effect.is_specializable(previous_perception, perception):
+        return None
+
+    # TODO: here
+
+    return None
+
+
 class ClassifierList(TypedList):
 
     def __init__(self, *args) -> None:
@@ -38,5 +54,6 @@ class ClassifierList(TypedList):
 
             if cl.does_anticipate_correctly(previous_situation, situation):
                 # new_cl = expected_case(cl, previous_situation, time)
+                # was_expected_case = True
                 # TODO: continue from here
                 pass

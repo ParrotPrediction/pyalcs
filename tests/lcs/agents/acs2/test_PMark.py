@@ -51,7 +51,7 @@ class TestPMark:
         assert '0' in mark[1]
         assert '1' in mark[1]
 
-    def test_should_set_mark_from_perception(self, cfg):
+    def test_should_complement_mark_from_perception(self, cfg):
         # Given
         p0 = Perception(['0', '1', '1', '1', '0', '1', '1', '1'])
         mark = PMark(cfg)
@@ -61,7 +61,7 @@ class TestPMark:
         mark[6] = '1'
 
         # When
-        mark.set_mark(p0)
+        mark.complement_marks(p0)
 
         # Then
         assert 4 == len(mark)

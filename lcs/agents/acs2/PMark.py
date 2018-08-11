@@ -21,7 +21,7 @@ class PMark(list):
 
         self[idx].add(value)
 
-    def set_mark(self, perception: Perception) -> bool:
+    def complement_marks(self, perception: Perception) -> bool:
         """
         Directly further specializes all specified attributes in the mark
 
@@ -43,7 +43,7 @@ class PMark(list):
         if not self.is_empty():
             # Mark is already specified. Further specialize all
             # specified attributes
-            return self.set_mark(perception)
+            return self.complement_marks(perception)
 
         changed = False
 
