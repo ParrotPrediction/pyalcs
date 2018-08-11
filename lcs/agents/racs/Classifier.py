@@ -80,7 +80,7 @@ class Classifier:
         # applied
 
         for idx, eitem in enumerate(self.effect):
-            if eitem.contains(p1_enc[idx]):
+            if p1_enc[idx] in eitem:
                 if p0_enc[idx] == p1_enc[idx]:
                     pass
             else:

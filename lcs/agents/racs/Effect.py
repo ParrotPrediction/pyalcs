@@ -37,4 +37,32 @@ class Effect(PerceptionString):
     def does_anticipate_correctly(self,
                                   previous_situation: Perception,
                                   situation: Perception) -> bool:
-        pass
+        # TODO: implement
+        raise NotImplementedError()
+
+    def is_specializable(self, p0: Perception, p1: Perception) -> bool:
+        """
+        Determines if the effect part can be modified to anticipate
+        changes from `p0` to `p1` correctly by only specializing attributes.
+
+        Parameters
+        ----------
+        p0: Perception
+            previous perception
+        p1: Perception
+            current perception
+
+        Returns
+        -------
+        bool
+            True if specializable, false otherwise
+        """
+        encoded_p0 = list(map(self.cfg.encoder.encode, p0))
+        encoded_p1 = list(map(self.cfg.encoder.encode, p1))
+
+        for p0i, p1i, ei in zip(encoded_p0, encoded_p1, self):
+            if ei != self.wildcard:
+                if p1i not in ei or p0i == p1i:
+                    return False
+
+        return True

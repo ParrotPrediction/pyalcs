@@ -18,4 +18,4 @@ class Condition(PerceptionString):
 
     def does_match(self, perception: Perception):
         encoded_perception = map(self.cfg.encoder.encode, perception)
-        return all(ubr.contains(p) for p, ubr in zip(encoded_perception, self))
+        return all(p in ubr for p, ubr in zip(encoded_perception, self))

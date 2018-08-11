@@ -4,8 +4,10 @@
 - `complement_marks()` works if there is no previous value in the set
 
 ## Mark
-- Mark holds a set of encoded perception values that holds bad states for classifier,
--
+- Mark holds a set of encoded perception values that holds bad states for classifier
+
+## Effect
+- `is_specializable` looks inside range.
 
 # Thoughts
-- bar
+- Maybe effect could return just encoded value, instead of UBR...

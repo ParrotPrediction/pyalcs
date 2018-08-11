@@ -20,9 +20,17 @@ class Effect(PerceptionString):
         Determines if the effect part can be modified to anticipate
         changes from `p0` to `p1` correctly by only specializing attributes.
 
-        :param p0: previous perception
-        :param p1: current perception
-        :return: True if specializable, false otherwise
+        Parameters
+        ----------
+        p0: Perception
+            previous perception
+        p1: Perception
+            current perception
+
+        Returns
+        -------
+        bool
+            True if specializable, false otherwise
         """
         for p0i, p1i, ei in zip(p0, p1, self):
             if ei != self.wildcard:
