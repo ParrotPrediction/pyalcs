@@ -476,7 +476,7 @@ class TestClassifierList:
     def test_if_selected_somewhat_close_to_other_marked_considered1(self, cfg):
         # given
         cl = Classifier(quality=0.8, cfg=cfg)
-        cl.mark[0] = '0'
+        cl.mark[0].add('0')
         cl_del = Classifier(quality=0.85, cfg=cfg)
 
         # when
@@ -492,14 +492,14 @@ class TestClassifierList:
         # given
         cl = Classifier(quality=0.8, cfg=cfg)
         cl_del = Classifier(quality=0.85, cfg=cfg)
-        cl_del.mark[0] = '0'
+        cl_del.mark[0].add('0')
 
         # when
         selected_cl = ClassifiersList(cfg=cfg)\
             .select_preferred_to_delete(cl, cl_del)
 
         # then
-        assert cl.is_unmarked() is True
+        assert cl.is_marked() is False
         assert cl_del.is_marked() is True
         assert cl_del == selected_cl
 
@@ -536,9 +536,9 @@ class TestClassifierList:
     def test_if_selected_close_to_other_both_marked_tav_considered1(self, cfg):
         # given
         cl = Classifier(quality=0.85, tav=0.2, cfg=cfg)
-        cl.mark[0] = '0'
+        cl.mark[0].add('0')
         cl_del = Classifier(quality=0.8, tav=0.1, cfg=cfg)
-        cl_del.mark[0] = '0'
+        cl_del.mark[0].add('0')
 
         # when
         selected_cl = ClassifiersList(cfg=cfg)\
@@ -552,9 +552,9 @@ class TestClassifierList:
     def test_if_selected_close_to_other_both_marked_tav_considered2(self, cfg):
         # given
         cl = Classifier(quality=0.8, tav=0.1, cfg=cfg)
-        cl.mark[0] = '0'
+        cl.mark[0].add('0')
         cl_del = Classifier(quality=0.85, tav=0.1, cfg=cfg)
-        cl_del.mark[0] = '0'
+        cl_del.mark[0].add('0')
 
         # when
         selected_cl = ClassifiersList(cfg=cfg)\

@@ -1,25 +1,24 @@
 from random import choice
-from typing import Optional
+from typing import Optional, List
 
-from lcs import Perception
+from lcs import Perception, TypedList
 from . import Configuration, Condition
 
 
-class PMark(list):
-    def __init__(self, cfg: Configuration = None) -> None:
-        if cfg is None:
-            raise TypeError("Configuration should be passed to PMark")
+class PMark(TypedList):
+    def __init__(self, cfg: Configuration) -> None:
         self.cfg = cfg
-        list.__init__(self, [set() for _ in range(self.cfg.classifier_length)])
+        initial: List = [set() for _ in range(self.cfg.classifier_length)]
+        super().__init__((set,), *initial)
 
-    def __len__(self):
-        return sum(1 for m in self if len(m) > 0)
-
-    def __setitem__(self, idx, value):
-        if not isinstance(value, str):
-            raise TypeError('Mark should be composed of string objects')
-
-        self[idx].add(value)
+    def is_marked(self) -> bool:
+        """
+        Returns
+        -------
+        bool
+            If mark is specified at any attribute
+        """
+        return any(len(attrib) != 0 for attrib in self)
 
     def complement_marks(self, perception: Perception) -> bool:
         """
@@ -32,7 +31,7 @@ class PMark(list):
 
         for idx, item in enumerate(self):
             if len(item) > 0:
-                self[idx] = perception[idx]
+                self[idx].add(perception[idx])
                 changed = True
 
         return changed
@@ -40,7 +39,7 @@ class PMark(list):
     def set_mark_using_condition(self,
                                  condition: Condition,
                                  perception: Perception) -> bool:
-        if not self.is_empty():
+        if self.is_marked():
             # Mark is already specified. Further specialize all
             # specified attributes
             return self.complement_marks(perception)
@@ -49,18 +48,10 @@ class PMark(list):
 
         for idx, item in enumerate(condition):
             if item == self.cfg.classifier_wildcard:
-                self[idx] = perception[idx]
+                self[idx].add(perception[idx])
                 changed = True
 
         return changed
-
-    def is_empty(self) -> bool:
-        """
-        Check if there is any mark
-
-        :return: True if is marked, False otherwise
-        """
-        return not len(self) > 0
 
     def get_differences(self, perception: Perception) -> Optional[Condition]:
         """

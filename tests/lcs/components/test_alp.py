@@ -53,14 +53,14 @@ class TestALP:
             quality=0.46,
             cfg=cfg
         )
-        cls.mark[0] = '0'
-        cls.mark[1] = '1'
-        cls.mark[2] = '0'
-        cls.mark[3] = '1'
-        cls.mark[4] = '0'
-        cls.mark[5] = '1'
-        cls.mark[6] = '1'
-        cls.mark[7] = '1'
+        cls.mark[0].add('0')
+        cls.mark[1].add('1')
+        cls.mark[2].add('0')
+        cls.mark[3].add('1')
+        cls.mark[4].add('0')
+        cls.mark[5].add('1')
+        cls.mark[6].add('1')
+        cls.mark[7].add('1')
 
         # when
         new_cls = expected_case(cls, p0, time)
@@ -71,7 +71,7 @@ class TestALP:
         assert 1 == new_cls.condition.specificity
         assert Effect('########') == new_cls.effect
         assert 5 == new_cls.action
-        assert new_cls.mark.is_empty() is True
+        assert new_cls.is_marked() is False
         assert 0.5 == new_cls.q
 
     def test_should_handle_expected_case_4(self, cfg):
@@ -99,7 +99,7 @@ class TestALP:
         assert 5 == new_cls.condition.specificity
         assert Effect('0##10#1#') == new_cls.effect
         assert 7 == new_cls.action
-        assert new_cls.mark.is_empty() is True
+        assert new_cls.is_marked() is False
         assert 0.5 == new_cls.q
 
     def test_should_handle_unexpected_case_1(self, cfg):
@@ -170,7 +170,7 @@ class TestALP:
         # then
         assert new_cl.condition == Condition('#110#010')
         assert new_cl.effect == Effect('#001#101')
-        assert new_cl.mark.is_empty() is True
+        assert new_cl.is_marked() is False
         assert time == new_cl.tga
         assert time == new_cl.talp
         assert abs(cls.q - 0.38) < 0.01
@@ -183,12 +183,12 @@ class TestALP:
             cfg=cfg
         )
 
-        cls.mark[0] = '1'
-        cls.mark[1] = '1'
-        cls.mark[2] = '0'
-        cls.mark[3] = '1'
-        cls.mark[5] = '1'
-        cls.mark[7] = '1'
+        cls.mark[0].add('1')
+        cls.mark[1].add('1')
+        cls.mark[2].add('0')
+        cls.mark[3].add('1')
+        cls.mark[5].add('1')
+        cls.mark[7].add('1')
 
         p0 = Perception('11001110')
         p1 = Perception('01110000')
@@ -217,11 +217,11 @@ class TestALP:
             tav=25.08,
             cfg=cfg
         )
-        cls.mark[2] = '2'
-        cls.mark[3] = '1'
-        cls.mark[4] = '1'
-        cls.mark[5] = '0'
-        cls.mark[7] = '0'
+        cls.mark[2].add('2')
+        cls.mark[3].add('1')
+        cls.mark[4].add('1')
+        cls.mark[5].add('0')
+        cls.mark[7].add('0')
 
         p0 = Perception('00211010')
         p1 = Perception('00001110')

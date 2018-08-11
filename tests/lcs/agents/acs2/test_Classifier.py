@@ -390,7 +390,7 @@ class TestClassifier:
         assert original_cl.effect is not copied_cl.effect
 
         # Assert that other properties were set accordingly
-        assert copied_cl.mark.is_empty() is True
+        assert copied_cl.is_marked() is False
         assert 50 == copied_cl.r
         assert 0.7 == copied_cl.q
         assert operation_time == copied_cl.tga
@@ -653,7 +653,7 @@ class TestClassifier:
         # Now check if the fact that classifier is marked will block
         # it from being considered as a subsumer
         cls = Classifier(experience=30, quality=0.92, cfg=cfg)
-        cls.mark[3] = '1'
+        cls.mark[3].add('1')
 
         # when & then
         assert cls._is_subsumer() is False
@@ -716,17 +716,17 @@ class TestClassifier:
         # given
         p0 = Perception('00001111')
         cls = Classifier(condition='##0#1#1#', cfg=cfg)
-        cls.mark[0] = '0'
-        cls.mark[1] = '0'
-        cls.mark[3] = '0'
-        cls.mark[5] = '1'
-        cls.mark[7] = '1'
+        cls.mark[0].add('0')
+        cls.mark[1].add('0')
+        cls.mark[3].add('0')
+        cls.mark[5].add('1')
+        cls.mark[7].add('1')
 
         # when
         cls.set_mark(p0)
 
         # then
-        assert 5 == len(cls.mark)
+        assert 8 == len(cls.mark)
         assert 1 == len(cls.mark[0])  # 0
         assert 1 == len(cls.mark[1])  # 0
         assert 0 == len(cls.mark[2])
@@ -745,8 +745,6 @@ class TestClassifier:
         cls.set_mark(p0)
 
         # then
-        assert 4 == len(cls.mark)
-
         assert 1 == len(cls.mark[0])
         assert '1' in cls.mark[0]
 
@@ -768,8 +766,6 @@ class TestClassifier:
         cls.set_mark(p0)
 
         # Then
-        assert 3 == len(cls.mark)
-
         assert 1 == len(cls.mark[2])
         assert '1' in cls.mark[2]
 
@@ -788,8 +784,6 @@ class TestClassifier:
         cls.set_mark(p0)
 
         # then
-        assert 6 == len(cls.mark)
-
         assert 1 == len(cls.mark[0])
         assert '0' in cls.mark[0]
 

@@ -13,41 +13,35 @@ class TestPMark:
     def test_should_initialize_mark(self, cfg):
         mark = PMark(cfg)
 
-        assert 0 == len(mark)
+        assert 8 == len(mark)
         for m in mark:
             assert 0 == len(m)
 
-    def test_should_mark_with_non_string_char(self, cfg):
-        mark = PMark(cfg)
-
-        with pytest.raises(TypeError):
-            mark[0] = 1
-
     def test_should_detect_if_marked(self, cfg):
         mark = PMark(cfg)
-        assert mark.is_empty() is True
+        assert mark.is_marked() is False
 
         # Add some mark
-        mark[1] = '0'
-        assert mark.is_empty() is False
+        mark[1].add('0')
+        assert mark.is_marked() is True
 
     def test_should_set_single_mark(self, cfg):
         mark = PMark(cfg)
-        mark[1] = '0'
+        mark[1].add('0')
 
-        assert 1 == len(mark)
-        assert 1 == len(mark[1])
+        assert len(mark) == 8
+        assert len(mark[1]) == 1
         assert '0' in mark[1]
 
         # Try to add the mark one more time into the same position
-        mark[1] = '1'
-        assert 2 == len(mark[1])
+        mark[1].add('1')
+        assert len(mark[1]) == 2
         assert '0' in mark[1]
         assert '1' in mark[1]
 
         # Check if duplicates are avoided
-        mark[1] = '1'
-        assert 2 == len(mark[1])
+        mark[1].add('1')
+        assert len(mark[1]) == 2
         assert '0' in mark[1]
         assert '1' in mark[1]
 
@@ -55,17 +49,15 @@ class TestPMark:
         # Given
         p0 = Perception(['0', '1', '1', '1', '0', '1', '1', '1'])
         mark = PMark(cfg)
-        mark[0] = '1'
-        mark[2] = '1'
-        mark[3] = '1'
-        mark[6] = '1'
+        mark[0].add('1')
+        mark[2].add('1')
+        mark[3].add('1')
+        mark[6].add('1')
 
         # When
         mark.complement_marks(p0)
 
         # Then
-        assert 4 == len(mark)
-
         assert 2 == len(mark[0])
         assert '0' in mark[0]
         assert '1' in mark[0]
@@ -94,14 +86,14 @@ class TestPMark:
         # Given
         p0 = Perception(['1', '1', '0', '1', '1', '1', '0', '1'])
         mark = PMark(cfg)
-        mark[0] = '1'
-        mark[1] = '1'
-        mark[2] = '0'
-        mark[3] = '0'
-        mark[4] = '0'
-        mark[5] = '0'
-        mark[6] = '1'
-        mark[7] = '0'
+        mark[0].add('1')
+        mark[1].add('1')
+        mark[2].add('0')
+        mark[3].add('0')
+        mark[4].add('0')
+        mark[5].add('0')
+        mark[6].add('1')
+        mark[7].add('0')
 
         for _ in range(100):
             # When
@@ -170,8 +162,8 @@ class TestPMark:
         # Given
         p0 = Perception(['0', '0', '2', '1', '1', '0', '1', '0'])
         mark = PMark(cfg)
-        mark[3] = '0'
-        mark[6] = '0'
+        mark[3].add('0')
+        mark[6].add('0')
 
         for _ in range(100):
             # When

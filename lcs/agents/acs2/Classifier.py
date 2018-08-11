@@ -411,24 +411,10 @@ class Classifier(object):
         """
         if self.exp > self.cfg.theta_exp:
             if self.is_reliable():
-                if self.mark.is_empty():
+                if not self.is_marked():
                     return True
 
         return False
 
-    def is_unmarked(self) -> bool:
-        return not self.is_marked()
-
-    def is_marked(self) -> bool:
-        """
-        Checks if classifier is marked.
-
-        Returns
-        -------
-        bool
-            True if classifier is marked, False otherwise
-        """
-        if self.mark.is_empty():
-            return False
-
-        return True
+    def is_marked(self):
+        return self.mark.is_marked()
