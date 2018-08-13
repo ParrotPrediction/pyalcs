@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 from typing import Optional
 
 from lcs import Perception
+from lcs.representations import UBR
 from . import Condition, Effect, Mark, Configuration
 
 
@@ -11,8 +14,11 @@ class Classifier:
                  action: Optional[int]=None,
                  effect: Optional[Effect]=None,
                  quality: float=0.5,
+                 reward: float = 0.5,
+                 intermediate_reward: float = 0.0,
                  experience: int=1,
                  talp=None,
+                 tga: int = 0,
                  tav: float=0.0,
                  cfg: Optional[Configuration]=None) -> None:
 
@@ -39,10 +45,78 @@ class Classifier:
 
         self.mark = Mark(cfg=cfg)
         self.q = quality
+        self.r = reward
+        self.ir = intermediate_reward
 
         self.exp = experience
         self.talp = talp
+        self.tga = tga
         self.tav = tav
+
+    @classmethod
+    def copy_from(cls, old_cls: Classifier, time: int):
+        """
+        Copies old classifier with given time (tga, talp).
+        Old tav gets replaced with new value.
+        New classifier also has no mark.
+
+        Parameters
+        ----------
+        old_cls: Classifier
+            classifier to copy from
+        time: int
+            time of creation / current epoch
+
+        Returns
+        -------
+        Classifier
+            copied classifier
+        """
+        new_cls = cls(
+            condition=Condition(old_cls.condition, old_cls.cfg),
+            action=old_cls.action,
+            effect=old_cls.effect,
+            quality=old_cls.q,
+            reward=old_cls.r,
+            intermediate_reward=old_cls.ir,
+            cfg=old_cls.cfg)
+
+        new_cls.tga = time
+        new_cls.talp = time
+        new_cls.tav = old_cls.tav
+
+        return new_cls
+
+    def specialize(self,
+                   previous_situation: Perception,
+                   situation: Perception) -> None:
+        """
+        Specializes the effect part where necessary to correctly anticipate
+        the changes from p0 to p1 and returns a condition which specifies
+        the attributes which must be specified in the condition part.
+        The specific attributes in the returned conditions are set to
+        the necessary values.
+
+        For real-valued representation a narrow, fixed point UBR is created
+        for condition and effect part using the encoded perceptions.
+
+        Parameters
+        ----------
+        previous_situation: Perception
+            previous raw perception obtained from environment
+        situation: Perception
+            current raw perception obtained from environment
+
+        Returns
+        -------
+        """
+        p0_enc = list(map(self.cfg.encoder.encode, previous_situation))
+        p1_enc = list(map(self.cfg.encoder.encode, situation))
+
+        for idx, item in enumerate(p1_enc):
+            if p0_enc[idx] != p1_enc[idx]:
+                self.effect[idx] = UBR(p1_enc[idx], p1_enc[idx])
+                self.condition[idx] = UBR(p0_enc[idx], p0_enc[idx])
 
     def increase_experience(self) -> int:
         self.exp += 1
@@ -121,3 +195,6 @@ class Classifier:
             self.tav += self.cfg.beta * ((time - self.talp) - self.tav)
 
         self.talp = time
+
+    def is_marked(self):
+        return self.mark.is_marked()

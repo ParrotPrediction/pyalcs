@@ -1,5 +1,8 @@
 import pytest
+
+from lcs import Perception
 from lcs.agents.racs import Configuration, Condition
+from lcs.representations import UBR
 
 
 class TestCondition:
@@ -18,3 +21,18 @@ class TestCondition:
         assert len(cond) == cfg.classifier_length
         for allele in cond:
             assert allele == cfg.classifier_wildcard
+
+    @pytest.mark.parametrize("_condition, _perception, _result", [
+        ([UBR(0, 16), UBR(0, 16)], [0.2, 0.4], True),
+        ([UBR(0, 16), UBR(0, 2)], [0.5, 0.5], False),
+        ([UBR(8, 8), UBR(11, 11)], [0.5, 0.7], True)
+    ])
+    def test_should_match_perception(
+            self, _condition, _perception, _result, cfg):
+
+        # given
+        cond = Condition(_condition, cfg=cfg)
+        p0 = Perception(_perception, oktypes=(float,))
+
+        # then
+        assert cond.does_match(p0) == _result

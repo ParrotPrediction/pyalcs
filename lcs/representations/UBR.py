@@ -18,7 +18,7 @@ class UBR:
         return max(self.x1, self.x2)
 
     def __contains__(self, item):
-        return self.lower_bound < item <= self.upper_bound
+        return self.lower_bound <= item <= self.upper_bound
 
     def __hash__(self):
         return hash((self.lower_bound, self.upper_bound))

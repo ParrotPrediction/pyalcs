@@ -3,6 +3,9 @@
 - _Don't care_ and _pass-through_ symbols (in ACS2 '#') are represented as fully ranged UBR.
 - `complement_marks()` works if there is no previous value in the set
 
+## Classifier
+- `Specialize` creates a fixed, narrow UBR like `UBR(4, 4)`. Later on during another processes it can be generalized more.
+
 ## Mark
 - Mark holds a set of encoded perception values that holds bad states for classifier
 

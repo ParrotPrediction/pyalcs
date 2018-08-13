@@ -597,32 +597,19 @@ class TestClassifier:
                 cfg=cfg
             )) is False
 
-    def test_should_detect_more_general_classifier_1(self, cfg):
+    @pytest.mark.parametrize("_c1_condition, _c2_condition, _result", [
+        (None, None, False),
+        (None, '1###1011', True),
+        ('1#1#1011', '1###1###', False)
+    ])
+    def test_should_detect_more_general_classifier(
+            self, _c1_condition, _c2_condition, _result, cfg):
         # given
-        cls = Classifier(cfg=cfg)
-        c = Classifier(cfg=cfg)
+        c1 = Classifier(condition=_c1_condition, cfg=cfg)
+        c2 = Classifier(condition=_c2_condition, cfg=cfg)
 
         # when & then
-        # no specified elements - should not be more general
-        assert cls.is_more_general(c) is False
-
-    def test_should_detect_more_general_classifier_2(self, cfg):
-        # given
-        cls = Classifier(cfg=cfg)
-        c = Classifier(condition='1###1011', cfg=cfg)
-
-        # when & then
-        # Should be more general
-        assert cls.is_more_general(c) is True
-
-    def test_should_detect_more_general_classifier_3(self, cfg):
-        # given
-        cls = Classifier(condition='1#1#1011', cfg=cfg)
-        c = Classifier(condition='1###1###', cfg=cfg)
-
-        # when & then
-        # shouldn't be more general
-        assert cls.is_more_general(c) is False
+        assert c1.is_more_general(c2) is _result
 
     def test_should_distinguish_classifier_as_subsumer_1(self, cfg):
         # given

@@ -17,9 +17,14 @@ def unexpected_case(cl: Classifier,
     if not cl.effect.is_specializable(previous_perception, perception):
         return None
 
-    # TODO: here
+    # TODO: p5 maybe also take into consideration cl.E = # (paper)
+    child = cl.copy_from(cl, time)
+    child.specialize(previous_perception, perception)
 
-    return None
+    if child.q < 0.5:
+        child.q = 0.5
+
+    return child
 
 
 class ClassifierList(TypedList):
