@@ -1,0 +1,14 @@
+.cache
+.mypy_cache
+.pytest_cache
+.coverage
+.idea
+assets
+notebooks
+.editorconfig
+.gitignore
+.travis.yml
+LICENSE
+MANIFEST.in
+README.md
+**/__pycache__
