@@ -7,7 +7,7 @@ language: python
 python:
   - '3.7-dev'
 
-before_install:
+install:
   - docker build -t parrot-prediction/lcs .
 
 script:
