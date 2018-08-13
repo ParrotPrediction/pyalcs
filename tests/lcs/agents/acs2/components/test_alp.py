@@ -3,7 +3,8 @@ import pytest
 from lcs import Perception
 from lcs.agents.acs2 import Configuration, Classifier, \
     Condition, Effect
-from lcs.components.alp import expected_case, unexpected_case, cover
+from lcs.agents.acs2.components.alp import expected_case, unexpected_case,\
+    cover
 
 
 class TestALP:

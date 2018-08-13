@@ -5,8 +5,9 @@ from random import random, choice, sample
 from typing import Optional, List
 
 from lcs import Perception
-from lcs.components.alp import expected_case, unexpected_case, cover
-from lcs.components.genetic_algorithm \
+from lcs.agents.acs2.components.alp import expected_case, unexpected_case, \
+    cover
+from lcs.agents.acs2.components.genetic_algorithm \
     import roulette_wheel_parents_selection, mutate, two_point_crossover
 from . import Classifier, Configuration
 
