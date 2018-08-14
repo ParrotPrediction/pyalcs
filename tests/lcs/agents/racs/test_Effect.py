@@ -26,7 +26,7 @@ class TestEffect:
         # Effect is all pass-through. Can be specialized.
         ([0.5, 0.5], [0.5, 0.5], [UBR(0, 16), UBR(0, 16)], True),
         # 1 pass-through effect get skipped. Second effect attribute get's
-        # examined. P1 perception is not in correct range. Thats invalid
+        # examined. P1 perception is not in correct range. That's invalid
         ([0.5, 0.5], [0.5, 0.5], [UBR(0, 16), UBR(2, 4)], False),
         # In this case the range is proper, but no change is anticipated.
         # In this case this should be a pass-through symbol.

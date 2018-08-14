@@ -103,8 +103,6 @@ class ClassifiersList(list):
         was_expected_case = False
         delete_count = 0
 
-        # Because we will be changing classifiers (adding/removing) - we will
-        # iterate over the copy of the list
         for cl in self:
             cl.increase_experience()
             cl.set_alp_timestamp(time)

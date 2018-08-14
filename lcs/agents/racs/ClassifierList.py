@@ -4,6 +4,7 @@ from typing import Optional
 
 from lcs import TypedList, Perception
 from . import Classifier
+from .components.alp import expected_case, unexpected_case
 
 
 class ClassifierList(TypedList):
@@ -37,7 +38,11 @@ class ClassifierList(TypedList):
             cl.set_alp_timestamp(time)
 
             if cl.does_anticipate_correctly(previous_situation, situation):
-                # new_cl = expected_case(cl, previous_situation, time)
-                # was_expected_case = True
+                new_cl = expected_case(cl, previous_situation, time)
+                was_expected_case = True
+            else:
+                new_cl = unexpected_case(cl,
+                                         previous_situation,
+                                         situation,
+                                         time)
                 # TODO: continue from here
-                pass
