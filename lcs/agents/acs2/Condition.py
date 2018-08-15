@@ -10,15 +10,16 @@ class Condition(PerceptionString):
     @property
     def specificity(self) -> int:
         """
-        Returns the number of  specific symbols (non-#)
-
-        :return: number of non-general elements
+        Returns
+        -------
+        int
+            Number of not generic (wildcards) attributes
         """
         return sum(1 for comp in self if comp != self.wildcard)
 
     def specialize(self,
-                   position: int = None,
-                   value: str = None,
+                   position: int=None,
+                   value: str=None,
                    new_condition=None):
 
         if position is not None and value is not None:

@@ -1,5 +1,5 @@
-from random import choice
-from typing import Optional, List
+import random
+from typing import List
 
 from lcs import Perception, TypedList
 from . import Configuration, Condition
@@ -53,7 +53,7 @@ class PMark(TypedList):
 
         return changed
 
-    def get_differences(self, perception: Perception) -> Optional[Condition]:
+    def get_differences(self, perception: Perception) -> Condition:
         """
         Determines the strongest differences in between the mark
         and perception.
@@ -61,41 +61,22 @@ class PMark(TypedList):
         :param: perception
         :return: condition that specifies all the differences.
         """
-        nr1 = 0
-        nr2 = 0
+        diff = Condition.empty(
+            wildcard=self.cfg.classifier_wildcard,
+            length=self.cfg.classifier_length)
 
-        # Count difference types
-        for idx, item in enumerate(self):
-            if len(item) > 0 and perception[idx] not in item:
-                nr1 += 1
-            elif len(item) > 1:
-                nr2 += 1
+        if self.is_marked():
+            unique_diff_indices = \
+                [pi for pi, p in enumerate(perception) if p not in self[pi]]
+            fuzzy_diff_indices = \
+                [pi for pi, p in enumerate(perception) if len(self[pi]) > 1]
 
-        if nr1 > 0:
-            # One or more absolute differences detected -> specialize one
-            # randomly chosen
-            condition = Condition.empty(
-                wildcard=self.cfg.classifier_wildcard,
-                length=self.cfg.classifier_length)
+            if len(unique_diff_indices) > 0:
+                ridx = random.choice(unique_diff_indices)
+                diff[ridx] = perception[ridx]
+            elif len(fuzzy_diff_indices) > 0:
+                for idx, item in enumerate(self):
+                    if len(item) > 1:
+                        diff[idx] = perception[idx]
 
-            possible_idx = []
-            for idx, item in enumerate(self):
-                if len(item) > 0 and perception[idx] not in item:
-                    possible_idx.append(idx)
-
-            rand_idx = choice(possible_idx)
-            condition[rand_idx] = perception[rand_idx]
-        elif nr2 > 0:
-            # One or more equal differences detected -> specialize all of them
-            condition = Condition.empty(
-                wildcard=self.cfg.classifier_wildcard,
-                length=self.cfg.classifier_length)
-
-            for idx, item in enumerate(self):
-                if len(item) > 1:
-                    condition[idx] = perception[idx]
-        else:
-            # Nothing for specialization found
-            return None
-
-        return condition
+        return diff

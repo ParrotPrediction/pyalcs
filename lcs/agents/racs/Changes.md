@@ -14,3 +14,4 @@
 
 # Thoughts
 - Maybe effect could return just encoded value, instead of UBR...
+- Specificity/generality should measure how wide is the UBR

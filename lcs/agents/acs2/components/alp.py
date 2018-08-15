@@ -46,7 +46,7 @@ def expected_case(cl: Classifier,
     """
     diff = cl.mark.get_differences(perception)
 
-    if diff is None:
+    if diff.specificity == 0:
         cl.increase_quality()
         return None
 

@@ -1,7 +1,7 @@
 import pytest
 
 from lcs import Perception
-from lcs.agents.acs2 import Configuration, PMark
+from lcs.agents.acs2 import Configuration, PMark, Condition
 
 
 class TestPMark:
@@ -71,16 +71,23 @@ class TestPMark:
         assert 1 == len(mark[6])
         assert '1' in mark[6]
 
-    def test_should_get_differences_1(self, cfg):
-        # Given
-        p0 = Perception(['0', '1', '1', '0', '0', '0', '1', '1'])
+    @pytest.mark.parametrize("_p0", [
+        (['0', '1', '1', '0', '0', '0', '1', '1']),
+        (['1', '0', '1', '0', '1', '0', '0', '1']),
+    ])
+    def test_should_get_differences_1(self, _p0, cfg):
+        # given
+        generic_condition = Condition.empty(
+            wildcard=cfg.classifier_wildcard,
+            length=cfg.classifier_length)
+        p0 = Perception(_p0)
         mark = PMark(cfg)
 
-        # When
+        # when
         diff = mark.get_differences(p0)
 
-        # Then
-        assert diff is None
+        # then
+        assert diff == generic_condition
 
     def test_should_get_differences_2(self, cfg):
         # Given
@@ -133,7 +140,7 @@ class TestPMark:
             assert 1 == diff.specificity
 
     def test_should_get_differences_4(self, cfg):
-        # Given
+        # given
         p0 = Perception(['1', '1', '1', '1', '1', '0', '1', '0'])
         mark = PMark(cfg)
         mark[0].update(['0', '1'])
@@ -143,20 +150,14 @@ class TestPMark:
         mark[6].update(['0', '1'])
         mark[7].update(['0'])
 
-        # When
+        # when
         diff = mark.get_differences(p0)
 
-        # Then
+        # then
+        # there are 3 unique and 5 fuzzy differences. Randomly specify
+        # one attribute (from 3 unique values).
         assert diff is not None
-        assert 5 == diff.specificity
-        assert '1' == diff[0]
-        assert '1' == diff[1]
-        assert '#' == diff[2]
-        assert '1' == diff[3]
-        assert '1' == diff[4]
-        assert '#' == diff[5]
-        assert '1' == diff[6]
-        assert '#' == diff[7]
+        assert 1 == diff.specificity
 
     def test_should_get_differences_5(self, cfg):
         # Given
@@ -172,14 +173,3 @@ class TestPMark:
             # Then
             assert diff is not None
             assert 1 == diff.specificity
-
-    def test_should_get_differences_6(self, cfg):
-        # Given
-        p0 = Perception(['1', '0', '1', '0', '1', '0', '0', '1'])
-        mark = PMark(cfg)
-
-        # When
-        diff = mark.get_differences(p0)
-
-        # Then
-        assert diff is None

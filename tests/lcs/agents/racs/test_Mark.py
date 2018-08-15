@@ -53,7 +53,7 @@ class TestMark:
         # then
         assert change_detected is changed
 
-    @pytest.mark.parametrize("initmark, perc, initcond, marked_count", [
+    @pytest.mark.parametrize("initmark, _p0, initcond, marked_count", [
         # not marked, all generic classifier, should mark two positions
         ([[], []], [0.5, 0.5], [], 2),
         # not marked, specified condition, shouldn't get marked
@@ -63,10 +63,10 @@ class TestMark:
         # already marked, should use perception, one mark
         ([[4], []], [0.5, 0.5], [], 1),
     ])
-    def test_should_set_mark_using_condition(self, initmark, perc,
+    def test_should_set_mark_using_condition(self, initmark, _p0,
                                              initcond, marked_count, cfg):
         # given
-        p0 = Perception(perc, oktypes=(float,))
+        p0 = Perception(_p0, oktypes=(float,))
         mark = self._init_mark(initmark, cfg)
         condition = self._init_condition(initcond, cfg)
 
@@ -75,6 +75,60 @@ class TestMark:
 
         # then
         assert self._count_marked_attributes(mark) is marked_count
+
+    def test_should_get_no_differences(self, cfg):
+        # given
+        p0 = Perception([.5, .5], oktypes=(float,))
+        mark = self._init_mark([], cfg)
+
+        # when
+        diff = mark.get_differences(p0)
+
+        # then
+        assert diff == Condition.generic(cfg)
+
+    @pytest.mark.parametrize("_m, _p0, _specif", [
+        # There is no perception in mark - one attribute should be
+        # randomly specified
+        ([[2], [4]], [.5, .5], 1),
+        # One perception is marked - the other should be specified
+        ([[8], [4]], [.5, .5], 1),
+        # Both perceptions are marked - no differences
+        ([[8], [8]], [.5, .5], 0)
+    ])
+    def test_should_handle_unique_differences(self, _m, _p0, _specif, cfg):
+        # given
+        p0 = Perception(_p0, oktypes=(float,))
+        mark = self._init_mark(_m, cfg)
+
+        # when
+        diff = mark.get_differences(p0)
+
+        # then
+        assert diff.specificity == _specif
+
+    @pytest.mark.parametrize("_m, _p0, _specificity", [
+        # There are two marks in one attribute - it should be specified.
+        ([[1, 2], [4]], [.5, .5], 1),
+        # Here we have clear unique difference - specify it first
+        ([[1, 2], [8]], [.5, .5], 1),
+        # Two fuzzy attributes (containing perception value) - both
+        # should be specified
+        ([[6, 8], [7, 8]], [.5, .5], 2),
+        # Two fuzzy attributes - but one is unique (does not contain
+        # perception)
+        ([[6, 8], [7, 9]], [.5, .5], 1),
+    ])
+    def test_should_handle_fuzzy_differences(self, _m, _p0, _specificity, cfg):
+        # given
+        p0 = Perception(_p0, oktypes=(float,))
+        mark = self._init_mark(_m, cfg)
+
+        # when
+        diff = mark.get_differences(p0)
+
+        # then
+        assert diff.specificity == _specificity
 
     @staticmethod
     def _init_mark(vals, cfg):

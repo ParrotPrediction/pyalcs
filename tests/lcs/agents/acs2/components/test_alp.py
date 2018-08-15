@@ -97,7 +97,7 @@ class TestALP:
         # then
         assert new_cls is not None
         # One `random` attribute gets specified
-        assert 5 == new_cls.condition.specificity
+        assert new_cls.condition.specificity in [4, 5]
         assert Effect('0##10#1#') == new_cls.effect
         assert 7 == new_cls.action
         assert new_cls.is_marked() is False
