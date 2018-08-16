@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, List
 
 from lcs import Perception
 from lcs.representations import UBR
@@ -87,6 +87,27 @@ class Classifier:
 
         return new_cls
 
+    @property
+    def specified_unchanging_attributes(self) -> List[int]:
+        """
+        Determines the number of specified unchanging attributes in
+        the classifier. An unchanging attribute is one that is anticipated
+        not to change in the effect part.
+
+        Returns
+        -------
+        List[int]
+            list specified unchanging attributes indices
+        """
+        indices = []
+
+        for idx, (cpi, epi) in enumerate(zip(self.condition, self.effect)):
+            if cpi != self.cfg.classifier_wildcard and \
+                    epi == self.cfg.classifier_wildcard:
+                indices.append(idx)
+
+        return indices
+
     def specialize(self,
                    previous_situation: Perception,
                    situation: Perception) -> None:
@@ -121,6 +142,10 @@ class Classifier:
     def increase_experience(self) -> int:
         self.exp += 1
         return self.exp
+
+    def increase_quality(self) -> float:
+        self.q += self.cfg.beta * (1 - self.q)
+        return self.q
 
     def decrease_quality(self) -> float:
         self.q -= self.cfg.beta * self.q

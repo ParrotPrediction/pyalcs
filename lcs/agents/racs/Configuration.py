@@ -7,7 +7,8 @@ class Configuration:
                  classifier_length: int,
                  number_of_possible_actions: int,
                  encoder_bits: int,
-                 beta=0.05) -> None:
+                 beta=0.05,
+                 u_max=100000,) -> None:
 
         self.oktypes = (UBR,)
         self.encoder = RealValueEncoder(encoder_bits)
@@ -17,3 +18,4 @@ class Configuration:
         self.classifier_wildcard = UBR(*self.encoder.range)
 
         self.beta = beta
+        self.u_max = u_max

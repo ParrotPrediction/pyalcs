@@ -47,27 +47,16 @@ class TestClassifier:
         # then
         assert cls.does_anticipate_correctly(p0, p1) is True
 
-    def test_should_calculate_specificity_1(self, cfg):
-        cls = Classifier(cfg=cfg)
-        assert 0 == cls.specificity
+    @pytest.mark.parametrize("_condition, _specificity", [
+        ('########', 0.0),
+        ('#1#01#0#', 0.5),
+        ('11101001', 1.0),
+    ])
+    def test_should_calculate_specificity(
+            self, _condition, _specificity, cfg):
 
-    def test_should_calculate_specificity_2(self, cfg):
-        # given
-        cls = Classifier(
-            condition=Condition('#1#01#0#'),
-            cfg=cfg)
-
-        # then
-        assert 0.5 == cls.specificity
-
-    def test_should_calculate_specificity_3(self, cfg):
-        # given
-        cls = Classifier(
-            condition=Condition('11101001'),
-            cfg=cfg)
-
-        # then
-        assert 1 == cls.specificity
+        cls = Classifier(Condition(_condition), cfg=cfg)
+        assert cls.specificity == _specificity
 
     def test_should_be_considered_as_reliable_1(self, cfg):
         # given
@@ -284,59 +273,21 @@ class TestClassifier:
         assert 6 == cls.effect.number_of_specified_elements
         assert Effect('10#010#0', cfg) == cls.effect
 
-    def test_should_count_specified_unchanging_attributes_1(self, cfg):
+    @pytest.mark.parametrize("_condition, _effect, _sua", [
+        ('######0#', '########', 1),
+        ('#####0#0', '########', 2),
+        ('1###1011', '0####1##', 3),
+        ('1#0#1011', '0####1##', 4),
+        ('10000001', '####1#1#', 6),
+    ])
+    def test_should_count_specified_unchanging_attributes(
+            self, _condition, _effect, _sua, cfg):
+
         # given
-        cls = Classifier(
-            condition='######0#',
-            effect='########',
-            cfg=cfg
-        )
+        cls = Classifier(condition=_condition, effect=_effect, cfg=cfg)
 
         # when & then
-        assert 1 == cls.specified_unchanging_attributes
-
-    def test_should_count_specified_unchanging_attributes_2(self, cfg):
-        # given
-        cls = Classifier(
-            condition='#####0#0',
-            effect='########',
-            cfg=cfg
-        )
-
-        # when & then
-        assert 2 == cls.specified_unchanging_attributes
-
-    def test_should_count_specified_unchanging_attributes_3(self, cfg):
-        # given
-        cls = Classifier(
-            condition='10000001',
-            effect='####1#1#',
-            cfg=cfg
-        )
-
-        # when & then
-        assert 6 == cls.specified_unchanging_attributes
-
-    def test_should_count_specified_unchanging_attributes_4(self, cfg):
-        # given
-        cls = Classifier(
-            condition='1#0#1011',
-            effect='0####1##',
-            cfg=cfg
-        )
-        # when & then
-        assert 4 == cls.specified_unchanging_attributes
-
-    def test_should_count_specified_unchanging_attributes_5(self, cfg):
-        # given
-        cls = Classifier(
-            condition='1###1011',
-            effect='0####1##',
-            cfg=cfg
-        )
-
-        # when & then
-        assert 3 == cls.specified_unchanging_attributes
+        assert len(cls.specified_unchanging_attributes) == _sua
 
     def test_copy_from_and_change_does_not_influence_another_effect(self, cfg):
         """ Verify that not just reference to Condition copied (changing which
@@ -805,56 +756,23 @@ class TestClassifier:
         # then
         assert cls.predicts_successfully(p0, action, p1) is True
 
-    def test_should_not_generalize_random_attributes(self, cfg):
-        # given
-        cls = Classifier(
-            condition='#####0#0',
-            effect='#####1#1',
-            cfg=cfg)
+    @pytest.mark.parametrize("_condition, _effect, _sua_before, _sua_after", [
+        ('#####0#0', '#####1#1', 0, 0),
+        ('#####0#0', '#######1', 1, 0),
+        ('#####0#0', '########', 2, 1),
+    ])
+    def test_should_not_generalize_unchanging_attribute(
+            self, _condition, _effect, _sua_before, _sua_after, cfg):
 
-        no_spec = cls.specified_unchanging_attributes
-        assert 0 == no_spec
+        # given
+        cls = Classifier(condition=_condition, effect=_effect, cfg=cfg)
+        assert len(cls.specified_unchanging_attributes) == _sua_before
 
         # when
-        generalized = cls.generalize_unchanging_condition_attribute(no_spec)
+        cls.generalize_unchanging_condition_attribute()
 
         # then
-        assert generalized is False
-        assert 0 == cls.specified_unchanging_attributes
-
-    def test_should_generalize_random_attribute(self, cfg):
-        # given
-        cls = Classifier(
-            condition='#####0#0',
-            effect='#######1',
-            cfg=cfg)
-
-        no_spec = cls.specified_unchanging_attributes
-        assert 1 == no_spec
-
-        # when
-        generalized = cls.generalize_unchanging_condition_attribute(no_spec)
-
-        # then
-        assert generalized is True
-        assert 0 == cls.specified_unchanging_attributes
-
-    def test_should_generalize_one_random_attribute(self, cfg):
-        # given
-        cls = Classifier(
-            condition='#####0#0',
-            effect='########',
-            cfg=cfg)
-
-        no_spec = cls.specified_unchanging_attributes
-        assert 2 == no_spec
-
-        # when
-        generalized = cls.generalize_unchanging_condition_attribute(no_spec)
-
-        # then
-        assert generalized is True
-        assert 1 == cls.specified_unchanging_attributes
+        assert len(cls.specified_unchanging_attributes) == _sua_after
 
     def test_should_generalize_second_unchanging_attribute(self, cfg):
         # given
@@ -863,14 +781,13 @@ class TestClassifier:
             effect='########',
             cfg=cfg)
 
-        no_spec = cls.specified_unchanging_attributes
-        assert 2 == no_spec
+        assert len(cls.specified_unchanging_attributes) == 2
 
         # when
         generalized = cls.generalize_unchanging_condition_attribute(
-            no_spec, lambda x, y: 1)
+            lambda x: 7)
 
         # then
         assert generalized is True
-        assert 1 == cls.specified_unchanging_attributes
+        assert len(cls.specified_unchanging_attributes) == 1
         assert Condition('#####0##') == cls.condition

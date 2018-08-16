@@ -42,6 +42,17 @@ class TestClassifier:
         # then
         assert c.does_anticipate_correctly(p0, p1) is _result
 
+    def test_should_increase_quality(self, cfg):
+        # given
+        cl = Classifier(cfg=cfg)
+        assert cl.q == 0.5
+
+        # when
+        cl.increase_quality()
+
+        # then
+        assert cl.q == 0.525
+
     def test_should_decrease_quality(self, cfg):
         # given
         cl = Classifier(cfg=cfg)
@@ -52,6 +63,24 @@ class TestClassifier:
 
         # then
         assert cl.q == 0.475
+
+    @pytest.mark.parametrize("_condition, _effect, _sua", [
+        ([UBR(4, 16), UBR(2, 16)], [UBR(0, 16), UBR(0, 16)], 2),
+        ([UBR(4, 16), UBR(0, 16)], [UBR(0, 16), UBR(0, 16)], 1),
+        ([UBR(0, 16), UBR(0, 16)], [UBR(0, 16), UBR(0, 16)], 0),
+        ([UBR(4, 16), UBR(0, 16)], [UBR(0, 16), UBR(5, 16)], 1),
+        ([UBR(4, 16), UBR(6, 16)], [UBR(4, 16), UBR(6, 16)], 0),
+    ])
+    def test_should_count_specified_unchanging_attributes(
+            self, _condition, _effect, _sua, cfg):
+
+        # given
+        cl = Classifier(condition=Condition(_condition, cfg),
+                        effect=Effect(_effect, cfg),
+                        cfg=cfg)
+
+        # then
+        assert len(cl.specified_unchanging_attributes) == _sua
 
     def test_should_create_copy(self, cfg):
         # given

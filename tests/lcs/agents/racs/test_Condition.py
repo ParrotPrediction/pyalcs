@@ -22,6 +22,20 @@ class TestCondition:
         for allele in cond:
             assert allele == cfg.classifier_wildcard
 
+    @pytest.mark.parametrize("_condition, _idx, _generalized", [
+        ([UBR(1, 4), UBR(5, 7)], 0, [UBR(0, 16), UBR(5, 7)]),
+        ([UBR(1, 4), UBR(5, 7)], 1, [UBR(1, 4), UBR(0, 16)])
+    ])
+    def test_generalize(self, _condition, _idx, _generalized, cfg):
+        # given
+        cond = Condition(_condition, cfg)
+
+        # when
+        cond.generalize(_idx)
+
+        # then
+        assert cond == Condition(_generalized, cfg)
+
     @pytest.mark.parametrize("_condition, _specificity", [
         ([UBR(0, 16), UBR(0, 16)], 0),
         ([UBR(0, 16), UBR(2, 16)], 1),

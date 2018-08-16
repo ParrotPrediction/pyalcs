@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from random import randint
-from typing import Optional, Union, Callable
+import random
+from typing import Optional, Union, Callable, List
 
 from lcs import Perception
 from . import Configuration, Condition, Effect, PMark
@@ -122,7 +122,7 @@ class Classifier(object):
         return self.q * self.r
 
     @property
-    def specified_unchanging_attributes(self) -> int:
+    def specified_unchanging_attributes(self) -> List[int]:
         """
         Determines the number of specified unchanging attributes in
         the classifier. An unchanging attribute is one that is anticipated
@@ -130,17 +130,17 @@ class Classifier(object):
 
         Returns
         -------
-        int
-            number of specified unchanging attributes
+        List[int]
+            list specified unchanging attributes indices
         """
-        spec = 0
+        indices = []
 
-        for cpi, epi in zip(self.condition, self.effect):
+        for idx, (cpi, epi) in enumerate(zip(self.condition, self.effect)):
             if cpi != self.cfg.classifier_wildcard and \
                     epi == self.cfg.classifier_wildcard:
-                spec += 1
+                indices.append(idx)
 
-        return spec
+        return indices
 
     @property
     def specificity(self):
@@ -344,7 +344,7 @@ class Classifier(object):
         return False
 
     def generalize_unchanging_condition_attribute(
-            self, no_spec: int, randomfunc: Callable=randint) -> bool:
+            self, randomfunc: Callable=random.choice) -> bool:
         """
         Generalizes one randomly unchanging attribute in the condition.
         An unchanging attribute is one that is anticipated not to change
@@ -352,31 +352,17 @@ class Classifier(object):
 
         Parameters
         ----------
-        no_spec: int
-            number of unchanging attributes
         randomfunc: Callable
-            specifies random function for distinguishing
-            which attribute to generalize
+            function returning attribute index to generalize
         Returns
         -------
         bool
             True if attribute was generalized, False otherwise
         """
-        if no_spec == 0:
-            return False  # nothing to generalize
-
-        att_idx = randomfunc(0, no_spec - 1)  # id of attribute to generalize
-        pos = 0  # current unchanging attribute id
-
-        for idx, (cpi, epi) in enumerate(zip(self.condition, self.effect)):
-            if cpi != self.cfg.classifier_wildcard and \
-                    epi == self.cfg.classifier_wildcard:
-
-                if att_idx == pos:
-                    self.condition.generalize(idx)
-                    return True
-                else:
-                    pos += 1
+        if len(self.specified_unchanging_attributes) > 0:
+            ridx = randomfunc(self.specified_unchanging_attributes)
+            self.condition.generalize(ridx)
+            return True
 
         return False
 

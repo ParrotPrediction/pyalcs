@@ -7,8 +7,18 @@ from lcs.agents.racs import Classifier
 def expected_case(cl: Classifier,
                   perception: Perception,
                   time: int) -> Optional[Classifier]:
-    # TODO: implement
-    raise NotImplementedError()
+    diff = cl.mark.get_differences(perception)
+
+    if diff.specificity == 0:
+        cl.increase_quality()
+        return None
+
+    no_spec = len(cl.specified_unchanging_attributes)
+    no_spec_new = diff.specificity
+    child = cl.copy_from(cl, time)
+
+    # TODO: continue from here
+    return None
 
 
 def unexpected_case(cl: Classifier,

@@ -50,13 +50,13 @@ def expected_case(cl: Classifier,
         cl.increase_quality()
         return None
 
-    no_spec = cl.specified_unchanging_attributes
+    no_spec = len(cl.specified_unchanging_attributes)
     no_spec_new = diff.specificity
     child = cl.copy_from(cl, time)
 
     if no_spec >= cl.cfg.u_max:
         while no_spec >= cl.cfg.u_max:
-            res = cl.generalize_unchanging_condition_attribute(no_spec)
+            res = cl.generalize_unchanging_condition_attribute()
             assert res is True
             no_spec -= 1
 
@@ -66,7 +66,7 @@ def expected_case(cl: Classifier,
                 diff.generalize(diff_idx)
                 no_spec_new -= 1
             else:
-                if cl.generalize_unchanging_condition_attribute(no_spec):
+                if cl.generalize_unchanging_condition_attribute():
                     no_spec -= 1
     else:
         while no_spec + no_spec_new > cl.cfg.u_max:
