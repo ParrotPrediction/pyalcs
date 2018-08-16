@@ -32,7 +32,7 @@ class TestMaze:
 
         assert 100 == self._get_knowledge(metrics)
 
-        assert count_macroclassifiers(population) > count_reliable(population)
+        assert count_macroclassifiers(population) == count_reliable(population)
 
         assert count_macroclassifiers(population) \
             == count_microclassifiers(population)

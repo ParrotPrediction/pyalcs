@@ -154,10 +154,16 @@ class TestPMark:
         diff = mark.get_differences(p0)
 
         # then
-        # there are 3 unique and 5 fuzzy differences. Randomly specify
-        # one attribute (from 3 unique values).
         assert diff is not None
-        assert 1 == diff.specificity
+        assert 5 == diff.specificity
+        assert '1' == diff[0]
+        assert '1' == diff[1]
+        assert '#' == diff[2]
+        assert '1' == diff[3]
+        assert '1' == diff[4]
+        assert '#' == diff[5]
+        assert '1' == diff[6]
+        assert '#' == diff[7]
 
     def test_should_get_differences_5(self, cfg):
         # Given

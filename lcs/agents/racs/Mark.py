@@ -117,17 +117,23 @@ class Mark(TypedList):
         if self.is_marked():
             enc_p0 = list(map(self.cfg.encoder.encode, p0))
 
-            unique_diff_indices = \
-                [pi for pi, p in enumerate(enc_p0) if p not in self[pi]]
-            fuzzy_diff_indices = \
-                [pi for pi, p in enumerate(enc_p0) if len(self[pi]) > 1]
+            # Unique and fuzzy difference counts
+            nr1, nr2 = 0, 0
 
-            if len(unique_diff_indices) > 0:
-                ridx = random.choice(unique_diff_indices)
-                p = enc_p0[ridx]
+            # Count difference types
+            for idx, item in enumerate(self):
+                if len(item) > 0 and enc_p0[idx] not in item:
+                    nr1 += 1
+                elif len(item) > 1:
+                    nr2 += 1
 
-                diff[ridx] = UBR(p, p)
-            elif len(fuzzy_diff_indices) > 0:
+            if nr1 > 0:
+                possible_idx = [pi for pi, p in enumerate(enc_p0) if
+                                p not in self[pi] and len(self[pi]) > 0]
+                rand_idx = random.choice(possible_idx)
+                p = enc_p0[rand_idx]
+                diff[rand_idx] = UBR(p, p)
+            elif nr2 > 0:
                 for pi, p in enumerate(enc_p0):
                     if len(self[pi]) > 1:
                         diff[pi] = UBR(p, p)

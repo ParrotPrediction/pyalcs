@@ -53,7 +53,7 @@ class PMark(TypedList):
 
         return changed
 
-    def get_differences(self, perception: Perception) -> Condition:
+    def get_differences(self, p0: Perception) -> Condition:
         """
         Determines the strongest differences in between the mark
         and perception.
@@ -65,18 +65,23 @@ class PMark(TypedList):
             wildcard=self.cfg.classifier_wildcard,
             length=self.cfg.classifier_length)
 
-        if self.is_marked():
-            unique_diff_indices = \
-                [pi for pi, p in enumerate(perception) if p not in self[pi]]
-            fuzzy_diff_indices = \
-                [pi for pi, p in enumerate(perception) if len(self[pi]) > 1]
+        nr1, nr2 = 0, 0
 
-            if len(unique_diff_indices) > 0:
-                ridx = random.choice(unique_diff_indices)
-                diff[ridx] = perception[ridx]
-            elif len(fuzzy_diff_indices) > 0:
-                for idx, item in enumerate(self):
-                    if len(item) > 1:
-                        diff[idx] = perception[idx]
+        # Count difference types
+        for idx, item in enumerate(self):
+            if len(item) > 0 and p0[idx] not in item:
+                nr1 += 1
+            elif len(item) > 1:
+                nr2 += 1
+
+        if nr1 > 0:
+            possible_idx = [pi for pi, p in enumerate(p0) if
+                            p not in self[pi] and len(self[pi]) > 0]
+            rand_idx = random.choice(possible_idx)
+            diff[rand_idx] = p0[rand_idx]
+        elif nr2 > 0:
+            for idx, item in enumerate(self):
+                if len(item) > 1:
+                    diff[idx] = p0[idx]
 
         return diff
