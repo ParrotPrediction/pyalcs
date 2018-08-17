@@ -26,6 +26,24 @@ class TestCondition:
         # then
         assert Condition("##O##O##") == cond
 
+    @pytest.mark.parametrize("_condition, _spec_before, _spec_after", [
+        ('##11####', 2, 1),
+        ('#######2', 1, 0),
+        ('########', 0, 0),
+    ])
+    def test_should_generalize_specific_attributes_randomly(
+            self, _condition, _spec_before, _spec_after):
+
+        # given
+        condition = Condition(_condition)
+        assert condition.specificity == _spec_before
+
+        # when
+        condition.generalize_specific_attribute_randomly()
+
+        # then
+        assert condition.specificity == _spec_after
+
     def test_generalize_decrements_specificity(self):
         # given
         condition = Condition('#11#####')
@@ -69,62 +87,25 @@ class TestCondition:
         condition = Condition("#1O##O##")
 
         # then
-        assert 8 == len(condition)
+        assert len(condition) == 8
 
-    def test_should_specialize_1(self):
+    @pytest.mark.parametrize("_condition, _diff, _result", [
+        ('########', '#0###1#1', '#0###1#1'),
+        ('###10#1#', '010##1##', '0101011#'),
+        ('#101#10#', '####1##1', '#1011101'),
+        ('####01#1', '2#00####', '2#0001#1'),
+        ('###01#0#', '101##0##', '1010100#'),
+    ])
+    def test_should_specialize(self, _condition, _diff, _result):
         # given
-        cond = Condition.empty(8)
-        diff = Condition('#0###1#1')
+        cond = Condition(_condition)
+        diff = Condition(_diff)
 
         # when
         cond.specialize(new_condition=diff)
 
         # then
-        assert Condition('#0###1#1') == cond
-
-    def test_should_specialize_2(self):
-        # given
-        c = Condition('###10#1#')
-        diff = Condition('010##1##')
-
-        # when
-        c.specialize(new_condition=diff)
-
-        # then
-        assert Condition('0101011#') == c
-
-    def test_should_specialize_3(self):
-        # given
-        c = Condition('#101#10#')
-        diff = Condition('####1##1')
-
-        # when
-        c.specialize(new_condition=diff)
-
-        # then
-        assert Condition('#1011101') == c
-
-    def test_should_specialize_4(self):
-        # given
-        c = Condition('####01#1')
-        diff = Condition('2#00####')
-
-        # when
-        c.specialize(new_condition=diff)
-
-        # then
-        assert Condition(['2', '#', '0', '0', '0', '1', '#', '1']) == c
-
-    def test_should_specialize_5(self):
-        # given
-        c = Condition(['#', '#', '#', '0', '1', '#', '0', '#'])
-        diff = Condition(['1', '0', '1', '#', '#', '0', '#', '#'])
-
-        # when
-        c.specialize(new_condition=diff)
-
-        # then
-        assert Condition(['1', '0', '1', '0', '1', '0', '0', '#']) == c
+        assert cond == Condition(_result)
 
     def test_should_match_perception(self):
         # given

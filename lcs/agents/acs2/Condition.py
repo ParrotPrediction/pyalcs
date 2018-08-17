@@ -1,3 +1,6 @@
+import random
+from typing import Callable
+
 from .. import PerceptionString
 
 
@@ -32,6 +35,23 @@ class Condition(PerceptionString):
 
     def generalize(self, position=None):
         self[position] = self.wildcard
+
+    def generalize_specific_attribute_randomly(
+            self, func: Callable = random.choice) -> None:
+        """
+        Generalizes one randomly selected specified attribute.
+
+        Parameters
+        ----------
+        func: Callable
+            Function for choosing which ID to generalize from the list of
+            available ones
+        """
+        specific_ids = [ci for ci, c in enumerate(self) if c != self.wildcard]
+
+        if len(specific_ids) > 0:
+            ridx = func(specific_ids)
+            self.generalize(ridx)
 
     def does_match(self, lst) -> bool:
         """

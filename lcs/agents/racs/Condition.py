@@ -1,4 +1,6 @@
+import random
 from copy import copy
+from typing import Callable
 
 from lcs import Perception
 from . import Configuration
@@ -29,6 +31,23 @@ class Condition(PerceptionString):
 
     def generalize(self, idx: int):
         self[idx] = self.cfg.classifier_wildcard
+
+    def generalize_specific_attribute_randomly(
+            self, func: Callable=random.choice) -> None:
+        """
+        Generalizes one randomly selected specified attribute.
+
+        Parameters
+        ----------
+        func: Callable
+            Function for choosing which ID to generalize from the list of
+            available ones
+        """
+        specific_ids = [ci for ci, c in enumerate(self) if c != self.wildcard]
+
+        if len(specific_ids) > 0:
+            ridx = func(specific_ids)
+            self.generalize(ridx)
 
     def does_match(self, perception: Perception):
         encoded_perception = map(self.cfg.encoder.encode, perception)

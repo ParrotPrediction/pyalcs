@@ -62,16 +62,14 @@ def expected_case(cl: Classifier,
 
         while no_spec + no_spec_new > cl.cfg.u_max:
             if random() < 0.5:
-                diff_idx = randint(0, no_spec_new)
-                diff.generalize(diff_idx)
+                diff.generalize_specific_attribute_randomly()
                 no_spec_new -= 1
             else:
                 if cl.generalize_unchanging_condition_attribute():
                     no_spec -= 1
     else:
         while no_spec + no_spec_new > cl.cfg.u_max:
-            diff_idx = randint(0, no_spec_new)
-            diff.generalize(diff_idx)
+            diff.generalize_specific_attribute_randomly()
             no_spec_new -= 1
 
     child.condition.specialize(new_condition=diff)

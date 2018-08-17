@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Optional, List
+import random
+from typing import Optional, List, Callable
 
 from lcs import Perception
 from lcs.representations import UBR
@@ -223,3 +224,26 @@ class Classifier:
 
     def is_marked(self):
         return self.mark.is_marked()
+
+    def generalize_unchanging_condition_attribute(
+            self, randomfunc: Callable=random.choice) -> bool:
+        """
+        Generalizes one randomly unchanging attribute in the condition.
+        An unchanging attribute is one that is anticipated not to change
+        in the effect part.
+
+        Parameters
+        ----------
+        randomfunc: Callable
+            function returning attribute index to generalize
+        Returns
+        -------
+        bool
+            True if attribute was generalized, False otherwise
+        """
+        if len(self.specified_unchanging_attributes) > 0:
+            ridx = randomfunc(self.specified_unchanging_attributes)
+            self.condition.generalize(ridx)
+            return True
+
+        return False

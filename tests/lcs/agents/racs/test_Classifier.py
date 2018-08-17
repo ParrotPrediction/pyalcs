@@ -125,6 +125,26 @@ class TestClassifier:
             assert condition_ubr.lower_bound == condition_ubr.upper_bound
             assert effect_ubr.lower_bound == effect_ubr.upper_bound
 
+    @pytest.mark.parametrize("_condition, _effect, _soa_before, _soa_after", [
+        ([UBR(4, 16), UBR(2, 16)], [UBR(0, 16), UBR(0, 16)], 2, 1),
+        ([UBR(4, 16), UBR(0, 16)], [UBR(0, 16), UBR(0, 16)], 1, 0),
+        ([UBR(0, 16), UBR(0, 16)], [UBR(0, 16), UBR(0, 16)], 0, 0),
+    ])
+    def test_should_generalize_randomly_unchanging_condition_attribute(
+            self, _condition, _effect, _soa_before, _soa_after, cfg):
+
+        # given
+        condition = Condition(_condition, cfg)
+        effect = Effect(_effect, cfg)
+        cl = Classifier(condition=condition, effect=effect, cfg=cfg)
+        assert len(cl.specified_unchanging_attributes) == _soa_before
+
+        # when
+        cl.generalize_unchanging_condition_attribute()
+
+        # then
+        assert (len(cl.specified_unchanging_attributes)) == _soa_after
+
     @staticmethod
     def _random_ubr(lower=0, upper=16):
         return UBR(random.randint(lower, upper), random.randint(lower, upper))
