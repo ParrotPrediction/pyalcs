@@ -72,7 +72,7 @@ def expected_case(cl: Classifier,
             diff.generalize_specific_attribute_randomly()
             no_spec_new -= 1
 
-    child.condition.specialize(new_condition=diff)
+    child.condition.specialize_with_condition(diff)
 
     if child.q < 0.5:
         child.q = 0.5

@@ -76,11 +76,11 @@ class TestCondition:
         assert 0 == condition.specificity
 
         # when
-        condition.specialize(2, '1')
-        condition.specialize(5, '0')
+        condition[2] = '1'
+        condition[5] = '0'
 
         # then
-        assert 2 == condition.specificity
+        assert condition.specificity == 2
 
     def test_should_get_initialized_with_str(self):
         # given
@@ -96,13 +96,15 @@ class TestCondition:
         ('####01#1', '2#00####', '2#0001#1'),
         ('###01#0#', '101##0##', '1010100#'),
     ])
-    def test_should_specialize(self, _condition, _diff, _result):
+    def test_should_specialize_with_condition(
+            self, _condition, _diff, _result):
+
         # given
         cond = Condition(_condition)
         diff = Condition(_diff)
 
         # when
-        cond.specialize(new_condition=diff)
+        cond.specialize_with_condition(diff)
 
         # then
         assert cond == Condition(_result)
@@ -116,11 +118,11 @@ class TestCondition:
         assert c.does_match(p) is True
 
         # Correct first position
-        c.specialize(0, '1')
+        c[0] = '1'
         assert c.does_match(p) is True
 
         # Expects 0 as the first condition
-        c.specialize(0, '0')
+        c[0] = '0'
         assert c.does_match(p) is False
 
         # Should fail when perception length is different
@@ -135,11 +137,11 @@ class TestCondition:
         assert c_empty.does_match(c) is True
 
         # Correct first position
-        c_empty.specialize(0, '1')
+        c_empty[0] = '1'
         assert c_empty.does_match(c) is True
 
         # Expects 0 as the first condition
-        c_empty.specialize(0, '0')
+        c_empty[0] = '0'
         assert c_empty.does_match(c) is False
 
     def test_should_match_condition_2(self):

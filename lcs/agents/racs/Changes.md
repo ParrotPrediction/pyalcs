@@ -16,3 +16,4 @@
 - Maybe effect could return just encoded value, instead of UBR...
 - Specificity/generality should measure how wide is the UBR
 - Maybe u_max should hold information how specific condition should be (not just wildcards but spread)
+- In the end of ALP phase we should perform something like classifier merge

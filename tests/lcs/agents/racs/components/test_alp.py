@@ -2,8 +2,8 @@ import pytest
 import random
 
 from lcs import Perception
-from lcs.agents.racs import Configuration, Condition, Effect, Classifier
-from lcs.agents.racs.components.alp import unexpected_case
+from lcs.agents.racs import Configuration, Condition, Effect, Mark, Classifier
+from lcs.agents.racs.components.alp import expected_case, unexpected_case
 from lcs.representations import UBR
 
 
@@ -14,6 +14,54 @@ class TestALP:
         return Configuration(classifier_length=2,
                              number_of_possible_actions=2,
                              encoder_bits=4)
+
+    def test_should_handle_expected_case_1(self, cfg):
+        # given
+        p0 = Perception([.5, .5], oktypes=(float,))
+        q = random.random()
+        cl = Classifier(quality=q, cfg=cfg)
+        time = random.randint(0, 1000)
+
+        # when
+        child = expected_case(cl, p0, time)
+
+        # then
+        # classifier is not marked - no child should be generated
+        assert child is None
+        assert cl.q > q
+
+    def test_should_handle_expected_case_2(self, cfg):
+        # given
+        p0 = Perception([.5, .5], oktypes=(float,))
+        q = random.random()
+        cl = Classifier(quality=q, cfg=cfg)
+        cl.mark[0].add(8)
+        cl.mark[1].add(8)
+        time = random.randint(0, 1000)
+
+        # when
+        child = expected_case(cl, p0, time)
+
+        # then
+        # there are no differences
+        assert child is None
+        assert cl.q > q
+
+    def test_should_handle_expected_case_3(self, cfg):
+        # given
+        p0 = Perception([.5, .5], oktypes=(float,))
+        q = 0.4
+        cl = Classifier(quality=q, cfg=cfg)
+        cl.mark[0].add(2)
+        time = random.randint(0, 1000)
+
+        # when
+        child = expected_case(cl, p0, time)
+
+        # then
+        assert child is not None
+        assert child.condition == Condition([UBR(8, 8), UBR(0, 16)], cfg)
+        assert child.q == 0.5
 
     def test_should_handle_unexpected_case_1(self, cfg):
         # given

@@ -22,6 +22,27 @@ class TestCondition:
         for allele in cond:
             assert allele == cfg.classifier_wildcard
 
+    @pytest.mark.parametrize("_init_cond, _other_cond, _result_cond", [
+        ([UBR(0, 10), UBR(5, 2)],
+         [UBR(0, 16), UBR(0, 16)],
+         [UBR(0, 10), UBR(2, 5)]),
+        ([UBR(0, 10), UBR(5, 2)],
+         [UBR(3, 12), UBR(0, 16)],
+         [UBR(3, 12), UBR(2, 5)])
+    ])
+    def test_should_specialize_with_condition(
+            self, _init_cond, _other_cond, _result_cond, cfg):
+
+        # given
+        cond = Condition(_init_cond, cfg)
+        other = Condition(_other_cond, cfg)
+
+        # when
+        cond.specialize_with_condition(other)
+
+        # then
+        assert cond == Condition(_result_cond, cfg)
+
     @pytest.mark.parametrize("_condition, _idx, _generalized", [
         ([UBR(1, 4), UBR(5, 7)], 0, [UBR(0, 16), UBR(5, 7)]),
         ([UBR(1, 4), UBR(5, 7)], 1, [UBR(1, 4), UBR(0, 16)])

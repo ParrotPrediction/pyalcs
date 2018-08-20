@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import random
 from typing import Callable
 
@@ -20,18 +22,10 @@ class Condition(PerceptionString):
         """
         return sum(1 for comp in self if comp != self.wildcard)
 
-    def specialize(self,
-                   position: int=None,
-                   value: str=None,
-                   new_condition=None):
-
-        if position is not None and value is not None:
-            self[position] = value
-
-        if new_condition is not None:
-            for idx, (oi, ni) in enumerate(zip(self, new_condition)):
-                if ni != self.wildcard:
-                    self[idx] = ni
+    def specialize_with_condition(self, other: Condition) -> None:
+        for idx, new_el in enumerate(other):
+            if new_el != self.wildcard:
+                self[idx] = new_el
 
     def generalize(self, position=None):
         self[position] = self.wildcard

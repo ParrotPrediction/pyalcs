@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import random
 from copy import copy
 from typing import Callable
@@ -28,6 +30,20 @@ class Condition(PerceptionString):
             Number of not generic (wildcards) attributes
         """
         return sum(1 for c in self if c != self.wildcard)
+
+    def specialize_with_condition(self, other: Condition) -> None:
+        """
+        Specializes the existing condition with specified attributes from
+        new condition string.
+
+        Parameters
+        ----------
+        other: Condition
+            New condition string. Most probably the diff from ALP
+        """
+        for idx, new_el in enumerate(other):
+            if new_el != self.wildcard:
+                self[idx] = new_el
 
     def generalize(self, idx: int):
         self[idx] = self.cfg.classifier_wildcard

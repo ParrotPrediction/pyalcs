@@ -197,9 +197,6 @@ class Classifier(object):
         ----------
         previous_situation: Perception
         situation: Perception
-
-        Returns
-        -------
         """
         for idx, item in enumerate(situation):
             if previous_situation[idx] != situation[idx]:
