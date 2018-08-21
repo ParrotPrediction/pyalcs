@@ -185,7 +185,8 @@ class Classifier(object):
 
     def specialize(self,
                    previous_situation: Perception,
-                   situation: Perception) -> None:
+                   situation: Perception,
+                   check_effect_wildcard=False) -> None:
         """
         Specializes the effect part where necessary to correctly anticipate
         the changes from p0 to p1 and returns a condition which specifies
@@ -197,8 +198,17 @@ class Classifier(object):
         ----------
         previous_situation: Perception
         situation: Perception
+        check_effect_wildcard: bool
+            Requires the effect attribute to be a wildcard to specialize it.
+            By default false
         """
+
         for idx, item in enumerate(situation):
+            if check_effect_wildcard:
+                if self.effect[idx] != self.cfg.classifier_wildcard:
+                    # We aren't specializing this attribute
+                    continue
+
             if previous_situation[idx] != situation[idx]:
                 self.effect[idx] = situation[idx]
                 self.condition[idx] = previous_situation[idx]

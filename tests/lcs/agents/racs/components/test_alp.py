@@ -126,5 +126,5 @@ class TestALP:
         assert child is not None
         assert child.is_marked() is False
         assert child.q == .5
-        assert child.condition == Condition([UBR(0, 16), UBR(8, 8)], cfg=cfg)
-        assert child.effect == Effect([UBR(0, 16), UBR(12, 12)], cfg=cfg)
+        assert child.condition == Condition([UBR(0, 16), UBR(0, 16)], cfg=cfg)
+        assert child.effect == Effect([UBR(0, 16), UBR(10, 14)], cfg=cfg)

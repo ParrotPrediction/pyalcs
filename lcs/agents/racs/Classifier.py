@@ -110,8 +110,9 @@ class Classifier:
         return indices
 
     def specialize(self,
-                   previous_situation: Perception,
-                   situation: Perception) -> None:
+                   p0: Perception,
+                   p1: Perception,
+                   check_effect_wildcard=False) -> None:
         """
         Specializes the effect part where necessary to correctly anticipate
         the changes from p0 to p1 and returns a condition which specifies
@@ -124,18 +125,23 @@ class Classifier:
 
         Parameters
         ----------
-        previous_situation: Perception
+        p0: Perception
             previous raw perception obtained from environment
-        situation: Perception
+        p1: Perception
             current raw perception obtained from environment
-
-        Returns
-        -------
+        check_effect_wildcard: bool
+            Requires the effect attribute to be a wildcard to specialize it.
+            By default false
         """
-        p0_enc = list(map(self.cfg.encoder.encode, previous_situation))
-        p1_enc = list(map(self.cfg.encoder.encode, situation))
+        p0_enc = list(map(self.cfg.encoder.encode, p0))
+        p1_enc = list(map(self.cfg.encoder.encode, p1))
 
         for idx, item in enumerate(p1_enc):
+            if check_effect_wildcard:
+                if self.effect[idx] != self.cfg.classifier_wildcard:
+                    # We aren't specializing this attribute
+                    continue
+
             if p0_enc[idx] != p1_enc[idx]:
                 self.effect[idx] = UBR(p1_enc[idx], p1_enc[idx])
                 self.condition[idx] = UBR(p0_enc[idx], p0_enc[idx])

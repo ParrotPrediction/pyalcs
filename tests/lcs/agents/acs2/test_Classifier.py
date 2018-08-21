@@ -228,50 +228,65 @@ class TestClassifier:
         # then
         assert cls.does_anticipate_correctly(p0, p1) is False
 
-    def test_should_specialize_1(self, cfg):
-        # given
-        cls = Classifier(cfg=cfg)
-        p0 = Perception('00001111')
-        p1 = Perception('00001111')
-
-        # when
-        cls.specialize(p0, p1)
-
-        # then
-        assert Condition('########') == cls.condition
-        assert Effect('########') == cls.effect
-
-    def test_should_specialize_2(self, cfg):
-        # given
-        cls = Classifier(cfg=cfg)
-        p0 = Perception('00001111')
-        p1 = Perception('00011111')
-
-        # when
-        cls.specialize(p0, p1)
-
-        # then
-        assert Condition('###0####') == cls.condition
-        assert Effect('###1####') == cls.effect
-
-    def test_should_specialize_3(self, cfg):
+    @pytest.mark.parametrize("_p0, _p1,"
+                             "_init_cond, _init_effect,"
+                             "_res_cond, _res_effect", [
+                                 ('00001111', '00001111',
+                                  '########', '########',
+                                  '########', '########'),
+                                 ('00001111', '00011111',
+                                  '########', '########',
+                                  '###0####', '###1####'),
+                                 ('01110111', '10101010',
+                                  '01#####1', '10#####0',
+                                  '01#101#1', '10#010#0')])
+    def test_should_specialize(self,
+                               _p0, _p1,
+                               _init_cond, _init_effect,
+                               _res_cond, _res_effect, cfg):
         # given
         cls = Classifier(
-            condition=Condition('01#####1'),
-            effect=Effect('10#####0'),
+            condition=Condition(_init_cond),
+            effect=Effect(_init_effect),
             cfg=cfg)
-        p0 = Perception('01110111')
-        p1 = Perception('10101010')
+        p0 = Perception(_p0)
+        p1 = Perception(_p1)
 
         # when
-        cls.specialize(p0, p1)
+        cls.specialize(p0, p1, check_effect_wildcard=False)
 
         # then
-        assert 6 == cls.condition.specificity
-        assert Condition('01#101#1') == cls.condition
+        assert cls.condition == Condition(_res_cond)
+        assert cls.effect == Effect(_res_effect)
 
-        assert 6 == cls.effect.number_of_specified_elements
-        assert Effect('10#010#0', cfg) == cls.effect
+    @pytest.mark.parametrize("_p0, _p1,"
+                             "_init_cond, _init_effect,"
+                             "_res_cond, _res_effect", [
+                                 ('00001111', '00001111',
+                                  '########', '########',
+                                  '########', '########'),
+                                 ('00001111', '00001111',
+                                  '########', '1#######',
+                                  '########', '1#######'),
+                             ])
+    def test_should_specialize_wrt_wildcards(self,
+                                             _p0, _p1,
+                                             _init_cond, _init_effect,
+                                             _res_cond, _res_effect, cfg):
+        # given
+        cls = Classifier(
+            condition=Condition(_init_cond),
+            effect=Effect(_init_effect),
+            cfg=cfg)
+        p0 = Perception(_p0)
+        p1 = Perception(_p1)
+
+        # when
+        cls.specialize(p0, p1, check_effect_wildcard=True)
+
+        # then
+        assert cls.condition == Condition(_res_cond)
+        assert cls.effect == Effect(_res_effect)
 
     @pytest.mark.parametrize("_condition, _effect, _sua", [
         ('######0#', '########', 1),
@@ -555,6 +570,7 @@ class TestClassifier:
     ])
     def test_should_detect_more_general_classifier(
             self, _c1_condition, _c2_condition, _result, cfg):
+
         # given
         c1 = Classifier(condition=_c1_condition, cfg=cfg)
         c2 = Classifier(condition=_c2_condition, cfg=cfg)

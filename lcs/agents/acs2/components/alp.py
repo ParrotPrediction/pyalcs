@@ -1,38 +1,52 @@
-from random import random, randint
+from random import random
 from typing import Optional
 
 from lcs import Perception
 from lcs.agents.acs2 import Classifier, Configuration
 
 
-def cover(previous_situation: Perception,
+def cover(p0: Perception,
           action: int,
-          situation: Perception,
+          p1: Perception,
           time: int,
           cfg: Configuration) -> Classifier:
     """
     Covering - creates a classifier that anticipates a change correctly.
+    The reward of the new classifier is set to 0 to prevent *reward bubbles*
+    in the environmental model.
 
-    :param previous_situation:
-    :param action:
-    :param situation:
-    :param time: current epoch
-    :param cfg: configuration
+    Parameters
+    ----------
+    p0: Perception
+        previous perception
+    action: int
+        chosen action
+    p1: Perception
+        current perception
+    time: int
+        current epoch
+    cfg: Configuration
+        algorithm configuration class
 
-    :return: new classifier
+    Returns
+    -------
+    Classifier
+        new classifier
     """
-    new_cl = Classifier(action=action, cfg=cfg)
-    # TODO: p5 exp=0, r=0 (paper)
+    # In paper it's advised to set experience and reward of newly generated
+    # classifier to 0. However in original code these values are initialized
+    # with defaults 1 and 0.5 correspondingly.
+    new_cl = Classifier(action=action, experience=0, reward=0, cfg=cfg)
     new_cl.tga = time
     new_cl.talp = time
 
-    new_cl.specialize(previous_situation, situation)
+    new_cl.specialize(p0, p1)
 
     return new_cl
 
 
 def expected_case(cl: Classifier,
-                  perception: Perception,
+                  p0: Perception,
                   time: int) -> Optional[Classifier]:
     """
     Controls the expected case of a classifier. If the classifier
@@ -40,11 +54,11 @@ def expected_case(cl: Classifier,
     generalizing some attributes.
 
     :param cl:
-    :param perception:
+    :param p0:
     :param time:
     :return: new classifier or None
     """
-    diff = cl.mark.get_differences(perception)
+    diff = cl.mark.get_differences(p0)
 
     if diff.specificity == 0:
         cl.increase_quality()
@@ -81,30 +95,29 @@ def expected_case(cl: Classifier,
 
 
 def unexpected_case(cl: Classifier,
-                    previous_perception: Perception,
-                    perception: Perception,
+                    p0: Perception,
+                    p1: Perception,
                     time: int) -> Optional[Classifier]:
     """
     Controls the unexpected case of the classifier.
 
     :param cl:
-    :param previous_perception:
-    :param perception:
+    :param p0:
+    :param p1:
     :param time:
     :return: specialized classifier if generation was possible,
     None otherwise
     """
     cl.decrease_quality()
-    cl.set_mark(previous_perception)
+    cl.set_mark(p0)
 
     # Return if the effect is not specializable
-    if not cl.effect.is_specializable(previous_perception, perception):
+    if not cl.effect.is_specializable(p0, p1):
         return None
 
     child = cl.copy_from(cl, time)
 
-    # TODO: p5 maybe also take into consideration cl.E = # (paper)
-    child.specialize(previous_perception, perception)
+    child.specialize(p0, p1, check_effect_wildcard=True)
 
     if child.q < 0.5:
         child.q = 0.5

@@ -6,10 +6,10 @@ from lcs.agents.racs import Classifier
 
 
 def expected_case(cl: Classifier,
-                  perception: Perception,
+                  p0: Perception,
                   time: int) -> Optional[Classifier]:
 
-    diff = cl.mark.get_differences(perception)
+    diff = cl.mark.get_differences(p0)
 
     if diff.specificity == 0:
         cl.increase_quality()
@@ -46,8 +46,8 @@ def expected_case(cl: Classifier,
 
 
 def unexpected_case(cl: Classifier,
-                    previous_perception: Perception,
-                    perception: Perception,
+                    p0: Perception,
+                    p1: Perception,
                     time: int) -> Optional[Classifier]:
     """
     The classifier does not anticipate the resulting state correctly.
@@ -61,9 +61,9 @@ def unexpected_case(cl: Classifier,
     ----------
     cl: Classifier
         Classifier object
-    previous_perception:
+    p0: Perception
         previous situation
-    perception: Perception
+    p1: Perception
         current situation
     time:
         current epoch
@@ -74,14 +74,13 @@ def unexpected_case(cl: Classifier,
         If possible to specialize parent, None otherwise
     """
     cl.decrease_quality()
-    cl.set_mark(previous_perception)
+    cl.set_mark(p0)
 
-    if not cl.effect.is_specializable(previous_perception, perception):
+    if not cl.effect.is_specializable(p0, p1):
         return None
 
-    # TODO: p5 maybe also take into consideration cl.E = # (paper)
     child = cl.copy_from(cl, time)
-    child.specialize(previous_perception, perception)
+    child.specialize(p0, p1, check_effect_wildcard=True)
 
     if child.q < .5:
         child.q = .5

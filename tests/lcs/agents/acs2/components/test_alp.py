@@ -1,4 +1,5 @@
 import pytest
+import random
 
 from lcs import Perception
 from lcs.agents.acs2 import Configuration, Classifier, \
@@ -287,23 +288,23 @@ class TestALP:
 
     def test_should_create_new_classifier_using_covering(self, cfg):
         # given
-        action_no = 2
-        time = 123
+        action = random.randint(0, cfg.number_of_possible_actions)
+        time = random.randint(0, 1000)
         p0 = Perception('01001101')
         p1 = Perception('00011111')
 
         # when
-        new_cl = cover(p0, action_no, p1, time, cfg)
+        new_cl = cover(p0, action, p1, time, cfg)
 
         # then
-        assert Condition('#1#0##0#') == new_cl.condition
-        assert 2 == new_cl.action
-        assert Effect('#0#1##1#') == new_cl.effect
-        assert 0.5 == new_cl.q
-        assert 0.5 == new_cl.r
-        assert 0 == new_cl.ir
-        assert 0 == new_cl.tav
-        assert time == new_cl.tga
-        assert time == new_cl.talp
-        assert 1 == new_cl.num
-        assert 1 == new_cl.exp
+        assert new_cl.condition == Condition('#1#0##0#')
+        assert new_cl.action == action
+        assert new_cl.effect == Effect('#0#1##1#')
+        assert new_cl.q == .5
+        assert new_cl.r == 0
+        assert new_cl.ir == 0
+        assert new_cl.tav == 0
+        assert new_cl.tga == time
+        assert new_cl.talp == time
+        assert new_cl.num == 1
+        assert new_cl.exp == 0
