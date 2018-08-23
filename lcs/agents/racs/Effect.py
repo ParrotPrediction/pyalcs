@@ -34,12 +34,6 @@ class Effect(PerceptionString):
                   in range(cfg.classifier_length)]
         return cls(ps_str, cfg)
 
-    def does_anticipate_correctly(self,
-                                  previous_situation: Perception,
-                                  situation: Perception) -> bool:
-        # TODO: implement
-        raise NotImplementedError()
-
     def is_specializable(self, p0: Perception, p1: Perception) -> bool:
         """
         Determines if the effect part can be modified to anticipate

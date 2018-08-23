@@ -112,7 +112,7 @@ class Classifier:
     def specialize(self,
                    p0: Perception,
                    p1: Perception,
-                   check_effect_wildcard=False) -> None:
+                   leave_specialized=False) -> None:
         """
         Specializes the effect part where necessary to correctly anticipate
         the changes from p0 to p1 and returns a condition which specifies
@@ -129,7 +129,7 @@ class Classifier:
             previous raw perception obtained from environment
         p1: Perception
             current raw perception obtained from environment
-        check_effect_wildcard: bool
+        leave_specialized: bool
             Requires the effect attribute to be a wildcard to specialize it.
             By default false
         """
@@ -137,14 +137,17 @@ class Classifier:
         p1_enc = list(map(self.cfg.encoder.encode, p1))
 
         for idx, item in enumerate(p1_enc):
-            if check_effect_wildcard:
+            if leave_specialized:
                 if self.effect[idx] != self.cfg.classifier_wildcard:
-                    # We aren't specializing this attribute
+                    # If we have a specialized attribute don't change it.
                     continue
 
             if p0_enc[idx] != p1_enc[idx]:
                 self.effect[idx] = UBR(p1_enc[idx], p1_enc[idx])
                 self.condition[idx] = UBR(p0_enc[idx], p0_enc[idx])
+
+    def is_inadequate(self):
+        return self.q < self.cfg.theta_i
 
     def increase_experience(self) -> int:
         self.exp += 1
@@ -179,18 +182,16 @@ class Classifier:
         p0_enc = list(map(self.cfg.encoder.encode, previous_situation))
         p1_enc = list(map(self.cfg.encoder.encode, situation))
 
-        # FIXME: Think - in this proposition there is no idea of an wildcard.
-        # However it works fine. Will see later. There might be a problem
-        # that for very wide Effect (wildcard) everything will be accepted as
-        # correctly anticipated. So some specialization pressure needs to be
-        # applied
-
         for idx, eitem in enumerate(self.effect):
-            if p1_enc[idx] in eitem:
-                if p0_enc[idx] == p1_enc[idx]:
-                    pass
+            if eitem == self.cfg.classifier_wildcard:
+                if p0_enc[idx] != p1_enc[idx]:
+                    return False
             else:
-                return False
+                if p0_enc[idx] == p1_enc[idx]:
+                    return False
+
+                if p1_enc[idx] not in eitem:
+                    return False
 
         return True
 

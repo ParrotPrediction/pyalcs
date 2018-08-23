@@ -93,3 +93,31 @@ class TestTypedList:
         # then
         assert len(lst) == 2
         assert 1 not in lst
+
+    def test_should_extend_list(self):
+        # given
+        lst1 = TypedList((int,), *[1, 2, 3])
+        lst2 = TypedList((int,), *[4, 5])
+
+        # when
+        lst1.extend(lst2)
+
+        # then
+        extended = TypedList((int,), *[1, 2, 3, 4, 5])
+        assert lst1 == extended
+
+    @pytest.mark.parametrize("_type, _init, _del, _result", [
+        (str, ['a', 'b', 'c'], 'd', ['a', 'b', 'c']),
+        (str, ['a', 'b', 'c'], 'b', ['a', 'c']),
+        (int, [1, 2, 3], 1, [2, 3]),
+    ])
+    def test_should_safe_remove_items(self, _type, _init, _del, _result):
+        # given
+        lst = TypedList((_type,), *_init)
+
+        # when
+        lst.safe_remove(_del)
+
+        # then
+        result = TypedList((_type,), *_result)
+        assert lst == result

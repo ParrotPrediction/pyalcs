@@ -117,7 +117,7 @@ def unexpected_case(cl: Classifier,
 
     child = cl.copy_from(cl, time)
 
-    child.specialize(p0, p1, check_effect_wildcard=True)
+    child.specialize(p0, p1, leave_specialized=True)
 
     if child.q < 0.5:
         child.q = 0.5

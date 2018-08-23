@@ -18,6 +18,12 @@ class TypedList(collections.abc.MutableSequence):
         check_types(self.oktypes, o)
         self._items.insert(index, o)
 
+    def safe_remove(self, o) -> None:
+        try:
+            self.remove(o)
+        except ValueError:
+            pass
+
     def __setitem__(self, i, o):
         check_types(self.oktypes, o)
         self._items[i] = o
@@ -30,3 +36,10 @@ class TypedList(collections.abc.MutableSequence):
 
     def __len__(self) -> int:
         return len(self._items)
+
+    def __hash__(self):
+        return hash((self.oktypes, self._items))
+
+    def __eq__(self, o) -> bool:
+        return self.oktypes == o.oktypes \
+            and self._items == o._items

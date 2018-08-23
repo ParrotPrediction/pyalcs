@@ -31,6 +31,8 @@ class TestClassifier:
         (None, [0.5, 0.5], [0.5, 0.5], True),
         ([UBR(0, 16), UBR(10, 12)], [0.5, 0.5], [0.5, 0.5], False),
         ([UBR(0, 4), UBR(10, 12)], [0.8, 0.8], [0.2, 0.7], True),
+        # second perception attribute is unchanged - should be a wildcard
+        ([UBR(0, 4), UBR(10, 12)], [0.8, 0.8], [0.2, 0.8], False),
     ])
     def test_should_anticipate_change(self, _effect, _p0, _p1, _result, cfg):
         # given
@@ -41,6 +43,18 @@ class TestClassifier:
 
         # then
         assert c.does_anticipate_correctly(p0, p1) is _result
+
+    @pytest.mark.parametrize("_q, _inadequate", [
+        (.5, False),
+        (.1, False),
+        (.09, True),
+    ])
+    def test_should_detect_inadequate(self, _q, _inadequate, cfg):
+        # given
+        cl = Classifier(quality=_q, cfg=cfg)
+
+        # then
+        assert cl.is_inadequate() is _inadequate
 
     def test_should_increase_quality(self, cfg):
         # given

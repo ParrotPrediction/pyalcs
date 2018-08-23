@@ -40,7 +40,7 @@ class Configuration:
         :param do_subsumption:
         :param beta:
         :param gamma:
-        :param theta_i:
+        :param theta_i: inadequacy threshold
         :param theta_r:
         :param epsilon:
         :param u_max:

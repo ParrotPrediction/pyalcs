@@ -8,6 +8,7 @@ class Configuration:
                  number_of_possible_actions: int,
                  encoder_bits: int,
                  beta=0.05,
+                 theta_i=0.1,
                  u_max=100000,) -> None:
 
         self.oktypes = (UBR,)
@@ -18,4 +19,5 @@ class Configuration:
         self.classifier_wildcard = UBR(*self.encoder.range)
 
         self.beta = beta
+        self.theta_i = theta_i
         self.u_max = u_max

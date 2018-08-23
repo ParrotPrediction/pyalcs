@@ -2,8 +2,9 @@ import pytest
 import random
 
 from lcs import Perception
-from lcs.agents.racs import Configuration, Condition, Effect, Mark, Classifier
-from lcs.agents.racs.components.alp import expected_case, unexpected_case
+from lcs.agents.racs import Configuration, Condition, Effect, Classifier
+from lcs.agents.racs.components.alp \
+    import cover, expected_case, unexpected_case
 from lcs.representations import UBR
 
 
@@ -128,3 +129,35 @@ class TestALP:
         assert child.q == .5
         assert child.condition == Condition([UBR(0, 16), UBR(0, 16)], cfg=cfg)
         assert child.effect == Effect([UBR(0, 16), UBR(10, 14)], cfg=cfg)
+
+    @pytest.mark.parametrize("_p0, _p1, _child_cond, _child_effect", [
+        ([.5, .5], [.5, .5],
+         [UBR(0, 16), UBR(0, 16)], [UBR(0, 16), UBR(0, 16)]),
+        ([.4, .5], [.9, .5],
+         [UBR(6, 6), UBR(0, 16)], [UBR(14, 14), UBR(0, 16)]),
+    ])
+    def test_should_create_new_classifier_with_covering(
+            self, _p0, _p1, _child_cond, _child_effect, cfg):
+
+        # given
+        p0 = Perception(_p0, oktypes=(float,))
+        p1 = Perception(_p1, oktypes=(float,))
+        action = random.randint(0, cfg.number_of_possible_actions)
+        time = random.randint(0, 100)
+
+        # when
+        new_cl = cover(p0, action, p1, time, cfg)
+
+        # then
+        assert new_cl is not None
+        assert new_cl.condition == Condition(_child_cond, cfg)
+        assert new_cl.action == action
+        assert new_cl.effect == Effect(_child_effect, cfg)
+        assert new_cl.q == .5
+        assert new_cl.r == 0
+        assert new_cl.ir == 0
+        assert new_cl.tav == 0
+        assert new_cl.tga == time
+        assert new_cl.talp == time
+        # assert new_cl.num == 1
+        assert new_cl.exp == 0

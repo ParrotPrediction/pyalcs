@@ -12,6 +12,7 @@ from lcs.agents.acs2.components.genetic_algorithm \
 from . import Classifier, Configuration
 
 
+# TODO: inherit from TypedList
 class ClassifiersList(list):
     """
     Represents overall population, match/action sets

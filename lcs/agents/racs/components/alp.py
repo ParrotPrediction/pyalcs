@@ -2,7 +2,47 @@ from typing import Optional
 import random
 
 from lcs import Perception
-from lcs.agents.racs import Classifier
+from lcs.agents.racs import Configuration, Classifier
+
+
+def cover(p0: Perception,
+          action: int,
+          p1: Perception,
+          time: int,
+          cfg: Configuration) -> Classifier:
+    """
+    Covering - creates a classifier that anticipates a change correctly.
+    The reward of the new classifier is set to 0 to prevent *reward bubbles*
+    in the environmental model.
+
+    Parameters
+    ----------
+    p0: Perception
+        previous perception
+    action: int
+        chosen action
+    p1: Perception
+        current perception
+    time: int
+        current epoch
+    cfg: Configuration
+        algorithm configuration class
+
+    Returns
+    -------
+    Classifier
+        new classifier
+    """
+    # In paper it's advised to set experience and reward of newly generated
+    # classifier to 0. However in original code these values are initialized
+    # with defaults 1 and 0.5 correspondingly.
+    new_cl = Classifier(action=action, experience=0, reward=0, cfg=cfg)
+    new_cl.tga = time
+    new_cl.talp = time
+
+    new_cl.specialize(p0, p1)
+
+    return new_cl
 
 
 def expected_case(cl: Classifier,
@@ -80,7 +120,7 @@ def unexpected_case(cl: Classifier,
         return None
 
     child = cl.copy_from(cl, time)
-    child.specialize(p0, p1, check_effect_wildcard=True)
+    child.specialize(p0, p1, leave_specialized=True)
 
     if child.q < .5:
         child.q = .5

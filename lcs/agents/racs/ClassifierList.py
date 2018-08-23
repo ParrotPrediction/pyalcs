@@ -45,4 +45,17 @@ class ClassifierList(TypedList):
                                          previous_situation,
                                          situation,
                                          time)
+                if cl.is_inadequate():
+                    delete_counter += 1
+                    for lst in [population, match_set, self]:
+                        lst.safe_remove(cl)
+
+            if new_cl is not None:
+                new_cl.tga = time
+
                 # TODO: continue from here
+
+    def add_alp_classifier(self,
+                           child: Classifier,
+                           new_list: ClassifierList):
+        raise NotImplementedError

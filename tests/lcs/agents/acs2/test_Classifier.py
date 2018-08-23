@@ -253,7 +253,7 @@ class TestClassifier:
         p1 = Perception(_p1)
 
         # when
-        cls.specialize(p0, p1, check_effect_wildcard=False)
+        cls.specialize(p0, p1, leave_specialized=False)
 
         # then
         assert cls.condition == Condition(_res_cond)
@@ -282,7 +282,7 @@ class TestClassifier:
         p1 = Perception(_p1)
 
         # when
-        cls.specialize(p0, p1, check_effect_wildcard=True)
+        cls.specialize(p0, p1, leave_specialized=True)
 
         # then
         assert cls.condition == Condition(_res_cond)
