@@ -29,7 +29,7 @@ class TestClassifier:
     @pytest.mark.parametrize("_effect, _p0, _p1, _result", [
         # Classifier with default pass-through effect
         (None, [0.5, 0.5], [0.5, 0.5], True),
-        ([UBR(0, 16), UBR(10, 12)], [0.5, 0.5], [0.5, 0.5], False),
+        ([UBR(0, 15), UBR(10, 12)], [0.5, 0.5], [0.5, 0.5], False),
         ([UBR(0, 4), UBR(10, 12)], [0.8, 0.8], [0.2, 0.7], True),
         # second perception attribute is unchanged - should be a wildcard
         ([UBR(0, 4), UBR(10, 12)], [0.8, 0.8], [0.2, 0.8], False),
@@ -79,11 +79,11 @@ class TestClassifier:
         assert cl.q == 0.475
 
     @pytest.mark.parametrize("_condition, _effect, _sua", [
-        ([UBR(4, 16), UBR(2, 16)], [UBR(0, 16), UBR(0, 16)], 2),
-        ([UBR(4, 16), UBR(0, 16)], [UBR(0, 16), UBR(0, 16)], 1),
-        ([UBR(0, 16), UBR(0, 16)], [UBR(0, 16), UBR(0, 16)], 0),
-        ([UBR(4, 16), UBR(0, 16)], [UBR(0, 16), UBR(5, 16)], 1),
-        ([UBR(4, 16), UBR(6, 16)], [UBR(4, 16), UBR(6, 16)], 0),
+        ([UBR(4, 15), UBR(2, 15)], [UBR(0, 15), UBR(0, 15)], 2),
+        ([UBR(4, 15), UBR(0, 15)], [UBR(0, 15), UBR(0, 15)], 1),
+        ([UBR(0, 15), UBR(0, 15)], [UBR(0, 15), UBR(0, 15)], 0),
+        ([UBR(4, 15), UBR(0, 15)], [UBR(0, 15), UBR(5, 15)], 1),
+        ([UBR(4, 15), UBR(6, 15)], [UBR(4, 15), UBR(6, 15)], 0),
     ])
     def test_should_count_specified_unchanging_attributes(
             self, _condition, _effect, _sua, cfg):
@@ -140,9 +140,9 @@ class TestClassifier:
             assert effect_ubr.lower_bound == effect_ubr.upper_bound
 
     @pytest.mark.parametrize("_condition, _effect, _soa_before, _soa_after", [
-        ([UBR(4, 16), UBR(2, 16)], [UBR(0, 16), UBR(0, 16)], 2, 1),
-        ([UBR(4, 16), UBR(0, 16)], [UBR(0, 16), UBR(0, 16)], 1, 0),
-        ([UBR(0, 16), UBR(0, 16)], [UBR(0, 16), UBR(0, 16)], 0, 0),
+        ([UBR(4, 15), UBR(2, 15)], [UBR(0, 15), UBR(0, 15)], 2, 1),
+        ([UBR(4, 15), UBR(0, 15)], [UBR(0, 15), UBR(0, 15)], 1, 0),
+        ([UBR(0, 15), UBR(0, 15)], [UBR(0, 15), UBR(0, 15)], 0, 0),
     ])
     def test_should_generalize_randomly_unchanging_condition_attribute(
             self, _condition, _effect, _soa_before, _soa_after, cfg):
@@ -160,5 +160,5 @@ class TestClassifier:
         assert (len(cl.specified_unchanging_attributes)) == _soa_after
 
     @staticmethod
-    def _random_ubr(lower=0, upper=16):
+    def _random_ubr(lower=0, upper=15):
         return UBR(random.randint(lower, upper), random.randint(lower, upper))

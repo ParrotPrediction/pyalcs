@@ -206,39 +206,40 @@ class ClassifiersList(TypedList):
 
     def add_alp_classifier(self,
                            child: Classifier,
-                           new_list: ClassifiersList):
+                           new_list: ClassifiersList) -> None:
         """
         Looks for subsuming / similar classifiers in the current set.
         If no appropriate classifier was found, the `child_cl` is added to
         `new_list`.
 
-        :param child:
-        :param new_list:
-        :return: True if an appropriate old classifier was found,
-        false otherwise
+        Parameters
+        ----------
+        child:  Classifier
+            New classifier to examine
+        new_list: ClassifiersList
+            A list of newly created classifiers in this ALP run
+
         """
         # TODO: p0: write tests
         old_cl = None
 
-        # Look if there is a classifier that subsumes the insertion
-        # candidate
-        for classifier in self:
-            if classifier.does_subsume(child):
-                if old_cl is None or classifier.is_more_general(old_cl):
-                    old_cl = classifier
+        # Look if there is a classifier that subsumes the insertion candidate
+        for cl in self:
+            if cl.does_subsume(child):
+                if old_cl is None or cl.is_more_general(old_cl):
+                    old_cl = cl
 
-                    # Check if any similar classifier wasn't in this
-                    # ALP application
+        # Check if any similar classifier was in this ALP run
         if old_cl is None:
-            for classifier in new_list:
-                if classifier.is_similar(child):
-                    old_cl = classifier
+            for cl in new_list:
+                if cl.is_similar(child):
+                    old_cl = cl
 
         # Check if there is similar classifier already
         if old_cl is None:
-            for classifier in self:
-                if classifier.is_similar(child):
-                    old_cl = classifier
+            for cl in self:
+                if cl.is_similar(child):
+                    old_cl = cl
 
         if old_cl is None:
             new_list.append(child)

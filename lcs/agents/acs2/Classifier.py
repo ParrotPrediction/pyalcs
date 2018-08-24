@@ -334,7 +334,8 @@ class Classifier(object):
 
     def is_more_general(self, other: Classifier) -> bool:
         """
-        Checks if the classifier is formally more general than `other`.
+        Checks if the classifiers condition is formally
+        more general than `other`s.
 
         Parameters
         ----------
@@ -346,10 +347,7 @@ class Classifier(object):
         bool
             True if `other` classifier is more general
         """
-        if self.condition.specificity < other.condition.specificity:
-            return True
-
-        return False
+        return self.condition.specificity < other.condition.specificity
 
     def generalize_unchanging_condition_attribute(
             self, randomfunc: Callable=random.choice) -> bool:

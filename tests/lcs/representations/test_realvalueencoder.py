@@ -44,8 +44,8 @@ class TestRealValueEncoder:
 
         # then
         assert 0 == encoder.encode(0.0)
-        assert 8 == encoder.encode(0.5)
-        assert 16 == encoder.encode(1.0)
+        assert 7 == encoder.encode(0.5)
+        assert 15 == encoder.encode(1.0)
 
     def test_should_decode_values(self):
         # given
@@ -54,8 +54,8 @@ class TestRealValueEncoder:
 
         # then
         assert 0.0 == encoder.decode(0)
-        assert 0.5 == encoder.decode(8)
-        assert 1.0 == encoder.decode(16)
+        assert abs(0.5 - encoder.decode(7)) < 0.05
+        assert 1.0 == encoder.decode(15)
 
     def test_should_encode_and_decode_approximately(self):
         # given
@@ -70,13 +70,18 @@ class TestRealValueEncoder:
         # then
         assert abs(observation - decoded) < epsilon
 
-    def test_should_return_min_max_range(self):
+    @pytest.mark.parametrize("_bits, _min_range, _max_range", [
+        (2, 0, 3),
+        (4, 0, 15),
+        (8, 0, 255)
+    ])
+    def test_should_return_min_max_range(self, _bits, _min_range, _max_range):
         # given
-        encoder = RealValueEncoder(8)
+        encoder = RealValueEncoder(_bits)
 
         # when
         min_val, max_val = encoder.range
 
         # then
-        assert min_val == 0
-        assert max_val == 256
+        assert min_val == _min_range
+        assert max_val == _max_range

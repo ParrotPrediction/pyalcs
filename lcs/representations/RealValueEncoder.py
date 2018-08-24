@@ -14,7 +14,7 @@ class RealValueEncoder:
         x\prime = \frac{x - \textrm{min}(x)} {\textrm{max}(x)-\textrm{min}(x)}
     """
     def __init__(self, resolution_bits: int) -> None:
-        self.resolution = pow(2, resolution_bits)
+        self.resolution = pow(2, resolution_bits) - 1
 
     @property
     def range(self) -> Tuple[int, int]:

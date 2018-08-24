@@ -10,12 +10,16 @@ class UBR:
     x2: int
 
     @property
-    def lower_bound(self):
+    def lower_bound(self) -> int:
         return min(self.x1, self.x2)
 
     @property
-    def upper_bound(self):
+    def upper_bound(self) -> int:
         return max(self.x1, self.x2)
+
+    @property
+    def bound_span(self) -> int:
+        return sum(1 for _ in range(self.lower_bound, self.upper_bound))
 
     def __contains__(self, item):
         return self.lower_bound <= item <= self.upper_bound

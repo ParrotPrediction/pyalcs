@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import random
+import statistics
 from copy import copy
 from typing import Callable
 
@@ -30,6 +31,22 @@ class Condition(PerceptionString):
             Number of not generic (wildcards) attributes
         """
         return sum(1 for c in self if c != self.wildcard)
+
+    @property
+    def cover_ratio(self) -> float:
+        """
+        Calculates the perception space covered by condition attribute.
+        An arithmetic average is taken over all condition attributes
+
+        Returns
+        -------
+        float
+            A value between [0.0, 1.0], where
+            0.0 means that condition is extremely narrow
+            1.0 means that condition is maximally general
+        """
+        maximum_span = self.cfg.encoder.range[1]
+        return statistics.mean(r.bound_span / maximum_span for r in self)
 
     def specialize_with_condition(self, other: Condition) -> None:
         """

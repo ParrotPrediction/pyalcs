@@ -39,7 +39,7 @@ class TestMark:
 
     @pytest.mark.parametrize("initmark, perception, changed", [
         ([[], []], [0.5, 0.5], False),  # shouldn't set mark if empty
-        ([[8], []], [0.5, 0.5], False),  # encoded value already marked
+        ([[7], []], [0.5, 0.5], False),  # encoded value already marked
         ([[5], []], [0.5, 0.5], True)
     ])
     def test_should_complement_mark(self, initmark, perception, changed, cfg):
@@ -59,7 +59,7 @@ class TestMark:
         # not marked, specified condition, shouldn't get marked
         ([[], []], [0.5, 0.5], [UBR(1, 3), UBR(2, 3)], 0),
         # not marked, one don't care, should mark one
-        ([[], []], [0.5, 0.5], [UBR(1, 3), UBR(0, 16)], 1),
+        ([[], []], [0.5, 0.5], [UBR(1, 3), UBR(0, 15)], 1),
         # already marked, should use perception, one mark
         ([[4], []], [0.5, 0.5], [], 1),
     ])
@@ -94,7 +94,7 @@ class TestMark:
         # One perception is marked - the other should be specified
         ([[8], [4]], [.5, .5], 1),
         # Both perceptions are marked - no differences
-        ([[8], [8]], [.5, .5], 0)
+        ([[7], [7]], [.5, .5], 0)
     ])
     def test_should_handle_unique_differences(self, _m, _p0, _specif, cfg):
         # given
@@ -114,7 +114,7 @@ class TestMark:
         ([[1, 2], [8]], [.5, .5], 1),
         # Two fuzzy attributes (containing perception value) - both
         # should be specified
-        ([[6, 8], [7, 8]], [.5, .5], 2),
+        ([[6, 7], [5, 7]], [.5, .5], 2),
         # Two fuzzy attributes - but one is unique (does not contain
         # perception)
         ([[6, 8], [7, 9]], [.5, .5], 1),

@@ -6,6 +6,9 @@
 ## Classifier
 - `Specialize` creates a fixed, narrow UBR like `UBR(4, 4)`. Later on during another processes it can be generalized more.
 
+## Condition
+- `cover_ratio`
+
 ## Mark
 - Mark holds a set of encoded perception values that holds bad states for classifier
 

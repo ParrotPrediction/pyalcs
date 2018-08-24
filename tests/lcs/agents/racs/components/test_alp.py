@@ -36,8 +36,8 @@ class TestALP:
         p0 = Perception([.5, .5], oktypes=(float,))
         q = random.random()
         cl = Classifier(quality=q, cfg=cfg)
-        cl.mark[0].add(8)
-        cl.mark[1].add(8)
+        cl.mark[0].add(7)
+        cl.mark[1].add(7)
         time = random.randint(0, 1000)
 
         # when
@@ -61,7 +61,7 @@ class TestALP:
 
         # then
         assert child is not None
-        assert child.condition == Condition([UBR(8, 8), UBR(0, 16)], cfg)
+        assert child.condition == Condition([UBR(7, 7), UBR(0, 15)], cfg)
         assert child.q == 0.5
 
     def test_should_handle_unexpected_case_1(self, cfg):
@@ -69,7 +69,7 @@ class TestALP:
         p0 = Perception([.5, .5], oktypes=(float,))
         p1 = Perception([.5, .5], oktypes=(float,))
         # Effect is all pass-through. Can be specialized.
-        effect = Effect([UBR(0, 16), UBR(0, 16)], cfg=cfg)
+        effect = Effect([UBR(0, 15), UBR(0, 15)], cfg=cfg)
         quality = .4
         time = random.randint(0, 1000)
         cl = Classifier(effect=effect, quality=quality, cfg=cfg)
@@ -85,15 +85,15 @@ class TestALP:
         assert child.talp == time
         # There is no change in perception so the child condition
         # and effect should stay the same.
-        assert child.condition == Condition([UBR(0, 16), UBR(0, 16)], cfg=cfg)
-        assert child.effect == Effect([UBR(0, 16), UBR(0, 16)], cfg=cfg)
+        assert child.condition == Condition([UBR(0, 15), UBR(0, 15)], cfg=cfg)
+        assert child.effect == Effect([UBR(0, 15), UBR(0, 15)], cfg=cfg)
 
     def test_should_handle_unexpected_case_2(self, cfg):
         # given
         p0 = Perception([.5, .5], oktypes=(float,))
         p1 = Perception([.5, .5], oktypes=(float,))
         # Effect is not specializable
-        effect = Effect([UBR(0, 16), UBR(2, 4)], cfg=cfg)
+        effect = Effect([UBR(0, 15), UBR(2, 4)], cfg=cfg)
         quality = random.random()
         time = random.randint(0, 1000)
         cl = Classifier(effect=effect, quality=quality, cfg=cfg)
@@ -112,7 +112,7 @@ class TestALP:
         p0 = Perception([.5, .5], oktypes=(float,))
         p1 = Perception([.5, .8], oktypes=(float,))
         # Second effect attribute is specializable
-        effect = Effect([UBR(0, 16), UBR(10, 14)], cfg=cfg)
+        effect = Effect([UBR(0, 15), UBR(10, 14)], cfg=cfg)
         quality = 0.4
         time = random.randint(0, 1000)
         cl = Classifier(effect=effect, quality=quality, cfg=cfg)
@@ -127,14 +127,14 @@ class TestALP:
         assert child is not None
         assert child.is_marked() is False
         assert child.q == .5
-        assert child.condition == Condition([UBR(0, 16), UBR(0, 16)], cfg=cfg)
-        assert child.effect == Effect([UBR(0, 16), UBR(10, 14)], cfg=cfg)
+        assert child.condition == Condition([UBR(0, 15), UBR(0, 15)], cfg=cfg)
+        assert child.effect == Effect([UBR(0, 15), UBR(10, 14)], cfg=cfg)
 
     @pytest.mark.parametrize("_p0, _p1, _child_cond, _child_effect", [
         ([.5, .5], [.5, .5],
-         [UBR(0, 16), UBR(0, 16)], [UBR(0, 16), UBR(0, 16)]),
+         [UBR(0, 15), UBR(0, 15)], [UBR(0, 15), UBR(0, 15)]),
         ([.4, .5], [.9, .5],
-         [UBR(6, 6), UBR(0, 16)], [UBR(14, 14), UBR(0, 16)]),
+         [UBR(6, 6), UBR(0, 15)], [UBR(13, 13), UBR(0, 15)]),
     ])
     def test_should_create_new_classifier_with_covering(
             self, _p0, _p1, _child_cond, _child_effect, cfg):

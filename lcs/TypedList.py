@@ -26,7 +26,7 @@ class TypedList(collections.abc.MutableSequence):
         except ValueError:
             pass
 
-    def sort(self, *args, **kwargs):
+    def sort(self, *args, **kwargs) -> None:
         self._items.sort(*args, **kwargs)
 
     def __setitem__(self, i, o):

@@ -1,4 +1,5 @@
 import pytest
+
 from lcs.representations import UBR
 
 
@@ -24,3 +25,11 @@ class TestUBR:
 
         # then
         assert len(container) == expected_length
+
+    @pytest.mark.parametrize("_ubr, _span", [
+        (UBR(0, 15), 15),
+        (UBR(5, 5), 0),
+        (UBR(5, 6), 1),
+    ])
+    def test_should_calculate_bound_span(self, _ubr, _span):
+        assert _ubr.bound_span == _span
