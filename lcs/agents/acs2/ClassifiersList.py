@@ -4,7 +4,7 @@ from itertools import chain
 from random import random, choice, sample
 from typing import Optional, List
 
-from lcs import Perception
+from lcs import Perception, TypedList
 from lcs.agents.acs2.components.alp import expected_case, unexpected_case, \
     cover
 from lcs.agents.acs2.components.genetic_algorithm \
@@ -12,49 +12,25 @@ from lcs.agents.acs2.components.genetic_algorithm \
 from . import Classifier, Configuration
 
 
-# TODO: inherit from TypedList
-class ClassifiersList(list):
+class ClassifiersList(TypedList):
     """
     Represents overall population, match/action sets
     """
-
-    def __init__(self, seq=(), cfg: Configuration = None) -> None:
-        if cfg is None:
-            raise TypeError("Configuration should be passed to ClassifierList")
-
+    def __init__(self, *args, cfg: Configuration) -> None:
         self.cfg = cfg
-        list.__init__(self, seq or [])
+        super().__init__((Classifier, ), *args)
 
-    def append(self, item):
-        if not isinstance(item, Classifier):
-            raise TypeError("Item should be a Classifier object")
-        super(ClassifiersList, self).append(item)
-
-    @classmethod
-    def form_match_set(cls,
-                       population: ClassifiersList,
+    def form_match_set(self,
                        situation: Perception,
-                       cfg: Configuration):
-        return cls([cl for cl in population
-                    if cl.condition.does_match(situation)], cfg)
+                       cfg: Configuration) -> ClassifiersList:
+        matching = [cl for cl in self if cl.condition.does_match(situation)]
+        return ClassifiersList(*matching, cfg=cfg)
 
-    @classmethod
-    def form_action_set(cls,
-                        population: ClassifiersList,
+    def form_action_set(self,
                         action: int,
-                        cfg: Configuration):
-        return cls([cl for cl in population
-                    if cl.action == action], cfg)
-
-    @staticmethod
-    def _remove_classifier(population: ClassifiersList, cl: Classifier):
-        """
-        Searches the list and removes classifier
-        :param cl: classifier to remove
-        """
-        # TODO p4: write test
-        if population is not None and cl in population:
-            population.remove(cl)
+                        cfg: Configuration) -> ClassifiersList:
+        matching = [cl for cl in self if cl.action == action]
+        return ClassifiersList(*matching, cfg=cfg)
 
     def expand(self):
         """
@@ -121,8 +97,9 @@ class ClassifiersList(list):
                     # Removes classifier from population, match set
                     # and current list
                     delete_count += 1
-                    for lst in [population, match_set, self]:
-                        ClassifiersList._remove_classifier(lst, cl)
+                    lists = [x for x in [population, match_set, self] if x]
+                    for lst in lists:
+                        lst.safe_remove(cl)
 
             if new_cl is not None:
                 new_cl.tga = time
@@ -347,9 +324,9 @@ class ClassifiersList(list):
             else:
                 # Removes classifier from population, match set
                 # and current list
-                for lst in [self, population, match_set]:
-                    if lst is not None:
-                        ClassifiersList._remove_classifier(lst, cl_del)
+                lists = [x for x in [population, match_set, self] if x]
+                for lst in lists:
+                    lst.safe_remove(cl_del)
 
     def select_classifier_to_delete(self, randomfunc=random) -> \
             Optional[Classifier]:

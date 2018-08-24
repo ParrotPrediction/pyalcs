@@ -121,3 +121,14 @@ class TestTypedList:
         # then
         result = TypedList((_type,), *_result)
         assert lst == result
+
+    def test_should_sort_list(self):
+        # given
+        lst = TypedList((int,), *[3, 5, 1, 8])
+
+        # when
+        lst.sort(key=lambda el: el)
+
+        # then
+        sorted_lst = TypedList((int,), *[1, 3, 5, 8])
+        assert lst == sorted_lst

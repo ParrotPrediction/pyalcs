@@ -8,6 +8,9 @@ class Perception(collections.abc.Sequence):
     Represents current state of the environment at given time instance.
     By default each environment attribute is represented as `str` type.
     """
+
+    __slots__ = ['_items', 'oktypes']
+
     def __init__(self, observation, oktypes=(str,)):
         self._items = list()
 

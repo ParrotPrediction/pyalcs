@@ -5,6 +5,8 @@ from . import check_types
 
 class TypedList(collections.abc.MutableSequence):
 
+    __slots__ = ['_items', 'oktypes']
+
     def __init__(self, oktypes, *args):
         self._items = list()
         self.oktypes = oktypes
@@ -23,6 +25,9 @@ class TypedList(collections.abc.MutableSequence):
             self.remove(o)
         except ValueError:
             pass
+
+    def sort(self, *args, **kwargs):
+        self._items.sort(*args, **kwargs)
 
     def __setitem__(self, i, o):
         check_types(self.oktypes, o)

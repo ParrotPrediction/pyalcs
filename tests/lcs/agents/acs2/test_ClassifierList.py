@@ -25,7 +25,7 @@ class TestClassifierList:
         nonsubsumer = Classifier(cfg=cfg)
 
         classifiers_list = ClassifiersList(
-            [nonsubsumer, subsumer, nonsubsumer], cfg)
+            *[nonsubsumer, subsumer, nonsubsumer], cfg=cfg)
 
         classifier = Classifier(condition='1##0####',
                                 action=3,
@@ -62,7 +62,7 @@ class TestClassifierList:
                                 experience=1,
                                 cfg=cfg)
         classifiers_list = ClassifiersList(
-            [nonsubsumer, subsumer, nonsubsumer], cfg)
+            *[nonsubsumer, subsumer, nonsubsumer], cfg=cfg)
 
         # when
         actual_subsumer = classifiers_list.find_subsumer(
@@ -99,7 +99,7 @@ class TestClassifierList:
                                 cfg=cfg)
 
         classifiers_list = ClassifiersList(
-            [nonsubsumer, subsumer2, subsumer1, nonsubsumer], cfg)
+            *[nonsubsumer, subsumer2, subsumer1, nonsubsumer], cfg=cfg)
 
         # when
         actual_subsumer = classifiers_list.find_subsumer(
@@ -139,7 +139,7 @@ class TestClassifierList:
             cfg=cfg)
 
         classifiers_list = ClassifiersList(
-            [nonsubsumer, subsumer1, subsumer2, nonsubsumer], cfg)
+            *[nonsubsumer, subsumer1, subsumer2, nonsubsumer], cfg=cfg)
 
         # when
         actual_subsumer = classifiers_list.find_subsumer(
@@ -178,7 +178,7 @@ class TestClassifierList:
                                 cfg=cfg)
 
         classifiers_list = ClassifiersList(
-            [nonsubsumer, subsumer1, subsumer2, nonsubsumer], cfg)
+            *[nonsubsumer, subsumer1, subsumer2, nonsubsumer], cfg=cfg)
 
         # when
         actual_subsumer = classifiers_list.find_subsumer(
@@ -234,8 +234,8 @@ class TestClassifierList:
             cfg=cfg)
 
         classifiers_list = ClassifiersList(
-            [nonsubsumer, subsumer1, nonsubsumer, most_general,
-             subsumer2, nonsubsumer], cfg)
+            *[nonsubsumer, subsumer1, nonsubsumer, most_general,
+              subsumer2, nonsubsumer], cfg=cfg)
 
         # when
         actual_subsumer = classifiers_list.find_subsumer(
@@ -285,8 +285,8 @@ class TestClassifierList:
             cfg=cfg)
 
         classifiers_list = ClassifiersList(
-            [nonsubsumer, subsumer1, nonsubsumer, most_general,
-             subsumer2, nonsubsumer], cfg)
+            *[nonsubsumer, subsumer1, nonsubsumer, most_general,
+              subsumer2, nonsubsumer], cfg=cfg)
 
         # when
         actual_old_classifier = classifiers_list.find_old_classifier(
@@ -300,10 +300,10 @@ class TestClassifierList:
         classifier_1 = Classifier(action=1, experience=32, cfg=cfg)
         classifier_2 = Classifier(action=1, cfg=cfg)
         classifiers = ClassifiersList(
-            [classifier_1,
-             Classifier(action=2, cfg=cfg),
-             Classifier(action=3, cfg=cfg),
-             classifier_2], cfg)
+            *[classifier_1,
+              Classifier(action=2, cfg=cfg),
+              Classifier(action=3, cfg=cfg),
+              classifier_2], cfg=cfg)
 
         # when
         actual_old_classifier = classifiers.find_old_classifier(
@@ -325,7 +325,7 @@ class TestClassifierList:
                              action=1,
                              cfg=cfg)
 
-        existing_classifiers = ClassifiersList([similar, subsumer], cfg)
+        existing_classifiers = ClassifiersList(*[similar, subsumer], cfg=cfg)
 
         classifier = Classifier(condition='10######',
                                 action=1,
@@ -341,7 +341,7 @@ class TestClassifierList:
 
     def test_find_old_classifier_none(self, cfg):
         # given
-        classifier_list = ClassifiersList([], cfg=cfg)
+        classifier_list = ClassifiersList(cfg=cfg)
         cl = Classifier(cfg=cfg)
 
         # when
@@ -355,12 +355,12 @@ class TestClassifierList:
         much_worse = Classifier(quality=0.2, cfg=cfg)
         yet_another_to_consider = Classifier(quality=0.2, cfg=cfg)
         classifiers = ClassifiersList(
-            [Classifier(cfg=cfg),
-             selected_first,
-             Classifier(cfg=cfg),
-             much_worse,
-             yet_another_to_consider,
-             Classifier(cfg=cfg)],
+            *[Classifier(cfg=cfg),
+              selected_first,
+              Classifier(cfg=cfg),
+              much_worse,
+              yet_another_to_consider,
+              Classifier(cfg=cfg)],
             cfg=cfg)
 
         # when
@@ -376,18 +376,18 @@ class TestClassifierList:
         cl_2 = Classifier(action=2, cfg=cfg)
         cl_3 = Classifier(action=3, cfg=cfg)
         cl_4 = Classifier(action=4, cfg=cfg)
-        action_set = ClassifiersList([cl_1, cl_2], cfg=cfg)
-        match_set = ClassifiersList([cl_2], cfg=cfg)
-        population = ClassifiersList([cl_1, cl_2, cl_3, cl_4], cfg=cfg)
+        action_set = ClassifiersList(*[cl_1, cl_2], cfg=cfg)
+        match_set = ClassifiersList(*[cl_2], cfg=cfg)
+        population = ClassifiersList(*[cl_1, cl_2, cl_3, cl_4], cfg=cfg)
 
         # when
         action_set.delete_a_classifier(
             match_set, population, randomfunc=RandomMock([0.5, 0.1, 0.5, 0.5]))
 
         # then
-        assert ClassifiersList([cl_1], cfg=cfg) == action_set
-        assert ClassifiersList([], cfg=cfg) == match_set
-        assert ClassifiersList([cl_1, cl_3, cl_4], cfg=cfg) == population
+        assert ClassifiersList(*[cl_1], cfg=cfg) == action_set
+        assert ClassifiersList(cfg=cfg) == match_set
+        assert ClassifiersList(*[cl_1, cl_3, cl_4], cfg=cfg) == population
 
     def test_delete_a_classifier_decrease_numerosity(self, cfg):
         # given
@@ -395,23 +395,23 @@ class TestClassifierList:
         cl_2 = Classifier(action=2, numerosity=3, cfg=cfg)
         cl_3 = Classifier(action=3, cfg=cfg)
         cl_4 = Classifier(action=4, cfg=cfg)
-        action_set = ClassifiersList([cl_1, cl_2], cfg=cfg)
-        match_set = ClassifiersList([cl_2], cfg=cfg)
-        population = ClassifiersList([cl_1, cl_2, cl_3, cl_4], cfg=cfg)
+        action_set = ClassifiersList(*[cl_1, cl_2], cfg=cfg)
+        match_set = ClassifiersList(*[cl_2], cfg=cfg)
+        population = ClassifiersList(*[cl_1, cl_2, cl_3, cl_4], cfg=cfg)
 
         # when
         action_set.delete_a_classifier(
             match_set, population, randomfunc=RandomMock([0.5, 0.1, 0.5, 0.5]))
 
         expected_action_set = ClassifiersList(
-            [cl_1, Classifier(action=2, numerosity=2, cfg=cfg)],
+            *[cl_1, Classifier(action=2, numerosity=2, cfg=cfg)],
             cfg=cfg)
         expected_match_set = ClassifiersList(
-            [Classifier(action=2, numerosity=2, cfg=cfg)],
+            *[Classifier(action=2, numerosity=2, cfg=cfg)],
             cfg=cfg)
         expected_population = ClassifiersList(
-            [cl_1, Classifier(action=2, numerosity=2, cfg=cfg),
-             cl_3, cl_4],
+            *[cl_1, Classifier(action=2, numerosity=2, cfg=cfg),
+              cl_3, cl_4],
             cfg=cfg)
 
         # then
@@ -425,9 +425,9 @@ class TestClassifierList:
         cl_2 = Classifier(action=2, numerosity=20, cfg=cfg)
         cl_3 = Classifier(action=3, cfg=cfg)
         cl_4 = Classifier(action=4, cfg=cfg)
-        action_set = ClassifiersList([cl_1, cl_2], cfg=cfg)
-        match_set = ClassifiersList([cl_2], cfg=cfg)
-        population = ClassifiersList([cl_1, cl_2, cl_3, cl_4], cfg=cfg)
+        action_set = ClassifiersList(*[cl_1, cl_2], cfg=cfg)
+        match_set = ClassifiersList(*[cl_2], cfg=cfg)
+        population = ClassifiersList(*[cl_1, cl_2, cl_3, cl_4], cfg=cfg)
 
         # when
         action_set.delete_ga_classifiers(
@@ -435,14 +435,14 @@ class TestClassifierList:
             randomfunc=RandomMock(([0.5, 0.1] + [0.5] * 19) * 3))
 
         expected_action_set = ClassifiersList(
-            [cl_1, Classifier(action=2, numerosity=17, cfg=cfg)],
+            *[cl_1, Classifier(action=2, numerosity=17, cfg=cfg)],
             cfg=cfg)
         expected_match_set = ClassifiersList(
-            [Classifier(action=2, numerosity=17, cfg=cfg)],
+            *[Classifier(action=2, numerosity=17, cfg=cfg)],
             cfg=cfg)
         expected_population = ClassifiersList(
-            [cl_1, Classifier(action=2, numerosity=17, cfg=cfg),
-             cl_3, cl_4], cfg=cfg)
+            *[cl_1, Classifier(action=2, numerosity=17, cfg=cfg), cl_3, cl_4],
+            cfg=cfg)
 
         # then
         assert expected_action_set == action_set
@@ -586,16 +586,17 @@ class TestClassifierList:
                           cfg=cfg)
         cl_3 = Classifier(action=3, cfg=cfg)
         cl_4 = Classifier(action=4, cfg=cfg)
-        action_set = ClassifiersList([cl_1], cfg=cfg)
-        match_set = ClassifiersList([], cfg=cfg)
-        population = ClassifiersList([cl_1, cl_3, cl_4], cfg)
+        action_set = ClassifiersList(*[cl_1], cfg=cfg)
+        match_set = ClassifiersList(cfg=cfg)
+        population = ClassifiersList(*[cl_1, cl_3, cl_4], cfg=cfg)
 
         # when
         action_set.add_ga_classifier(cl_2, match_set, population)
 
         # then
-        assert ClassifiersList([cl_2], cfg=cfg) == match_set
-        assert ClassifiersList([cl_1, cl_3, cl_4, cl_2], cfg) == population
+        assert ClassifiersList(*[cl_2], cfg=cfg) == match_set
+        assert ClassifiersList(*[cl_1, cl_3, cl_4, cl_2],
+                               cfg=cfg) == population
 
     def test_add_ga_classifier_increase_numerosity(self, cfg):
         # given
@@ -608,9 +609,9 @@ class TestClassifierList:
         cl_3 = Classifier(action=3, cfg=cfg)
         cl_4 = Classifier(action=4, cfg=cfg)
 
-        action_set = ClassifiersList([cl_1], cfg)
-        match_set = ClassifiersList([cl_1], cfg)
-        population = ClassifiersList([cl_1, cl_3, cl_4], cfg)
+        action_set = ClassifiersList(*[cl_1], cfg=cfg)
+        match_set = ClassifiersList(*[cl_1], cfg=cfg)
+        population = ClassifiersList(*[cl_1, cl_3, cl_4], cfg=cfg)
 
         # when
         action_set.add_ga_classifier(cl_2, match_set, population)
@@ -621,7 +622,8 @@ class TestClassifierList:
             cfg=cfg)
 
         # then
-        assert ClassifiersList([new_classifier, cl_3, cl_4], cfg) == population
+        assert ClassifiersList(*[new_classifier, cl_3, cl_4],
+                               cfg=cfg) == population
 
     @pytest.mark.skip(reason="todo: test with deterministic RNG")
     def test_apply_ga(self, cfg):
@@ -634,9 +636,9 @@ class TestClassifierList:
             condition='0#0#0#0#',
             numerosity=9,
             cfg=cfg)
-        action_set = ClassifiersList([cl_1, cl_2], cfg=cfg)
-        match_set = ClassifiersList([cl_1, cl_2], cfg=cfg)
-        population = ClassifiersList([cl_1, cl_2], cfg=cfg)
+        action_set = ClassifiersList(*[cl_1, cl_2], cfg=cfg)
+        match_set = ClassifiersList(*[cl_1, cl_2], cfg=cfg)
+        population = ClassifiersList(*[cl_1, cl_2], cfg=cfg)
 
         random_sequence = \
             [
@@ -676,7 +678,7 @@ class TestClassifierList:
                             cfg=cfg)
 
         expected_population = ClassifiersList(
-            [modified_parent1, modified_parent2, child1, child2], cfg)
+            *[modified_parent1, modified_parent2, child1, child2], cfg=cfg)
 
         # it might sometime fails because one function RNDG is not mocked
         assert expected_population == population

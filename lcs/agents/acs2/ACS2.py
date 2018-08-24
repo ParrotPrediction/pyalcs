@@ -9,9 +9,15 @@ from ...utils import parse_state
 
 
 class ACS2(Agent):
-    def __init__(self, cfg: Configuration, population=None) -> None:
+    def __init__(self,
+                 cfg: Configuration,
+                 population: ClassifiersList=None) -> None:
         self.cfg = cfg
-        self.population = population or ClassifiersList(cfg=self.cfg)
+
+        if population:
+            self.population = population
+        else:
+            self.population = ClassifiersList(cfg=self.cfg)
 
     def explore(self, env, trials):
         """
@@ -86,9 +92,7 @@ class ACS2(Agent):
         done = False
 
         while not done:
-            match_set = ClassifiersList.form_match_set(self.population,
-                                                       state,
-                                                       self.cfg)
+            match_set = self.population.form_match_set(state, self.cfg)
 
             if steps > 0:
                 # Apply learning in the last action set
@@ -111,9 +115,7 @@ class ACS2(Agent):
 
             action = choose_action(match_set, self.cfg.epsilon)
             logging.debug("\tExecuting action: [%d]", action)
-            action_set = ClassifiersList.form_action_set(match_set,
-                                                         action,
-                                                         self.cfg)
+            action_set = match_set.form_action_set(action, self.cfg)
 
             prev_state = state
             raw_state, reward, done, _ = env.step(self._parse_action(action))
@@ -153,9 +155,7 @@ class ACS2(Agent):
         done = False
 
         while not done:
-            match_set = ClassifiersList.form_match_set(self.population,
-                                                       state,
-                                                       self.cfg)
+            match_set = self.population.form_match_set(state, self.cfg)
 
             if steps > 0:
                 action_set.apply_reinforcement_learning(
@@ -164,9 +164,7 @@ class ACS2(Agent):
 
             # Here while exploiting always choose best action
             action = choose_action(match_set, epsilon=0.0)
-            action_set = ClassifiersList.form_action_set(match_set,
-                                                         action,
-                                                         self.cfg)
+            action_set = match_set.form_action_set(action, self.cfg)
 
             raw_state, reward, done, _ = env.step(self._parse_action(action))
             state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
