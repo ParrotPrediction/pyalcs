@@ -20,7 +20,7 @@ setup(name='pyalcs',
           'Source': 'https://github.com/ParrotPrediction/pyalcs',
           'Tracking': 'https://github.com/ParrotPrediction/pyalcs/issues',
       },
-      python_requires='>=3.7',
+      python_requires='>=3.5',
       packages=find_packages(),
       install_requires=[
 
