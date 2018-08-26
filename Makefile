@@ -1,3 +1,5 @@
+.PHONY: docs
+
 lint:
 	mypy lcs
 
@@ -7,3 +9,6 @@ test: lint
 
 notebook:
 	jupyter notebook
+
+docs:
+	(cd docs && make html)
