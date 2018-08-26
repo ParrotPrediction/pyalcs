@@ -1,7 +1,10 @@
 # Anticipatory Learning Classifier Systems in Python
 Repository containing code implementation for various *Anticipatory Learning Classifier Systems* (ALCS).
 
-[![Build Status](https://travis-ci.org/ParrotPrediction/pyalcs.svg?branch=master)](https://travis-ci.org/ParrotPrediction/pyalcs)
+[![Build Status](https://travis-ci.org/ParrotPrediction/pyalcs.svg?branch=master)](https://travis-ci.org/ParrotPrediction/pyalcs) [![Documentation Status](https://readthedocs.org/projects/pyalcs/badge/?version=latest)](https://pyalcs.readthedocs.io/en/latest/?badge=latest)
+
+## Documentation
+Documentation is available [here](pyalcs.readthedocs.io).
 
 ### Citation
 If you want to use the library in your project please cite the following:
