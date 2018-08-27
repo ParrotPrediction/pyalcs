@@ -6,6 +6,13 @@ from lcs.agents.acs2 import Condition
 
 class TestCondition:
 
+    def test_should_get_initialized_with_str(self):
+        # given
+        condition = Condition("#1O##O##")
+
+        # then
+        assert len(condition) == 8
+
     def test_equal(self):
         assert Condition('########') == Condition('########')
         assert Condition('1#######') != Condition('########')
@@ -82,13 +89,6 @@ class TestCondition:
         # then
         assert condition.specificity == 2
 
-    def test_should_get_initialized_with_str(self):
-        # given
-        condition = Condition("#1O##O##")
-
-        # then
-        assert len(condition) == 8
-
     @pytest.mark.parametrize("_condition, _diff, _result", [
         ('########', '#0###1#1', '#0###1#1'),
         ('###10#1#', '010##1##', '0101011#'),
@@ -109,44 +109,29 @@ class TestCondition:
         # then
         assert cond == Condition(_result)
 
-    def test_should_match_perception(self):
+    @pytest.mark.parametrize("_c, _p, _result", [
+        ('########', '10011001', True),
+        ('1#######', '10011001', True),
+        ('0#######', '10011001', False),
+    ])
+    def test_should_match_perception(self, _c, _p, _result):
         # given
-        c = Condition.empty(8)
-        p = Perception(['1', '0', '0', '1', '1', '0', '0', '1'])
+        c = Condition(_c)
+        p = Perception(_p)
 
-        # General condition - should match everything
-        assert c.does_match(p) is True
+        # then
+        assert c.does_match(p) is _result
 
-        # Correct first position
-        c[0] = '1'
-        assert c.does_match(p) is True
+    @pytest.mark.parametrize("_c, _other, _result", [
+        ('########', '10011001', True),
+        ('1#######', '10011001', True),
+        ('0#######', '10011001', False),
+        ('####0###', '#1O##O##', True),
+    ])
+    def test_should_match_condition(self, _c, _other, _result):
+        # given
+        c = Condition(_c)
+        other = Condition(_other)
 
-        # Expects 0 as the first condition
-        c[0] = '0'
-        assert c.does_match(p) is False
-
-    def test_should_match_condition_1(self):
-        c_empty = Condition.empty(8)
-        c = Condition(['1', '0', '0', '1', '1', '0', '0', '1'])
-
-        # General condition - should match everything
-        assert c_empty.does_match(c) is True
-
-        # Correct first position
-        c_empty[0] = '1'
-        assert c_empty.does_match(c) is True
-
-        # Expects 0 as the first condition
-        c_empty[0] = '0'
-        assert c_empty.does_match(c) is False
-
-    def test_should_match_condition_2(self):
-        # Given
-        c = Condition('####O###')
-        other = Condition('#1O##O##')
-
-        # When
-        res = c.does_match(other)
-
-        # Then
-        assert res is True
+        # then
+        assert c.does_match(other) is _result
