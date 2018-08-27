@@ -229,6 +229,26 @@ class Classifier:
 
         self.talp = time
 
+    def is_more_general(self, other: Classifier) -> bool:
+        """
+        Checks if the current classifier is more general than the other.
+        The average area covered by condition attributes is compared.
+
+        For example UBR(0, 10) is more general than UBR(5, 6) because
+        it covers more values.
+
+        Parameters
+        ----------
+        other: Classifier
+            other classifier to compare
+
+        Returns
+        -------
+        bool
+            True is current classifier is more general, False otherwise
+        """
+        return self.condition.cover_ratio > other.condition.cover_ratio
+
     def is_marked(self):
         return self.mark.is_marked()
 

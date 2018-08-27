@@ -10,6 +10,7 @@ Representation
 Classifier
 ^^^^^^^^^^
 * ``specialize()`` creates a fixed, narrow UBR like ``UBR(4, 4)``. Later on during another processes it can be generalized more.
+* ``is_more_general`` looks at average ``cover_ratio``
 
 Condition
 ^^^^^^^^^

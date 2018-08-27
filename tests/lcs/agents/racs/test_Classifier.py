@@ -159,6 +159,20 @@ class TestClassifier:
         # then
         assert (len(cl.specified_unchanging_attributes)) == _soa_after
 
+    @pytest.mark.parametrize("_c1, _c2, _result", [
+        ([UBR(4, 6), UBR(1, 5)], [UBR(4, 6), UBR(1, 4)], True),
+        ([UBR(4, 6), UBR(1, 5)], [UBR(4, 6), UBR(1, 6)], False),
+        # The same classifiers
+        ([UBR(4, 6), UBR(1, 5)], [UBR(4, 6), UBR(1, 5)], False)
+    ])
+    def test_should_find_more_general(self, _c1, _c2, _result, cfg):
+        # given
+        cl1 = Classifier(condition=Condition(_c1, cfg), cfg=cfg)
+        cl2 = Classifier(condition=Condition(_c2, cfg), cfg=cfg)
+
+        # then
+        assert cl1.is_more_general(cl2) is _result
+
     @staticmethod
     def _random_ubr(lower=0, upper=15):
         return UBR(random.randint(lower, upper), random.randint(lower, upper))
