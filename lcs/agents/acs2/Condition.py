@@ -63,7 +63,7 @@ class Condition(PerceptionString):
         bool
             True if condition match given list, False otherwise
         """
-        for idx, (ci, oi) in enumerate(zip(self, other)):
+        for ci, oi in zip(self, other):
             if ci != self.wildcard and oi != self.wildcard and ci != oi:
                 return False
 
