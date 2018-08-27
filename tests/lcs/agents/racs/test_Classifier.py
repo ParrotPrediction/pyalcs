@@ -44,6 +44,43 @@ class TestClassifier:
         # then
         assert c.does_anticipate_correctly(p0, p1) is _result
 
+    @pytest.mark.parametrize("_exp, _q, _is_subsumer", [
+        (1, .5, False),  # too young classifier
+        (30, .92, True),  # enough experience and quality
+        (15, .92, False),  # not experienced enough
+    ])
+    def test_should_distinguish_classifier_as_subsumer(
+            self, _exp, _q, _is_subsumer, cfg):
+        # given
+        cl = Classifier(experience=_exp, quality=_q, cfg=cfg)
+
+        # when & then
+        # general classifier should not be considered as subsumer
+        assert cl.is_subsumer is _is_subsumer
+
+    def test_should_not_distinguish_marked_classifier_as_subsumer(self, cfg):
+        # given
+        # Now check if the fact that classifier is marked will block
+        # it from being considered as a subsumer
+        cl = Classifier(experience=30, quality=0.92, cfg=cfg)
+        cl.mark[0].add(4)
+
+        # when & then
+        assert cl.is_subsumer is False
+
+    @pytest.mark.parametrize("_q, _reliable", [
+        (.5, False),
+        (.1, False),
+        (.9, False),
+        (.91, True),
+    ])
+    def test_should_detect_reliable(self, _q, _reliable, cfg):
+        # given
+        cl = Classifier(quality=_q, cfg=cfg)
+
+        # then
+        assert cl.is_reliable() is _reliable
+
     @pytest.mark.parametrize("_q, _inadequate", [
         (.5, False),
         (.1, False),

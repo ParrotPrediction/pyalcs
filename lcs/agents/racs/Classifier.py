@@ -109,6 +109,24 @@ class Classifier:
 
         return indices
 
+    @property
+    def is_subsumer(self) -> bool:
+        """
+        Determines whether the classifier satisfies the subsumer criteria.
+
+        Returns
+        -------
+        bool
+            True is classifier can be considered as subsumer,
+            False otherwise
+        """
+        if self.exp > self.cfg.theta_exp:
+            if self.is_reliable():
+                if not self.is_marked():
+                    return True
+
+        return False
+
     def specialize(self,
                    p0: Perception,
                    p1: Perception,
@@ -146,7 +164,10 @@ class Classifier:
                 self.effect[idx] = UBR(p1_enc[idx], p1_enc[idx])
                 self.condition[idx] = UBR(p0_enc[idx], p0_enc[idx])
 
-    def is_inadequate(self):
+    def is_reliable(self) -> bool:
+        return self.q > self.cfg.theta_r
+
+    def is_inadequate(self) -> bool:
         return self.q < self.cfg.theta_i
 
     def increase_experience(self) -> int:

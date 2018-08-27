@@ -379,7 +379,7 @@ class TestClassifier:
         )
 
         # when && then
-        assert base.is_similar(c1) is True
+        assert base == c1
 
     def test_similar_returns_true_if_differs_by_numbers(self, cfg):
         # given
@@ -521,8 +521,7 @@ class TestClassifier:
         # then
         cls = [c_num, c_exp, c_inter, c_qual, c_rew, c_talp, c_tav, c_tga]
         for cl in cls:
-            assert cl.is_similar(original) is True
-            assert original.is_similar(cl) is True
+            assert cl == original
 
     def test_should_detect_similar_classifiers_2(self, cfg):
         # given
@@ -535,33 +534,33 @@ class TestClassifier:
 
         # when & then
         # Changed condition part
-        assert base.is_similar(
+        assert base != (
             Classifier(
                 condition='1#1#1011',
                 action=1,
                 effect='10####1#',
                 cfg=cfg
-            )) is False
+            ))
 
         # when & then
         # changed action part
-        assert base.is_similar(
+        assert base != (
             Classifier(
                 condition='1###1011',
                 action=2,
                 effect='10####1#',
                 cfg=cfg
-            )) is False
+            ))
 
         # when & then
         # changed effect part
-        assert base.is_similar(
+        assert base != (
             Classifier(
                 condition='1###1011',
                 action=1,
                 effect='10####11',
                 cfg=cfg
-            )) is False
+            ))
 
     @pytest.mark.parametrize("_c1_condition, _c2_condition, _result", [
         (None, None, False),
@@ -578,31 +577,21 @@ class TestClassifier:
         # when & then
         assert c1.is_more_general(c2) is _result
 
-    def test_should_distinguish_classifier_as_subsumer_1(self, cfg):
+    @pytest.mark.parametrize("_exp, _q, _is_subsumer", [
+        (1, .5, False),  # too young classifier
+        (30, .92, True),  # enough experience and quality
+        (15, .92, False),  # not experienced enough
+    ])
+    def test_should_distinguish_classifier_as_subsumer(
+            self, _exp, _q, _is_subsumer, cfg):
         # given
-        cls = Classifier(cfg=cfg)
+        cls = Classifier(experience=_exp, quality=_q, cfg=cfg)
 
         # when & then
         # general classifier should not be considered as subsumer
-        assert cls._is_subsumer() is False
+        assert cls.is_subsumer is _is_subsumer
 
-    def test_should_distinguish_classifier_as_subsumer_2(self, cfg):
-        # given
-        # let's assign enough experience and quality
-        cls = Classifier(experience=30, quality=0.92, cfg=cfg)
-
-        # when & then
-        assert cls._is_subsumer()
-
-    def test_should_distinguish_classifier_as_subsumer_3(self, cfg):
-        # given
-        # let's reduce experience below threshold
-        cls = Classifier(experience=15, quality=0.92, cfg=cfg)
-
-        # when & then
-        assert cls._is_subsumer() is False
-
-    def test_should_distinguish_classifier_as_subsumer_4(self, cfg):
+    def test_should_not_distinguish_marked_classifier_as_subsumer(self, cfg):
         # given
         # Now check if the fact that classifier is marked will block
         # it from being considered as a subsumer
@@ -610,7 +599,7 @@ class TestClassifier:
         cls.mark[3].add('1')
 
         # when & then
-        assert cls._is_subsumer() is False
+        assert cls.is_subsumer is False
 
     def test_should_subsume_another_classifier_1(self, cfg):
         # given

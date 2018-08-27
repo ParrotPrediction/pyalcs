@@ -336,7 +336,7 @@ class TestClassifierList:
 
         # then
         assert subsumer.does_subsume(classifier) is True
-        assert similar.is_similar(classifier)
+        assert similar == classifier
         assert subsumer == old_cls
 
     def test_find_old_classifier_none(self, cfg):

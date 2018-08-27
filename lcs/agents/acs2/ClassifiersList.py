@@ -208,9 +208,11 @@ class ClassifiersList(TypedList):
                            child: Classifier,
                            new_list: ClassifiersList) -> None:
         """
-        Looks for subsuming / similar classifiers in the current set.
-        If no appropriate classifier was found, the `child_cl` is added to
-        `new_list`.
+        Looks for subsuming / similar classifiers in the current set and
+        those created in the current ALP run.
+
+        If a similar classifier was found it's quality is increased,
+        otherwise `child_cl` is added to `new_list`.
 
         Parameters
         ----------
@@ -218,7 +220,6 @@ class ClassifiersList(TypedList):
             New classifier to examine
         new_list: ClassifiersList
             A list of newly created classifiers in this ALP run
-
         """
         # TODO: p0: write tests
         old_cl = None
@@ -232,13 +233,13 @@ class ClassifiersList(TypedList):
         # Check if any similar classifier was in this ALP run
         if old_cl is None:
             for cl in new_list:
-                if cl.is_similar(child):
+                if cl == child:
                     old_cl = cl
 
         # Check if there is similar classifier already
         if old_cl is None:
             for cl in self:
-                if cl.is_similar(child):
+                if cl == child:
                     old_cl = cl
 
         if old_cl is None:
@@ -246,14 +247,21 @@ class ClassifiersList(TypedList):
         else:
             old_cl.increase_quality()
 
-    def get_similar(self, other: Classifier):
+    def get_similar(self, other: Classifier) -> Optional[Classifier]:
         """
         Searches for the first similar classifier `other` and returns it.
 
-        :param other: classifier to compare
-        :return: first similar classifier, None otherwise
+        Parameters
+        ----------
+        other: Classifier
+            classifier to compare
+        Returns
+        -------
+        Optional[Classifier]
+            classifier (with the same condition, action, effect),
+            None otherwise
         """
-        return next(filter(lambda cl: cl.is_similar(other), self), None)
+        return next(filter(lambda cl: cl == other, self), None)
 
     def should_apply_ga(self, time: int):
         """

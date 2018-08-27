@@ -72,7 +72,12 @@ class Classifier(object):
         return pow(self.q, 3) * self.num
 
     def __eq__(self, other):
-        return self.is_similar(other)
+        if self.condition == other.condition and \
+                self.action == other.action and \
+                self.effect == other.effect:
+            return True
+
+        return False
 
     def __hash__(self):
         return hash((str(self.condition), self.action, str(self.effect)))
@@ -146,6 +151,24 @@ class Classifier(object):
     def specificity(self):
         return self.condition.specificity / len(self.condition)
 
+    @property
+    def is_subsumer(self) -> bool:
+        """
+        Determines whether the classifier satisfies the subsumer criteria.
+
+        Returns
+        -------
+        bool
+            True is classifier can be considered as subsumer,
+            False otherwise
+        """
+        if self.exp > self.cfg.theta_exp:
+            if self.is_reliable():
+                if not self.is_marked():
+                    return True
+
+        return False
+
     def does_anticipate_change(self) -> bool:
         """
         Checks whether any change in environment is anticipated
@@ -157,10 +180,10 @@ class Classifier(object):
         """
         return self.effect.number_of_specified_elements > 0
 
-    def is_reliable(self):
+    def is_reliable(self) -> bool:
         return self.q > self.cfg.theta_r
 
-    def is_inadequate(self):
+    def is_inadequate(self) -> bool:
         return self.q < self.cfg.theta_i
 
     def update_reward(self, p: float) -> float:
@@ -312,26 +335,6 @@ class Classifier(object):
 
         self.talp = time
 
-    def is_similar(self, other: Classifier) -> bool:
-        """
-        Check if classifier is equals to `other` classifier in condition,
-        action and effect part.
-
-        Parameters
-        ----------
-        other: Classifier
-            other classifier
-        Returns
-        -------
-        bool
-            True if equals, False otherwise
-        """
-        if self.condition == other.condition and \
-                self.action == other.action and \
-                self.effect == other.effect:
-            return True
-        return False
-
     def is_more_general(self, other: Classifier) -> bool:
         """
         Checks if the classifiers condition is formally
@@ -386,28 +389,11 @@ class Classifier(object):
         bool
             True if `other` classifier is subsumed, False otherwise
         """
-        if self._is_subsumer() and \
+        if self.is_subsumer and \
             self.is_more_general(other) and \
             self.condition.does_match(other.condition) and \
                 self.effect == other.effect:
             return True
-
-        return False
-
-    def _is_subsumer(self) -> bool:
-        """
-        Controls if the classifier satisfies the subsumer criteria.
-
-        Returns
-        -------
-        bool
-            True is classifier can be considered as subsumer,
-            False otherwise
-        """
-        if self.exp > self.cfg.theta_exp:
-            if self.is_reliable():
-                if not self.is_marked():
-                    return True
 
         return False
 
