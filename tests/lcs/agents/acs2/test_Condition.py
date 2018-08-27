@@ -125,10 +125,6 @@ class TestCondition:
         c[0] = '0'
         assert c.does_match(p) is False
 
-        # Should fail when perception length is different
-        with pytest.raises(ValueError):
-            c.does_match(Perception(['1', '2']))
-
     def test_should_match_condition_1(self):
         c_empty = Condition.empty(8)
         c = Condition(['1', '0', '0', '1', '1', '0', '0', '1'])

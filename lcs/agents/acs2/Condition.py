@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import random
-from typing import Callable
+from typing import Callable, Union
 
+from lcs import Perception
 from .. import PerceptionString
 
 
@@ -47,23 +48,23 @@ class Condition(PerceptionString):
             ridx = func(specific_ids)
             self.generalize(ridx)
 
-    def does_match(self, lst) -> bool:
+    def does_match(self, other: Union[Perception, Condition]) -> bool:
         """
         Check if condition match other list such as perception or another
         condition.
 
-        :param lst: perception or condition given as list
-        :return: True if condition match given list, false otherwise
-        """
-        if len(self) != len(lst):
-            raise ValueError('Cannot execute `does_match` '
-                             'because lengths are different')
+        Parameters
+        ----------
+        other: Union[Perception, Condition]
+            perception or condition object
 
-        # TODO zip can be used instead
-        for idx, attrib in enumerate(self):
-            if attrib != self.wildcard \
-                    and lst[idx] != self.wildcard \
-                    and attrib != lst[idx]:
+        Returns
+        -------
+        bool
+            True if condition match given list, False otherwise
+        """
+        for idx, (ci, oi) in enumerate(zip(self, other)):
+            if ci != self.wildcard and oi != self.wildcard and ci != oi:
                 return False
 
         return True
