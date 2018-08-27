@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 
 
@@ -20,6 +22,23 @@ class UBR:
     @property
     def bound_span(self) -> int:
         return sum(1 for _ in range(self.lower_bound, self.upper_bound))
+
+    def incorporates(self, other: UBR) -> bool:
+        """
+        Checks whether current UBR incorporates other.
+
+        Parameters
+        ----------
+        other: UBR
+            Other real-value representation
+
+        Returns
+        -------
+        bool
+            True if `other` is contained in this UBR, False otherwise
+        """
+        return self.lower_bound <= other.lower_bound and \
+            self.upper_bound >= other.upper_bound
 
     def __contains__(self, item):
         return self.lower_bound <= item <= self.upper_bound

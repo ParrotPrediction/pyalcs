@@ -33,3 +33,15 @@ class TestUBR:
     ])
     def test_should_calculate_bound_span(self, _ubr, _span):
         assert _ubr.bound_span == _span
+
+    @pytest.mark.parametrize("ubr1, ubr2, _result", [
+        (UBR(0, 15), UBR(2, 4), True),
+        (UBR(4, 6), UBR(6, 7), False),
+        (UBR(4, 6), UBR(4, 5), True),
+        (UBR(4, 4), UBR(4, 4), True),
+        (UBR(4, 4), UBR(4, 5), False),
+        (UBR(4, 5), UBR(2, 7), False),
+        (UBR(4, 6), UBR(5, 7), False),
+    ])
+    def test_should_detect_incorporation(self, ubr1, ubr2, _result):
+        assert ubr1.incorporates(ubr2) == _result
