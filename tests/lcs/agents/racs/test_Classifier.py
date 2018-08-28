@@ -1,5 +1,6 @@
-import pytest
 import random
+
+import pytest
 
 from lcs import Perception
 from lcs.agents.racs import Configuration, Condition, Effect, Classifier
@@ -209,6 +210,46 @@ class TestClassifier:
 
         # then
         assert cl1.is_more_general(cl2) is _result
+
+    @pytest.mark.parametrize(
+        "_e1, _e2, _exp1, _marked, _reliable,"
+        "_more_general, _condition_matching, _result", [
+            ([UBR(2, 4), UBR(5, 6)], [UBR(2, 4), UBR(5, 6)], 30, False, True,
+             True, True, True),  # all good
+            ([UBR(2, 4), UBR(5, 6)], [UBR(2, 4), UBR(5, 6)], 30, False, False,
+             True, True, False),  # not reliable
+            ([UBR(2, 4), UBR(5, 6)], [UBR(2, 4), UBR(5, 6)], 30, True, True,
+             True, True, False),  # marked
+            ([UBR(2, 4), UBR(5, 6)], [UBR(2, 4), UBR(5, 6)], 30, False, True,
+             False, True, False),  # less general
+            ([UBR(2, 4), UBR(5, 6)], [UBR(2, 4), UBR(5, 6)], 30, False, True,
+             True, False, False),  # condition not matching
+            ([UBR(2, 4), UBR(5, 6)], [UBR(2, 4), UBR(5, 7)], 30, False, True,
+             True, True, False),  # different effects
+            ([UBR(2, 4), UBR(5, 6)], [UBR(2, 4), UBR(5, 7)], 10, False, True,
+             True, True, False),  # not experienced
+        ])
+    def test_should_detect_subsumption(self, _e1, _e2, _exp1, _marked,
+                                       _reliable, _more_general,
+                                       _condition_matching, _result,
+                                       mocker, cfg):
+        # given
+        cl1 = Classifier(effect=Effect(_e1, cfg), experience=_exp1, cfg=cfg)
+        cl2 = Classifier(effect=Effect(_e2, cfg), cfg=cfg)
+
+        # when
+        mocker.patch.object(cl1, "is_reliable")
+        mocker.patch.object(cl1, "is_marked")
+        mocker.patch.object(cl1, "is_more_general")
+        mocker.patch.object(cl1.condition, "does_match_condition")
+
+        cl1.is_reliable.return_value = _reliable
+        cl1.is_marked.return_value = _marked
+        cl1.is_more_general.return_value = _more_general
+        cl1.condition.does_match_condition.return_value = _condition_matching
+
+        # then
+        assert cl1.does_subsume(cl2) == _result
 
     @staticmethod
     def _random_ubr(lower=0, upper=15):

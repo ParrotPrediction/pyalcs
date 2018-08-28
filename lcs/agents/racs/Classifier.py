@@ -11,17 +11,17 @@ from . import Condition, Effect, Mark, Configuration
 class Classifier:
 
     def __init__(self,
-                 condition: Optional[Condition]=None,
-                 action: Optional[int]=None,
-                 effect: Optional[Effect]=None,
-                 quality: float=0.5,
+                 condition: Optional[Condition] = None,
+                 action: Optional[int] = None,
+                 effect: Optional[Effect] = None,
+                 quality: float = 0.5,
                  reward: float = 0.5,
                  intermediate_reward: float = 0.0,
-                 experience: int=1,
+                 experience: int = 1,
                  talp=None,
                  tga: int = 0,
-                 tav: float=0.0,
-                 cfg: Optional[Configuration]=None) -> None:
+                 tav: float = 0.0,
+                 cfg: Optional[Configuration] = None) -> None:
 
         if cfg is None:
             raise TypeError("Configuration should be passed to Classifier")
@@ -292,6 +292,28 @@ class Classifier:
         if len(self.specified_unchanging_attributes) > 0:
             ridx = randomfunc(self.specified_unchanging_attributes)
             self.condition.generalize(ridx)
+            return True
+
+        return False
+
+    def does_subsume(self, other: Classifier) -> bool:
+        """
+        Returns if a classifier subsumes `other` classifier
+
+        Parameters
+        ----------
+        other: Classifier
+            other classifier
+
+        Returns
+        -------
+        bool
+            True if `other` classifier is subsumed, False otherwise
+        """
+        if self.is_subsumer and \
+            self.is_more_general(other) and \
+            self.condition.does_match_condition(other.condition) and \
+                self.effect == other.effect:
             return True
 
         return False

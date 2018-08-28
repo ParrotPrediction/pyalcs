@@ -14,7 +14,8 @@ Classifier
 
 Condition
 ^^^^^^^^^
-* ``cover_ratio`` function
+* ``cover_ratio`` function,
+* ``does_match_condition`` - analyzes incorporation (when doing subsumption)
 
 Mark
 ^^^^

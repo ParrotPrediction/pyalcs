@@ -85,3 +85,19 @@ class Condition(PerceptionString):
     def does_match(self, perception: Perception):
         encoded_perception = map(self.cfg.encoder.encode, perception)
         return all(p in ubr for p, ubr in zip(encoded_perception, self))
+
+    def does_match_condition(self, other: Condition):
+        """
+        Checks if self conditions matches other one.
+
+        Parameters
+        ----------
+        other: Condition
+            other Condition
+
+        Returns
+        -------
+        bool
+            True if `other` is matched by `self`, False otherwise
+        """
+        return all(ci.incorporates(oi) for ci, oi in zip(self, other))

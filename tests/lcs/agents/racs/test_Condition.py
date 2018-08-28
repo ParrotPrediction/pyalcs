@@ -109,3 +109,17 @@ class TestCondition:
 
         # then
         assert cond.does_match(p0) == _result
+
+    @pytest.mark.parametrize("_cond1, _cond2, _result", [
+        ([UBR(0, 15), UBR(0, 15)], [UBR(2, 4), UBR(5, 10)], True),
+        ([UBR(6, 10), UBR(0, 15)], [UBR(2, 4), UBR(5, 10)], False),
+        ([UBR(0, 15), UBR(4, 10)], [UBR(2, 4), UBR(6, 12)], False),
+        ([UBR(2, 4), UBR(5, 5)], [UBR(2, 4), UBR(5, 5)], True),
+    ])
+    def test_should_match_condition(self, _cond1, _cond2, _result, cfg):
+        # given
+        cond1 = Condition(_cond1, cfg=cfg)
+        cond2 = Condition(_cond2, cfg=cfg)
+
+        # then
+        assert cond1.does_match_condition(cond2) == _result

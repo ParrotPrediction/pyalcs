@@ -3,3 +3,4 @@ mypy==0.620
 pytest>=3.2
 pytest-cov==2.5.1
 pytest-pep8==1.0.6
+pytest-mock==1.10.0
