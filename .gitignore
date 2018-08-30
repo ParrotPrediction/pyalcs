@@ -20,6 +20,7 @@ lib64/
 parts/
 sdist/
 var/
+wheels/
 *.egg-info/
 .installed.cfg
 *.egg
@@ -40,10 +41,9 @@ htmlcov/
 .coverage
 .coverage.*
 .cache
-.pytest_cache
 nosetests.xml
 coverage.xml
-*,cover
+*.cover
 .hypothesis/
 
 # Translations
@@ -67,7 +67,7 @@ docs/_build/
 # PyBuilder
 target/
 
-# IPython Notebook
+# Jupyter Notebook
 .ipynb_checkpoints
 
 # pyenv
@@ -76,33 +76,28 @@ target/
 # celery beat schedule file
 celerybeat-schedule
 
+# SageMath parsed files
+*.sage.py
+
 # dotenv
 .env
 
 # virtualenv
+.venv
 venv/
 ENV/
 
 # Spyder project settings
 .spyderproject
+.spyproject
 
 # Rope project settings
 .ropeproject
 
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
 .idea
-/examples/learning_progress.png
-*.pkl
-
 .DS_Store
-/assets/ACS2/cmake-build-debug/
-/assets/ACS2/*.txt
-
-/.coverage
-
-# C++ byproducts
-*.o
-*.out
-
-# Not wanted, EPS graphics, serialized pickle dumps
-*.eps
-*.p

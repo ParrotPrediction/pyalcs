@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Anticipatory Learning Classifier Systems in Python
 Repository containing code implementation for various *Anticipatory Learning Classifier Systems* (ALCS).
 
@@ -84,3 +85,19 @@ Prior to PR please execute to check if standards are holding:
     make test
     make coverage
     make pep8
+=======
+# Parrot Prediction OpenAI environments
+
+## Maze
+
+Initializing
+
+    maze = gym.make('MazeF1-v0')
+
+Getting all possible transitions
+
+    transitions = maze.env.get_all_possible_transitions()
+
+## Boolean Multiplexer
+Read blog [post](https://medium.com/parrot-prediction/boolean-multiplexer-in-practice-94e3236821b5) describing the usage.
+>>>>>>> f42c44068b14d3e935e6e299b173935e30d8d4b1
