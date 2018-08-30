@@ -1,3 +1,10 @@
--e .
-
+twine
+pep8==1.7.0
+coverage==4.3.4
+jupyter==1.0.0
+matplotlib==2.1.0
+gym[all]==0.9.4
+pandas==0.21.0
 pytest==3.2.3
+
+-e git+https://github.com/ParrotPrediction/openai-envs.git#egg=parrotprediction-openai-envs

@@ -1,5 +1,4 @@
 language: python
-<<<<<<< HEAD
 python:
 - '3.6'
 before_install:
@@ -13,22 +12,6 @@ deploy:
   user: khozzy
   password:
     secure: sf1nCbtMTGEJNv0GsKzdJT3zghwUGe8jvvjky377Y7lU2Kk7PKxxti8lNE60ET+KuI7ePuiR4Fb+8UuvCPVfhRu7b5bgyDghstQEoNPuzebHynkWc17d4+i9UwY+SsqamxaBQ8ol+iqRHi6HzYiX7Bpe8eFK8B3Lee14RFWSPTtOUrSv5TZCtShS98JW5qds4TwsMRWNghdcp9o170DSvk8yR9TCSSwZYpXt51xqN413nuw7bwrFreTl2/4lsvM0Z205MkHjAfIgDh5DV8+cy7zlVe2qhCKVBnKYdxOlNSS0K6vKbwr1R0S7Fcw6XTqqZE0pIQLXEMbMFeiOTzkvs2gZiR3GsbQQ4XNevnMS1mcMjA6dc//8mug9fKMbDA0RD/EQB3a0+JTGZovWKSFleg6XkA5mwNC1CwnzMY+ZOjACQQaOpbvE/1tx5m0lfBbIG8vnlnFA53X2VedIILa6Pq+vhfaH8Zrz2MvGFb8+aiI5N5qfOr7eKoBZPQn2g4CjsJLQhfZ3k9FxuDYX+9X90O7yLhEMocP4g2W4Zoi7IDDOxlp7B5ZoRAH0Z2E25COEr/4dl5I1/oax1ZA4bgNKiszyWAST4HjhQ8p2KZNJWRdCjzLbAMAdcHsOUx9Bcj8xJ6pWq/KWMCGOzeD7hIrIp5ur6w1BrKcRS2s0KSLoiIs=
-=======
-
-python:
-  - '3.6'
-
-script:
-  - pip3 install -r requirements.txt
-  - pytest
-
-deploy:
-  skip_cleanup: true
-  provider: pypi
-  user: khozzy
-  password:
-    secure: U7bfuxnP8i/5roS1frPVi3EuYSw2YmNGwnGumr2Fw+GRbzYP0AyB+pTzZ9CbKk8A8gCWnsGR+ky00SdLcAAmzpoui9QxPlr1ndRy/z8W7KY5EGe2R65VoM1ztCOH3ZtclfGrQAMYHz4HLvXrGbkf5+xeYRhhW/tC4fH+VwHMNH8eT+e2+1xLkHTBQr0Devp1Qthl3EMJhIUSiCtj15wR+k9a3hN/plLTFWFuHg82OTmuh2UkKJ1z9kxLxPRC2+cB7XivPKcPW9MpEDr4jzh+T+4SpjxNbL6hzXMGUz/6FXv8IUojjN5OjsOsKzEY5B2tWSs81z+NCgS8EVggYDmtQHSL+O1jdEBLUpNRLaVYoH6fbsBVujEzNnPw1fbk5idlMUpQfxrDg/CbPL5lQ7XQ9OiS7/LRz98v1NwSwzARGNGgOx9yFBpsmPyfVA/2xzrGCLppkaftGSwPegxGe5w0ULFo/ITmaG4Sux1JBsODkWGParDlTXtcGMjWlZOhBTm+nlobeIxMtSG+M//+xOcE2KqdOkPFYZgSEDeqZoO1pglmxMso8FTGYcOWUW/wEErwP6MFAllWWwVPOPTAS++Ll3jJBhGNXyo9ZuKlXBTk/immrWoGUNHfCZXkblfvmo4D7vMg2HLyKbgAdShfLX/M8kYGzQTw8JtflhcgsuaygSU=
->>>>>>> f42c44068b14d3e935e6e299b173935e30d8d4b1
   on:
     tags: true
     branch: master

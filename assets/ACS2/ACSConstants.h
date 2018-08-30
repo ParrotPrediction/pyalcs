@@ -41,8 +41,7 @@
 #define PROB_EXPLORATION_BIAS 0.5 /* specifies the probability of applying an exploration biased action-selection */
 #define EXPLORATION_BIAS_METHOD 2 /* 0 = action delay bias, 1 = knowledge array bias, 2 = 50/50 */
 
-/*********************ACTION PLANNING***************************/
-#define DO_ACTION_PLANNING 1
+#define DO_ACTION_PLANNING 0
 #define ACTION_PLANNING_FREQUENCY 50
 
 /* GA constants */
@@ -57,8 +56,8 @@
 #define DO_SUBSUMPTION 1
 
 /*andere Makros:*/
-#define ENVIRONMENT_CLASS HandEyeEnvironment /*MPEnvironment*/
-#define RESULT_FILE "ACS2_tests.txt" /*"ACS2_Maze4_5050B050.txt"*/
+#define ENVIRONMENT_CLASS MPEnvironment
+#define RESULT_FILE "ACS2_Maze4_5050B050.txt"
 
 #define MAX_STEPS 30000
 #define MAX_TRIAL_STEPS 50

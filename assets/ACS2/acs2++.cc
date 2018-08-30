@@ -24,7 +24,6 @@
 #include "ClassifierList.h"
 #include "MazeEnvironment.h"
 #include "MPEnvironment.h"
-#include "HandEyeEnvironment.h"
 
 using namespace std;
 
@@ -300,7 +299,6 @@ int startActionPlanning(ClassifierList *population, Environment *env, int time, 
                         Perception *previousSituation, ClassifierList **actionSet, Action *act, double *rho0) {
     /* Recheck this function -> is step set correct and we need to do model testing in here! */
     //Perception -
-    //cout << "############Action Planning##########################################\n";
     Perception *goalSituation = new Perception();
 
     int steps;
