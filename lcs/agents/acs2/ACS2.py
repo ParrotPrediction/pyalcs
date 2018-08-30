@@ -8,6 +8,9 @@ from ...strategies.action_selection import choose_action
 from ...utils import parse_state
 
 
+logger = logging.getLogger(__name__)
+
+
 class ACS2(Agent):
     def __init__(self,
                  cfg: Configuration,
@@ -72,7 +75,7 @@ class ACS2(Agent):
 
             trial_metrics = self._collect_metrics(
                 env, current_trial, steps_in_trial, steps)
-            logging.info(trial_metrics)
+            logger.info(trial_metrics)
             metrics.append(trial_metrics)
 
             current_trial += 1
@@ -80,7 +83,7 @@ class ACS2(Agent):
         return self.population, metrics
 
     def _run_trial_explore(self, env, time, current_trial=None):
-        logging.debug("** Running trial explore ** ")
+        logger.debug("** Running trial explore ** ")
         # Initial conditions
         steps = 0
         raw_state = env.reset()
@@ -114,7 +117,7 @@ class ACS2(Agent):
                         state)
 
             action = choose_action(match_set, self.cfg.epsilon)
-            logging.debug("\tExecuting action: [%d]", action)
+            logger.debug("\tExecuting action: [%d]", action)
             action_set = match_set.form_action_set(action, self.cfg)
 
             prev_state = state
@@ -144,7 +147,7 @@ class ACS2(Agent):
         return steps
 
     def _run_trial_exploit(self, env, time=None, current_trial=None):
-        logging.debug("** Running trial exploit **")
+        logger.debug("** Running trial exploit **")
         # Initial conditions
         steps = 0
         raw_state = env.reset()
