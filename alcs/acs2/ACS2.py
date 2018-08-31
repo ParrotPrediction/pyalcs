@@ -197,7 +197,9 @@ class ACS2:
             act_sequence = self.population.search_goal_sequence(situation, goal_situation) # TODO: search_goal_sequence (ClassifierList)
             i = 0
             while act_sequence[i] != 0:
-                match_set = ClassifiersList(self.population, situation)  # TODO new constructor???
+                match_set = ClassifiersList.form_match_set(self.population,
+                                                       situation,
+                                                       self.cfg)
                 if action_set is not None:
                     action_set.apply_alp(previous_situation, action, situation, time + steps, self.population, match_set)
                     action_set.apply_reinforcement_learning(reward, match_set.get_maximum_fitness())
@@ -205,7 +207,7 @@ class ACS2:
                         action_set.apply_ga(time + steps, self.population, match_set, situation)
 
                 action = act_sequence[i]
-                action_set = ClassifiersList(match_set, action)
+                action_set = ClassifiersList.form_action_set(match_set, action, self.cfg)
 
                 previous_situation = situation
                 raw_state, reward, done, _ = env.step(self._parse_action(action))

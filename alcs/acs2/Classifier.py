@@ -142,7 +142,7 @@ class Classifier(object):
 
         for cpi, epi in zip(self.condition, self.effect):
             if cpi != self.cfg.classifier_wildcard and \
-                    epi == self.cfg.classifier_wildcard:
+                epi == self.cfg.classifier_wildcard:
                 spec += 1
 
         return spec
@@ -339,7 +339,7 @@ class Classifier(object):
         """
         for idx, cond in enumerate(self.condition):
             if cond != self.cfg.classifier_wildcard and \
-                    randomfunc() < self.cfg.mu:
+                randomfunc() < self.cfg.mu:
                 self.condition.generalize(idx)
 
     def is_similar(self, other) -> bool:
@@ -351,8 +351,8 @@ class Classifier(object):
         :return: True if equals, False otherwise
         """
         if self.condition == other.condition and \
-                self.action == other.action and \
-                self.effect == other.effect:
+            self.action == other.action and \
+            self.effect == other.effect:
             return True
         return False
 
@@ -369,7 +369,7 @@ class Classifier(object):
         return False
 
     def generalize_unchanging_condition_attribute(
-            self, no_spec, randomfunc=randint) -> bool:
+        self, no_spec, randomfunc=randint) -> bool:
         """
         Generalizes one randomly unchanging attribute in the condition.
         An unchanging attribute is one that is anticipated not to change
@@ -387,7 +387,7 @@ class Classifier(object):
 
         for idx, (cpi, epi) in enumerate(zip(self.condition, self.effect)):
             if cpi != self.cfg.classifier_wildcard and \
-                    epi == self.cfg.classifier_wildcard:
+                epi == self.cfg.classifier_wildcard:
 
                 if att_idx == pos:
                     self.condition.generalize(idx)
@@ -407,7 +407,7 @@ class Classifier(object):
         if self._is_subsumer() and \
             self.is_more_general(other) and \
             self.condition.does_match(other.condition) and \
-                self.effect == other.effect:
+            self.effect == other.effect:
             return True
 
         return False
@@ -452,3 +452,9 @@ class Classifier(object):
 
         cl2.q = q
         cl2.r = r
+
+    def does_match(self, situation):
+        return self.condition.does_match(situation.condition)  # TODO: check if correct
+
+    def has_action(self, action):
+        return action == self.action

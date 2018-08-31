@@ -535,5 +535,10 @@ class ClassifiersList(list):
         pass
 
     def exists_classifier(self, previous_situation, action, situation, quality):
-        #TODO: state = self._parse_state(raw_state)
-        pass
+        for cl in self:
+            if cl.q > quality:
+                if cl.does_match(previous_situation):
+                    if cl.has_action(action):
+                        if cl.does_anticipate_correctly(previous_situation, situation):
+                            return 1
+        return 0
