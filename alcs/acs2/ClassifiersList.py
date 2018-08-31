@@ -533,3 +533,7 @@ class ClassifiersList(list):
     def search_goal_sequence(self, start, goal):
         #TODO: Action **ClassifierList::searchGoalSequence(Perception *start, Perception *goal) {
         pass
+
+    def exists_classifier(self, previous_situation, action, situation, quality):
+        #TODO: state = self._parse_state(raw_state)
+        pass

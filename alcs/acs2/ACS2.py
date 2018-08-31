@@ -81,6 +81,10 @@ class ACS2:
         done = False
 
         while not done:
+            if self.cfg.do_action_planning and (steps + time) % self.cfg.action_planning_frequency == 0:
+                # TODO: check if HandEye?
+                self._run_action_planning(env, steps + time, state, prev_state, action_set, action, reward)
+
             match_set = ClassifiersList.form_match_set(self.population,
                                                        state,
                                                        self.cfg)
@@ -174,22 +178,47 @@ class ACS2:
         return steps
 
     def _run_action_planning(self, env, time, situation,
-                             previous_situation, actionSet, act, rho0):
+                             previous_situation, action_set, action, reward):
+
+        if not hasattr(env, "get_goal_state"):
+            return 0
+
         steps = 0
-        matchSet = 0  # TODO ClassifierList *matchSet = 0;
+        match_set = 0
         done = False
-        goal_situation = 0  # TODO env->getGoalState(goalSituation)
+        goal_situation = 0
 
         while not done:
-            # TODO if (!env->getGoalState(goalSituation)) {break;
-            act_sequence = self.population.search_goal_sequence(situation, goal_situation)
+            goal_situation = env.get_goal_state()
+
+            if goal_situation is None:
+                return 0
+
+            act_sequence = self.population.search_goal_sequence(situation, goal_situation) # TODO: search_goal_sequence (ClassifierList)
             i = 0
             while act_sequence[i] != 0:
-                matchSet = ClassifiersList() #TODO new constructor???
+                match_set = ClassifiersList(self.population, situation)  # TODO new constructor???
+                if action_set is not None:
+                    action_set.apply_alp(previous_situation, action, situation, time + steps, self.population, match_set)
+                    action_set.apply_reinforcement_learning(reward, match_set.get_maximum_fitness())
+                    if self.cfg.do_ga:
+                        action_set.apply_ga(time + steps, self.population, match_set, situation)
+
+                action = act_sequence[i]
+                action_set = ClassifiersList(match_set, action)
+
+                previous_situation = situation
+                raw_state, reward, done, _ = env.step(self._parse_action(action))
+                situation = self._parse_state(raw_state)
+
+                if action_set.exists_classifier(previous_situation, action, situation, self.cfg.theta_r):
+                    break
 
                 i += 1
-                pass
-            pass
+                steps += 1
+
+            if not(i == 0 or action != 0): # TODO: necessary?
+                break
 
         return steps
 
