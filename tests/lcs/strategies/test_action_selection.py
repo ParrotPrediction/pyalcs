@@ -15,19 +15,23 @@ class TestActionSelection:
 
     def test_should_return_all_possible_actions(self, cfg):
         # given
+        all_actions = cfg.number_of_possible_actions
         population = ClassifiersList(cfg=cfg)
         actions = set()
 
         # when
         for _ in range(1000):
-            act = choose_action(population, epsilon=1.0)
+            act = choose_action(population,
+                                all_actions=all_actions,
+                                epsilon=1.0)
             actions.add(act)
 
         # then
-        assert 8 == len(actions)
+        assert len(actions) == all_actions
 
     def test_should_return_best_fitness_action(self, cfg):
         # given
+        all_actions = cfg.number_of_possible_actions
         population = ClassifiersList(cfg=cfg)
 
         # when & then
@@ -36,7 +40,7 @@ class TestActionSelection:
         population.append(c1)
 
         # Some random action should be selected here
-        best_action = exploit(population)
+        best_action = exploit(population, all_actions)
         assert best_action is not None
 
         # when & then
@@ -48,8 +52,8 @@ class TestActionSelection:
         population.append(c2)
 
         # Here C2 action should be selected
-        best_action = exploit(population)
-        assert 2 == best_action
+        best_action = exploit(population, all_actions)
+        assert best_action == 2
 
         # when & then
         # C3 - does anticipate change and is quite good
@@ -61,27 +65,28 @@ class TestActionSelection:
         population.append(c3)
 
         # Here C3 has the biggest fitness score
-        best_action = exploit(population)
-        assert 3 == best_action
+        best_action = exploit(population, all_actions)
+        assert best_action == 3
 
     def test_should_return_random_action(self, cfg):
         # given
-        population = ClassifiersList(cfg=cfg)
+        all_actions = cfg.number_of_possible_actions
         random_actions = []
 
         # when
         for _ in range(0, 500):
-            random_actions.append(choose_random_action(population))
+            random_actions.append(choose_random_action(all_actions))
 
         min_action = min(random_actions)
         max_action = max(random_actions)
 
         # then
-        assert 0 == min_action
-        assert 7 == max_action
+        assert min_action == 0
+        assert max_action == 7
 
     def test_should_return_latest_action(self, cfg):
         # given
+        all_actions = cfg.number_of_possible_actions
         population = ClassifiersList(cfg=cfg)
         c0 = Classifier(action=0, cfg=cfg)
         c0.talp = 1
@@ -90,7 +95,7 @@ class TestActionSelection:
         population.append(c0)
 
         # Should return first action with no classifiers
-        assert 1 == choose_latest_action(population)
+        assert 1 == choose_latest_action(population, all_actions)
 
         # Add rest of classifiers
         population.append(Classifier(action=3, cfg=cfg))
@@ -109,16 +114,17 @@ class TestActionSelection:
         population[2].talp = randint(10, 20)
 
         # then
-        assert 7 == choose_latest_action(population)
+        assert choose_latest_action(population, all_actions) == 7
 
     def test_should_return_worst_quality_action(self, cfg):
         # given
+        all_actions = cfg.number_of_possible_actions
         population = ClassifiersList(cfg=cfg)
         c0 = Classifier(action=0, cfg=cfg)
         population.append(c0)
 
         # Should return C1 (because it's first not mentioned)
-        assert 1 == choose_action_from_knowledge_array(population)
+        assert choose_action_from_knowledge_array(population, all_actions) == 1
 
         # Add rest of classifiers
         c1 = Classifier(action=1, numerosity=31, quality=0.72, cfg=cfg)
@@ -144,4 +150,4 @@ class TestActionSelection:
 
         # then
         # Classifier C7 should be the worst here
-        assert 7 == choose_action_from_knowledge_array(population)
+        assert choose_action_from_knowledge_array(population, all_actions) == 7

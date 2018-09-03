@@ -3,8 +3,9 @@ from __future__ import annotations
 from typing import Optional
 
 from lcs import TypedList, Perception
+from lcs.agents.racs import Configuration
 from . import Classifier
-from .components.alp import expected_case, unexpected_case
+from .components.alp import expected_case, unexpected_case, cover
 
 
 class ClassifierList(TypedList):
@@ -21,12 +22,13 @@ class ClassifierList(TypedList):
         return ClassifierList(*matching)
 
     def apply_alp(self,
-                  previous_situation: Perception,
+                  p0: Perception,
                   action: int,
-                  situation: Perception,
+                  p1: Perception,
                   time: int,
                   population: ClassifierList,
-                  match_set: ClassifierList) -> None:
+                  match_set: ClassifierList,
+                  cfg: Configuration) -> None:
 
         new_list = ClassifierList()
         new_cl: Optional[Classifier] = None
@@ -37,13 +39,13 @@ class ClassifierList(TypedList):
             cl.increase_experience()
             cl.set_alp_timestamp(time)
 
-            if cl.does_anticipate_correctly(previous_situation, situation):
-                new_cl = expected_case(cl, previous_situation, time)
+            if cl.does_anticipate_correctly(p0, p1):
+                new_cl = expected_case(cl, p0, time)
                 was_expected_case = True
             else:
                 new_cl = unexpected_case(cl,
-                                         previous_situation,
-                                         situation,
+                                         p0,
+                                         p1,
                                          time)
                 if cl.is_inadequate():
                     delete_counter += 1
@@ -52,8 +54,38 @@ class ClassifierList(TypedList):
 
             if new_cl is not None:
                 new_cl.tga = time
+                self.add_alp_classifier(new_cl, new_list)
 
-                # TODO: continue from here
+        # No classifier anticipated correctly - generate new one
+        if not was_expected_case:
+            new_cl = cover(p0, action, p1, time, cfg)
+            self.add_alp_classifier(new_cl, new_list)
+
+        # Merge classifiers from new_list into self and population
+        self.extend(new_list)
+        population.extend(new_list)
+
+        if match_set is not None:
+            new_matching = [cl for cl in new_list if
+                            cl.condition.does_match(p1)]
+            match_set.extend(new_matching)
+
+    def apply_reinforcement_learning(self, reward: int, p: float) -> None:
+        """
+        Reinforcement Learning. Applies RL according to
+        current reinforcement `reward` and back-propagated reinforcement
+        `maximum_fitness`.
+
+        Parameters
+        ----------
+        reward: int
+            current reward obtained from the environment
+        p: float
+            maximum fitness - back-propagated reinforcement
+        """
+        for cl in self:
+            cl.update_reward(reward + cl.cfg.gamma * p)
+            cl.update_intermediate_reward(reward)
 
     def add_alp_classifier(self,
                            child: Classifier,

@@ -67,3 +67,18 @@ class TestClassifierList:
         assert cl1 in action_set
         assert cl2 in action_set
         assert cl3 not in action_set
+
+    def test_should_apply_reinforcement_learning(self, cfg):
+        # given
+        cl = Classifier(
+            reward=34.29,
+            intermediate_reward=11.29,
+            cfg=cfg)
+        population = ClassifierList(*[cl])
+
+        # when
+        population.apply_reinforcement_learning(0, 28.79)
+
+        # then
+        assert abs(33.94 - population[0].r) < 0.1
+        assert abs(10.74 - population[0].ir) < 0.1

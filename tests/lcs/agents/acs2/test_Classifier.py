@@ -86,25 +86,31 @@ class TestClassifier:
         # then
         assert cls.is_inadequate() is True
 
-    def test_should_update_reward(self, cfg):
+    @pytest.mark.parametrize("_r0, _r1, _p", [
+        (0.5, 50.475, 1000)
+    ])
+    def test_should_update_reward(self, _r0, _r1, _p, cfg):
         # given
-        cls = Classifier(cfg=cfg)
+        cls = Classifier(reward=_r0, cfg=cfg)
 
         # when
-        cls.update_reward(1000)
+        cls.update_reward(_p)
 
         # then
-        assert 50.475 == cls.r
+        assert cls.r == _r1
 
-    def test_should_update_intermediate_reward(self, cfg):
+    @pytest.mark.parametrize("_ir0, _ir1, _p", [
+        (0.0, 50.0, 1000)
+    ])
+    def test_should_update_intermediate_reward(self, _ir0, _ir1, _p, cfg):
         # given
-        cls = Classifier(cfg=cfg)
+        cls = Classifier(intermediate_reward=_ir0, cfg=cfg)
 
         # when
-        cls.update_intermediate_reward(1000)
+        cls.update_intermediate_reward(_p)
 
         # then
-        assert 50.0 == cls.ir
+        assert cls.ir == _ir1
 
     def test_should_increase_experience(self, cfg):
         # given

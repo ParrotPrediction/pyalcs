@@ -4,7 +4,7 @@ class Configuration:
                  number_of_possible_actions,
                  classifier_wildcard='#',
                  perception_mapper_fcn=None,
-                 action_mapping_dict=None,
+                 action_mapping_fcn=None,
                  environment_metrics_fcn=None,
                  performance_fcn=None,
                  performance_fcn_params={},
@@ -29,9 +29,7 @@ class Configuration:
             be executed
         :param classifier_wildcard: wildcard symbol
         :param perception_mapper_fcn:
-        :param action_mapping_dict: dictionary where key is internal ID of
-            action (numbers from `0 .. number_of_possible_actions)` and value
-            is the environmental representation of the action.
+        :param action_mapping_fcn:
         :param environment_metrics_fcn:
         :param performance_fcn: function for estimating agent performance
         :param performance_fcn_params: optional parameters needed for
@@ -56,7 +54,7 @@ class Configuration:
         self.number_of_possible_actions = number_of_possible_actions
         self.classifier_wildcard = classifier_wildcard
         self.perception_mapper_fcn = perception_mapper_fcn
-        self.action_mapping_dict = action_mapping_dict
+        self.action_mapping_fcn = action_mapping_fcn
         self.environment_metrics_fcn = environment_metrics_fcn
         self.performance_fcn = performance_fcn
         self.performance_fcn_params = performance_fcn_params
@@ -80,7 +78,7 @@ class Configuration:
                "\n\t- Number of possible actions: [{}]" \
                "\n\t- Classifier wildcard: [{}]" \
                "\n\t- Perception mapper function: [{}]" \
-               "\n\t- Action mapping dict: [{}]" \
+               "\n\t- Action mapping function: [{}]" \
                "\n\t- Environment metrics function: [{}]" \
                "\n\t- Performance calculation function: [{}] " \
                "\n\t- Do GA: [{}]" \
@@ -93,7 +91,7 @@ class Configuration:
                     self.number_of_possible_actions,
                     self.classifier_wildcard,
                     self.perception_mapper_fcn,
-                    self.action_mapping_dict,
+                    self.action_mapping_fcn,
                     self.environment_metrics_fcn,
                     self.performance_fcn,
                     self.do_ga,

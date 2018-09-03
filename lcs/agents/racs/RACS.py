@@ -1,10 +1,11 @@
 import logging
-from typing import Optional
+from typing import Optional, Callable, Tuple, List
 
+from lcs.strategies.action_selection import choose_action
 from ...agents import Agent
 from ...agents.Agent import Metric
 from ...agents.racs import Configuration, ClassifierList
-from ...utils import parse_state
+from ...utils import parse_state, parse_action
 
 
 class RACS(Agent):
@@ -16,25 +17,108 @@ class RACS(Agent):
         self.cfg = cfg
         self.population = population or ClassifierList()
 
-    def explore(self, env, trials):
-        pass
+    def explore(self, env, trials) -> Tuple:
+        return self._evaluate(env, trials, self._run_trial_explore)
 
     def exploit(self, env, trials):
         pass
 
-    def _run_trial_explore(self, env, time):
+    def _evaluate(self, env, max_trials: int, func: Callable) -> Tuple:
+        """
+        Runs the classifier in desired strategy (see `func`) and collects
+        metrics.
+
+        Parameters
+        ----------
+        env:
+            OpenAI Gym environment
+        max_trials: int
+            maximum number of trials
+        func: Callable
+            Function accepting three parameters: env, steps already made,
+             current trial
+
+        Returns
+        -------
+        tuple
+            population of classifiers and metrics
+        """
+        current_trial = 0
+        steps = 0
+
+        metrics: List = []
+        while current_trial < max_trials:
+            steps_in_trial = func(env, steps, current_trial)
+            steps += steps_in_trial
+
+            # TODO: collect metrics
+
+            current_trial += 1
+
+        return self.population, metrics
+
+    def _run_trial_explore(self, env, time, current_trial=None):
         logging.debug("** Running trial explore ** ")
         # Initial conditions
         steps = 0
         raw_state = env.reset()
-        state = parse_state(raw_state)
+        state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
         action = None
         reward = None
         prev_state = None
         action_set = ClassifierList()
         done = False
 
-        # TODO: rest of the code
+        while not done:
+            match_set = self.population.form_match_set(state)
+
+            if steps > 0:
+                # Apply learning in the last action set
+                action_set.apply_alp(
+                    prev_state,
+                    action,
+                    state,
+                    time + steps,
+                    self.population,
+                    match_set,
+                    self.cfg)
+                action_set.apply_reinforcement_learning(
+                    reward,
+                    match_set.get_maximum_fitness())
+                if self.cfg.do_ga:
+                    pass
+                    # TODO: implement GA
+
+            action = choose_action(
+                match_set,
+                self.cfg.number_of_possible_actions,
+                self.cfg.epsilon)
+            internal_action = parse_action(action, self.cfg.action_mapping_fcn)
+            logging.debug("\tExecuting action: [%d]", action)
+            action_set = match_set.form_action_set(action)
+
+            prev_state = state
+            raw_state, reward, done, _ = env.step(internal_action)
+            state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
+
+            if done:
+                action_set.apply_alp(
+                    prev_state,
+                    action,
+                    state,
+                    time + steps,
+                    self.population,
+                    None,
+                    self.cfg)
+                action_set.apply_reinforcement_learning(
+                    reward,
+                    0)
+                if self.cfg.do_ga:
+                    pass
+                    # TODO: implement GA
+            steps += 1
+
+        return steps
 
     def _collect_agent_metrics(self, trial, steps, total_steps) -> Metric:
         return {
