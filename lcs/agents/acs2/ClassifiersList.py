@@ -8,7 +8,8 @@ from lcs import Perception, TypedList
 from lcs.agents.acs2.components.alp import expected_case, unexpected_case, \
     cover
 from lcs.agents.acs2.components.genetic_algorithm \
-    import roulette_wheel_parents_selection, mutate, two_point_crossover
+    import mutate, two_point_crossover
+from lcs.strategies.genetic_algorithms import roulette_wheel_selection
 from . import Classifier, Configuration
 
 
@@ -146,8 +147,10 @@ class ClassifiersList(TypedList):
 
         if self.should_apply_ga(time):
             self.set_ga_timestamp(time)
-            parent1, parent2 = roulette_wheel_parents_selection(
-                self, randomfunc=randomfunc)
+
+            # Select parents
+            parent1, parent2 = roulette_wheel_selection(
+                self, lambda cl: pow(cl.q, 3) * cl.num)
 
             child1 = Classifier.copy_from(parent1, time)
             child2 = Classifier.copy_from(parent2, time)

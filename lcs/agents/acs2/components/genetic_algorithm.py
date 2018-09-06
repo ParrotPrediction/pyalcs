@@ -1,34 +1,7 @@
 from random import random, sample
 from typing import Callable
 
-from lcs.agents.acs2 import Classifier, ClassifiersList
-
-
-def roulette_wheel_parents_selection(pop: ClassifiersList,
-                                     randomfunc: Callable=random):
-    """
-    Select two classifiers from population according
-    to roulette-wheel selection.
-    """
-    parent1, parent2 = None, None
-
-    q_sum = sum(cl.q3num() for cl in pop)
-
-    q_sel1 = randomfunc() * q_sum
-    q_sel2 = randomfunc() * q_sum
-
-    q_sel1, q_sel2 = sorted([q_sel2, q_sel1])
-
-    q_counter = 0.0
-    for cl in pop:
-        q_counter += cl.q3num()
-        if parent1 is None and q_counter > q_sel1:
-            parent1 = cl
-        if q_counter > q_sel2:
-            parent2 = cl
-            break
-
-    return parent1, parent2
+from lcs.agents.acs2 import Classifier
 
 
 def mutate(cl: Classifier,

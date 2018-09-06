@@ -68,9 +68,6 @@ class Classifier(object):
         # I don't know yet what it is
         self.ee = 0
 
-    def q3num(self):
-        return pow(self.q, 3) * self.num
-
     def __eq__(self, other):
         if self.condition == other.condition and \
                 self.action == other.action and \
