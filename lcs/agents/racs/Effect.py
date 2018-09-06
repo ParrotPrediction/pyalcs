@@ -15,6 +15,19 @@ class Effect(PerceptionString):
         self.cfg = cfg
         super().__init__(lst, cfg.classifier_wildcard, cfg.oktypes)
 
+    @property
+    def specify_change(self) -> bool:
+        """
+        Checks whether there is any attribute in the effect part that
+        is not "pass-through" - so predicts a change.
+
+        Returns
+        -------
+        bool
+            True if the effect part predicts a change, False otherwise
+        """
+        return any(True for e in self if e != self.wildcard)
+
     @classmethod
     def pass_through(cls, cfg: Configuration):
         """

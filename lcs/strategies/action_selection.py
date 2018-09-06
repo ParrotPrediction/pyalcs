@@ -1,23 +1,23 @@
 import logging
+import random
 
 from itertools import groupby
-from random import random, randint
 from typing import Optional
-
-from lcs.agents.acs2 import Classifier, ClassifiersList
 
 
 logger = logging.getLogger(__name__)
 
 
-def choose_action(cll, epsilon: float) -> Optional[int]:
+def choose_action(cll, all_actions: int, epsilon: float) -> Optional[int]:
     """
     Chooses which action to execute given classifier list (match set).
 
     Parameters
     ----------
-    cll: ClassifiersList
-        Population of classifiers
+    cll:
+        list of classifiers
+    all_actions:
+        int: number of all possible actions available
     epsilon: float
         Probability of executing exploration path
 
@@ -26,22 +26,24 @@ def choose_action(cll, epsilon: float) -> Optional[int]:
     Optional[int]
         number of chosen action
     """
-    if random() < epsilon:
+    if random.random() < epsilon:
         logger.debug("\t\tExploration path")
-        return explore(cll)
+        return explore(cll, all_actions)
 
     logger.debug("\t\tExploitation path")
-    return exploit(cll)
+    return exploit(cll, all_actions)
 
 
-def explore(cll: ClassifiersList, pb: float = 0.5) -> Optional[int]:
+def explore(cll, all_actions: int, pb: float = 0.5) -> Optional[int]:
     """
     Chooses action according to current exploration policy
 
     Parameters
     ----------
-    cll: ClassifiersList
-        classifier list
+    cll:
+        list of classifiers
+    all_actions: int
+        number of all possible actions available
     pb: float
         probability of biased exploration
 
@@ -50,25 +52,27 @@ def explore(cll: ClassifiersList, pb: float = 0.5) -> Optional[int]:
     int
         action to be executed
     """
-    if random() < pb:
+    if random.random() < pb:
         # We are in the biased exploration
-        if random() < 0.5:
-            return choose_latest_action(cll)
+        if random.random() < 0.5:
+            return choose_latest_action(cll, all_actions)
         else:
-            return choose_action_from_knowledge_array(cll)
+            return choose_action_from_knowledge_array(cll, all_actions)
 
-    return choose_random_action(cll)
+    return choose_random_action(all_actions)
 
 
-def exploit(cll: ClassifiersList) -> int:
+def exploit(cll, all_actions: int) -> int:
     """
     Chooses best action according to fitness. If there is no classifier
     in list (or none is predicting change) than a random action is returned
 
     Parameters
     ----------
-    cll: ClassifiersList
-        classifier list
+    cll:
+        list of classifiers
+    all_actions: int
+        number of all possible actions available
 
     Returns
     -------
@@ -86,26 +90,27 @@ def exploit(cll: ClassifiersList) -> int:
     if best_classifier is not None:
         return best_classifier.action
 
-    return choose_random_action(cll)
+    return choose_random_action(all_actions)
 
 
-def choose_latest_action(cll: ClassifiersList) -> Optional[int]:
+def choose_latest_action(cll, all_actions: int) -> Optional[int]:
     """
     Chooses latest executed action ("action delay bias")
 
     Parameters
     ----------
-    cll: ClassifiersList
-        classifier list
+    cll:
+        list of classifiers
+    all_actions: int
+        number of all possible actions available
 
     Returns
     -------
     int
         chosen action number
     """
-    last_executed_cls: Classifier
-    number_of_cls_per_action = \
-        {i: 0 for i in range(cll.cfg.number_of_possible_actions)}
+    last_executed_cls = None
+    number_of_cls_per_action = {i: 0 for i in range(all_actions)}
 
     if len(cll) > 0:
         last_executed_cls = min(cll, key=lambda cl: cl.talp)
@@ -121,10 +126,13 @@ def choose_latest_action(cll: ClassifiersList) -> Optional[int]:
             return action
 
     # Otherwise return the action of the last executed classifier
-    return last_executed_cls.action
+    if last_executed_cls:
+        return last_executed_cls.action
+
+    return None
 
 
-def choose_action_from_knowledge_array(cll: ClassifiersList) -> int:
+def choose_action_from_knowledge_array(cll, all_actions: int) -> int:
     """
     Creates 'knowledge array' that represents the average quality of the
     anticipation for each action in the current list. Chosen is
@@ -132,16 +140,17 @@ def choose_action_from_knowledge_array(cll: ClassifiersList) -> int:
 
     Parameters
     ----------
-    cll: ClassifiersList
-        classifier list
+    cll:
+        list of classifiers
+    all_actions: int
+        number of all possible actions available
 
     Returns
     -------
     int
         chosen action
     """
-    knowledge_array = {i: 0.0
-                       for i in range(cll.cfg.number_of_possible_actions)}
+    knowledge_array = {i: 0.0 for i in range(all_actions)}
 
     cll.sort(key=lambda cl: cl.action)
 
@@ -159,19 +168,18 @@ def choose_action_from_knowledge_array(cll: ClassifiersList) -> int:
     return action
 
 
-def choose_random_action(cll: ClassifiersList) -> int:
+def choose_random_action(all_actions: int) -> int:
     """
     Chooses one of the possible actions in the environment randomly
 
     Parameters
     ----------
-    cll: ClassifiersList
-        classifier list
+    all_actions: int
+        number of all possible actions available
 
     Returns
     -------
     int
         random action number
-
     """
-    return randint(0, cll.cfg.number_of_possible_actions - 1)
+    return random.choice(range(all_actions))

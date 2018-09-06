@@ -68,9 +68,6 @@ class Classifier(object):
         # I don't know yet what it is
         self.ee = 0
 
-    def q3num(self):
-        return pow(self.q, 3) * self.num
-
     def __eq__(self, other):
         if self.condition == other.condition and \
                 self.action == other.action and \
@@ -178,7 +175,7 @@ class Classifier(object):
         bool
             true if the effect part contains any specified attributes
         """
-        return self.effect.number_of_specified_elements > 0
+        return self.effect.specify_change
 
     def is_reliable(self) -> bool:
         return self.q > self.cfg.theta_r

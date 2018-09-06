@@ -17,6 +17,7 @@ class Classifier:
                  quality: float = 0.5,
                  reward: float = 0.5,
                  intermediate_reward: float = 0.0,
+                 numerosity: int = 1,
                  experience: int = 1,
                  talp=None,
                  tga: int = 0,
@@ -48,6 +49,7 @@ class Classifier:
         self.q = quality
         self.r = reward
         self.ir = intermediate_reward
+        self.num = numerosity
 
         self.exp = experience
         self.talp = talp
@@ -170,6 +172,14 @@ class Classifier:
     def is_inadequate(self) -> bool:
         return self.q < self.cfg.theta_i
 
+    def update_reward(self, p: float) -> float:
+        self.r += self.cfg.beta * (p - self.r)
+        return self.r
+
+    def update_intermediate_reward(self, rho) -> float:
+        self.ir += self.cfg.beta * (rho - self.ir)
+        return self.ir
+
     def increase_experience(self) -> int:
         self.exp += 1
         return self.exp
@@ -181,6 +191,17 @@ class Classifier:
     def decrease_quality(self) -> float:
         self.q -= self.cfg.beta * self.q
         return self.q
+
+    def does_anticipate_change(self) -> bool:
+        """
+        Checks whether any change in environment is anticipated
+
+        Returns
+        -------
+        bool
+            true if the effect part contains any specified attributes
+        """
+        return self.effect.specify_change
 
     def does_anticipate_correctly(self,
                                   previous_situation: Perception,

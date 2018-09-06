@@ -8,7 +8,8 @@ from lcs import Perception, TypedList
 from lcs.agents.acs2.components.alp import expected_case, unexpected_case, \
     cover
 from lcs.agents.acs2.components.genetic_algorithm \
-    import roulette_wheel_parents_selection, mutate, two_point_crossover
+    import mutate, two_point_crossover
+from lcs.strategies.genetic_algorithms import roulette_wheel_selection
 from . import Classifier, Configuration
 
 
@@ -32,10 +33,14 @@ class ClassifiersList(TypedList):
         matching = [cl for cl in self if cl.action == action]
         return ClassifiersList(*matching, cfg=cfg)
 
-    def expand(self):
+    def expand(self) -> List[Classifier]:
         """
         Returns an array containing all micro-classifiers
-        :return: a list of all classifiers
+
+        Returns
+        -------
+        List[Classifier]
+            list of all expanded classifiers
         """
         list2d = [[cl] * cl.num for cl in self]
         return list(chain.from_iterable(list2d))
@@ -45,7 +50,10 @@ class ClassifiersList(TypedList):
         Returns the maximum fitness value amongst those classifiers
         that anticipated a change in environment.
 
-        :return: fitness value
+        Returns
+        -------
+        float
+            fitness value
         """
         anticipated_change_cls = [cl for cl in self
                                   if cl.does_anticipate_change()]
@@ -57,9 +65,9 @@ class ClassifiersList(TypedList):
         return 0.0
 
     def apply_alp(self,
-                  previous_situation: Perception,
+                  p0: Perception,
                   action: int,
-                  situation: Perception,
+                  p1: Perception,
                   time: int,
                   population: ClassifiersList,
                   match_set: ClassifiersList) -> None:
@@ -68,9 +76,9 @@ class ClassifiersList(TypedList):
         insertion of new classifiers in pop and possibly matchSet, and
         deletion of inadequate classifiers in pop and possibly matchSet.
 
-        :param previous_situation:
+        :param p0:
         :param action:
-        :param situation:
+        :param p1:
         :param time:
         :param population:
         :param match_set:
@@ -84,14 +92,11 @@ class ClassifiersList(TypedList):
             cl.increase_experience()
             cl.set_alp_timestamp(time)
 
-            if cl.does_anticipate_correctly(previous_situation, situation):
-                new_cl = expected_case(cl, previous_situation, time)
+            if cl.does_anticipate_correctly(p0, p1):
+                new_cl = expected_case(cl, p0, time)
                 was_expected_case = True
             else:
-                new_cl = unexpected_case(cl,
-                                         previous_situation,
-                                         situation,
-                                         time)
+                new_cl = unexpected_case(cl, p0, p1, time)
 
                 if cl.is_inadequate():
                     # Removes classifier from population, match set
@@ -107,11 +112,7 @@ class ClassifiersList(TypedList):
 
         # No classifier anticipated correctly - generate new one
         if not was_expected_case:
-            new_cl = cover(previous_situation,
-                           action,
-                           situation,
-                           time,
-                           self.cfg)
+            new_cl = cover(p0, action, p1, time, self.cfg)
             self.add_alp_classifier(new_cl, new_list)
 
         # Merge classifiers from new_list into self and population
@@ -120,7 +121,7 @@ class ClassifiersList(TypedList):
 
         if match_set is not None:
             new_matching = [cl for cl in new_list if
-                            cl.condition.does_match(situation)]
+                            cl.condition.does_match(p1)]
             match_set.extend(new_matching)
 
     def apply_reinforcement_learning(self, reward: int, p) -> None:
@@ -146,8 +147,10 @@ class ClassifiersList(TypedList):
 
         if self.should_apply_ga(time):
             self.set_ga_timestamp(time)
-            parent1, parent2 = roulette_wheel_parents_selection(
-                self, randomfunc=randomfunc)
+
+            # Select parents
+            parent1, parent2 = roulette_wheel_selection(
+                self, lambda cl: pow(cl.q, 3) * cl.num)
 
             child1 = Classifier.copy_from(parent1, time)
             child2 = Classifier.copy_from(parent2, time)

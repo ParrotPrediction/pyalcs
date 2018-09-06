@@ -5,7 +5,7 @@ from . import ClassifiersList, Configuration
 from ...agents import Agent
 from ...agents.Agent import Metric
 from ...strategies.action_selection import choose_action
-from ...utils import parse_state
+from ...utils import parse_state, parse_action
 
 
 logger = logging.getLogger(__name__)
@@ -60,10 +60,21 @@ class ACS2(Agent):
         """
         Runs the classifier in desired strategy (see `func`) and collects
         metrics.
-        :param env: environment
-        :param max_trials: number of trials
-        :param func: three arguments: env, steps already made, current trial
-        :return: population of classifiers and metrics
+
+        Parameters
+        ----------
+        env:
+            OpenAI Gym environment
+        max_trials: int
+            maximum number of trials
+        func: Callable
+            Function accepting three parameters: env, steps already made,
+             current trial
+
+        Returns
+        -------
+        tuple
+            population of classifiers and metrics
         """
         current_trial = 0
         steps = 0
@@ -116,12 +127,17 @@ class ACS2(Agent):
                         match_set,
                         state)
 
-            action = choose_action(match_set, self.cfg.epsilon)
+
+            action = choose_action(
+                match_set,
+                self.cfg.number_of_possible_actions,
+                self.cfg.epsilon)
+            internal_action = parse_action(action, self.cfg.action_mapping_fcn)
             logger.debug("\tExecuting action: [%d]", action)
             action_set = match_set.form_action_set(action, self.cfg)
 
             prev_state = state
-            raw_state, reward, done, _ = env.step(self._parse_action(action))
+            raw_state, reward, done, _ = env.step(internal_action)
             state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
 
             if done:
@@ -166,10 +182,14 @@ class ACS2(Agent):
                     match_set.get_maximum_fitness())
 
             # Here while exploiting always choose best action
-            action = choose_action(match_set, epsilon=0.0)
+            action = choose_action(
+                match_set,
+                self.cfg.number_of_possible_actions,
+                epsilon=0.0)
+            internal_action = parse_action(action, self.cfg.action_mapping_fcn)
             action_set = match_set.form_action_set(action, self.cfg)
 
-            raw_state, reward, done, _ = env.step(self._parse_action(action))
+            raw_state, reward, done, _ = env.step(internal_action)
             state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
 
             if done:
@@ -178,21 +198,6 @@ class ACS2(Agent):
             steps += 1
 
         return steps
-
-    def _parse_action(self, action_idx):
-        """
-        Sometimes the step function from OpenAI Gym takes different
-        representation of actions than sequential range of integers.
-        There is a possiblity to provide custom mapping function for
-        suitable action values.
-
-        :param action_idx: action id, used in ACS2
-        :return: action id for the step function
-        """
-        if self.cfg.action_mapping_dict:
-            return self.cfg.action_mapping_dict[action_idx]
-
-        return action_idx
 
     def _collect_agent_metrics(self, trial, steps, total_steps) -> Metric:
         return {

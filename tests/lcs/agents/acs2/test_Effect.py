@@ -20,15 +20,13 @@ class TestEffect:
         with pytest.raises(TypeError):
             effect[0] = 1
 
-    def test_should_return_number_of_specific_components_1(self):
-        effect = Effect.empty(8)
-        assert 0 == effect.number_of_specified_elements
-
-    def test_should_return_number_of_specific_components_2(self):
-        effect = Effect.empty(8)
-        effect[1] = '1'
-
-        assert 1 == effect.number_of_specified_elements
+    @pytest.mark.parametrize("_e, _result", [
+        ("########", False),
+        ("#######1", True),
+        ("11111111", True),
+    ])
+    def test_should_detect_change(self, _e, _result):
+        assert Effect(_e).specify_change == _result
 
     def test_should_check_if_specializable_1(self):
         # given
