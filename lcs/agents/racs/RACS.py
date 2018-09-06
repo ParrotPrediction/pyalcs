@@ -7,6 +7,9 @@ from ...agents.racs import Configuration, ClassifierList
 from ...utils import parse_state
 
 
+logger = logging.getLogger(__name__)
+
+
 class RACS(Agent):
     """ACS2 agent operating on real-valued (floating) number"""
 
@@ -23,7 +26,7 @@ class RACS(Agent):
         pass
 
     def _run_trial_explore(self, env, time):
-        logging.debug("** Running trial explore ** ")
+        logger.debug("** Running trial explore ** ")
         # Initial conditions
         steps = 0
         raw_state = env.reset()
