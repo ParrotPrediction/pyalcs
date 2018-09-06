@@ -178,7 +178,7 @@ class Classifier(object):
         bool
             true if the effect part contains any specified attributes
         """
-        return self.effect.number_of_specified_elements > 0
+        return self.effect.specify_change
 
     def is_reliable(self) -> bool:
         return self.q > self.cfg.theta_r

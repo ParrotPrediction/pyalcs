@@ -9,11 +9,17 @@ class Effect(PerceptionString):
     """
 
     @property
-    def number_of_specified_elements(self) -> int:
+    def specify_change(self) -> bool:
         """
-        :return: number of specified components
+        Checks whether there is any attribute in the effect part that
+        is not "pass-through" - so predicts a change.
+
+        Returns
+        -------
+        bool
+            True if the effect part predicts a change, False otherwise
         """
-        return sum(1 for comp in self if comp != self.wildcard)
+        return any(True for e in self if e != self.wildcard)
 
     def is_specializable(self, p0: Perception, p1: Perception) -> bool:
         """

@@ -32,10 +32,14 @@ class ClassifiersList(TypedList):
         matching = [cl for cl in self if cl.action == action]
         return ClassifiersList(*matching, cfg=cfg)
 
-    def expand(self):
+    def expand(self) -> List[Classifier]:
         """
         Returns an array containing all micro-classifiers
-        :return: a list of all classifiers
+
+        Returns
+        -------
+        List[Classifier]
+            list of all expanded classifiers
         """
         list2d = [[cl] * cl.num for cl in self]
         return list(chain.from_iterable(list2d))
@@ -45,7 +49,10 @@ class ClassifiersList(TypedList):
         Returns the maximum fitness value amongst those classifiers
         that anticipated a change in environment.
 
-        :return: fitness value
+        Returns
+        -------
+        float
+            fitness value
         """
         anticipated_change_cls = [cl for cl in self
                                   if cl.does_anticipate_change()]

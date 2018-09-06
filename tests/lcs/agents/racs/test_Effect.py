@@ -13,6 +13,14 @@ class TestEffect:
                              number_of_possible_actions=2,
                              encoder_bits=4)
 
+    @pytest.mark.parametrize("_e, _result", [
+        ([UBR(0, 15), UBR(0, 15)], False),
+        ([UBR(0, 15), UBR(2, 14)], True),
+        ([UBR(4, 10), UBR(2, 14)], True),
+    ])
+    def test_should_detect_change(self, _e, _result, cfg):
+        assert Effect(_e, cfg).specify_change == _result
+
     def test_should_create_pass_through_effect(self, cfg):
         # when
         effect = Effect.pass_through(cfg)

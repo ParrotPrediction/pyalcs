@@ -193,8 +193,15 @@ class Classifier:
         return self.q
 
     def does_anticipate_change(self) -> bool:
-        # TODO: implement
-        raise NotImplementedError()
+        """
+        Checks whether any change in environment is anticipated
+
+        Returns
+        -------
+        bool
+            true if the effect part contains any specified attributes
+        """
+        return self.effect.specify_change
 
     def does_anticipate_correctly(self,
                                   previous_situation: Perception,
