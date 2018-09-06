@@ -98,7 +98,7 @@ class RACS(Agent):
                 self.cfg.number_of_possible_actions,
                 self.cfg.epsilon)
             internal_action = parse_action(action, self.cfg.action_mapping_fcn)
-            logging.debug("\tExecuting action: [%d]", action)
+            logger.debug("\tExecuting action: [%d]", action)
             action_set = match_set.form_action_set(action)
 
             prev_state = state
