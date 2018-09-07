@@ -3,7 +3,7 @@
 docs:
 	(cd docs && make html)
 
-lint: docs
+lint:
 	mypy lcs
 
 test: lint
