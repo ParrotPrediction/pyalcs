@@ -6,7 +6,7 @@ from lcs.agents.acs2 import Classifier
 
 def mutate(cl: Classifier,
            mu: float,
-           randomfunc: Callable=random):
+           randomfunc: Callable=random) -> None:
     """
     Executes the generalizing mutation in the classifier.
     Specified attributes in classifier conditions are randomly

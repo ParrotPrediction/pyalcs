@@ -62,7 +62,16 @@ class Condition(PerceptionString):
             if new_el != self.wildcard:
                 self[idx] = new_el
 
-    def generalize(self, idx: int):
+    def generalize(self, idx: int) -> None:
+        """
+        Broadens the range of specific condition attribute
+        to the maximum range.
+
+        Parameters
+        ----------
+        idx: int
+            Id of the attribute to generalize
+        """
         self[idx] = self.cfg.classifier_wildcard
 
     def generalize_specific_attribute_randomly(
