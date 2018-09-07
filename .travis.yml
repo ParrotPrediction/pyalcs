@@ -9,11 +9,9 @@ python:
 
 install:
   - docker build -t parrot-prediction/lcs .
-  - pip install -r requirements-docs.txt
 
 script:
   - docker run parrot-prediction/lcs
-  - make docs
 
 deploy:
   provider: pypi
