@@ -45,6 +45,7 @@ class ACS2(Agent):
         :param trials: number of trials
         :return: population of classifiers and metrics
         """
+
         def switch_phases(env, steps, current_trial):
             if current_trial % 2 == 0:
                 return self._run_trial_explore(env, steps)
@@ -103,7 +104,13 @@ class ACS2(Agent):
         done = False
 
         while not done:
-            match_set = self.population.form_match_set(state, self.cfg)
+            if self.cfg.do_action_planning and (steps + time) % self.cfg.action_planning_frequency == 0:
+                # Action Planning for increased model learning
+                steps_ap, state, prev_state, action_set, reward = self._run_action_planning(env, steps + time, state, prev_state, action_set, action, reward)
+                steps += steps_ap
+
+            match_set = self.population.form_match_set(state,
+                                                       self.cfg)
 
             if steps > 0:
                 # Apply learning in the last action set
@@ -194,6 +201,72 @@ class ACS2(Agent):
             steps += 1
 
         return steps
+
+    def _run_action_planning(self, env, time, situation,
+                             previous_situation, action_set, action, reward):
+        """
+        Executes action planning for model learning speed up.
+        Method requests goals from 'goal generator' provided by the environment.
+        If goal is provided, ACS2 searches for a goal sequence in the current model (only the reliable classifiers).
+        This is done as long as goals are provided and ACS2 finds a sequence and successfully reaches the goal.
+        :param env:
+        :param time:
+        :param situation:
+        :param previous_situation:
+        :param action_set:
+        :param action:
+        :param reward:
+        :return:
+        """
+        logging.debug("** Running action planning **")
+
+        # The environment has to have a function "get_goal_state"
+        if not hasattr(env.env, "get_goal_state"):
+            logging.debug("Action planning stopped - no function get_goal_state in env")
+            return 0, situation, previous_situation, action_set, reward
+
+        steps = 0
+        done = False
+
+        while not done:
+            goal_situation = env.env.get_goal_state()
+
+            if goal_situation is None:
+                break
+
+            act_sequence = self.population.search_goal_sequence(situation, goal_situation)
+
+            # Execute the found sequence and learn during executing
+            i = 0
+            for act in act_sequence:
+                if act == -1:
+                    break
+
+                match_set = self.population.form_match_set(situation=situation, cfg=self.cfg)
+                if action_set is not None and previous_situation is not None:
+                    action_set.apply_alp(previous_situation, action, situation, time + steps, self.population, match_set)
+                    action_set.apply_reinforcement_learning(reward, match_set.get_maximum_fitness())
+                    if self.cfg.do_ga:
+                        action_set.apply_ga(time + steps, self.population, match_set, situation)
+
+                action = act
+                action_set = ClassifiersList.form_action_set(match_set, action, self.cfg)
+
+                raw_state, reward, done, _ = env.step(self.parse_action(action))
+                previous_situation = situation
+                situation = self.parse_state(raw_state)
+
+                if not action_set.exists_classifier(previous_situation, action, situation, self.cfg.theta_r):
+                    # no reliable classifier was able to anticipate such a change
+                    break
+
+                steps += 1
+                i += 1
+
+            if i == 0:
+                break
+
+        return steps, situation, previous_situation, action_set, reward
 
     def _collect_agent_metrics(self, trial, steps, total_steps) -> Metric:
         return {

@@ -23,7 +23,7 @@
 #include "Classifier.h"
 #include "ClassifierList.h"
 #include "MazeEnvironment.h"
-#include "MPEnvironment.h"
+#include "HandEyeEnvironment.h"
 
 using namespace std;
 
@@ -298,6 +298,7 @@ int startOneTrialExploit(ClassifierList *population, Environment *env) {
 int startActionPlanning(ClassifierList *population, Environment *env, int time, ofstream *out, Perception *situation,
                         Perception *previousSituation, ClassifierList **actionSet, Action *act, double *rho0) {
     /* Recheck this function -> is step set correct and we need to do model testing in here! */
+    //Perception -
     Perception *goalSituation = new Perception();
 
     int steps;
@@ -306,18 +307,23 @@ int startActionPlanning(ClassifierList *population, Environment *env, int time, 
     for (steps = 0;
          !env->isReset() && (REWARD_TEST || time + steps <= MAX_STEPS) && (!REWARD_TEST || steps < MAX_TRIAL_STEPS);) {
 
+        //take new goal from environment
         if (!env->getGoalState(goalSituation)) {
+            //if there is none,then break
             break;
         } else {
             Action **actSequence = population->searchGoalSequence(situation, goalSituation);
             int i;
-            //cout<<situation<<"->";
-            //for(act=actSequence[0], i=0; act!=0; ++i, act=actSequence[i])
-            // cout<<act<<"->";
-            //cout<<goalSituation<<endl;
+            Action *a;
+            // TODO go back to comment
+//            cout<<situation<<"->";
+//            for(a=actSequence[0], i=0; a!=0; ++i, a=actSequence[i])
+//             cout<<a<<"->";
+//            cout<<goalSituation<<endl;
 
             //Execute the found sequence and learn during executing
             for (i = 0; actSequence[i] != 0; i++, steps++) {
+
 
                 matchSet = new ClassifierList(population, situation);
 

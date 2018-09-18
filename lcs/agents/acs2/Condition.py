@@ -68,3 +68,15 @@ class Condition(PerceptionString):
                 return False
 
         return True
+
+    def get_backwards_anticipation(self, perception):
+        """
+        Returns the believed backwards anticipation. Hereby, the condition is treated like an effect part.
+        :param perception:
+        :return:
+        """
+        ant = Perception(perception)
+        for idx, item in enumerate(self):
+            if item != self.cfg.classifier_wildcard:
+                ant[idx] = item
+        return ant
