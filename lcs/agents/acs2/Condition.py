@@ -77,6 +77,6 @@ class Condition(PerceptionString):
         """
         ant = Perception(perception)
         for idx, item in enumerate(self):
-            if item != self.cfg.classifier_wildcard:
+            if item != self.wildcard:
                 ant[idx] = item
         return ant

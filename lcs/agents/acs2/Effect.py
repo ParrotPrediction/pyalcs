@@ -56,7 +56,7 @@ class Effect(PerceptionString):
         # TODO: implement the rest after PEEs are implemented ('getBestChar' function)
         ant = Perception(perception)
         for idx, item in enumerate(self):
-            if item != self.cfg.classifier_wildcard:
+            if item != self.wildcard:
                 ant[idx] = item
         return ant
 
@@ -69,11 +69,11 @@ class Effect(PerceptionString):
         :return:
         """
         for idx, (item, back_ant, sit) in enumerate(zip(self, back_anticipation, situation)):
-            if item == self.cfg.classifier_wildcard and back_ant != sit:
+            if item == self.wildcard and back_ant != sit:
                 # change anticipated backwards although no change should occur
                 return False
             # TODO: if PEEs are implemented, 'isEnhanced()' should be added to the condition below
-            if item != self.cfg.classifier_wildcard and item == back_ant:
+            if item != self.wildcard and item == back_ant:
                 return False
         return True
 
@@ -88,8 +88,8 @@ class Effect(PerceptionString):
         :return:
         """
         for (item, percept, percept2) in zip(self, perception, other_perception):
-            if item == self.cfg.classifier_wildcard and percept != percept2:
+            if item == self.wildcard and percept != percept2:
                 return False
-            elif item != self.cfg.classifier_wildcard and item != percept:
+            elif item != self.wildcard and item != percept:
                 return False
         return True

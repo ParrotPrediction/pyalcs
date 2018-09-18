@@ -8,7 +8,7 @@ sys.path.append('/home/e-dzia/openai-envs')
 # noinspection PyUnresolvedReferences
 import gym_handeye
 from alcs import ACS2, ACS2Configuration
-from integration.handeye.utils import calculate_performance
+from examples.acs2.handeye.utils import calculate_performance
 
 # Configure logger
 logging.basicConfig(level=logging.INFO)
