@@ -1,5 +1,6 @@
 from random import sample
 
+from alcs import Perception
 from alcs.acs2 import AbstractCondition
 
 
@@ -74,3 +75,15 @@ class Condition(AbstractCondition):
         for idx, el in enumerate(range(left, right)):
             self[el] = chromosome2[idx]
             other[el] = chromosome1[idx]
+
+    def get_backwards_anticipation(self, perception):
+        """
+        Returns the believed backwards anticipation. Hereby, the condition is treated like an effect part.
+        :param perception:
+        :return:
+        """
+        ant = Perception(perception)
+        for idx, item in enumerate(self):
+            if item != self.cfg.classifier_wildcard:
+                ant[idx] = item
+        return ant

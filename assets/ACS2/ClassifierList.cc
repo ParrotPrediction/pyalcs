@@ -1158,6 +1158,7 @@ Action **
 ClassifierList::searchOneForwardStep(ClassifierList *relList, int *fs, int fSize, int fPoint, Perception **arrayPF,
                                      int bSize, Perception **arrayPB, ClassifierList **arrayListF,
                                      ClassifierList **arrayListB) {
+//    cout << "###SIZE " << fPoint << " " << fSize << "\n";
     for (int i = fPoint; i < fSize; i++) {
         ClassifierList *matchFW = new ClassifierList(relList, arrayPF[i]);
         if (matchFW->size > 0) {

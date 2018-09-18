@@ -82,8 +82,9 @@ class ACS2:
 
         while not done:
             if self.cfg.do_action_planning and (steps + time) % self.cfg.action_planning_frequency == 0:
-                # TODO: check if HandEye?
-                self._run_action_planning(env, steps + time, state, prev_state, action_set, action, reward)
+                # Action Planning for increased model learning
+                steps_ap, state, prev_state, action_set, reward = self._run_action_planning(env, steps + time, state, prev_state, action_set, action, reward)
+                steps += steps_ap
 
             match_set = ClassifiersList.form_match_set(self.population,
                                                        state,
@@ -179,50 +180,70 @@ class ACS2:
 
     def _run_action_planning(self, env, time, situation,
                              previous_situation, action_set, action, reward):
+        """
+        Executes action planning for model learning speed up.
+        Method requests goals from 'goal generator' provided by the environment.
+        If goal is provided, ACS2 searches for a goal sequence in the current model (only the reliable classifiers).
+        This is done as long as goals are provided and ACS2 finds a sequence and successfully reaches the goal.
+        :param env:
+        :param time:
+        :param situation:
+        :param previous_situation:
+        :param action_set:
+        :param action:
+        :param reward:
+        :return:
+        """
+        logging.debug("** Running action planning **")
 
-        if not hasattr(env, "get_goal_state"):
-            return 0
+        # The environment has to have a function "get_goal_state"
+        if not hasattr(env.env, "get_goal_state"):
+            logging.debug("Action planning stopped - no function get_goal_state in env")
+            return 0, situation, previous_situation, action_set, reward
 
         steps = 0
-        match_set = 0
         done = False
-        goal_situation = 0
 
         while not done:
-            goal_situation = env.get_goal_state()
+            goal_situation = env.env.get_goal_state()
 
             if goal_situation is None:
-                return 0
+                break
 
-            act_sequence = self.population.search_goal_sequence(situation, goal_situation) # TODO: search_goal_sequence (ClassifierList)
+            act_sequence = self.population.search_goal_sequence(situation, goal_situation)
+
+            # Execute the found sequence and learn during executing
             i = 0
-            while act_sequence[i] != 0:
-                match_set = ClassifiersList.form_match_set(self.population,
-                                                       situation,
-                                                       self.cfg)
-                if action_set is not None:
+            for act in act_sequence:
+                if act == -1:
+                    break
+
+                match_set = ClassifiersList.form_match_set(population=self.population,
+                                                           situation=situation, cfg=self.cfg)
+                if action_set is not None and previous_situation is not None:
                     action_set.apply_alp(previous_situation, action, situation, time + steps, self.population, match_set)
                     action_set.apply_reinforcement_learning(reward, match_set.get_maximum_fitness())
                     if self.cfg.do_ga:
                         action_set.apply_ga(time + steps, self.population, match_set, situation)
 
-                action = act_sequence[i]
+                action = act
                 action_set = ClassifiersList.form_action_set(match_set, action, self.cfg)
 
-                previous_situation = situation
                 raw_state, reward, done, _ = env.step(self._parse_action(action))
+                previous_situation = situation
                 situation = self._parse_state(raw_state)
 
-                if action_set.exists_classifier(previous_situation, action, situation, self.cfg.theta_r):
+                if not action_set.exists_classifier(previous_situation, action, situation, self.cfg.theta_r):
+                    # no reliable classifier was able to anticipate such a change
                     break
 
-                i += 1
                 steps += 1
+                i += 1
 
-            if not(i == 0 or action != 0): # TODO: necessary?
+            if i == 0:
                 break
 
-        return steps
+        return steps, situation, previous_situation, action_set, reward
 
     def _parse_state(self, raw_state):
         """

@@ -23,7 +23,7 @@
 #include "Classifier.h"
 #include "ClassifierList.h"
 #include "MazeEnvironment.h"
-#include "MPEnvironment.h"
+#include "HandEyeEnvironment.h"
 
 using namespace std;
 
@@ -314,10 +314,12 @@ int startActionPlanning(ClassifierList *population, Environment *env, int time, 
         } else {
             Action **actSequence = population->searchGoalSequence(situation, goalSituation);
             int i;
-            //cout<<situation<<"->";
-            //for(act=actSequence[0], i=0; act!=0; ++i, act=actSequence[i])
-            // cout<<act<<"->";
-            //cout<<goalSituation<<endl;
+            Action *a;
+            // TODO go back to comment
+//            cout<<situation<<"->";
+//            for(a=actSequence[0], i=0; a!=0; ++i, a=actSequence[i])
+//             cout<<a<<"->";
+//            cout<<goalSituation<<endl;
 
             //Execute the found sequence and learn during executing
             for (i = 0; actSequence[i] != 0; i++, steps++) {

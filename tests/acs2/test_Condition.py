@@ -206,3 +206,25 @@ class TestCondition:
         # then
         assert Condition('0##10011', cfg) == c1
         assert Condition('#10#####', cfg) == c2
+
+    def test_get_backwards_anticipation(self, cfg):
+        # given
+        p0 = Perception(['1', '1', '1', '1', '1', '0', '1', '1'])
+        condition = Condition(['#', '#', '0', '#', '#', '1', '#', '#'], cfg)
+
+        # when
+        result = condition.get_backwards_anticipation(p0)
+
+        # then
+        assert result == ['1', '1', '0', '1', '1', '1', '1', '1']
+
+    def test_get_backwards_anticipation_2(self, cfg):
+        # given
+        p0 = Perception(['0', '1', '1', '1', '1', '0', '1', '0'])
+        condition = Condition(['#', '0', '#', '#', '#', '1', '#', '#'], cfg)
+
+        # when
+        result = condition.get_backwards_anticipation(p0)
+
+        # then
+        assert result == ['0', '0', '1', '1', '1', '1', '1', '0']

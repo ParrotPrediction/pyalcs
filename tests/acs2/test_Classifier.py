@@ -1150,3 +1150,60 @@ class TestClassifier:
         assert generalized is True
         assert 1 == cls.specified_unchanging_attributes
         assert Condition('#####0##', cfg) == cls.condition
+
+    def test_does_match_backwards(self, cfg):
+        # given
+        percept = Perception('11111111')
+
+        # C1 - matching
+        c1 = Classifier(
+            condition='#####0#0',
+            effect='#####1#1',
+            cfg=cfg)
+
+        # C2 - non-matching
+        c2 = Classifier(
+            condition='#####0#0',
+            effect='0######1',
+            cfg=cfg)
+
+        # C3 - non-matching
+        c3 = Classifier(
+            condition='#####0#0',
+            effect='#####0#1',
+            cfg=cfg)
+
+        # when
+        result1 = c1.does_match_backwards(percept)
+        result2 = c2.does_match_backwards(percept)
+        result3 = c3.does_match_backwards(percept)
+
+        # then
+        assert result1 is True
+        assert result2 is False
+        assert result3 is False
+
+    def test_get_backwards_anticipation(self, cfg):
+        # given
+        p0 = Perception(['0', '1', '1', '1', '1', '0', '1', '0'])
+
+        # C0 - OK
+        c0 = Classifier(condition='#0###1##', effect='#1###0##', cfg=cfg)
+
+        # C1 - not OK
+        c1 = Classifier(condition='#0###1##', effect='#0###0##', cfg=cfg)
+
+        # C1 - not OK
+        c2 = Classifier(condition='#0###1##', effect='0####0##', cfg=cfg)
+
+        # when
+        result0 = c0.get_backwards_anticipation(p0)
+        result1 = c1.get_backwards_anticipation(p0)
+        result2 = c2.get_backwards_anticipation(p0)
+
+        # then
+        assert result0 == ['0', '0', '1', '1', '1', '1', '1', '0']
+        assert result1 is None
+        assert result2 is None
+
+

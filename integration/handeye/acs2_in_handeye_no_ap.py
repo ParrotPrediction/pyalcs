@@ -20,10 +20,10 @@ if __name__ == '__main__':
     hand_eye = gym.make('HandEye3-v0')
 
     # Configure and create the agent
-    cfg = ACS2Configuration(10, 6,
+    cfg = ACS2Configuration(hand_eye.observation_space.n, hand_eye.action_space.n,
                             epsilon=1.0,
                             do_ga=False,
-                            do_action_planning=True,
+                            do_action_planning=False,
                             performance_fcn=calculate_performance)
     logging.info(cfg)
 

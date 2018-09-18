@@ -225,6 +225,12 @@ class Classifier(object):
     def does_anticipate_correctly(self,
                                   previous_situation: Perception,
                                   situation: Perception) -> bool:
+        """
+        Returns if the classifier correctly anticipates the change from previous_situation to situation.
+        :param previous_situation:
+        :param situation:
+        :return:
+        """
         return self.effect.does_anticipate_correctly(
             previous_situation, situation)
 
@@ -454,7 +460,46 @@ class Classifier(object):
         cl2.r = r
 
     def does_match(self, situation):
-        return self.condition.does_match(situation.condition)  # TODO: check if correct
+        """
+        Returns if the classifier matches the situation.
+        :param situation:
+        :return:
+        """
+        return self.condition.does_match(situation)
 
-    def has_action(self, action):
-        return action == self.action
+    def does_match_backwards(self, situation):
+        """
+        Returns if 'situation' is matched by the anticipations.
+        This is only the case if the specified conditions that have #-symbols in the effect part are also matched!
+        :param situation:
+        :return:
+        """
+        p = self.condition.get_backwards_anticipation(situation)
+        if self.effect.does_match(situation, p):
+            return True
+        return False
+
+    def get_best_anticipation(self, perception):
+        """
+        Returns the anticipation, the classifier believes to happen most probably.
+        This is usually the normal anticipation. However, if PEEs are activated, the most probable
+        value of each attribute is returned.
+        :param perception: Perception
+        :return:
+        """
+        return self.effect.get_best_anticipation(perception)
+
+    def get_backwards_anticipation(self, perception):
+        """
+        Returns the backwards anticipation.
+        Returns -1 if the backwards anticipation was impossible to create. This is the case if
+        changing attributes are not specified in the conditions.
+        :param perception:
+        :return:
+        """
+        back_anticipation = self.condition.get_backwards_anticipation(perception)
+        if not self.effect.does_specify_only_changes_backwards(back_anticipation, perception):
+            # If a specified attribute in the effect part matches the anticipated 'back_anticipation',
+            # the backward anticipation fails, because a specified attribute in Effect means a change!
+            return None
+        return back_anticipation

@@ -227,3 +227,101 @@ class TestEffect:
     def test_eq(self, cfg):
         assert Effect('00001111', cfg) == Effect('00001111', cfg)
         assert Effect('00001111', cfg) != Effect('0000111#', cfg)
+
+    def test_does_match(self, cfg):
+        # given
+        p0 = Perception(['1', '1', '0', '1', '1', '1', '0', '1'])
+        p1 = Perception(['1', '1', '1', '1', '1', '0', '0', '1'])
+        effect = Effect(['#', '#', '0', '#', '#', '1', '#', '#'], cfg)
+
+        # when
+        result = effect.does_match(p0, p1)
+
+        # then
+        assert result is True
+
+    def test_does_match_false(self, cfg):
+        # given
+        p0 = Perception(['1', '0', '1', '1', '1', '0', '0', '1'])
+        p1 = Perception(['1', '1', '0', '1', '1', '1', '0', '1'])
+        effect = Effect(['#', '#', '0', '#', '#', '1', '#', '#'], cfg)
+
+        # when
+        result = effect.does_match(p0, p1)
+
+        # then
+        assert result is False
+
+    def test_does_match_false_2(self, cfg):
+        # given
+        p0 = Perception(['1', '1', '1', '1', '0', '0', '0', '1'])
+        p1 = Perception(['1', '1', '0', '1', '1', '1', '0', '1'])
+        effect = Effect(['#', '#', '0', '#', '#', '1', '#', '#'], cfg)
+
+        # when
+        result = effect.does_match(p0, p1)
+
+        # then
+        assert result is False
+
+    def test_does_match_false_3(self, cfg):
+        # given
+        p0 = Perception(['1', '1', '1', '1', '1', '0', '1', '1'])
+        p1 = Perception(['1', '1', '1', '1', '1', '1', '0', '1'])
+        effect = Effect(['#', '#', '0', '#', '#', '1', '#', '#'], cfg)
+
+        # when
+        result = effect.does_match(p0, p1)
+
+        # then
+        assert result is False
+
+    def test_get_best_anticipation(self, cfg):
+        # given
+        p0 = Perception(['1', '1', '0', '1', '1', '1', '1', '1'])
+        p1 = Perception(['1', '1', '1', '1', '1', '1', '1', '1'])
+        effect = Effect(['#', '#', '0', '#', '#', '0', '#', '#'], cfg)
+
+        # when
+        result0 = effect.get_best_anticipation(p0)
+        result1 = effect.get_best_anticipation(p1)
+
+        # then
+        assert result0 == ['1', '1', '0', '1', '1', '0', '1', '1']
+        assert result1 == ['1', '1', '0', '1', '1', '0', '1', '1']
+
+    def test_does_specify_only_changes_backwards(self, cfg):
+        # given
+        back_ant = Perception(['1', '1', '0', '1', '1', '1', '1', '0'])
+        sit = Perception(['1', '1', '1', '1', '1', '1', '1', '0'])
+        effect = Effect(['#', '#', '1', '#', '#', '0', '#', '#'], cfg)
+
+        # when
+        result = effect.does_specify_only_changes_backwards(back_ant, sit)
+
+        # then
+        assert result is True
+
+    def test_does_specify_only_changes_backwards_false(self, cfg):
+        # given
+        back_ant = Perception(['1', '1', '0', '1', '1', '1', '1', '0'])
+        sit = Perception(['1', '1', '1', '1', '1', '1', '0', '0'])
+        effect = Effect(['#', '#', '1', '#', '#', '0', '#', '#'], cfg)
+
+        # when
+        result = effect.does_specify_only_changes_backwards(back_ant, sit)
+
+        # then
+        assert result is False
+
+    def test_does_specify_only_changes_backwards_false_2(self, cfg):
+        # given
+        back_ant = Perception(['1', '1', '0', '1', '1', '0', '1', '0'])
+        sit = Perception(['1', '1', '1', '1', '1', '1', '1', '0'])
+        effect = Effect(['#', '#', '1', '#', '#', '0', '#', '#'], cfg)
+
+        # when
+        result = effect.does_specify_only_changes_backwards(back_ant, sit)
+
+        # then
+        assert result is False
