@@ -11,19 +11,30 @@ class TestClassifier:
     def cfg(self):
         return Configuration(8, 8)
 
-    def test_equality(self, cfg):
+    @pytest.mark.parametrize("_c1, _a1, _e1, _c2, _a2, _e2, _result", [
+        # Similar classifiers - everything the same
+        ('00001111', 1, '0000111#', '00001111', 1, '0000111#', True),
+        # Different condition
+        ('00001111', 1, '0000111#', '000#1111', 1, '0000111#', False),
+        # Different action
+        ('00001111', 1, '0000111#', '00001111', 2, '0000111#', False),
+        # Different effect
+        ('00001111', 1, '0000111#', '00001111', 1, '00001111', False),
+    ])
+    def test_equality(self, _c1, _a1, _e1, _c2, _a2, _e2, _result, cfg):
         # given
-        cl = Classifier(action=1, numerosity=2, cfg=cfg)
+        cl1 = Classifier(condition=_c1, action=_a1, effect=_e1, cfg=cfg)
+        cl2 = Classifier(condition=_c2, action=_a2, effect=_e2, cfg=cfg)
 
-        # when & then
-        assert Classifier(action=1, numerosity=2, cfg=cfg) == cl
+        # then
+        assert (cl1 == cl2) is _result
 
     def test_should_calculate_fitness(self, cfg):
         # given
         cls = Classifier(reward=0.25, cfg=cfg)
 
         # then
-        assert 0.125 == cls.fitness
+        assert cls.fitness == 0.125
 
     def test_should_anticipate_change(self, cfg):
         # given

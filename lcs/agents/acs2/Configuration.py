@@ -46,7 +46,7 @@ class Configuration:
         :param thera_ga:
         :param theta_as:
         :param mu:
-        :param chi:
+        :param chi: GA crossover probability
         """
         if performance_fcn_params is None:
             performance_fcn_params = {}

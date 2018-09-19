@@ -126,7 +126,8 @@ class ACS2(Agent):
                         state,
                         self.cfg.theta_ga,
                         self.cfg.chi,
-                        self.cfg.theta_as)
+                        self.cfg.theta_as,
+                        self.cfg.do_subsumption)
 
             action = choose_action(
                 match_set,
@@ -160,7 +161,8 @@ class ACS2(Agent):
                     state,
                     self.cfg.theta_ga,
                     self.cfg.chi,
-                    self.cfg.theta_as)
+                    self.cfg.theta_as,
+                    self.cfg.do_subsumption)
 
             steps += 1
 

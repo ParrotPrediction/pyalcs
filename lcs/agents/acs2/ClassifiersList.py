@@ -1,14 +1,12 @@
 from __future__ import annotations
 
 from itertools import chain
-from random import random, choice, sample
+from random import random, sample
 from typing import Optional, List
 
-from lcs import Perception, TypedList
 import lcs.agents.acs2.components.alp as alp
-from lcs.agents.acs2.components.genetic_algorithm \
-    import mutate, two_point_crossover
-from lcs.strategies.genetic_algorithms import roulette_wheel_selection
+import lcs.strategies.genetic_algorithms as ga
+from lcs import Perception, TypedList
 from . import Classifier, Configuration
 
 
@@ -145,71 +143,47 @@ class ClassifiersList(TypedList):
                  theta_ga: int,
                  chi: float,
                  theta_as: int,
+                 do_subsumption: bool,
                  randomfunc=random,
                  samplefunc=sample) -> None:
 
-        if ClassifiersList.should_apply_ga(action_set, time, theta_ga):
-            ClassifiersList.set_ga_timestamp(action_set, time)
+        if ga.should_apply(action_set, time, theta_ga):
+            ga.set_timestamps(action_set, time)
 
             # Select parents
-            parent1, parent2 = roulette_wheel_selection(
+            parent1, parent2 = ga.roulette_wheel_selection(
                 action_set, lambda cl: pow(cl.q, 3) * cl.num)
 
             child1 = Classifier.copy_from(parent1, time)
             child2 = Classifier.copy_from(parent2, time)
 
-            mutate(child1, child1.cfg.mu, randomfunc=randomfunc)
-            mutate(child2, child2.cfg.mu, randomfunc=randomfunc)
+            ga.generalizing_mutation(child1, child1.cfg.mu)
+            ga.generalizing_mutation(child2, child2.cfg.mu)
 
             if randomfunc() < chi:
                 if child1.effect == child2.effect:
-                    two_point_crossover(child1, child2, samplefunc=samplefunc)
+                    ga.two_point_crossover(child1, child2, samplefunc=samplefunc)
 
                     # Update quality and reward
-                    # TODO: check if needed
-                    child2.q = float(sum([child1.q, child2.q]) / 2)
-                    child2.r = float(sum([child1.r, child2.r]) / 2)
+                    child1.q = child2.q = float(sum([child1.q, child2.q]) / 2)
+                    child2.r = child2.r = float(sum([child1.r, child2.r]) / 2)
 
             child1.q /= 2
             child2.q /= 2
 
-            children = [child for child in [child1, child2]
-                        if child.condition.specificity > 0]
+            # we are interested only in classifiers with specialized condition
+            unique_children = {cl for cl in [child1, child2]
+                               if cl.condition.specificity > 0}
 
-            # if two classifiers are identical, leave only one
-            unique_children = set(children)
-
-            ClassifiersList.delete_ga_classifiers(
+            ga.delete_classifiers(
                 population, match_set, action_set,
-                len(unique_children), theta_as, randomfunc=randomfunc)
+                len(unique_children), theta_as)
 
             # check for subsumers / similar classifiers
             for child in unique_children:
-                ClassifiersList.add_ga_classifier(child, population, match_set, action_set)
-
-    @staticmethod
-    def add_ga_classifier(child: Classifier,
-                          population: ClassifiersList,
-                          match_set: ClassifiersList,
-                          action_set: ClassifiersList):
-        """
-        Find subsumer/similar classifier, if present - increase its numerosity,
-        else add this new classifier
-        :param child: new classifier to add
-        :param match_set:
-        :param population:
-        :return:
-        """
-        old_cl = action_set.find_old_classifier(child)
-
-        if old_cl is None:
-            action_set.append(child)
-            population.append(child)
-            if match_set is not None:
-                match_set.append(child)
-        else:
-            if not old_cl.is_marked():
-                old_cl.num += 1
+                ga.add_classifier(child, p,
+                                  population, match_set, action_set,
+                                  do_subsumption)
 
     def add_alp_classifier(self,
                            child: Classifier,
@@ -253,167 +227,3 @@ class ClassifiersList(TypedList):
             new_list.append(child)
         else:
             old_cl.increase_quality()
-
-    def get_similar(self, other: Classifier) -> Optional[Classifier]:
-        """
-        Searches for the first similar classifier `other` and returns it.
-
-        Parameters
-        ----------
-        other: Classifier
-            classifier to compare
-        Returns
-        -------
-        Optional[Classifier]
-            classifier (with the same condition, action, effect),
-            None otherwise
-        """
-        return next(filter(lambda cl: cl == other, self), None)
-
-    @staticmethod
-    def should_apply_ga(action_set: ClassifiersList, time: int, theta_ga: int):
-        """
-        Checks the average last GA application to determine if a GA
-        should be applied.If no classifier is in the current set,
-        no GA is applied!
-        :param time:
-        :return:
-        """
-        overall_time = sum(cl.tga * cl.num for cl in action_set)
-        overall_num = action_set.overall_numerosity()
-
-        if overall_num == 0:
-            return False
-
-        if time - overall_time / overall_num > theta_ga:
-            return True
-
-        return False
-
-    def overall_numerosity(self):
-        return sum(cl.num for cl in self)
-
-    @staticmethod
-    def set_ga_timestamp(action_set: ClassifiersList, time: int) -> None:
-        """
-        Sets the GA time stamps to the current time to control
-        the GA application frequency.
-        :param time:
-        :return:
-        """
-        for cl in action_set:
-            cl.tga = time
-
-    @staticmethod
-    def delete_ga_classifiers(population: ClassifiersList,
-                              match_set: ClassifiersList,
-                              action_set: ClassifiersList,
-                              child_no: int,
-                              theta_as: int,
-                              randomfunc=random):
-        """
-        Deletes classifiers in the set to keep the size THETA_AS.
-        Also considers that still childNo classifiers are added by the GA.
-        :param randomfunc:
-        :param population:
-        :param match_set:
-        :param child_no: number of classifiers that will be inserted
-        :return:
-        """
-        del_no = action_set.overall_numerosity() + child_no - theta_as
-        if del_no <= 0:
-            # There is still room for more classifiers
-            return
-
-        # print("GA: requested to delete: %d classifiers", del_no)
-        for _ in range(0, del_no):
-            ClassifiersList.delete_a_classifier(
-                population, match_set, action_set, randomfunc=randomfunc)
-
-    @staticmethod
-    def delete_a_classifier(population: ClassifiersList,
-                            match_set: ClassifiersList,
-                            action_set: ClassifiersList,
-                            randomfunc=random):
-        """ Delete one classifier from a population """
-        if len(population) == 0:   # Nothing to remove
-            return None
-
-        cl_del = ClassifiersList.select_classifier_to_delete(action_set, randomfunc=randomfunc)
-
-        if cl_del is not None:
-            if cl_del.num > 1:
-                cl_del.num -= 1
-            else:
-                # Removes classifier from population, match set
-                # and current list
-                lists = [x for x in [population, match_set, action_set] if x]
-                for lst in lists:
-                    lst.safe_remove(cl_del)
-
-    @staticmethod
-    def select_classifier_to_delete(
-        population: ClassifiersList, randomfunc=random) -> \
-            Optional[Classifier]:
-
-        if len(population) == 0:
-            return None
-
-        cl_del = None
-        while cl_del is None:  # We must delete at least one
-            for cl in population.expand():
-                if randomfunc() < 1. / 3.:
-                    if cl_del is None:
-                        cl_del = cl
-                    else:
-                        cl_del = ClassifiersList.select_preferred_to_delete(cl, cl_del)
-        return cl_del
-
-    @staticmethod
-    def select_preferred_to_delete(cl: Classifier,
-                                   cl_to_delete: Classifier) -> \
-            Classifier:
-
-        if cl.q - cl_to_delete.q < -0.1:
-            cl_to_delete = cl
-            return cl_to_delete
-
-        if abs(cl.q - cl_to_delete.q) <= 0.1:
-            if cl.is_marked() and not cl_to_delete.is_marked():
-                cl_to_delete = cl
-            elif cl.is_marked or not cl_to_delete.is_marked():
-                if cl.tav > cl_to_delete.tav:
-                    cl_to_delete = cl
-
-        return cl_to_delete
-
-    def find_old_classifier(self, cl: Classifier):
-        old_cl = None
-
-        if self.cfg.do_subsumption:
-            old_cl = self.find_subsumer(cl)
-
-        if old_cl is None:
-            old_cl = self.get_similar(cl)
-
-        return old_cl
-
-    def find_subsumer(self, cl: Classifier, choice_func=choice) -> \
-            Classifier:
-
-        subsumer = None
-        most_general_subsumers: List[Classifier] = []
-
-        for classifier in self:
-            if classifier.does_subsume(cl):
-                if subsumer is None:
-                    subsumer = classifier
-                    most_general_subsumers = [subsumer]
-                elif classifier.is_more_general(subsumer):
-                    subsumer = classifier
-                    most_general_subsumers = [subsumer]
-                elif not subsumer.is_more_general(classifier):
-                    most_general_subsumers.append(classifier)  # !
-
-        return choice_func(most_general_subsumers) \
-            if most_general_subsumers else None

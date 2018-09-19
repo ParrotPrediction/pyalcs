@@ -565,19 +565,6 @@ class TestClassifierList:
         assert cl_del.is_marked() is True
         assert cl_del == selected_cl
 
-    def test_overall_numerosity(self, cfg):
-        population = ClassifiersList(cfg=cfg)
-        assert 0 == population.overall_numerosity()
-
-        population.append(Classifier(numerosity=2, cfg=cfg))
-        assert 2 == population.overall_numerosity()
-
-        population.append(Classifier(numerosity=1, cfg=cfg))
-        assert 3 == population.overall_numerosity()
-
-        population.append(Classifier(numerosity=3, cfg=cfg))
-        assert 6 == population.overall_numerosity()
-
     def test_add_ga_classifier_add(self, cfg):
         # given
         cl_1 = Classifier(action=1, cfg=cfg)
@@ -797,21 +784,6 @@ class TestClassifierList:
                         cfg=cfg)
         population.append(c3)
         assert 4 == population.get_maximum_fitness()
-
-    def test_should_get_similar_classifier(self, cfg):
-        # given
-        pop = ClassifiersList(cfg=cfg)
-        pop.append(Classifier(action=1, cfg=cfg))
-        pop.append(Classifier(action=2, cfg=cfg))
-        pop.append(Classifier(action=3, cfg=cfg))
-
-        # when & then
-        # No similar classifiers exist
-        assert pop.get_similar(Classifier(action=4, cfg=cfg)) is None
-
-        # when & then
-        # Should find similar classifier
-        assert pop.get_similar(Classifier(action=2, cfg=cfg)) is not None
 
     def test_should_apply_reinforcement_learning(self, cfg):
         # given
