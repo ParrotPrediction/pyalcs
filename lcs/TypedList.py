@@ -29,6 +29,9 @@ class TypedList(collections.abc.MutableSequence):
     def sort(self, *args, **kwargs) -> None:
         self._items.sort(*args, **kwargs)
 
+    def __repr__(self):
+        return f"{len(self._items)} items"
+
     def __setitem__(self, i, o):
         check_types(self.oktypes, o)
         self._items[i] = o

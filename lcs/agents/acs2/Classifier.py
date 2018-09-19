@@ -389,6 +389,7 @@ class Classifier(object):
         if self.is_subsumer and \
             self.is_more_general(other) and \
             self.condition.does_match(other.condition) and \
+                self.action == other.action and \
                 self.effect == other.effect:
             return True
 

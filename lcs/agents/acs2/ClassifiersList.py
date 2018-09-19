@@ -5,8 +5,7 @@ from random import random, choice, sample
 from typing import Optional, List
 
 from lcs import Perception, TypedList
-from lcs.agents.acs2.components.alp import expected_case, unexpected_case, \
-    cover
+import lcs.agents.acs2.components.alp as alp
 from lcs.agents.acs2.components.genetic_algorithm \
     import mutate, two_point_crossover
 from lcs.strategies.genetic_algorithms import roulette_wheel_selection
@@ -93,10 +92,10 @@ class ClassifiersList(TypedList):
             cl.set_alp_timestamp(time)
 
             if cl.does_anticipate_correctly(p0, p1):
-                new_cl = expected_case(cl, p0, time)
+                new_cl = alp.expected_case(cl, p0, time)
                 was_expected_case = True
             else:
-                new_cl = unexpected_case(cl, p0, p1, time)
+                new_cl = alp.unexpected_case(cl, p0, p1, time)
 
                 if cl.is_inadequate():
                     # Removes classifier from population, match set
@@ -112,7 +111,7 @@ class ClassifiersList(TypedList):
 
         # No classifier anticipated correctly - generate new one
         if not was_expected_case:
-            new_cl = cover(p0, action, p1, time, self.cfg)
+            new_cl = alp.cover(p0, action, p1, time, self.cfg)
             self.add_alp_classifier(new_cl, new_list)
 
         # Merge classifiers from new_list into self and population
@@ -137,20 +136,24 @@ class ClassifiersList(TypedList):
             cl.update_reward(reward + self.cfg.gamma * p)
             cl.update_intermediate_reward(reward)
 
-    def apply_ga(self,
-                 time: int,
+    @staticmethod
+    def apply_ga(time: int,
                  population: ClassifiersList,
                  match_set: ClassifiersList,
-                 situation: Perception,
+                 action_set: ClassifiersList,
+                 p: Perception,
+                 theta_ga: int,
+                 chi: float,
+                 theta_as: int,
                  randomfunc=random,
                  samplefunc=sample) -> None:
 
-        if self.should_apply_ga(time):
-            self.set_ga_timestamp(time)
+        if ClassifiersList.should_apply_ga(action_set, time, theta_ga):
+            ClassifiersList.set_ga_timestamp(action_set, time)
 
             # Select parents
             parent1, parent2 = roulette_wheel_selection(
-                self, lambda cl: pow(cl.q, 3) * cl.num)
+                action_set, lambda cl: pow(cl.q, 3) * cl.num)
 
             child1 = Classifier.copy_from(parent1, time)
             child2 = Classifier.copy_from(parent2, time)
@@ -158,7 +161,7 @@ class ClassifiersList(TypedList):
             mutate(child1, child1.cfg.mu, randomfunc=randomfunc)
             mutate(child2, child2.cfg.mu, randomfunc=randomfunc)
 
-            if randomfunc() < self.cfg.chi:
+            if randomfunc() < chi:
                 if child1.effect == child2.effect:
                     two_point_crossover(child1, child2, samplefunc=samplefunc)
 
@@ -176,18 +179,19 @@ class ClassifiersList(TypedList):
             # if two classifiers are identical, leave only one
             unique_children = set(children)
 
-            self.delete_ga_classifiers(population, match_set,
-                                       len(unique_children),
-                                       randomfunc=randomfunc)
+            ClassifiersList.delete_ga_classifiers(
+                population, match_set, action_set,
+                len(unique_children), theta_as, randomfunc=randomfunc)
 
             # check for subsumers / similar classifiers
             for child in unique_children:
-                self.add_ga_classifier(child, match_set, population)
+                ClassifiersList.add_ga_classifier(child, population, match_set, action_set)
 
-    def add_ga_classifier(self,
-                          child: Classifier,
+    @staticmethod
+    def add_ga_classifier(child: Classifier,
+                          population: ClassifiersList,
                           match_set: ClassifiersList,
-                          population: ClassifiersList):
+                          action_set: ClassifiersList):
         """
         Find subsumer/similar classifier, if present - increase its numerosity,
         else add this new classifier
@@ -196,10 +200,10 @@ class ClassifiersList(TypedList):
         :param population:
         :return:
         """
-        old_cl = self.find_old_classifier(child)
+        old_cl = action_set.find_old_classifier(child)
 
         if old_cl is None:
-            self.append(child)
+            action_set.append(child)
             population.append(child)
             if match_set is not None:
                 match_set.append(child)
@@ -266,7 +270,8 @@ class ClassifiersList(TypedList):
         """
         return next(filter(lambda cl: cl == other, self), None)
 
-    def should_apply_ga(self, time: int):
+    @staticmethod
+    def should_apply_ga(action_set: ClassifiersList, time: int, theta_ga: int):
         """
         Checks the average last GA application to determine if a GA
         should be applied.If no classifier is in the current set,
@@ -274,13 +279,13 @@ class ClassifiersList(TypedList):
         :param time:
         :return:
         """
-        overall_time = sum(cl.tga * cl.num for cl in self)
-        overall_num = self.overall_numerosity()
+        overall_time = sum(cl.tga * cl.num for cl in action_set)
+        overall_num = action_set.overall_numerosity()
 
         if overall_num == 0:
             return False
 
-        if time - overall_time / overall_num > self.cfg.theta_ga:
+        if time - overall_time / overall_num > theta_ga:
             return True
 
         return False
@@ -288,20 +293,23 @@ class ClassifiersList(TypedList):
     def overall_numerosity(self):
         return sum(cl.num for cl in self)
 
-    def set_ga_timestamp(self, time: int):
+    @staticmethod
+    def set_ga_timestamp(action_set: ClassifiersList, time: int) -> None:
         """
         Sets the GA time stamps to the current time to control
         the GA application frequency.
         :param time:
         :return:
         """
-        for cl in self:
+        for cl in action_set:
             cl.tga = time
 
-    def delete_ga_classifiers(self,
-                              population: ClassifiersList,
+    @staticmethod
+    def delete_ga_classifiers(population: ClassifiersList,
                               match_set: ClassifiersList,
+                              action_set: ClassifiersList,
                               child_no: int,
+                              theta_as: int,
                               randomfunc=random):
         """
         Deletes classifiers in the set to keep the size THETA_AS.
@@ -312,48 +320,53 @@ class ClassifiersList(TypedList):
         :param child_no: number of classifiers that will be inserted
         :return:
         """
-        del_no = self.overall_numerosity() + child_no - self.cfg.theta_as
+        del_no = action_set.overall_numerosity() + child_no - theta_as
         if del_no <= 0:
             # There is still room for more classifiers
             return
 
         # print("GA: requested to delete: %d classifiers", del_no)
         for _ in range(0, del_no):
-            self.delete_a_classifier(
-                match_set, population, randomfunc=randomfunc)
+            ClassifiersList.delete_a_classifier(
+                population, match_set, action_set, randomfunc=randomfunc)
 
-    def delete_a_classifier(self,
+    @staticmethod
+    def delete_a_classifier(population: ClassifiersList,
                             match_set: ClassifiersList,
-                            population: ClassifiersList,
+                            action_set: ClassifiersList,
                             randomfunc=random):
         """ Delete one classifier from a population """
         if len(population) == 0:   # Nothing to remove
             return None
-        cl_del = self.select_classifier_to_delete(randomfunc=randomfunc)
+
+        cl_del = ClassifiersList.select_classifier_to_delete(action_set, randomfunc=randomfunc)
+
         if cl_del is not None:
             if cl_del.num > 1:
                 cl_del.num -= 1
             else:
                 # Removes classifier from population, match set
                 # and current list
-                lists = [x for x in [population, match_set, self] if x]
+                lists = [x for x in [population, match_set, action_set] if x]
                 for lst in lists:
                     lst.safe_remove(cl_del)
 
-    def select_classifier_to_delete(self, randomfunc=random) -> \
+    @staticmethod
+    def select_classifier_to_delete(
+        population: ClassifiersList, randomfunc=random) -> \
             Optional[Classifier]:
 
-        if len(self) == 0:
+        if len(population) == 0:
             return None
 
         cl_del = None
         while cl_del is None:  # We must delete at least one
-            for cl in self.expand():
+            for cl in population.expand():
                 if randomfunc() < 1. / 3.:
                     if cl_del is None:
                         cl_del = cl
                     else:
-                        cl_del = self.select_preferred_to_delete(cl, cl_del)
+                        cl_del = ClassifiersList.select_preferred_to_delete(cl, cl_del)
         return cl_del
 
     @staticmethod
@@ -371,6 +384,7 @@ class ClassifiersList(TypedList):
             elif cl.is_marked or not cl_to_delete.is_marked():
                 if cl.tav > cl_to_delete.tav:
                     cl_to_delete = cl
+
         return cl_to_delete
 
     def find_old_classifier(self, cl: Classifier):

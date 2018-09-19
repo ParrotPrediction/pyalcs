@@ -118,11 +118,15 @@ class ACS2(Agent):
                     reward,
                     match_set.get_maximum_fitness())
                 if self.cfg.do_ga:
-                    action_set.apply_ga(
+                    ClassifiersList.apply_ga(
                         time + steps,
                         self.population,
                         match_set,
-                        state)
+                        action_set,
+                        state,
+                        self.cfg.theta_ga,
+                        self.cfg.chi,
+                        self.cfg.theta_as)
 
             action = choose_action(
                 match_set,
@@ -148,11 +152,15 @@ class ACS2(Agent):
                     reward,
                     0)
             if self.cfg.do_ga:
-                action_set.apply_ga(
+                ClassifiersList.apply_ga(
                     time + steps,
                     self.population,
                     None,
-                    state)
+                    action_set,
+                    state,
+                    self.cfg.theta_ga,
+                    self.cfg.chi,
+                    self.cfg.theta_as)
 
             steps += 1
 
