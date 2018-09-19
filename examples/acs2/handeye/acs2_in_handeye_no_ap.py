@@ -2,9 +2,6 @@ import logging
 
 import gym
 
-import sys
-sys.path.append('/home/e-dzia/openai-envs')
-
 # noinspection PyUnresolvedReferences
 import gym_handeye
 from lcs.agents.acs2 import ACS2, Configuration
@@ -13,9 +10,7 @@ from examples.acs2.handeye.utils import calculate_performance
 # Configure logger
 logging.basicConfig(level=logging.INFO)
 
-
 if __name__ == '__main__':
-
     # Load desired environment
     hand_eye = gym.make('HandEye3-v0')
 
