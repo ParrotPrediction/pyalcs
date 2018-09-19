@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Optional
 
+import lcs.strategies.reinforcement_learning as rl
 from lcs import TypedList, Perception
 from lcs.agents.racs import Configuration
 from . import Classifier
@@ -70,22 +71,10 @@ class ClassifierList(TypedList):
                             cl.condition.does_match(p1)]
             match_set.extend(new_matching)
 
-    def apply_reinforcement_learning(self, reward: int, p: float) -> None:
-        """
-        Reinforcement Learning. Applies RL according to
-        current reinforcement `reward` and back-propagated reinforcement
-        `maximum_fitness`.
-
-        Parameters
-        ----------
-        reward: int
-            current reward obtained from the environment
-        p: float
-            maximum fitness - back-propagated reinforcement
-        """
+    def apply_reinforcement_learning(
+            self, reward: int, p: float, cfg: Configuration) -> None:
         for cl in self:
-            cl.update_reward(reward + cl.cfg.gamma * p)
-            cl.update_intermediate_reward(reward)
+            rl.update_classifier(cl, reward, p, cfg.beta, cfg.gamma)
 
     def add_alp_classifier(self,
                            child: Classifier,

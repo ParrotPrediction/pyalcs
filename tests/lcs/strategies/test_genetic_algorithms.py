@@ -130,7 +130,8 @@ class TestGeneticAlgorithms:
 
         for action, num_lst in action_cl_num_fixtures.items():
             for num in num_lst:
-                clss.append(acs2.Classifier(action=action, numerosity=num, cfg=cfg))
+                clss.append(acs2.Classifier(
+                    action=action, numerosity=num, cfg=cfg))
 
         insize = 2  # space needed for new classifiers
         theta_as = 10  # maximum size of the action set
@@ -144,3 +145,20 @@ class TestGeneticAlgorithms:
         # then
         assert sum(cl.num for cl in population) == 18
         assert sum(cl.num for cl in action_set) == 8
+
+    def test_should_not_find_old_classifier(self):
+        pass
+
+    def test_should_find_subsumer(self):
+        # Among nonsubsumers
+        pass
+
+    def test_should_find_most_general_subsumer(self):
+        pass
+
+    def test_should_find_similar_classifier(self):
+        pass
+
+    def test_should_find_similar_among_subsumer(self):
+        # When there are both subsumers and similar classifiers
+        pass

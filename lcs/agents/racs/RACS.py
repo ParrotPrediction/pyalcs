@@ -84,7 +84,8 @@ class RACS(Agent):
                     self.cfg)
                 action_set.apply_reinforcement_learning(
                     reward,
-                    match_set.get_maximum_fitness())
+                    match_set.get_maximum_fitness(),
+                    self.cfg)
                 if self.cfg.do_ga:
                     pass
                     # TODO: implement GA
@@ -112,7 +113,8 @@ class RACS(Agent):
                     self.cfg)
                 action_set.apply_reinforcement_learning(
                     reward,
-                    0)
+                    0,
+                    self.cfg)
                 if self.cfg.do_ga:
                     pass
                     # TODO: implement GA

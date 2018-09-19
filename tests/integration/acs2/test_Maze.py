@@ -50,7 +50,7 @@ class TestMaze:
         agent = ACS2(cfg)
 
         # when
-        population, metrics = agent.explore(env, 1500)
+        population, metrics = agent.explore(env, 300)
 
         # then
         print(f"Macroclassifiers: {count_macroclassifiers(population)}")
@@ -61,7 +61,8 @@ class TestMaze:
 
         reliable = [cl for cl in population if cl.is_reliable()]
         for cl in sorted(reliable, key=lambda cl: -cl.fitness):
-            print(f"{cl} num: {cl.num} q: {cl.q:.2f} fitness: {cl.fitness:.2f}")
+            print(f"{cl} num: {cl.num} "
+                  f"q: {cl.q:.2f} r: {cl.r:.2f} fit: {cl.fitness:.2f}")
 
         assert abs(250 - count_macroclassifiers(population)) < 55
 

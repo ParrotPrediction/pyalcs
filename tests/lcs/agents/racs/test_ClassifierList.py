@@ -77,7 +77,7 @@ class TestClassifierList:
         population = ClassifierList(*[cl])
 
         # when
-        population.apply_reinforcement_learning(0, 28.79)
+        population.apply_reinforcement_learning(0, 28.79, cfg)
 
         # then
         assert abs(33.94 - population[0].r) < 0.1

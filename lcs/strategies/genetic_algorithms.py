@@ -94,8 +94,7 @@ def generalizing_mutation(cl, mu: float) -> None:
             cl.condition.generalize(idx)
 
 
-def two_point_crossover(
-        parent, donor, samplefunc: Callable = random.sample) -> None:
+def two_point_crossover(parent, donor) -> None:
     """
     Executes two-point crossover using condition parts of two classifiers.
     Condition in both classifiers are changed.
@@ -106,10 +105,8 @@ def two_point_crossover(
         Classifier
     donor
         Classifier
-    samplefunc: Callable
     """
-
-    left, right = samplefunc(range(0, parent.cfg.classifier_length + 1), 2)
+    left, right = random.sample(range(0, parent.cfg.classifier_length + 1), 2)
 
     if left > right:
         left, right = right, left
@@ -158,7 +155,8 @@ def add_classifier(cl, p: Perception,
             old_cl.num += 1
 
 
-def delete_classifiers(population, match_set, action_set, insize: int, theta_as: int):
+def delete_classifiers(population, match_set, action_set,
+                       insize: int, theta_as: int):
     """
     Make room for new classifiers
 

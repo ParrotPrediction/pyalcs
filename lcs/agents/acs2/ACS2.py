@@ -116,7 +116,10 @@ class ACS2(Agent):
                     match_set)
                 action_set.apply_reinforcement_learning(
                     reward,
-                    match_set.get_maximum_fitness())
+                    match_set.get_maximum_fitness(),
+                    self.cfg.beta,
+                    self.cfg.gamma
+                )
                 if self.cfg.do_ga:
                     ClassifiersList.apply_ga(
                         time + steps,
@@ -151,7 +154,9 @@ class ACS2(Agent):
                     None)
                 action_set.apply_reinforcement_learning(
                     reward,
-                    0)
+                    0,
+                    self.cfg.beta,
+                    self.cfg.gamma)
             if self.cfg.do_ga:
                 ClassifiersList.apply_ga(
                     time + steps,
@@ -185,7 +190,9 @@ class ACS2(Agent):
             if steps > 0:
                 action_set.apply_reinforcement_learning(
                     reward,
-                    match_set.get_maximum_fitness())
+                    match_set.get_maximum_fitness(),
+                    self.cfg.beta,
+                    self.cfg.gamma)
 
             # Here while exploiting always choose best action
             action = choose_action(
@@ -199,7 +206,8 @@ class ACS2(Agent):
             state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
 
             if done:
-                action_set.apply_reinforcement_learning(reward, 0)
+                action_set.apply_reinforcement_learning(
+                    reward, 0, self.cfg.beta, self.cfg.gamma)
 
             steps += 1
 

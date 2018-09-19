@@ -172,14 +172,6 @@ class Classifier:
     def is_inadequate(self) -> bool:
         return self.q < self.cfg.theta_i
 
-    def update_reward(self, p: float) -> float:
-        self.r += self.cfg.beta * (p - self.r)
-        return self.r
-
-    def update_intermediate_reward(self, rho) -> float:
-        self.ir += self.cfg.beta * (rho - self.ir)
-        return self.ir
-
     def increase_experience(self) -> int:
         self.exp += 1
         return self.exp
