@@ -87,12 +87,10 @@ Effect::Effect(Effect *ef1, Effect *ef2, double q1, double q2, Perception *perce
  */
 Perception *Effect::getBestAnticipation(Perception *percept) {
     Perception *ant = new Perception(percept);
-    //cout << "List:" << list << "a: " << ant << "\n";
     list->reset();
     ProbCharPosItem *item = list->getNextItem();
     while (item != 0) {
         ant->setAttribute(item->getItem()->getBestChar(), item->getPos());
-        //cout << "a: " << ant << " " << item->getItem() << " " << item->getPos() << "\n";
         item = list->getNextItem();
     }
     return ant;
@@ -176,7 +174,6 @@ int Effect::doesSpecifyOnlyChangesBackwards(Perception *backAnt, Perception *sit
         }
         if (item->getItem()->doesContain(backAnt->getAttribute(i)) && !item->getItem()->isEnhanced())
             //if the attribute contains more values, it is not considered to specify one.
-            cout << "#### " << i << " " << this << " " << backAnt << " " << item->getItem() << "\n";
             return 0;
         i++;
     }
