@@ -68,7 +68,7 @@ class Effect(PerceptionString):
         :param situation: Perception
         :return:
         """
-        for idx, (item, back_ant, sit) in enumerate(zip(self, back_anticipation, situation)):
+        for item, back_ant, sit in zip(self, back_anticipation, situation):
             if item == self.wildcard and back_ant != sit:
                 # change anticipated backwards although no change should occur
                 return False

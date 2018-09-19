@@ -27,3 +27,12 @@ class Perception(collections.abc.Sequence):
 
     def __repr__(self):
         return ' '.join(map(str, self))
+
+    def __setitem__(self, i, o):
+        self._items[i] = o
+
+    def __eq__(self, other):
+        for si, oi in zip(self, other):
+            if si != oi:
+                return False
+        return True

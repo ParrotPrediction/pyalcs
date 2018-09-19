@@ -136,10 +136,10 @@ class TestCondition:
         # then
         assert c.does_match(other) is _result
 
-    def test_get_backwards_anticipation(self, cfg):
+    def test_get_backwards_anticipation(self):
         # given
         p0 = Perception(['1', '1', '1', '1', '1', '0', '1', '1'])
-        condition = Condition(['#', '#', '0', '#', '#', '1', '#', '#'], cfg)
+        condition = Condition(['#', '#', '0', '#', '#', '1', '#', '#'])
 
         # when
         result = condition.get_backwards_anticipation(p0)
@@ -147,10 +147,10 @@ class TestCondition:
         # then
         assert result == ['1', '1', '0', '1', '1', '1', '1', '1']
 
-    def test_get_backwards_anticipation_2(self, cfg):
+    def test_get_backwards_anticipation_2(self):
         # given
         p0 = Perception(['0', '1', '1', '1', '1', '0', '1', '0'])
-        condition = Condition(['#', '0', '#', '#', '#', '1', '#', '#'], cfg)
+        condition = Condition(['#', '0', '#', '#', '#', '1', '#', '#'])
 
         # when
         result = condition.get_backwards_anticipation(p0)

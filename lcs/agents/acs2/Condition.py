@@ -78,5 +78,5 @@ class Condition(PerceptionString):
         ant = Perception(perception)
         for idx, item in enumerate(self):
             if item != self.wildcard:
-                ant[idx] = item
+                ant[idx] = item  # TODO
         return ant

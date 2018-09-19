@@ -252,9 +252,9 @@ class ACS2(Agent):
                 action = act
                 action_set = ClassifiersList.form_action_set(match_set, action, self.cfg)
 
-                raw_state, reward, done, _ = env.step(self.parse_action(action))
+                raw_state, reward, done, _ = env.step(parse_action(action))
                 previous_situation = situation
-                situation = self.parse_state(raw_state)
+                situation = parse_state(raw_state)
 
                 if not action_set.exists_classifier(previous_situation, action, situation, self.cfg.theta_r):
                     # no reliable classifier was able to anticipate such a change

@@ -567,7 +567,8 @@ class ClassifiersList(TypedList):
         :return: new size of classifiers
         """
         if i > 0:
-            new_classifiers = ClassifiersList(classifiers_lists[i - 1], cfg=self.cfg)
+            new_classifiers = ClassifiersList(cfg=self.cfg)
+            new_classifiers.extend(classifiers_lists[i - 1])  # TODO
         else:
             new_classifiers = ClassifiersList(cfg=self.cfg)
         new_classifiers.append(match_set_el)
