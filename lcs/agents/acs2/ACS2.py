@@ -11,7 +11,7 @@ from ...utils import parse_state, parse_action
 class ACS2(Agent):
     def __init__(self,
                  cfg: Configuration,
-                 population: ClassifiersList=None) -> None:
+                 population: ClassifiersList = None) -> None:
         self.cfg = cfg
 
         if population:
@@ -104,9 +104,13 @@ class ACS2(Agent):
         done = False
 
         while not done:
-            if self.cfg.do_action_planning and (steps + time) % self.cfg.action_planning_frequency == 0:
+            if self.cfg.do_action_planning and \
+                    (steps + time) % self.cfg.action_planning_frequency == 0:
                 # Action Planning for increased model learning
-                steps_ap, state, prev_state, action_set, reward = self._run_action_planning(env, steps + time, state, prev_state, action_set, action, reward)
+                steps_ap, state, prev_state, action_set, reward = \
+                    self._run_action_planning(env, steps + time, state,
+                                              prev_state, action_set, action,
+                                              reward)
                 steps += steps_ap
 
             match_set = self.population.form_match_set(state,
@@ -206,9 +210,11 @@ class ACS2(Agent):
                              previous_situation, action_set, action, reward):
         """
         Executes action planning for model learning speed up.
-        Method requests goals from 'goal generator' provided by the environment.
-        If goal is provided, ACS2 searches for a goal sequence in the current model (only the reliable classifiers).
-        This is done as long as goals are provided and ACS2 finds a sequence and successfully reaches the goal.
+        Method requests goals from 'goal generator' provided by
+        the environment. If goal is provided, ACS2 searches for
+        a goal sequence in the current model (only the reliable classifiers).
+        This is done as long as goals are provided and ACS2 finds a sequence
+        and successfully reaches the goal.
         :param env:
         :param time:
         :param situation:
@@ -222,7 +228,8 @@ class ACS2(Agent):
 
         # The environment has to have a function "get_goal_state"
         if not hasattr(env.env, "get_goal_state"):
-            logging.debug("Action planning stopped - no function get_goal_state in env")
+            logging.debug("Action planning stopped - "
+                          "no function get_goal_state in env")
             return 0, situation, previous_situation, action_set, reward
 
         steps = 0
@@ -234,7 +241,8 @@ class ACS2(Agent):
             if goal_situation is None:
                 break
 
-            act_sequence = self.population.search_goal_sequence(situation, goal_situation)
+            act_sequence = self.population.search_goal_sequence(situation,
+                                                                goal_situation)
 
             # Execute the found sequence and learn during executing
             i = 0
@@ -242,22 +250,34 @@ class ACS2(Agent):
                 if act == -1:
                     break
 
-                match_set = self.population.form_match_set(situation=situation, cfg=self.cfg)
+                match_set = self.population.form_match_set(situation=situation,
+                                                           cfg=self.cfg)
                 if action_set is not None and previous_situation is not None:
-                    action_set.apply_alp(previous_situation, action, situation, time + steps, self.population, match_set)
-                    action_set.apply_reinforcement_learning(reward, match_set.get_maximum_fitness())
+                    action_set.apply_alp(previous_situation, action, situation,
+                                         time + steps, self.population,
+                                         match_set)
+                    action_set.\
+                        apply_reinforcement_learning(reward,
+                                                     match_set.
+                                                     get_maximum_fitness())
                     if self.cfg.do_ga:
-                        action_set.apply_ga(time + steps, self.population, match_set, situation)
+                        action_set.apply_ga(time + steps, self.population,
+                                            match_set, situation)
 
                 action = act
-                action_set = ClassifiersList.form_action_set(match_set, action, self.cfg)
+                action_set = ClassifiersList.form_action_set(match_set, action,
+                                                             self.cfg)
 
                 raw_state, reward, done, _ = env.step(parse_action(action))
                 previous_situation = situation
                 situation = parse_state(raw_state)
 
-                if not action_set.exists_classifier(previous_situation, action, situation, self.cfg.theta_r):
-                    # no reliable classifier was able to anticipate such a change
+                if not action_set.exists_classifier(previous_situation,
+                                                    action,
+                                                    situation,
+                                                    self.cfg.theta_r):
+                    # no reliable classifier was able to anticipate
+                    # such a change
                     break
 
                 steps += 1

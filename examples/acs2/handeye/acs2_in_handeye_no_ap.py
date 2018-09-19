@@ -16,10 +16,10 @@ if __name__ == '__main__':
 
     # Configure and create the agent
     cfg = Configuration(hand_eye.observation_space.n, hand_eye.action_space.n,
-                            epsilon=1.0,
-                            do_ga=False,
-                            do_action_planning=False,
-                            performance_fcn=calculate_performance)
+                        epsilon=1.0,
+                        do_ga=False,
+                        do_action_planning=False,
+                        performance_fcn=calculate_performance)
     logging.info(cfg)
 
     # Explore the environment

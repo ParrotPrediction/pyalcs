@@ -17,9 +17,10 @@ class ClassifiersList(TypedList):
     """
     Represents overall population, match/action sets
     """
+
     def __init__(self, *args, cfg: Configuration) -> None:
         self.cfg = cfg
-        super().__init__((Classifier, ), *args)
+        super().__init__((Classifier,), *args)
 
     def form_match_set(self,
                        situation: Perception,
@@ -333,7 +334,7 @@ class ClassifiersList(TypedList):
                             population: ClassifiersList,
                             randomfunc=random):
         """ Delete one classifier from a population """
-        if len(population) == 0:   # Nothing to remove
+        if len(population) == 0:  # Nothing to remove
             return None
         cl_del = self.select_classifier_to_delete(randomfunc=randomfunc)
         if cl_del is not None:
@@ -410,10 +411,12 @@ class ClassifiersList(TypedList):
         return choice_func(most_general_subsumers) \
             if most_general_subsumers else None
 
-    def exists_classifier(self, previous_situation, action, situation, quality):
+    def exists_classifier(self, previous_situation, action, situation,
+                          quality):
         """
-        Returns True if there is a classifier in this list with a quality higher than 'quality'
-        that matches previous_situation, specifies action, and predicts situation.
+        Returns True if there is a classifier in this list with a quality
+        higher than 'quality' that matches previous_situation,
+        specifies action, and predicts situation.
         Returns False otherwise.
         :param previous_situation:
         :param action:
@@ -422,8 +425,10 @@ class ClassifiersList(TypedList):
         :return:
         """
         for cl in self:
-            if cl.q > quality and cl.does_match(previous_situation) and cl.action == action \
-                    and cl.does_anticipate_correctly(previous_situation, situation):
+            if cl.q > quality and cl.does_match(previous_situation) \
+                and cl.action == action \
+                and cl.does_anticipate_correctly(previous_situation,
+                                                 situation):
                 return True
         return False
 
@@ -442,13 +447,15 @@ class ClassifiersList(TypedList):
 
     def search_goal_sequence(self, start, goal):
         """
-        Searches a path from start to goal using a bidirectional method in the environmental model
-        (i.e. the list of reliable classifiers).
+        Searches a path from start to goal using a bidirectional method in the
+        environmental model (i.e. the list of reliable classifiers).
         :param start: Perception
         :param goal: Perception
         :return: Sequence of actions
         """
-        reliable_classifiers = self.get_quality_classifiers_list(quality=self.cfg.theta_r, cfg=self.cfg)
+        reliable_classifiers = self. \
+            get_quality_classifiers_list(quality=self.cfg.theta_r,
+                                         cfg=self.cfg)
 
         if len(reliable_classifiers) < 1:
             return self._empty_sequence()
@@ -471,8 +478,9 @@ class ClassifiersList(TypedList):
 
         for depth in range(0, max_depth):
             # forward step
-            action_sequence, forward_size_new = self._search_one_forward_step(reliable_classifiers, forward_size,
-                                                                              forward_point)
+            action_sequence, forward_size_new = self. \
+                _search_one_forward_step(reliable_classifiers, forward_size,
+                                         forward_point)
             forward_point = forward_size
             forward_size = forward_size_new
 
@@ -480,8 +488,9 @@ class ClassifiersList(TypedList):
                 return action_sequence
 
             # backwards step
-            action_sequence, backward_size_new = self._search_one_backward_step(reliable_classifiers, backward_size,
-                                                                                backward_point)
+            action_sequence, backward_size_new = self. \
+                _search_one_backward_step(reliable_classifiers, backward_size,
+                                          backward_point)
             backward_point = backward_size
             backward_size = backward_size_new
 
@@ -491,11 +500,14 @@ class ClassifiersList(TypedList):
         # depth limit was reached -> return empty action sequence
         return self._empty_sequence()
 
-    def _search_one_forward_step(self, reliable_classifiers, forward_size, forward_point):
+    def _search_one_forward_step(self, reliable_classifiers, forward_size,
+                                 forward_point):
         """
         Serches one step forward in the reliable_classifiers classifier list.
-        Returns None if nothing was found so far, a sequence with a -1 element if the search failed completely
-        (which is the case if the allowed array size of 10000 is reached), or the sequence if one was found.
+        Returns None if nothing was found so far, a sequence with a -1 element
+        if the search failed completely
+        (which is the case if the allowed array size of 10000 is reached),
+        or the sequence if one was found.
         :param reliable_classifiers: ClassifiersList
         :param forward_size: int
         :param forward_point: int
@@ -503,32 +515,45 @@ class ClassifiersList(TypedList):
         """
         size = forward_size
         for i in range(forward_point, forward_size):
-            match_forward = reliable_classifiers.form_match_set(situation=self.forward_perceptions[i],
-                                                cfg=self.cfg)
+            match_forward = reliable_classifiers. \
+                form_match_set(situation=self.forward_perceptions[i],
+                               cfg=self.cfg)
             for match_set_element in match_forward:
-                anticipation = match_set_element.get_best_anticipation(self.forward_perceptions[i])
-                if self._does_contain_state(self.forward_perceptions, anticipation) is None:
-                        # state not detected forward -> search in backwards
-                        backward_sequence_idx = self._does_contain_state(self.backward_perceptions, anticipation)
-                        if backward_sequence_idx is None:
-                            # state neither detected backwards
-                            self.forward_perceptions.append(anticipation)
-                            self.forward_classifiers.append(
-                                self._form_new_classifiers(self.forward_classifiers, i, match_set_element))
-                            size += 1
-                            if size > 10001:
-                                # logging.debug("Arrays are full")
-                                return self._empty_sequence(), size
-                        else:
-                            # sequence found
-                            return self._sequence_found_forwards(i, backward_sequence_idx, match_set_element), size
+                anticipation = match_set_element. \
+                    get_best_anticipation(self.forward_perceptions[i])
+                if self._does_contain_state(self.forward_perceptions,
+                                            anticipation) is None:
+                    # state not detected forward -> search in backwards
+                    backward_sequence_idx = self. \
+                        _does_contain_state(self.backward_perceptions,
+                                            anticipation)
+                    if backward_sequence_idx is None:
+                        # state neither detected backwards
+                        self.forward_perceptions.append(anticipation)
+                        self.forward_classifiers.append(
+                            self._form_new_classifiers(
+                                self.forward_classifiers, i,
+                                match_set_element))
+                        size += 1
+                        if size > 10001:
+                            # logging.debug("Arrays are full")
+                            return self._empty_sequence(), size
+                    else:
+                        # sequence found
+                        return self. \
+                            _sequence_found_forwards(
+                                i, backward_sequence_idx,
+                                match_set_element), size
         return None, size
 
-    def _search_one_backward_step(self, reliable_classifiers, backward_size, backward_point):
+    def _search_one_backward_step(self, reliable_classifiers, backward_size,
+                                  backward_point):
         """
-        Searches one step backward in the reliable_classifiers classifiers list.
-        Returns None if nothing was found so far, a sequence with a -1 element if the search failed completely
-        (which is the case if the allowed array size of 10000 is reached), or the sequence if one was found.
+        Searches one step backward in the reliable_classifiers classifiers list
+        Returns None if nothing was found so far, a sequence with a -1 element
+        if the search failed completely
+        (which is the case if the allowed array size of 10000 is reached),
+        or the sequence if one was found.
         :param reliable_classifiers: ClassifiersList
         :param backward_size: int
         :param backward_point: int
@@ -536,31 +561,40 @@ class ClassifiersList(TypedList):
         """
         size = backward_size
         for i in range(backward_point, backward_size):
-            match_backward = reliable_classifiers.form_match_set_backwards(situation=self.backward_perceptions[i],
-                                                                           cfg=self.cfg)
+            match_backward = reliable_classifiers. \
+                form_match_set_backwards(
+                    situation=self.backward_perceptions[i],
+                    cfg=self.cfg)
             for match_set_el in match_backward:
-                anticipation = match_set_el.get_backwards_anticipation(self.backward_perceptions[i])
+                anticipation = match_set_el. \
+                    get_backwards_anticipation(self.backward_perceptions[i])
                 if anticipation is not None and \
-                            self._does_contain_state(self.backward_perceptions, anticipation) is None:
-                    # Backwards anticipation was formable but not detected backwards
-                    forward_sequence_idx = self._does_contain_state(self.forward_perceptions,
-                                                                    anticipation)
+                    self._does_contain_state(self.backward_perceptions,
+                                             anticipation) is None:
+                    # Backwards anticipation was formable but
+                    # not detected backwards
+                    forward_sequence_idx = self. \
+                        _does_contain_state(self.forward_perceptions,
+                                            anticipation)
                     if forward_sequence_idx is None:
                         self.backward_perceptions.append(anticipation)
                         self.backward_classifiers.append(
-                            self._form_new_classifiers(self.backward_classifiers, i, match_set_el))
+                            self._form_new_classifiers(
+                                self.backward_classifiers, i, match_set_el))
                         size += 1
                         if size > 10001:
                             # logging.debug("Arrays are full")
                             return self._empty_sequence(), size
                     else:
-                        return self._sequence_found_backwards(i, forward_sequence_idx, match_set_el), size
+                        return self. \
+                            _sequence_found_backwards(
+                                i, forward_sequence_idx,
+                                match_set_el), size
         return None, size
 
     def _form_new_classifiers(self, classifiers_lists, i, match_set_el):
         """
         Executes actions after sequence was not detected.
-        :param size: int
         :param classifiers_lists: list of ClassifiersLists
         :param i: int
         :param match_set_el: Classifier
@@ -568,7 +602,7 @@ class ClassifiersList(TypedList):
         """
         if i > 0:
             new_classifiers = ClassifiersList(cfg=self.cfg)
-            new_classifiers.extend(classifiers_lists[i - 1])  # TODO
+            new_classifiers.extend(classifiers_lists[i - 1])
         else:
             new_classifiers = ClassifiersList(cfg=self.cfg)
         new_classifiers.append(match_set_el)
@@ -587,7 +621,8 @@ class ClassifiersList(TypedList):
         if i > 0:
             sequence_size += len(self.forward_classifiers[i - 1])
         if backward_sequence_idx > 0:
-            sequence_size += len(self.backward_classifiers[backward_sequence_idx - 1])
+            sequence_size += len(
+                self.backward_classifiers[backward_sequence_idx - 1])
         sequence_size += 1
 
         # construct sequence
@@ -595,12 +630,14 @@ class ClassifiersList(TypedList):
         j = 0
         if i > 0:
             for j, cl in enumerate(self.forward_classifiers[i - 1]):
-                act_seq[len(self.forward_classifiers[i - 1]) - j - 1] = cl.action
+                act_seq[len(self.forward_classifiers[i - 1]) - j - 1] \
+                    = cl.action
             j += 1
         act_seq[j] = match_set_el.action
         j += 1
         if backward_sequence_idx > 0:
-            for k, cl in enumerate(self.backward_classifiers[backward_sequence_idx - 1]):
+            for k, cl in enumerate(
+                    self.backward_classifiers[backward_sequence_idx - 1]):
                 act_seq[k + j] = cl.action
         return act_seq
 
@@ -617,15 +654,21 @@ class ClassifiersList(TypedList):
         if i > 0:
             sequence_size += len(self.backward_classifiers[i - 1])
         if forward_sequence_idx > 0:
-            sequence_size += len(self.forward_classifiers[forward_sequence_idx - 1])
+            sequence_size += len(
+                self.forward_classifiers[forward_sequence_idx - 1])
         sequence_size += 1
 
         # construct sequence
         act_seq = [-1] * sequence_size
         j = 0
         if forward_sequence_idx > 0:
-            for j, cl in enumerate(self.forward_classifiers[forward_sequence_idx - 1]):
-                act_seq[len(self.forward_classifiers[forward_sequence_idx - 1]) - j - 1] = cl.action
+            for j, cl in enumerate(
+                    self.forward_classifiers[forward_sequence_idx - 1]):
+                act_seq[
+                    len(self.
+                        forward_classifiers[
+                            forward_sequence_idx - 1]) - j - 1] \
+                    = cl.action
             j += 1
         act_seq[j] = match_set_el.action
         j += 1
@@ -637,7 +680,8 @@ class ClassifiersList(TypedList):
     @staticmethod
     def _does_contain_state(perceptions, state):
         """
-        Returns the position in the perception list where 'state' is stored or None if state is not found
+        Returns the position in the perception list where 'state' is stored or
+        None if state is not found
         :param perceptions: Perception list
         :param state: Perception
         :return:
@@ -651,9 +695,10 @@ class ClassifiersList(TypedList):
     def _empty_sequence():
         """
         Returns empty sequence.
-        This function might be deleted in later versions of code, but it is useful if we decide to change the definition
-        of an empty sequence (it used to be [-1], because it was more alike the original code in C++).
+        This function might be deleted in later versions of code, but it is
+        useful if we decide to change the definition
+        of an empty sequence (it used to be [-1], because it was more alike
+        the original code in C++).
         :return: empty action sequence
         """
         return []
-

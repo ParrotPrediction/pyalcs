@@ -71,7 +71,8 @@ class Condition(PerceptionString):
 
     def get_backwards_anticipation(self, perception):
         """
-        Returns the believed backwards anticipation. Hereby, the condition is treated like an effect part.
+        Returns the believed backwards anticipation. Hereby, the condition
+        is treated like an effect part.
         :param perception:
         :return:
         """
