@@ -2,7 +2,7 @@ import random
 from typing import Callable, Dict
 
 from lcs import Perception
-from lcs.strategies.subsumption import does_subsume
+from lcs.strategies.subsumption import find_subsumers
 
 
 def should_apply(action_set, time: int, theta_ga: int) -> bool:
@@ -232,13 +232,13 @@ def _find_old_classifier(
     old_cl = None
 
     if use_subsumption:
-        subsumers = [sub for sub in population if does_subsume(
-            sub, cl, theta_exp)]
+        subsumers = find_subsumers(cl, population, theta_exp)
 
-        # Find most general subsumer
-        old_cl = min(subsumers,
-                     key=lambda cl: cl.condition.specificity,
-                     default=None)
+        # Try to find most general subsumer
+        try:
+            old_cl = subsumers[0]
+        except IndexError:
+            pass
 
     if old_cl is None:
         old_cl = _find_similar(cl, population)

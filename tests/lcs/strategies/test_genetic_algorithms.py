@@ -146,19 +146,19 @@ class TestGeneticAlgorithms:
         assert sum(cl.num for cl in population) == 18
         assert sum(cl.num for cl in action_set) == 8
 
+    @pytest.mark.skip(reason="implement")
     def test_should_not_find_old_classifier(self):
         pass
 
-    def test_should_find_subsumer(self):
-        # Among nonsubsumers
-        pass
-
+    @pytest.mark.skip(reason="implement")
     def test_should_find_most_general_subsumer(self):
         pass
 
+    @pytest.mark.skip(reason="implement")
     def test_should_find_similar_classifier(self):
         pass
 
+    @pytest.mark.skip(reason="implement")
     def test_should_find_similar_among_subsumer(self):
         # When there are both subsumers and similar classifiers
         pass

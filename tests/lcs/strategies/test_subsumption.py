@@ -3,7 +3,8 @@ import pytest
 import lcs.agents.acs2 as acs2
 import lcs.agents.racs as racs
 from lcs.representations import UBR
-from lcs.strategies.subsumption import is_subsumer, does_subsume
+from lcs.strategies.subsumption import find_subsumers, \
+    is_subsumer, does_subsume
 
 
 class TestSubsumption:
@@ -17,6 +18,154 @@ class TestSubsumption:
         return racs.Configuration(classifier_length=2,
                                   number_of_possible_actions=2,
                                   encoder_bits=4)
+
+    def test_should_find_subsumer(self, acs2_cfg):
+        # given
+        subsumer = acs2.Classifier(
+            condition='###0####',
+            action=3,
+            effect='##1#####',
+            quality=0.93,
+            reward=1.35,
+            experience=23,
+            cfg=acs2_cfg)
+
+        nonsubsumer = acs2.Classifier(action=3, cfg=acs2_cfg)
+
+        population = acs2.ClassifiersList(
+            *[nonsubsumer, subsumer, nonsubsumer], cfg=acs2_cfg)
+
+        cl = acs2.Classifier(
+            condition='1##0####',
+            action=3,
+            effect='##1#####',
+            quality=0.5,
+            reward=0.35,
+            experience=1,
+            cfg=acs2_cfg)
+
+        # when
+        actual_subsumers = find_subsumers(cl, population, acs2_cfg.theta_exp)
+
+        # then
+        assert len(actual_subsumers) == 1
+        assert actual_subsumers[0] == subsumer
+
+    def test_should_find_subsumer_among_nonsubsumers(self, acs2_cfg):
+        # given
+        subsumer = acs2.Classifier(
+            condition='###0####',
+            action=3,
+            effect='##1#####',
+            quality=0.93,
+            reward=1.35,
+            experience=23,
+            cfg=acs2_cfg)
+
+        nonsubsumer = acs2.Classifier(action=3, cfg=acs2_cfg)
+
+        cl = acs2.Classifier(
+            condition='1##0####',
+            action=3,
+            effect='##1#####',
+            quality=0.5,
+            reward=0.35,
+            experience=1,
+            cfg=acs2_cfg)
+
+        population = acs2.ClassifiersList(
+            *[nonsubsumer, subsumer, nonsubsumer], cfg=acs2_cfg)
+
+        # when
+        subsumers = find_subsumers(cl, population, acs2_cfg.theta_exp)
+
+        # then
+        assert len(subsumers) == 1
+        assert subsumers[0] == subsumer
+
+    def test_should_sort_more_general_subsumers_1(self, acs2_cfg):
+        # given
+        subsumer1 = acs2.Classifier(
+            condition='1##0####',
+            action=3,
+            effect='##1#####',
+            quality=0.93,
+            reward=1.35,
+            experience=23,
+            cfg=acs2_cfg)
+
+        subsumer2 = acs2.Classifier(
+            condition='###0####',
+            action=3,
+            effect='##1#####',
+            quality=0.93,
+            reward=1.35,
+            experience=23,
+            cfg=acs2_cfg)
+
+        nonsubsumer = acs2.Classifier(action=3, cfg=acs2_cfg)
+
+        cl = acs2.Classifier(
+            condition='11#0####',
+            action=3,
+            effect='##1#####',
+            quality=0.5,
+            reward=0.35,
+            experience=1,
+            cfg=acs2_cfg)
+
+        population = acs2.ClassifiersList(
+            *[nonsubsumer, subsumer2, subsumer1, nonsubsumer], cfg=acs2_cfg)
+
+        # when
+        subsumers = find_subsumers(cl, population, acs2_cfg.theta_exp)
+
+        # then
+        assert len(subsumers) == 2
+        assert subsumers[0] == subsumer2
+        assert subsumers[1] == subsumer1
+
+    def test_should_sort_more_general_subsumers_2(self, acs2_cfg):
+        # given
+        subsumer1 = acs2.Classifier(
+            condition='1##0####',
+            action=3,
+            effect='##1#####',
+            quality=0.93,
+            reward=1.35,
+            experience=23,
+            cfg=acs2_cfg)
+
+        subsumer2 = acs2.Classifier(
+            condition='###0####',
+            action=3,
+            effect='##1#####',
+            quality=0.93,
+            reward=1.35,
+            experience=23,
+            cfg=acs2_cfg)
+
+        nonsubsumer = acs2.Classifier(action=3, cfg=acs2_cfg)
+
+        cl = acs2.Classifier(
+            condition='11#0####',
+            action=3,
+            effect='##1#####',
+            quality=0.5,
+            reward=0.35,
+            experience=1,
+            cfg=acs2_cfg)
+
+        population = acs2.ClassifiersList(
+            *[nonsubsumer, subsumer1, subsumer2, nonsubsumer], cfg=acs2_cfg)
+
+        # when
+        subsumers = find_subsumers(cl, population, acs2_cfg.theta_exp)
+
+        # then
+        assert len(subsumers) == 2
+        assert subsumers[0] == subsumer2
+        assert subsumers[1] == subsumer1
 
     @pytest.mark.parametrize("_exp, _q, _is_subsumer", [
         (1, .5, False),  # too young classifier

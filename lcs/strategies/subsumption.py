@@ -1,3 +1,29 @@
+from typing import List
+
+
+def find_subsumers(cl, population, theta_exp: int) -> List:
+    """
+    Looks for subsumers of `cl` inside `population`.
+
+    Parameters
+    ----------
+    cl:
+        classifier
+    population:
+        population of classifiers
+    theta_exp: int
+        subsumption experience threshold
+
+    Returns
+    -------
+    List
+        list of subsumers (classifiers) sorted by specificity (most general
+        are first)
+    """
+    subsumers = [sub for sub in population if does_subsume(sub, cl, theta_exp)]
+    return sorted(subsumers, key=lambda cl: cl.condition.specificity)
+
+
 def does_subsume(cl, other_cl, theta_exp: int) -> bool:
     """
     Returns if a classifier `cl` subsumes `other_cl` classifier
