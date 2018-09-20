@@ -29,7 +29,7 @@ Effect
 Components
 ^^^^^^^^^^
 * ALP implemented
-* Custom mutation in GA
+* Custom mutation in GA (condition and effect)
 
 Thoughts
 ^^^^^^^^

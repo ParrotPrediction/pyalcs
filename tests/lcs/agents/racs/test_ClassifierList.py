@@ -1,8 +1,8 @@
 import pytest
 
 from lcs import Perception
-from lcs.agents.racs import Configuration, Condition,\
-    Classifier, ClassifierList
+from lcs.agents.racs import Configuration, Condition, \
+    Classifier, ClassifierList, Effect
 from lcs.representations import UBR
 
 
@@ -67,6 +67,71 @@ class TestClassifierList:
         assert cl1 in action_set
         assert cl2 in action_set
         assert cl3 not in action_set
+
+    def test_should_expand(self, cfg):
+        # given
+        cl1 = Classifier(numerosity=1, cfg=cfg)
+        cl2 = Classifier(numerosity=2, cfg=cfg)
+        cl3 = Classifier(numerosity=3, cfg=cfg)
+
+        population = ClassifierList(*[cl1, cl2, cl3])
+
+        # when
+        expanded = population.expand()
+
+        # then
+        assert len(expanded) == 6
+        assert cl1 in expanded
+        assert cl2 in expanded
+        assert cl3 in expanded
+
+    def test_should_get_maximum_fitness(self, cfg):
+        # given
+        # anticipate change - low fitness
+        cl1 = Classifier(
+            effect=Effect([UBR(0, 1), UBR(0, 3)], cfg),
+            quality=0.3, reward=1,
+            cfg=cfg)
+
+        # do not anticipate change - high fitness
+        cl2 = Classifier(
+            effect=Effect([UBR(0, 15), UBR(0, 15)], cfg),
+            quality=0.5, reward=1,
+            cfg=cfg)
+
+        # anticipate change - medium fitness
+        cl3 = Classifier(
+            effect=Effect([UBR(0, 14), UBR(0, 15)], cfg),
+            quality=0.4, reward=1,
+            cfg=cfg)
+
+        population = ClassifierList(*[cl1, cl2, cl3])
+
+        # when
+        mf = population.get_maximum_fitness()
+
+        # then
+        assert mf == cl3.fitness
+
+    def test_should_return_zero_max_fitness(self, cfg):
+        # given classifiers that does not anticipate change
+        cl1 = Classifier(
+            effect=Effect([UBR(0, 15), UBR(0, 15)], cfg),
+            quality=0.5, reward=1,
+            cfg=cfg)
+
+        cl2 = Classifier(
+            effect=Effect([UBR(0, 15), UBR(0, 15)], cfg),
+            quality=0.7, reward=1,
+            cfg=cfg)
+
+        population = ClassifierList(*[cl1, cl2])
+
+        # when
+        mf = population.get_maximum_fitness()
+
+        # then
+        assert mf == 0.0
 
     def test_should_apply_reinforcement_learning(self, cfg):
         # given

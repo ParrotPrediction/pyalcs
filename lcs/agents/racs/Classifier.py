@@ -91,6 +91,10 @@ class Classifier:
         return new_cls
 
     @property
+    def fitness(self):
+        return self.q * self.r
+
+    @property
     def specified_unchanging_attributes(self) -> List[int]:
         """
         Determines the number of specified unchanging attributes in

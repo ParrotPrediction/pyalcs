@@ -488,7 +488,7 @@ class TestClassifierList:
         expanded = population.expand()
 
         # then
-        assert 6 == len(expanded)
+        assert len(expanded) == 6
         assert c0 in expanded
         assert c1 in expanded
         assert c2 in expanded
@@ -529,7 +529,7 @@ class TestClassifierList:
         population.append(c1)
 
         # when
-        population.apply_reinforcement_learning(0, 28.79)
+        population.apply_reinforcement_learning(0, 28.79, cfg.beta, cfg.gamma)
 
         # then
         assert abs(33.94 - population[0].r) < 0.1

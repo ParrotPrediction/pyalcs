@@ -152,9 +152,11 @@ class ClassifiersList(TypedList):
             child1 = Classifier.copy_from(parent1, time)
             child2 = Classifier.copy_from(parent2, time)
 
+            # Execute mutation
             ga.generalizing_mutation(child1, child1.cfg.mu)
             ga.generalizing_mutation(child2, child2.cfg.mu)
 
+            # Execute cross-over
             if random.random() < chi:
                 if child1.effect == child2.effect:
                     ga.two_point_crossover(child1, child2)
@@ -166,7 +168,7 @@ class ClassifiersList(TypedList):
             child1.q /= 2
             child2.q /= 2
 
-            # we are interested only in classifiers with specialized condition
+            # We are interested only in classifiers with specialized condition
             unique_children = {cl for cl in [child1, child2]
                                if cl.condition.specificity > 0}
 

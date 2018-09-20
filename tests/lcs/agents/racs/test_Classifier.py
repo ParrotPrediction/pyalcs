@@ -27,6 +27,14 @@ class TestClassifier:
         assert c.talp is None
         assert c.tav == 0.0
 
+    @pytest.mark.parametrize("_q, _r, _fitness", [
+        (0.0, 0.0, 0.0),
+        (0.3, 0.5, 0.15),
+        (1.0, 1.0, 1.0),
+    ])
+    def test_should_calculate_fitness(self, _q, _r, _fitness, cfg):
+        assert Classifier(quality=_q, reward=_r, cfg=cfg).fitness == _fitness
+
     @pytest.mark.parametrize("_effect, _p0, _p1, _result", [
         # Classifier with default pass-through effect
         (None, [0.5, 0.5], [0.5, 0.5], True),

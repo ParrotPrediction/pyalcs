@@ -17,7 +17,7 @@ class Configuration:
                  epsilon=0.5,
                  u_max=100000,
                  theta_exp=20,
-                 thera_ga=100,
+                 theta_ga=100,
                  theta_as=20,
                  mu=0.3,
                  chi=0.8):
@@ -67,7 +67,7 @@ class Configuration:
         self.theta_r = theta_r
         self.epsilon = epsilon
         self.u_max = u_max
-        self.theta_ga = thera_ga
+        self.theta_ga = theta_ga
         self.theta_as = theta_as
         self.mu = mu
         self.chi = chi

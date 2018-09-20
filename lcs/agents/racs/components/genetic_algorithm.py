@@ -10,8 +10,8 @@ from lcs.representations import UBR
 
 def mutate(cl: Classifier, bounds: Tuple[int, int], mu: float) -> None:
     """
-    Tries to generalize the classifier condition part. Each condition attribute
-    (both lower/upper bound) have `mu` chances to being broaden.
+    Tries to generalize the classifier condition and effect part.
+    Each attribute (both lower/upper bound) have `mu` chances of being broaden.
 
     Parameters
     ----------
@@ -22,9 +22,12 @@ def mutate(cl: Classifier, bounds: Tuple[int, int], mu: float) -> None:
     mu: float
         probability of executing mutation on single bound
     """
-    for idx, attrib in enumerate(cl.condition):
-        if attrib != cl.cfg.classifier_wildcard:
-            cl.condition[idx] = _mutate_attribute(attrib, bounds, mu)
+    for idx, (c, e) in enumerate(zip(cl.condition, cl.effect)):
+        if c != cl.cfg.classifier_wildcard:
+            cl.condition[idx] = _mutate_attribute(c, bounds, mu)
+
+        if e != cl.cfg.classifier_wildcard:
+            cl.effect[idx] = _mutate_attribute(e, bounds, mu)
 
 
 def _mutate_attribute(ubr: UBR, bounds: Tuple[int, int], mu: float) -> UBR:
