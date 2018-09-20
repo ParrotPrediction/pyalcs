@@ -1,6 +1,7 @@
 import pytest
 
 from lcs import Perception
+from lcs.strategies.subsumption import does_subsume
 from lcs.agents.acs2 import Configuration, ClassifiersList, \
     Condition, Classifier
 
@@ -343,7 +344,7 @@ class TestClassifierList:
         old_cls = existing_classifiers.find_old_classifier(classifier)
 
         # then
-        assert subsumer.does_subsume(classifier) is True
+        assert does_subsume(subsumer, classifier, cfg.theta_exp) is True
         assert similar == classifier
         assert subsumer == old_cls
 

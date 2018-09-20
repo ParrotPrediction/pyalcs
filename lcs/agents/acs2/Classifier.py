@@ -148,24 +148,6 @@ class Classifier(object):
     def specificity(self):
         return self.condition.specificity / len(self.condition)
 
-    @property
-    def is_subsumer(self) -> bool:
-        """
-        Determines whether the classifier satisfies the subsumer criteria.
-
-        Returns
-        -------
-        bool
-            True is classifier can be considered as subsumer,
-            False otherwise
-        """
-        if self.exp > self.cfg.theta_exp:
-            if self.is_reliable():
-                if not self.is_marked():
-                    return True
-
-        return False
-
     def does_anticipate_change(self) -> bool:
         """
         Checks whether any change in environment is anticipated
@@ -360,29 +342,6 @@ class Classifier(object):
         if len(self.specified_unchanging_attributes) > 0:
             ridx = randomfunc(self.specified_unchanging_attributes)
             self.condition.generalize(ridx)
-            return True
-
-        return False
-
-    def does_subsume(self, other: Classifier) -> bool:
-        """
-        Returns if a classifier subsumes `other` classifier
-
-        Parameters
-        ----------
-        other: Classifier
-            other classifier
-
-        Returns
-        -------
-        bool
-            True if `other` classifier is subsumed, False otherwise
-        """
-        if self.is_subsumer and \
-            self.is_more_general(other) and \
-            self.condition.does_match(other.condition) and \
-                self.action == other.action and \
-                self.effect == other.effect:
             return True
 
         return False

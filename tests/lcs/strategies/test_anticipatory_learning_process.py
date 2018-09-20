@@ -70,7 +70,7 @@ class TestAnticipatoryLearningProcess:
         population.extend([c1, c2, c3])
 
         # when
-        alp.add_classifier(child, population, new_list)
+        alp.add_classifier(child, population, new_list, cfg.theta_exp)
 
         # then
         assert len(population) == 3
@@ -217,7 +217,7 @@ class TestAnticipatoryLearningProcess:
         population.extend([c1, c2, c3, c4, c5, c6, c7])
 
         # When
-        alp.add_classifier(child, population, new_list)
+        alp.add_classifier(child, population, new_list, cfg.theta_exp)
 
         # Then
         assert 7 == len(population)

@@ -107,12 +107,12 @@ class ClassifiersList(TypedList):
 
             if new_cl is not None:
                 new_cl.tga = time
-                alp.add_classifier(new_cl, self, new_list)
+                alp.add_classifier(new_cl, self, new_list, self.cfg.theta_exp)
 
         # No classifier anticipated correctly - generate new one
         if not was_expected_case:
             new_cl = alp_acs2.cover(p0, action, p1, time, self.cfg)
-            alp.add_classifier(new_cl, self, new_list)
+            alp.add_classifier(new_cl, self, new_list, self.cfg.theta_exp)
 
         # Merge classifiers from new_list into self and population
         self.extend(new_list)
@@ -140,7 +140,8 @@ class ClassifiersList(TypedList):
                  theta_ga: int,
                  chi: float,
                  theta_as: int,
-                 do_subsumption: bool) -> None:
+                 do_subsumption: bool,
+                 theta_exp: int) -> None:
 
         if ga.should_apply(action_set, time, theta_ga):
             ga.set_timestamps(action_set, time)
@@ -180,4 +181,4 @@ class ClassifiersList(TypedList):
             for child in unique_children:
                 ga.add_classifier(child, p,
                                   population, match_set, action_set,
-                                  do_subsumption)
+                                  do_subsumption, theta_exp)

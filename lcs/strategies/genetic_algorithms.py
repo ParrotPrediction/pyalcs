@@ -2,6 +2,7 @@ import random
 from typing import Callable, Dict
 
 from lcs import Perception
+from lcs.strategies.subsumption import does_subsume
 
 
 def should_apply(action_set, time: int, theta_ga: int) -> bool:
@@ -123,7 +124,8 @@ def two_point_crossover(parent, donor) -> None:
 
 def add_classifier(cl, p: Perception,
                    population, match_set, action_set,
-                   do_subsumption: bool) -> None:
+                   do_subsumption: bool,
+                   theta_exp: int) -> None:
     """
     Find subsumer/similar classifier, if present - increase its numerosity,
     else add this new classifier
@@ -141,9 +143,11 @@ def add_classifier(cl, p: Perception,
     action_set:
         action set
     do_subsumption: bool
-        Use subsumption mechanizm when finding existing classifiers?
+        Use subsumption mechanizm when finding existing classifiers
+    theta_exp: int
+        subsumption experience threshold
     """
-    old_cl = _find_old_classifier(action_set, cl, do_subsumption)
+    old_cl = _find_old_classifier(action_set, cl, do_subsumption, theta_exp)
 
     if old_cl is None:
         population.append(cl)
@@ -222,11 +226,14 @@ def _is_preferred_to_delete(cl_del, cl) -> bool:
     return False
 
 
-def _find_old_classifier(population, cl, use_subsumption: bool):
+def _find_old_classifier(
+        population, cl, use_subsumption: bool, theta_exp: int):
+
     old_cl = None
 
     if use_subsumption:
-        subsumers = [sub for sub in population if sub.does_subsume(cl)]
+        subsumers = [sub for sub in population if does_subsume(
+            sub, cl, theta_exp)]
 
         # Find most general subsumer
         old_cl = min(subsumers,

@@ -68,3 +68,6 @@ class Condition(PerceptionString):
                 return False
 
         return True
+
+    def does_match_condition(self, other: Condition) -> bool:
+        return self.does_match(other)
