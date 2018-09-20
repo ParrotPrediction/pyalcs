@@ -857,3 +857,44 @@ class TestClassifier:
         assert result0 == ['0', '0', '1', '1', '1', '1', '1', '0']
         assert result1 is None
         assert result2 is None
+
+    def test_get_best_anticipation(self, cfg):
+        # given
+        p0 = Perception(['1', '1', '0', '1', '1', '1', '1', '1'])
+        p1 = Perception(['1', '1', '1', '1', '1', '1', '1', '1'])
+        classifier = Classifier(effect='##0##0##', cfg=cfg)
+
+        # when
+        result0 = classifier.get_best_anticipation(p0)
+        result1 = classifier.get_best_anticipation(p1)
+
+        # then
+        assert result0 == ['1', '1', '0', '1', '1', '0', '1', '1']
+        assert result1 == ['1', '1', '0', '1', '1', '0', '1', '1']
+
+    @pytest.mark.parametrize("_c, _p, _result", [
+        ('########', '10011001', True),
+        ('1#######', '10011001', True),
+        ('0#######', '10011001', False),
+    ])
+    def test_should_match_perception(self, _c, _p, _result):
+        # given
+        c = Condition(_c)
+        p = Perception(_p)
+
+        # then
+        assert c.does_match(p) is _result
+
+    @pytest.mark.parametrize("_c, _other, _result", [
+        ('########', '10011001', True),
+        ('1#######', '10011001', True),
+        ('0#######', '10011001', False),
+        ('####0###', '#1O##O##', True),
+    ])
+    def test_should_match_condition(self, _c, _other, _result):
+        # given
+        c = Condition(_c)
+        other = Condition(_other)
+
+        # then
+        assert c.does_match(other) is _result
