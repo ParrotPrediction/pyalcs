@@ -17,3 +17,4 @@ Guide
    installation
    acs2/acs2
    racs/racs
+   notebooks
