@@ -137,8 +137,8 @@ class TestGeneticAlgorithms:
         theta_as = 10  # maximum size of the action set
 
         # when
-        population = acs2.ClassifiersList(*clss, cfg=cfg)
-        action_set = population.form_action_set(1, cfg)
+        population = acs2.ClassifiersList(*clss)
+        action_set = population.form_action_set(1)
 
         ga.delete_classifiers(population, None, action_set, insize, theta_as)
 

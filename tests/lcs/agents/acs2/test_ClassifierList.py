@@ -43,7 +43,7 @@ class TestClassifierList:
                                 cfg=cfg)
 
         classifiers_list = ClassifiersList(
-            *[nonsubsumer, subsumer1, subsumer2, nonsubsumer], cfg=cfg)
+            *[nonsubsumer, subsumer1, subsumer2, nonsubsumer])
 
         # when
         actual_subsumer = classifiers_list.find_subsumer(
@@ -101,7 +101,7 @@ class TestClassifierList:
 
         classifiers_list = ClassifiersList(
             *[nonsubsumer, subsumer1, nonsubsumer, most_general,
-              subsumer2, nonsubsumer], cfg=cfg)
+              subsumer2, nonsubsumer])
 
         # when
         actual_subsumer = classifiers_list.find_subsumer(
@@ -153,7 +153,7 @@ class TestClassifierList:
 
         classifiers_list = ClassifiersList(
             *[nonsubsumer, subsumer1, nonsubsumer, most_general,
-              subsumer2, nonsubsumer], cfg=cfg)
+              subsumer2, nonsubsumer])
 
         # when
         actual_old_classifier = classifiers_list.find_old_classifier(
@@ -171,7 +171,7 @@ class TestClassifierList:
             *[classifier_1,
               Classifier(action=2, cfg=cfg),
               Classifier(action=3, cfg=cfg),
-              classifier_2], cfg=cfg)
+              classifier_2])
 
         # when
         actual_old_classifier = classifiers.find_old_classifier(
@@ -194,7 +194,7 @@ class TestClassifierList:
                              action=1,
                              cfg=cfg)
 
-        existing_classifiers = ClassifiersList(*[similar, subsumer], cfg=cfg)
+        existing_classifiers = ClassifiersList(*[similar, subsumer])
 
         classifier = Classifier(condition='10######',
                                 action=1,
@@ -211,7 +211,7 @@ class TestClassifierList:
     @pytest.mark.skip(reason="move to another file")
     def test_find_old_classifier_none(self, cfg):
         # given
-        classifier_list = ClassifiersList(cfg=cfg)
+        classifier_list = ClassifiersList()
         cl = Classifier(cfg=cfg)
 
         # when
@@ -228,17 +228,16 @@ class TestClassifierList:
                           cfg=cfg)
         cl_3 = Classifier(action=3, cfg=cfg)
         cl_4 = Classifier(action=4, cfg=cfg)
-        action_set = ClassifiersList(*[cl_1], cfg=cfg)
-        match_set = ClassifiersList(cfg=cfg)
-        population = ClassifiersList(*[cl_1, cl_3, cl_4], cfg=cfg)
+        action_set = ClassifiersList(*[cl_1])
+        match_set = ClassifiersList()
+        population = ClassifiersList(*[cl_1, cl_3, cl_4])
 
         # when
         action_set.add_ga_classifier(cl_2, match_set, population)
 
         # then
-        assert ClassifiersList(*[cl_2], cfg=cfg) == match_set
-        assert ClassifiersList(*[cl_1, cl_3, cl_4, cl_2],
-                               cfg=cfg) == population
+        assert ClassifiersList(*[cl_2]) == match_set
+        assert ClassifiersList(*[cl_1, cl_3, cl_4, cl_2]) == population
 
     @pytest.mark.skip(reason="move to another file")
     def test_add_ga_classifier_increase_numerosity(self, cfg):
@@ -252,9 +251,9 @@ class TestClassifierList:
         cl_3 = Classifier(action=3, cfg=cfg)
         cl_4 = Classifier(action=4, cfg=cfg)
 
-        action_set = ClassifiersList(*[cl_1], cfg=cfg)
-        match_set = ClassifiersList(*[cl_1], cfg=cfg)
-        population = ClassifiersList(*[cl_1, cl_3, cl_4], cfg=cfg)
+        action_set = ClassifiersList(*[cl_1])
+        match_set = ClassifiersList(*[cl_1])
+        population = ClassifiersList(*[cl_1, cl_3, cl_4])
 
         # when
         action_set.add_ga_classifier(cl_2, match_set, population)
@@ -265,11 +264,10 @@ class TestClassifierList:
             cfg=cfg)
 
         # then
-        assert ClassifiersList(*[new_classifier, cl_3, cl_4],
-                               cfg=cfg) == population
+        assert ClassifiersList(*[new_classifier, cl_3, cl_4]) == population
 
     def test_should_insert_classifier_1(self, cfg):
-        population = ClassifiersList(cfg=cfg)
+        population = ClassifiersList()
 
         with pytest.raises(TypeError):
             # Try to insert an integer instead of classifier object
@@ -277,7 +275,7 @@ class TestClassifierList:
 
     def test_should_insert_classifier_2(self, cfg):
         # given
-        population = ClassifiersList(cfg=cfg)
+        population = ClassifiersList()
 
         # when
         population.append(Classifier(cfg=cfg))
@@ -287,7 +285,7 @@ class TestClassifierList:
 
     def test_should_form_match_set(self, cfg):
         # given
-        population = ClassifiersList(cfg=cfg)
+        population = ClassifiersList()
         situation = Perception('11110000')
 
         # C1 - general condition
@@ -304,9 +302,7 @@ class TestClassifierList:
         population.append(c3)
 
         # when
-        match_set = ClassifiersList.form_match_set(population,
-                                                   situation,
-                                                   cfg=cfg)
+        match_set = ClassifiersList.form_match_set(population, situation)
         # then
         assert 2 == len(match_set)
         assert c1 in match_set
@@ -314,7 +310,7 @@ class TestClassifierList:
 
     def test_should_form_action_set(self, cfg):
         # given
-        population = ClassifiersList(cfg=cfg)
+        population = ClassifiersList()
         c0 = Classifier(action=0, cfg=cfg)
         c01 = Classifier(action=0, cfg=cfg)
         c1 = Classifier(action=1, cfg=cfg)
@@ -324,19 +320,19 @@ class TestClassifierList:
         population.append(c1)
 
         # when & then
-        action_set = ClassifiersList.form_action_set(population, 0, cfg)
+        action_set = ClassifiersList.form_action_set(population, 0)
         assert 2 == len(action_set)
         assert c0 in action_set
         assert c01 in action_set
 
         # when & then
-        action_set = ClassifiersList.form_action_set(population, 1, cfg)
+        action_set = ClassifiersList.form_action_set(population, 1)
         assert 1 == len(action_set)
         assert c1 in action_set
 
     def test_should_expand(self, cfg):
         # given
-        population = ClassifiersList(cfg=cfg)
+        population = ClassifiersList()
         c0 = Classifier(action=0, cfg=cfg)
         c1 = Classifier(action=1, numerosity=2, cfg=cfg)
         c2 = Classifier(action=2, numerosity=3, cfg=cfg)
@@ -356,7 +352,7 @@ class TestClassifierList:
 
     def test_should_calculate_maximum_fitness(self, cfg):
         # given
-        population = ClassifiersList(cfg=cfg)
+        population = ClassifiersList()
 
         # when & then
         # C1 - does not anticipate change
@@ -383,14 +379,16 @@ class TestClassifierList:
 
     def test_should_apply_reinforcement_learning(self, cfg):
         # given
-        population = ClassifiersList(cfg=cfg)
+        population = ClassifiersList()
         c1 = Classifier(cfg=cfg)
         c1.r = 34.29
         c1.ir = 11.29
         population.append(c1)
 
         # when
-        population.apply_reinforcement_learning(0, 28.79, cfg.beta, cfg.gamma)
+        ClassifiersList.apply_reinforcement_learning(population,
+                                                     0, 28.79,
+                                                     cfg.beta, cfg.gamma)
 
         # then
         assert abs(33.94 - population[0].r) < 0.1

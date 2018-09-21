@@ -9,28 +9,24 @@ import lcs.strategies.anticipatory_learning_process as alp
 import lcs.strategies.genetic_algorithms as ga
 import lcs.strategies.reinforcement_learning as rl
 from lcs import Perception, TypedList
-from . import Classifier, Configuration
+from lcs.agents.acs2 import Configuration
+from . import Classifier
 
 
 class ClassifiersList(TypedList):
     """
     Represents overall population, match/action sets
     """
-    def __init__(self, *args, cfg: Configuration) -> None:
-        self.cfg = cfg
+    def __init__(self, *args) -> None:
         super().__init__((Classifier, ), *args)
 
-    def form_match_set(self,
-                       situation: Perception,
-                       cfg: Configuration) -> ClassifiersList:
+    def form_match_set(self, situation: Perception) -> ClassifiersList:
         matching = [cl for cl in self if cl.condition.does_match(situation)]
-        return ClassifiersList(*matching, cfg=cfg)
+        return ClassifiersList(*matching)
 
-    def form_action_set(self,
-                        action: int,
-                        cfg: Configuration) -> ClassifiersList:
+    def form_action_set(self, action: int) -> ClassifiersList:
         matching = [cl for cl in self if cl.action == action]
-        return ClassifiersList(*matching, cfg=cfg)
+        return ClassifiersList(*matching)
 
     def expand(self) -> List[Classifier]:
         """
@@ -63,31 +59,43 @@ class ClassifiersList(TypedList):
 
         return 0.0
 
-    def apply_alp(self,
+    @staticmethod
+    def apply_alp(population: ClassifiersList,
+                  match_set: ClassifiersList,
+                  action_set: ClassifiersList,
                   p0: Perception,
                   action: int,
                   p1: Perception,
                   time: int,
-                  population: ClassifiersList,
-                  match_set: ClassifiersList) -> None:
+                  theta_exp: int,
+                  cfg: Configuration) -> None:
         """
         The Anticipatory Learning Process. Handles all updates by the ALP,
         insertion of new classifiers in pop and possibly matchSet, and
         deletion of inadequate classifiers in pop and possibly matchSet.
 
-        :param p0:
-        :param action:
-        :param p1:
-        :param time:
-        :param population:
-        :param match_set:
+        Parameters
+        ----------
+        population
+        match_set
+        action_set
+        p0: Perception
+        action: int
+        p1: Perception
+        time: int
+        theta_exp
+        cfg: Configuration
+
+        Returns
+        -------
+
         """
-        new_list = ClassifiersList(cfg=self.cfg)
+        new_list = ClassifiersList()
         new_cl: Optional[Classifier] = None
         was_expected_case = False
         delete_count = 0
 
-        for cl in self:
+        for cl in action_set:
             cl.increase_experience()
             cl.set_alp_timestamp(time)
 
@@ -101,21 +109,22 @@ class ClassifiersList(TypedList):
                     # Removes classifier from population, match set
                     # and current list
                     delete_count += 1
-                    lists = [x for x in [population, match_set, self] if x]
+                    lists = [x for x in [population, match_set, action_set]
+                             if x]
                     for lst in lists:
                         lst.safe_remove(cl)
 
             if new_cl is not None:
                 new_cl.tga = time
-                alp.add_classifier(new_cl, self, new_list, self.cfg.theta_exp)
+                alp.add_classifier(new_cl, action_set, new_list, theta_exp)
 
         # No classifier anticipated correctly - generate new one
         if not was_expected_case:
-            new_cl = alp_acs2.cover(p0, action, p1, time, self.cfg)
-            alp.add_classifier(new_cl, self, new_list, self.cfg.theta_exp)
+            new_cl = alp_acs2.cover(p0, action, p1, time, cfg)
+            alp.add_classifier(new_cl, action_set, new_list, theta_exp)
 
         # Merge classifiers from new_list into self and population
-        self.extend(new_list)
+        action_set.extend(new_list)
         population.extend(new_list)
 
         if match_set is not None:
@@ -123,12 +132,13 @@ class ClassifiersList(TypedList):
                             cl.condition.does_match(p1)]
             match_set.extend(new_matching)
 
-    def apply_reinforcement_learning(self,
+    @staticmethod
+    def apply_reinforcement_learning(action_set: ClassifiersList,
                                      reward: int,
                                      p: float,
                                      beta: float,
                                      gamma: float) -> None:
-        for cl in self:
+        for cl in action_set:
             rl.update_classifier(cl, reward, p, beta, gamma)
 
     @staticmethod

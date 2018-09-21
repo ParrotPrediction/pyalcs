@@ -17,7 +17,7 @@ class ACS2(Agent):
         if population:
             self.population = population
         else:
-            self.population = ClassifiersList(cfg=self.cfg)
+            self.population = ClassifiersList()
 
     def explore(self, env, trials):
         """
@@ -99,22 +99,26 @@ class ACS2(Agent):
         action = None
         reward = None
         prev_state = None
-        action_set = ClassifiersList(cfg=self.cfg)
+        action_set = ClassifiersList()
         done = False
 
         while not done:
-            match_set = self.population.form_match_set(state, self.cfg)
+            match_set = self.population.form_match_set(state)
 
             if steps > 0:
                 # Apply learning in the last action set
-                action_set.apply_alp(
+                ClassifiersList.apply_alp(
+                    self.population,
+                    match_set,
+                    action_set,
                     prev_state,
                     action,
                     state,
                     time + steps,
-                    self.population,
-                    match_set)
-                action_set.apply_reinforcement_learning(
+                    self.cfg.theta_exp,
+                    self.cfg)
+                ClassifiersList.apply_reinforcement_learning(
+                    action_set,
                     reward,
                     match_set.get_maximum_fitness(),
                     self.cfg.beta,
@@ -139,21 +143,25 @@ class ACS2(Agent):
                 self.cfg.epsilon)
             internal_action = parse_action(action, self.cfg.action_mapping_fcn)
             logging.debug("\tExecuting action: [%d]", action)
-            action_set = match_set.form_action_set(action, self.cfg)
+            action_set = match_set.form_action_set(action)
 
             prev_state = state
             raw_state, reward, done, _ = env.step(internal_action)
             state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
 
             if done:
-                action_set.apply_alp(
+                ClassifiersList.apply_alp(
+                    self.population,
+                    None,
+                    action_set,
                     prev_state,
                     action,
                     state,
                     time + steps,
-                    self.population,
-                    None)
-                action_set.apply_reinforcement_learning(
+                    self.cfg.theta_exp,
+                    self.cfg)
+                ClassifiersList.apply_reinforcement_learning(
+                    action_set,
                     reward,
                     0,
                     self.cfg.beta,
@@ -183,14 +191,15 @@ class ACS2(Agent):
         state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
 
         reward = None
-        action_set = ClassifiersList(cfg=self.cfg)
+        action_set = ClassifiersList()
         done = False
 
         while not done:
-            match_set = self.population.form_match_set(state, self.cfg)
+            match_set = self.population.form_match_set(state)
 
             if steps > 0:
-                action_set.apply_reinforcement_learning(
+                ClassifiersList.apply_reinforcement_learning(
+                    action_set,
                     reward,
                     match_set.get_maximum_fitness(),
                     self.cfg.beta,
@@ -202,14 +211,14 @@ class ACS2(Agent):
                 self.cfg.number_of_possible_actions,
                 epsilon=0.0)
             internal_action = parse_action(action, self.cfg.action_mapping_fcn)
-            action_set = match_set.form_action_set(action, self.cfg)
+            action_set = match_set.form_action_set(action)
 
             raw_state, reward, done, _ = env.step(internal_action)
             state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
 
             if done:
-                action_set.apply_reinforcement_learning(
-                    reward, 0, self.cfg.beta, self.cfg.gamma)
+                ClassifiersList.apply_reinforcement_learning(
+                    action_set, reward, 0, self.cfg.beta, self.cfg.gamma)
 
             steps += 1
 

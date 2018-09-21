@@ -8,8 +8,8 @@ class TestAnticipatoryLearningProcess:
     def test_should_insert_alp_offspring_1(self):
         # given
         cfg = acs2.Configuration(8, 8)
-        population = acs2.ClassifiersList(cfg=cfg)
-        new_list = acs2.ClassifiersList(cfg=cfg)
+        population = acs2.ClassifiersList()
+        new_list = acs2.ClassifiersList()
 
         child = acs2.Classifier(
             condition='1##1#010',
@@ -82,8 +82,8 @@ class TestAnticipatoryLearningProcess:
     def test_should_insert_alp_offspring_2(self):
         # given
         cfg = acs2.Configuration(8, 8)
-        population = acs2.ClassifiersList(cfg=cfg)
-        new_list = acs2.ClassifiersList(cfg=cfg)
+        population = acs2.ClassifiersList()
+        new_list = acs2.ClassifiersList()
 
         child = acs2.Classifier(
             condition='#1O##O##',

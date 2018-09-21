@@ -33,7 +33,7 @@ class TestSubsumption:
         nonsubsumer = acs2.Classifier(action=3, cfg=acs2_cfg)
 
         population = acs2.ClassifiersList(
-            *[nonsubsumer, subsumer, nonsubsumer], cfg=acs2_cfg)
+            *[nonsubsumer, subsumer, nonsubsumer])
 
         cl = acs2.Classifier(
             condition='1##0####',
@@ -74,7 +74,7 @@ class TestSubsumption:
             cfg=acs2_cfg)
 
         population = acs2.ClassifiersList(
-            *[nonsubsumer, subsumer, nonsubsumer], cfg=acs2_cfg)
+            *[nonsubsumer, subsumer, nonsubsumer])
 
         # when
         subsumers = find_subsumers(cl, population, acs2_cfg.theta_exp)
@@ -115,7 +115,7 @@ class TestSubsumption:
             cfg=acs2_cfg)
 
         population = acs2.ClassifiersList(
-            *[nonsubsumer, subsumer2, subsumer1, nonsubsumer], cfg=acs2_cfg)
+            *[nonsubsumer, subsumer2, subsumer1, nonsubsumer])
 
         # when
         subsumers = find_subsumers(cl, population, acs2_cfg.theta_exp)
@@ -157,7 +157,7 @@ class TestSubsumption:
             cfg=acs2_cfg)
 
         population = acs2.ClassifiersList(
-            *[nonsubsumer, subsumer1, subsumer2, nonsubsumer], cfg=acs2_cfg)
+            *[nonsubsumer, subsumer1, subsumer2, nonsubsumer])
 
         # when
         subsumers = find_subsumers(cl, population, acs2_cfg.theta_exp)

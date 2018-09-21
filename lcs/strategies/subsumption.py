@@ -32,7 +32,7 @@ def does_subsume(cl, other_cl, theta_exp: int) -> bool:
     ----------
     cl:
         subsumer classifier
-    other:
+    other_cl:
         other classifier
     theta_exp: int
         experience threshold
