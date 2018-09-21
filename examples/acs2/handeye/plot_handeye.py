@@ -109,8 +109,8 @@ def plot_performance(agent, env, metrics_df, cfg, env_name, additional_info):
     plt.subplots_adjust(top=0.86, wspace=0.3, hspace=0.3)
 
 
-def plot_handeye(env_name='HandEye3', filename='images/handeye.pdf', do_action_planning=True):
-    hand_eye = gym.make('{}-v0'.format(env_name))
+def plot_handeye(env_name='HandEye3-v0', filename='images/handeye.pdf', do_action_planning=True):
+    hand_eye = gym.make(env_name)
     cfg = Configuration(hand_eye.observation_space.n, hand_eye.action_space.n,
                         epsilon=1.0,
                         do_ga=False,
@@ -140,9 +140,19 @@ def plot_handeye(env_name='HandEye3', filename='images/handeye.pdf', do_action_p
 
 
 if __name__ == "__main__":
-    date = datetime.datetime.now()
-    env_name = 'HandEye3'
-    plot_handeye(env_name, 'images/{}_ap_{}.pdf'.format(env_name, date),
+    env_name = 'HandEye3-v0'
+
+    start = datetime.datetime.now()
+    print("time start: {}".format(start))
+
+    plot_handeye(env_name, 'images/{}_ap_{}.pdf'.format(env_name, start),
                  do_action_planning=True)
-    plot_handeye(env_name, 'images/{}_no_ap_{}.pdf'.format(env_name, date),
+
+    middle = datetime.datetime.now()
+    print("done with AP, time: {}, elapsed: {}".format(middle, middle-start))
+
+    plot_handeye(env_name, 'images/{}_no_ap_{}.pdf'.format(env_name, start),
                  do_action_planning=False)
+
+    end = datetime.datetime.now()
+    print("done without AP, time: {}, elapsed: {}".format(end, end-middle))
