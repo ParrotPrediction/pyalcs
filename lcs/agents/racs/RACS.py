@@ -26,7 +26,6 @@ class RACS(Agent):
     def exploit(self, env, trials):
         pass
 
-
     def _evaluate(self, env, max_trials: int, func: Callable) -> Tuple:
         """
         Runs the classifier in desired strategy (see `func`) and collects

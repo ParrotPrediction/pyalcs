@@ -127,7 +127,6 @@ class ACS2(Agent):
                         match_set,
                         state)
 
-
             action = choose_action(
                 match_set,
                 self.cfg.number_of_possible_actions,
