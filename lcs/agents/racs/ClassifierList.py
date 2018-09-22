@@ -58,13 +58,15 @@ class ClassifierList(TypedList):
 
         return 0.0
 
-    def apply_alp(self,
+    @staticmethod
+    def apply_alp(population: ClassifierList,
+                  match_set: ClassifierList,
+                  action_set: ClassifierList,
                   p0: Perception,
                   action: int,
                   p1: Perception,
                   time: int,
-                  population: ClassifierList,
-                  match_set: ClassifierList,
+                  theta_exp: int,
                   cfg: Configuration) -> None:
 
         new_list = ClassifierList()
@@ -72,7 +74,7 @@ class ClassifierList(TypedList):
         was_expected_case = False
         delete_counter = 0
 
-        for cl in self:
+        for cl in action_set:
             cl.increase_experience()
             cl.set_alp_timestamp(time)
 
@@ -83,20 +85,23 @@ class ClassifierList(TypedList):
                 new_cl = alp_racs.unexpected_case(cl, p0, p1, time)
                 if cl.is_inadequate():
                     delete_counter += 1
-                    for lst in [population, match_set, self]:
+
+                    lists = [x for x in [population, match_set, action_set]
+                             if x]
+                    for lst in lists:
                         lst.safe_remove(cl)
 
             if new_cl is not None:
                 new_cl.tga = time
-                alp.add_classifier(new_cl, self, new_list, cfg.theta_exp)
+                alp.add_classifier(new_cl, action_set, new_list, theta_exp)
 
         # No classifier anticipated correctly - generate new one
         if not was_expected_case:
             new_cl = alp_racs.cover(p0, action, p1, time, cfg)
-            alp.add_classifier(new_cl, self, new_list, cfg.theta_exp)
+            alp.add_classifier(new_cl, action_set, new_list, theta_exp)
 
         # Merge classifiers from new_list into self and population
-        self.extend(new_list)
+        action_set.extend(new_list)
         population.extend(new_list)
 
         if match_set is not None:
@@ -104,10 +109,14 @@ class ClassifierList(TypedList):
                             cl.condition.does_match(p1)]
             match_set.extend(new_matching)
 
-    def apply_reinforcement_learning(
-            self, reward: int, p: float, cfg: Configuration) -> None:
-        for cl in self:
-            rl.update_classifier(cl, reward, p, cfg.beta, cfg.gamma)
+    @staticmethod
+    def apply_reinforcement_learning(action_set: ClassifierList,
+                                     reward: int,
+                                     p: float,
+                                     beta: float,
+                                     gamma: float) -> None:
+        for cl in action_set:
+            rl.update_classifier(cl, reward, p, beta, gamma)
 
     @staticmethod
     def apply_ga(time: int,
@@ -116,6 +125,7 @@ class ClassifierList(TypedList):
                  action_set: ClassifierList,
                  p: Perception,
                  theta_ga: int,
+                 mu: float,
                  chi: float,
                  theta_as: int,
                  do_subsumption: bool,
@@ -133,8 +143,8 @@ class ClassifierList(TypedList):
 
             # Execute mutation
             attribute_range = child1.cfg.encoder.range
-            mutate(child1, attribute_range, child1.cfg.mu)
-            mutate(child2, attribute_range, child2.cfg.mu)
+            mutate(child1, attribute_range, mu)
+            mutate(child2, attribute_range, mu)
 
             # Execute cross-over
             if random.random() < chi:

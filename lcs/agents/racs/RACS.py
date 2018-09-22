@@ -48,6 +48,13 @@ class RACS(Agent):
 
         metrics: List = []
         while current_trial < max_trials:
+            if current_trial % 25 == 0:
+                reliable = [cl for cl in self.population if cl.is_reliable()]
+                onum = sum(cl.num for cl in self.population)
+                print(f"Trial {current_trial}, "
+                      f"num/pop: {onum}/{len(self.population)}, "
+                      f"reliable {len(reliable)}")
+
             steps_in_trial = func(env, steps, current_trial)
             steps += steps_in_trial
 
@@ -74,21 +81,35 @@ class RACS(Agent):
 
             if steps > 0:
                 # Apply learning in the last action set
-                action_set.apply_alp(
+                ClassifierList.apply_alp(
+                    self.population,
+                    match_set,
+                    action_set,
                     prev_state,
                     action,
                     state,
                     time + steps,
-                    self.population,
-                    match_set,
+                    self.cfg.theta_exp,
                     self.cfg)
-                action_set.apply_reinforcement_learning(
+                ClassifierList.apply_reinforcement_learning(
+                    action_set,
                     reward,
                     match_set.get_maximum_fitness(),
-                    self.cfg)
+                    self.cfg.beta,
+                    self.cfg.gamma)
                 if self.cfg.do_ga:
-                    pass
-                    # TODO: implement GA
+                    ClassifierList.apply_ga(
+                        time + steps,
+                        self.population,
+                        match_set,
+                        action_set,
+                        state,
+                        self.cfg.theta_ga,
+                        self.cfg.mu,
+                        self.cfg.chi,
+                        self.cfg.theta_as,
+                        self.cfg.do_subsumption,
+                        self.cfg.theta_exp)
 
             action = choose_action(
                 match_set,
@@ -103,21 +124,35 @@ class RACS(Agent):
             state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
 
             if done:
-                action_set.apply_alp(
+                ClassifierList.apply_alp(
+                    self.population,
+                    None,
+                    action_set,
                     prev_state,
                     action,
                     state,
                     time + steps,
-                    self.population,
-                    None,
+                    self.cfg.theta_exp,
                     self.cfg)
-                action_set.apply_reinforcement_learning(
+                ClassifierList.apply_reinforcement_learning(
+                    action_set,
                     reward,
                     0,
-                    self.cfg)
+                    self.cfg.beta,
+                    self.cfg.gamma)
                 if self.cfg.do_ga:
-                    pass
-                    # TODO: implement GA
+                    ClassifierList.apply_ga(
+                        time + steps,
+                        self.population,
+                        match_set,
+                        action_set,
+                        state,
+                        self.cfg.theta_ga,
+                        self.cfg.mu,
+                        self.cfg.chi,
+                        self.cfg.theta_as,
+                        self.cfg.do_subsumption,
+                        self.cfg.theta_exp)
             steps += 1
 
         return steps

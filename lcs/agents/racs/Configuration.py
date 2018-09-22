@@ -10,6 +10,7 @@ class Configuration:
                  perception_mapper_fcn=None,
                  action_mapping_fcn=None,
                  do_ga=False,
+                 do_subsumption=True,
                  beta=0.05,
                  gamma=0.95,
                  theta_i=0.1,
@@ -18,7 +19,9 @@ class Configuration:
                  u_max=100000,
                  theta_exp=20,
                  theta_ga=100,
-                 theta_as=20) -> None:
+                 theta_as=20,
+                 mu=0.3,
+                 chi=0.8) -> None:
 
         self.oktypes = (UBR,)
         self.encoder = RealValueEncoder(encoder_bits)
@@ -30,6 +33,7 @@ class Configuration:
         self.perception_mapper_fcn = perception_mapper_fcn
         self.action_mapping_fcn = action_mapping_fcn
         self.do_ga = do_ga
+        self.do_subsumption = do_subsumption
 
         self.beta = beta
         self.gamma = gamma
@@ -41,3 +45,6 @@ class Configuration:
         self.theta_exp = theta_exp
         self.theta_ga = theta_ga
         self.theta_as = theta_as
+
+        self.mu = mu
+        self.chi = chi

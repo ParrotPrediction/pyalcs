@@ -148,6 +148,7 @@ class ClassifiersList(TypedList):
                  action_set: ClassifiersList,
                  p: Perception,
                  theta_ga: int,
+                 mu: float,
                  chi: float,
                  theta_as: int,
                  do_subsumption: bool,
@@ -164,8 +165,8 @@ class ClassifiersList(TypedList):
             child2 = Classifier.copy_from(parent2, time)
 
             # Execute mutation
-            ga.generalizing_mutation(child1, child1.cfg.mu)
-            ga.generalizing_mutation(child2, child2.cfg.mu)
+            ga.generalizing_mutation(child1, mu)
+            ga.generalizing_mutation(child2, mu)
 
             # Execute cross-over
             if random.random() < chi:

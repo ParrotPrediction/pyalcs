@@ -288,6 +288,7 @@ class Classifier:
         bool
             True if attribute was generalized, False otherwise
         """
+        # TODO: this might be too aggressive. Consider slight mutation
         if len(self.specified_unchanging_attributes) > 0:
             ridx = randomfunc(self.specified_unchanging_attributes)
             self.condition.generalize(ridx)
