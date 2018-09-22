@@ -8,6 +8,9 @@ from ...agents.racs import Configuration, ClassifierList
 from ...utils import parse_state, parse_action
 
 
+logger = logging.getLogger(__name__)
+
+
 class RACS(Agent):
     """ACS2 agent operating on real-valued (floating) number"""
 
@@ -22,6 +25,7 @@ class RACS(Agent):
 
     def exploit(self, env, trials):
         pass
+
 
     def _evaluate(self, env, max_trials: int, func: Callable) -> Tuple:
         """
@@ -58,7 +62,7 @@ class RACS(Agent):
         return self.population, metrics
 
     def _run_trial_explore(self, env, time, current_trial=None):
-        logging.debug("** Running trial explore ** ")
+        logger.debug("** Running trial explore ** ")
         # Initial conditions
         steps = 0
         raw_state = env.reset()
@@ -94,7 +98,7 @@ class RACS(Agent):
                 self.cfg.number_of_possible_actions,
                 self.cfg.epsilon)
             internal_action = parse_action(action, self.cfg.action_mapping_fcn)
-            logging.debug("\tExecuting action: [%d]", action)
+            logger.debug("\tExecuting action: [%d]", action)
             action_set = match_set.form_action_set(action)
 
             prev_state = state

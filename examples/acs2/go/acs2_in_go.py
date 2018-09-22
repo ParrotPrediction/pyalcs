@@ -14,6 +14,9 @@ logging.basicConfig(
     filemode='w'
 )
 
+logger = logging.getLogger(__name__)
+
+
 if __name__ == '__main__':
     env = gym.make('Go9x9-v0')  # TODO: removed from GYM after 0.9 :(
     state = env.reset()
@@ -36,15 +39,15 @@ if __name__ == '__main__':
         do_ga=True
     )
 
-    logging.info(cfg)
+    logger.info(cfg)
 
     # Create the agent
     agent = ACS2(cfg)
     population, metrics = agent.explore_exploit(env, 50)
 
     # Store metrics in file
-    logging.info("Dumping data to files ...")
+    logger.info("Dumping data to files ...")
     pickle.dump(population, open("go_population.pkl", "wb"))
     pickle.dump(metrics, open("go_metrics.pkl", "wb"))
 
-    logging.info("Done")
+    logger.info("Done")

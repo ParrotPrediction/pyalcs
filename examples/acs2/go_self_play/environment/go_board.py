@@ -4,6 +4,9 @@ from .go_naive import Position, IllegalMove
 from .go_naive import WHITE, swap_colors
 
 
+logger = logging.getLogger(__name__)
+
+
 class GoBoard:
     """
     Class mimic OpenAI Gym Environment interface but enables ACS2 to play
@@ -15,7 +18,7 @@ class GoBoard:
         self.moves = 0
 
     def reset(self):
-        logging.debug("Resetting Go board state")
+        logger.debug("Resetting Go board state")
         self.pos = Position.initial_state()
         self.color = None
         self.moves = 0
@@ -25,7 +28,7 @@ class GoBoard:
         reward = 0
         done = False
         self._distinguish_player_color()
-        logging.debug("[{}] moves to [{}]".format(self.color, action))
+        logger.debug("[{}] moves to [{}]".format(self.color, action))
 
         try:
             self.pos = self.pos.play_move(action, self.color)
@@ -35,7 +38,7 @@ class GoBoard:
                 done = True
 
         except IllegalMove:
-            # logging.error("Illegal move exception, finishing trial")
+            # logger.error("Illegal move exception, finishing trial")
             reward = -1
             done = True
 
