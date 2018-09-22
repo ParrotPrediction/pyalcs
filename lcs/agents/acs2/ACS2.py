@@ -1,6 +1,7 @@
 import logging
 from typing import Optional
 
+from lcs.strategies.action_planning.action_planning import search_goal_sequence, exists_classifier
 from . import ClassifiersList, Configuration
 from ...agents import Agent
 from ...agents.Agent import Metric
@@ -105,7 +106,7 @@ class ACS2(Agent):
 
         while not done:
             if self.cfg.do_action_planning and \
-                    (steps + time) % self.cfg.action_planning_frequency == 0:
+                    self._time_for_action_planning(steps + time):
                 # Action Planning for increased model learning
                 steps_ap, state, prev_state, action_set, reward = \
                     self._run_action_planning(env, steps + time, state,
@@ -241,8 +242,8 @@ class ACS2(Agent):
             if goal_situation is None:
                 break
 
-            act_sequence = self.population.search_goal_sequence(situation,
-                                                                goal_situation)
+            act_sequence = search_goal_sequence(self.population, situation,
+                                                goal_situation)
 
             # Execute the found sequence and learn during executing
             i = 0
@@ -272,10 +273,8 @@ class ACS2(Agent):
                 previous_situation = situation
                 situation = parse_state(raw_state)
 
-                if not action_set.exists_classifier(previous_situation,
-                                                    action,
-                                                    situation,
-                                                    self.cfg.theta_r):
+                if not exists_classifier(action_set, previous_situation,
+                                         action, situation, self.cfg.theta_r):
                     # no reliable classifier was able to anticipate
                     # such a change
                     break
@@ -287,6 +286,9 @@ class ACS2(Agent):
                 break
 
         return steps, situation, previous_situation, action_set, reward
+
+    def _time_for_action_planning(self, time):
+        return time % self.cfg.action_planning_frequency == 0
 
     def _collect_agent_metrics(self, trial, steps, total_steps) -> Metric:
         return {

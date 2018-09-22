@@ -56,11 +56,11 @@ class Effect(PerceptionString):
         """
         # TODO: implement the rest after PEEs are implemented
         # ('getBestChar' function)
-        ant = Perception(perception)
+        ant = list(perception)
         for idx, item in enumerate(self):
             if item != self.wildcard:
                 ant[idx] = item
-        return ant
+        return Perception(ant)
 
     def does_specify_only_changes_backwards(self, back_anticipation,
                                             situation):

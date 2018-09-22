@@ -76,8 +76,8 @@ class Condition(PerceptionString):
         :param perception:
         :return:
         """
-        ant = Perception(perception)
+        ant = list(perception)
         for idx, item in enumerate(self):
             if item != self.wildcard:
-                ant[idx] = item  # TODO
-        return ant
+                ant[idx] = item
+        return Perception(ant)

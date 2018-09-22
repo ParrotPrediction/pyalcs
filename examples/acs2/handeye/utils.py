@@ -2,9 +2,19 @@ def calculate_performance(hand_eye, population):
     """
     Analyzes all possible transition in maze environment and checks if there
     is a reliable classifier for it.
+    Note: knowledge with/without block only works if env has note_in_hand
+    set to True
     :param hand_eye: maze object
     :param population: list of classifiers
-    :return: percentage of knowledge
+    :return:
+            knowledge - percentage of transitions we are able to anticipate
+            correctly (max 100)
+            with_block - percentage of all transitions involving block -
+            gripping, realising or moving block - we are able to anticipate
+            correctly (max 100)
+            no_block - percentage of all transitions not involving block -
+            moving the gripper without block - we are able to anticipate
+            correctly (max 100)
     """
     transitions = hand_eye.env.get_all_possible_transitions()
 
@@ -15,8 +25,6 @@ def calculate_performance(hand_eye, population):
     nr_correct = 0
     nr_with_block = 0
     nr_correct_with_block = 0
-
-    # note: knowledge with block only works if env has note_in_hand set to True
 
     # For all possible destinations from each path cell
     for start, action, end in transitions:

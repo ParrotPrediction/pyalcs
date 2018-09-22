@@ -1,5 +1,5 @@
 from lcs import Perception
-from lcs.agents.acs2 import ClassifiersList
+from lcs.agents.acs2.ClassifiersList import ClassifiersList
 
 
 class GoalSequenceSearcher:
@@ -19,7 +19,7 @@ class GoalSequenceSearcher:
         :return: Sequence of actions
         """
         if len(reliable_classifiers) < 1:
-            return self.empty_sequence()
+            return []
 
         max_depth = 6
         forward_size = 1
@@ -58,7 +58,7 @@ class GoalSequenceSearcher:
                 return action_sequence
 
         # depth limit was reached -> return empty action sequence
-        return self.empty_sequence()
+        return []
 
     def _search_one_forward_step(self, reliable_classifiers, forward_size,
                                  forward_point):
@@ -97,7 +97,7 @@ class GoalSequenceSearcher:
                         size += 1
                         if size > 10001:
                             # logging.debug("Arrays are full")
-                            return self.empty_sequence(), size
+                            return [], size
                     else:
                         # sequence found
                         return self._form_sequence_forwards(
@@ -142,7 +142,7 @@ class GoalSequenceSearcher:
                         size += 1
                         if size > 10001:
                             # logging.debug("Arrays are full")
-                            return self.empty_sequence(), size
+                            return [], size
                     else:
                         return self._form_sequence_backwards(
                             i, forward_sequence_idx, match_set_el), size
@@ -158,10 +158,10 @@ class GoalSequenceSearcher:
         :return: new size of classifiers
         """
         if i > 0:
-            new_classifiers = ClassifiersList.ClassifiersList(cfg=cfg)
+            new_classifiers = ClassifiersList(cfg=cfg)
             new_classifiers.extend(classifiers_lists[i - 1])
         else:
-            new_classifiers = ClassifiersList.ClassifiersList(cfg=cfg)
+            new_classifiers = ClassifiersList(cfg=cfg)
         new_classifiers.append(match_set_el)
         return new_classifiers
 
@@ -244,15 +244,3 @@ class GoalSequenceSearcher:
             if percept == state:
                 return i
         return None
-
-    @staticmethod
-    def empty_sequence():
-        """
-        Returns empty sequence.
-        This function might be deleted in later versions of code, but it is
-        useful if we decide to change the definition
-        of an empty sequence (it used to be [-1], because it was more alike
-        the original code in C++).
-        :return: empty action sequence
-        """
-        return []

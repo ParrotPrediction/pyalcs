@@ -11,7 +11,6 @@ from lcs.agents.acs2.components.genetic_algorithm \
     import mutate, two_point_crossover
 from lcs.strategies.genetic_algorithms import roulette_wheel_selection
 from . import Classifier, Configuration
-from lcs.strategies.action_planning import GoalSequenceSearcher
 
 
 class ClassifiersList(TypedList):
@@ -411,52 +410,3 @@ class ClassifiersList(TypedList):
 
         return choice_func(most_general_subsumers) \
             if most_general_subsumers else None
-
-    def exists_classifier(self, previous_situation, action, situation,
-                          quality):
-        """
-        Returns True if there is a classifier in this list with a quality
-        higher than 'quality' that matches previous_situation,
-        specifies action, and predicts situation.
-        Returns False otherwise.
-        :param previous_situation:
-        :param action:
-        :param situation:
-        :param quality:
-        :return:
-        """
-        for cl in self:
-            if cl.q > quality and cl.does_match(previous_situation) \
-                and cl.action == action \
-                and cl.does_anticipate_correctly(previous_situation,
-                                                 situation):
-                return True
-        return False
-
-    def get_quality_classifiers_list(self, quality, cfg=None):
-        """
-        Constructs classifier list out of a list with q > quality.
-        :param quality:
-        :param cfg:
-        :return: ClassifiersList with only quality classifiers.
-        """
-        listp = ClassifiersList(cfg=cfg)
-        for item in self:
-            if item.q > quality:
-                listp.append(item)
-        return listp
-
-    def search_goal_sequence(self, start, goal):
-        """
-        Searches a path from start to goal using a bidirectional method in the
-        environmental model (i.e. the list of reliable classifiers).
-        :param start: Perception
-        :param goal: Perception
-        :return: Sequence of actions
-        """
-        reliable_classifiers = self. \
-            get_quality_classifiers_list(quality=self.cfg.theta_r,
-                                         cfg=self.cfg)
-
-        return GoalSequenceSearcher().search_goal_sequence(
-            reliable_classifiers, start, goal)
