@@ -240,6 +240,7 @@ def _find_old_classifier(
         except IndexError:
             pass
 
+    # If there is no subsumer - look for similar classifiers
     if old_cl is None:
         old_cl = _find_similar(cl, population)
 

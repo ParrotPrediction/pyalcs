@@ -139,11 +139,13 @@ class TestClassifierList:
             reward=34.29,
             intermediate_reward=11.29,
             cfg=cfg)
+
         population = ClassifierList(*[cl])
 
         # when
-        population.apply_reinforcement_learning(0, 28.79, cfg)
+        ClassifierList.apply_reinforcement_learning(
+            population, 0, 28.79, cfg.beta, cfg.gamma)
 
         # then
-        assert abs(33.94 - population[0].r) < 0.1
-        assert abs(10.74 - population[0].ir) < 0.1
+        assert abs(33.94 - cl.r) < 0.1
+        assert abs(10.74 - cl.ir) < 0.1

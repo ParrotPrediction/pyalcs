@@ -83,7 +83,7 @@ class TestSubsumption:
         assert len(subsumers) == 1
         assert subsumers[0] == subsumer
 
-    def test_should_sort_more_general_subsumers_1(self, acs2_cfg):
+    def test_should_sort_more_general_subsumer_1(self, acs2_cfg):
         # given
         subsumer1 = acs2.Classifier(
             condition='1##0####',
@@ -125,7 +125,7 @@ class TestSubsumption:
         assert subsumers[0] == subsumer2
         assert subsumers[1] == subsumer1
 
-    def test_should_sort_more_general_subsumers_2(self, acs2_cfg):
+    def test_should_sort_more_general_subsumer_2(self, acs2_cfg):
         # given
         subsumer1 = acs2.Classifier(
             condition='1##0####',
@@ -166,6 +166,95 @@ class TestSubsumption:
         assert len(subsumers) == 2
         assert subsumers[0] == subsumer2
         assert subsumers[1] == subsumer1
+
+    def test_should_find_most_general_subsumer(self, acs2_cfg):
+        # given
+        subsumer1 = acs2.Classifier(
+            condition='1##0####',
+            action=3,
+            effect='##1#####',
+            quality=0.93,
+            reward=1.35,
+            experience=23,
+            cfg=acs2_cfg)
+
+        subsumer2 = acs2.Classifier(
+            condition='#1#0####',
+            action=3,
+            effect='##1#####',
+            quality=0.93,
+            reward=1.35, experience=23,
+            cfg=acs2_cfg)
+
+        most_general = acs2.Classifier(
+            condition='###0####',
+            action=3,
+            effect='##1#####',
+            quality=0.93,
+            reward=1.35,
+            experience=23,
+            cfg=acs2_cfg)
+
+        nonsubsumer = acs2.Classifier(cfg=acs2_cfg)
+
+        cl = acs2.Classifier(
+            condition='11#0####',
+            action=3,
+            effect='##1#####',
+            quality=0.5,
+            reward=0.35,
+            experience=1,
+            cfg=acs2_cfg)
+
+        population = acs2.ClassifiersList(
+            *[nonsubsumer, subsumer1, nonsubsumer, most_general,
+              subsumer2, nonsubsumer])
+
+        # when
+        subsumers = find_subsumers(cl, population, acs2_cfg.theta_exp)
+
+        # then
+        assert subsumers[0] == most_general
+
+    def test_should_randomly_select_one_of_equally_general_subsumers(
+            self, acs2_cfg):
+
+        # given
+        subsumer1 = acs2.Classifier(condition='1##0####',
+                                    action=3,
+                                    effect='##1#####',
+                                    quality=0.93,
+                                    reward=1.35,
+                                    experience=23,
+                                    cfg=acs2_cfg)
+
+        subsumer2 = acs2.Classifier(condition='#1#0####',
+                                    action=3,
+                                    effect='##1#####',
+                                    quality=0.93,
+                                    reward=1.35,
+                                    experience=23,
+                                    cfg=acs2_cfg)
+
+        nonsubsumer = acs2.Classifier(cfg=acs2_cfg)
+
+        cl = acs2.Classifier(condition='11#0####',
+                             action=3,
+                             effect='##1#####',
+                             quality=0.5,
+                             reward=0.35,
+                             experience=1,
+                             cfg=acs2_cfg)
+
+        population = acs2.ClassifiersList(
+            *[nonsubsumer, subsumer1, subsumer2, nonsubsumer])
+
+        # when
+        subsumers = find_subsumers(cl, population, acs2_cfg.theta_exp)
+
+        # then
+        assert subsumers[0] in [subsumer1, subsumer2]
+        assert subsumers[1] in [subsumer1, subsumer2]
 
     @pytest.mark.parametrize("_exp, _q, _is_subsumer", [
         (1, .5, False),  # too young classifier

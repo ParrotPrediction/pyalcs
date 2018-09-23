@@ -1,10 +1,10 @@
 import gym
-import pytest
-
 # noinspection PyUnresolvedReferences
 import gym_maze
-from lcs.agents.acs2 import ACS2, Configuration
+import pytest
+
 from examples.acs2.maze.utils import calculate_performance
+from lcs.agents.acs2 import ACS2, Configuration
 from .utils import count_microclassifiers, \
     count_macroclassifiers, \
     count_reliable
@@ -53,28 +53,16 @@ class TestMaze:
         population, metrics = agent.explore(env, 300)
 
         # then
-        print(f"Macroclassifiers: {count_macroclassifiers(population)}")
-        print(f"Microclassifiers: {count_microclassifiers(population)}")
-        print(f"Reliable: {count_reliable(population)}")
-        print(f"Knowledge: {self._get_knowledge(metrics)}")
-        print(f"Total steps: {self._get_total_steps(metrics)}")
-
-        reliable = [cl for cl in population if cl.is_reliable()]
-        for cl in sorted(reliable, key=lambda cl: -cl.fitness):
-            print(f"{cl} num: {cl.num} "
-                  f"q: {cl.q:.2f} r: {cl.r:.2f} fit: {cl.fitness:.2f}")
-
-        assert abs(250 - count_macroclassifiers(population)) < 55
-
-        assert 100 == self._get_knowledge(metrics)
+        assert abs(380 - count_macroclassifiers(population)) < 55
+        assert abs(100 - self._get_knowledge(metrics)) < 5
 
         assert count_macroclassifiers(population) \
             > count_reliable(population)
 
         assert count_macroclassifiers(population) \
-            <= count_microclassifiers(population)
+            < count_microclassifiers(population)
 
-        assert self._get_total_steps(metrics) > 5000
+        assert self._get_total_steps(metrics) > 2500
 
     @pytest.mark.skip(reason="implement it")
     def test_should_exploit_maze(self):
