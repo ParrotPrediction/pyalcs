@@ -1,12 +1,18 @@
+import logging
+
 import gym
 # noinspection PyUnresolvedReferences
 import gym_multiplexer
 
 from lcs.agents.racs import Configuration, RACS
 
+# Configure logger
+logging.basicConfig(level=logging.INFO)
+
 if __name__ == '__main__':
+
     # Load desired environment
-    rmpx = gym.make('real-multiplexer-6bit-v0')
+    rmpx = gym.make('real-multiplexer-3bit-v0')
 
     # Create agent
     cfg = Configuration(rmpx.env.observation_space.shape[0], 2,
@@ -18,8 +24,6 @@ if __name__ == '__main__':
                         theta_ga=100,
                         chi=0.5,
                         mu=0.15)
-    agent = RACS(cfg)
-    # favour most general condition
-    # and least general effect
 
-    population, _ = agent.explore(rmpx, 100_000)
+    agent = RACS(cfg)
+    population, _ = agent.explore(rmpx, 100)

@@ -83,8 +83,10 @@ class ACS2(Agent):
 
             trial_metrics = self._collect_metrics(
                 env, current_trial, steps_in_trial, steps)
-            logging.info(trial_metrics)
             metrics.append(trial_metrics)
+
+            if current_trial % 25 == 0:
+                logging.info(trial_metrics)
 
             current_trial += 1
 
@@ -207,7 +209,7 @@ class ACS2(Agent):
                     self.cfg.beta,
                     self.cfg.gamma)
 
-            # Here while exploiting always choose best action
+            # Here when exploiting always choose best action
             action = choose_action(
                 match_set,
                 self.cfg.number_of_possible_actions,
