@@ -6,7 +6,7 @@ class Configuration:
     def __init__(self,
                  classifier_length: int,
                  number_of_possible_actions: int,
-                 encoder_bits: int,
+                 encoder=None,
                  perception_mapper_fcn=None,
                  action_mapping_fcn=None,
                  environment_metrics_fcn=None,
@@ -26,8 +26,11 @@ class Configuration:
                  mu=0.3,
                  chi=0.8) -> None:
 
+        if encoder is None:
+            raise TypeError('Real number encoder should be passed')
+
         self.oktypes = (UBR,)
-        self.encoder = RealValueEncoder(encoder_bits)
+        self.encoder = encoder
 
         self.classifier_length = classifier_length
         self.number_of_possible_actions = number_of_possible_actions

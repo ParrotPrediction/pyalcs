@@ -4,6 +4,7 @@ import gym
 # noinspection PyUnresolvedReferences
 import gym_multiplexer
 
+from lcs.representations.RealValueEncoder import RealValueEncoder
 from lcs.agents.racs import Configuration, RACS
 
 # Configure logger
@@ -15,8 +16,10 @@ if __name__ == '__main__':
     rmpx = gym.make('real-multiplexer-3bit-v0')
 
     # Create agent
-    cfg = Configuration(rmpx.env.observation_space.shape[0], 2,
-                        encoder_bits=2,
+    encoder = RealValueEncoder(resolution_bits=2)
+    cfg = Configuration(rmpx.observation_space.shape[0],
+                        rmpx.action_space.n,
+                        encoder=encoder,
                         epsilon=0.5,
                         do_ga=True,
                         theta_r=0.9,

@@ -3,6 +3,7 @@ import pytest
 from lcs.agents.racs import Classifier, Configuration, Condition, Effect
 from lcs.agents.racs.components.genetic_algorithm import mutate
 from lcs.representations import UBR
+from lcs.representations.RealValueEncoder import RealValueEncoder
 
 
 class TestGeneticAlgorithm:
@@ -11,7 +12,7 @@ class TestGeneticAlgorithm:
     def cfg(self):
         return Configuration(classifier_length=2,
                              number_of_possible_actions=2,
-                             encoder_bits=4)
+                             encoder=RealValueEncoder(4))
 
     @pytest.mark.parametrize("_cond, _effect", [
         ([UBR(2, 5), UBR(5, 10)], [UBR(2, 5), UBR(5, 10)]),

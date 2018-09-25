@@ -3,6 +3,7 @@ import pytest
 from lcs import Perception
 from lcs.agents.racs import Configuration, Effect
 from lcs.representations import UBR
+from lcs.representations.RealValueEncoder import RealValueEncoder
 
 
 class TestEffect:
@@ -11,7 +12,7 @@ class TestEffect:
     def cfg(self):
         return Configuration(classifier_length=2,
                              number_of_possible_actions=2,
-                             encoder_bits=4)
+                             encoder=RealValueEncoder(4))
 
     @pytest.mark.parametrize("_e, _result", [
         ([UBR(0, 15), UBR(0, 15)], False),

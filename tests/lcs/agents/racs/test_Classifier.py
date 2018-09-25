@@ -5,6 +5,7 @@ import pytest
 from lcs import Perception
 from lcs.agents.racs import Configuration, Condition, Effect, Classifier
 from lcs.representations import UBR
+from lcs.representations.RealValueEncoder import RealValueEncoder
 
 
 class TestClassifier:
@@ -13,7 +14,7 @@ class TestClassifier:
     def cfg(self):
         return Configuration(classifier_length=2,
                              number_of_possible_actions=2,
-                             encoder_bits=4)
+                             encoder=RealValueEncoder(4))
 
     def test_should_initialize_without_arguments(self, cfg):
         # when

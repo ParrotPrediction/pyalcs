@@ -46,7 +46,8 @@ def does_subsume(cl, other_cl, theta_exp: int) -> bool:
         cl.is_more_general(other_cl) and \
         cl.condition.does_match_condition(other_cl.condition) and \
             cl.action == other_cl.action and \
-            cl.effect == other_cl.effect:
+            cl.effect == other_cl.effect:  # TODO: for rACS this
+        # should be more liberate
         return True
 
     return False

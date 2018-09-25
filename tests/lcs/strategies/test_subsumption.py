@@ -3,6 +3,7 @@ import pytest
 import lcs.agents.acs2 as acs2
 import lcs.agents.racs as racs
 from lcs.representations import UBR
+from lcs.representations.RealValueEncoder import RealValueEncoder
 from lcs.strategies.subsumption import find_subsumers, \
     is_subsumer, does_subsume
 
@@ -17,7 +18,7 @@ class TestSubsumption:
     def racs_cfg(self):
         return racs.Configuration(classifier_length=2,
                                   number_of_possible_actions=2,
-                                  encoder_bits=4)
+                                  encoder=RealValueEncoder(4))
 
     def test_should_find_subsumer(self, acs2_cfg):
         # given

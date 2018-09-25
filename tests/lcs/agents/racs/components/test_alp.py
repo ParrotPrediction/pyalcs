@@ -1,11 +1,13 @@
-import pytest
 import random
+
+import pytest
 
 from lcs import Perception
 from lcs.agents.racs import Configuration, Condition, Effect, Classifier
 from lcs.agents.racs.components.alp \
     import cover, expected_case, unexpected_case
 from lcs.representations import UBR
+from lcs.representations.RealValueEncoder import RealValueEncoder
 
 
 class TestALP:
@@ -14,7 +16,7 @@ class TestALP:
     def cfg(self):
         return Configuration(classifier_length=2,
                              number_of_possible_actions=2,
-                             encoder_bits=4)
+                             encoder=RealValueEncoder(4))
 
     def test_should_handle_expected_case_1(self, cfg):
         # given
@@ -36,8 +38,8 @@ class TestALP:
         p0 = Perception([.5, .5], oktypes=(float,))
         q = random.random()
         cl = Classifier(quality=q, cfg=cfg)
-        cl.mark[0].add(7)
-        cl.mark[1].add(7)
+        cl.mark[0].add(8)
+        cl.mark[1].add(8)
         time = random.randint(0, 1000)
 
         # when
@@ -61,7 +63,7 @@ class TestALP:
 
         # then
         assert child is not None
-        assert child.condition == Condition([UBR(7, 7), UBR(0, 15)], cfg)
+        assert child.condition == Condition([UBR(8, 8), UBR(0, 15)], cfg)
         assert child.q == 0.5
 
     def test_should_handle_unexpected_case_1(self, cfg):
@@ -134,7 +136,7 @@ class TestALP:
         ([.5, .5], [.5, .5],
          [UBR(0, 15), UBR(0, 15)], [UBR(0, 15), UBR(0, 15)]),
         ([.4, .5], [.9, .5],
-         [UBR(6, 6), UBR(0, 15)], [UBR(13, 13), UBR(0, 15)]),
+         [UBR(6, 6), UBR(0, 15)], [UBR(14, 14), UBR(0, 15)]),
     ])
     def test_should_create_new_classifier_with_covering(
             self, _p0, _p1, _child_cond, _child_effect, cfg):
