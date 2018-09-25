@@ -45,7 +45,7 @@ class Effect(PerceptionString):
 
         return True
 
-    def get_best_anticipation(self, perception: Perception):
+    def get_best_anticipation(self, perception: Perception) -> Perception:
         """
         Returns the most probable anticipation of the effect part.
         This is usually the normal anticipation. However, if PEEs are
@@ -64,7 +64,7 @@ class Effect(PerceptionString):
 
     def does_specify_only_changes_backwards(self,
                                             back_anticipation: Perception,
-                                            situation: Perception):
+                                            situation: Perception) -> bool:
         """
         Returns if the effect part specifies at least one of the percepts.
         An PEE attribute never specifies the corresponding percept.
@@ -82,7 +82,9 @@ class Effect(PerceptionString):
                 return False
         return True
 
-    def does_match(self, perception: Perception, other_perception: Perception):
+    def does_match(self,
+                   perception: Perception,
+                   other_perception: Perception) -> bool:
         """
         Returns if the effect matches the perception.
         Hereby, the specified attributes are compared with perception.

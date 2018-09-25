@@ -208,8 +208,13 @@ class ACS2(Agent):
 
         return steps
 
-    def _run_action_planning(self, env, time, situation,
-                             previous_situation, action_set, action, reward):
+    def _run_action_planning(self, env,
+                             time: int,
+                             situation: str,
+                             previous_situation: str,
+                             action_set: ClassifiersList,
+                             action: int,
+                             reward: int):
         """
         Executes action planning for model learning speed up.
         Method requests goals from 'goal generator' provided by

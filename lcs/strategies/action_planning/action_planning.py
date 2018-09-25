@@ -8,7 +8,7 @@ def exists_classifier(classifiers: ClassifiersList,
                       previous_situation: Perception,
                       action: int,
                       situation: Perception,
-                      quality: float):
+                      quality: float) -> bool:
     """
     Returns True if there is a classifier in this list with a quality
     higher than 'quality' that matches previous_situation,
@@ -32,7 +32,7 @@ def exists_classifier(classifiers: ClassifiersList,
 
 def get_quality_classifiers_list(classifiers: ClassifiersList,
                                  quality: float,
-                                 cfg: Configuration = None):
+                                 cfg: Configuration = None) -> ClassifiersList:
     """
     Constructs classifier list out of a list with q > quality.
     :param classifiers:
@@ -49,7 +49,7 @@ def get_quality_classifiers_list(classifiers: ClassifiersList,
 
 def search_goal_sequence(classifiers: ClassifiersList,
                          start: Perception,
-                         goal: Perception):
+                         goal: Perception) -> list:
     """
     Searches a path from start to goal using a bidirectional method in the
     environmental model (i.e. the list of reliable classifiers).
