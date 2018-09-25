@@ -56,6 +56,17 @@ class Classifier:
         self.tga = tga
         self.tav = tav
 
+    def __eq__(self, other):
+        if self.condition == other.condition and \
+                self.action == other.action and \
+                self.effect == other.effect:
+            return True
+
+        return False
+
+    def __hash__(self):
+        return hash((str(self.condition), self.action, str(self.effect)))
+
     @classmethod
     def copy_from(cls, old_cls: Classifier, time: int):
         """

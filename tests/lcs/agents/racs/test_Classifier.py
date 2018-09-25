@@ -28,6 +28,21 @@ class TestClassifier:
         assert c.talp is None
         assert c.tav == 0.0
 
+    def test_should_detect_identical_classifier(self, cfg):
+        cl_1 = Classifier(
+            condition=Condition([UBR(0, 1), UBR(0, 2)], cfg=cfg),
+            action=1,
+            effect=Effect([UBR(2, 3), UBR(4, 5)], cfg=cfg),
+            cfg=cfg)
+
+        cl_2 = Classifier(
+            condition=Condition([UBR(0, 1), UBR(0, 2)], cfg=cfg),
+            action=1,
+            effect=Effect([UBR(2, 3), UBR(4, 5)], cfg=cfg),
+            cfg=cfg)
+
+        assert cl_1 == cl_2
+
     @pytest.mark.parametrize("_q, _r, _fitness", [
         (0.0, 0.0, 0.0),
         (0.3, 0.5, 0.15),

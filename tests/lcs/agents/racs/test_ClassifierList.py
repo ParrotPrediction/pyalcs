@@ -17,9 +17,9 @@ class TestClassifierList:
 
     def test_should_initialize_classifier_list(self, cfg):
         # given
-        cl1 = Classifier(cfg=cfg)
-        cl2 = Classifier(cfg=cfg)
-        cl3 = Classifier(cfg=cfg)
+        cl1 = Classifier(action=1, cfg=cfg)
+        cl2 = Classifier(action=2, cfg=cfg)
+        cl3 = Classifier(action=3, cfg=cfg)
 
         # when
         cll = ClassifierList(*[cl1, cl2])
