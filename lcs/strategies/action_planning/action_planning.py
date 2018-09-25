@@ -1,10 +1,14 @@
-from lcs.agents.acs2 import ClassifiersList
+from lcs import Perception
+from lcs.agents.acs2 import ClassifiersList, Configuration
 from lcs.strategies.action_planning.goal_sequence_searcher \
     import GoalSequenceSearcher
 
 
-def exists_classifier(classifiers, previous_situation, action, situation,
-                      quality):
+def exists_classifier(classifiers: ClassifiersList,
+                      previous_situation: Perception,
+                      action: int,
+                      situation: Perception,
+                      quality: float):
     """
     Returns True if there is a classifier in this list with a quality
     higher than 'quality' that matches previous_situation,
@@ -26,7 +30,9 @@ def exists_classifier(classifiers, previous_situation, action, situation,
     return False
 
 
-def get_quality_classifiers_list(classifiers, quality, cfg=None):
+def get_quality_classifiers_list(classifiers: ClassifiersList,
+                                 quality: float,
+                                 cfg: Configuration = None):
     """
     Constructs classifier list out of a list with q > quality.
     :param classifiers:
@@ -41,10 +47,13 @@ def get_quality_classifiers_list(classifiers, quality, cfg=None):
     return listp
 
 
-def search_goal_sequence(classifiers, start, goal):
+def search_goal_sequence(classifiers: ClassifiersList,
+                         start: Perception,
+                         goal: Perception):
     """
     Searches a path from start to goal using a bidirectional method in the
     environmental model (i.e. the list of reliable classifiers).
+    :param classifiers:
     :param start: Perception
     :param goal: Perception
     :return: Sequence of actions
