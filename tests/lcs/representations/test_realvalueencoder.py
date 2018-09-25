@@ -37,15 +37,35 @@ class TestRealValueEncoder:
         assert e1 is not None
         assert e2 is not None
 
-    def test_should_encode_values(self):
+    def test_should_encode_with_one_bit(self):
+        # given
+        encoder = RealValueEncoder(1)
+
+        # then
+        assert encoder.encode(0.0) == 0
+        assert encoder.encode(0.5) == 0
+        assert encoder.encode(0.51) == 1
+        assert encoder.encode(1.0) == 1
+
+    def test_should_encode_with_two_bits(self):
+        # given
+        encoder = RealValueEncoder(2)
+
+        # then
+        assert encoder.encode(0.0) == 0
+        assert encoder.encode(0.33) == 1
+        assert encoder.encode(0.66) == 2
+        assert encoder.encode(1.0) == 3
+
+    def test_should_encode_with_four_bits(self):
         # given
         bits = 4  # 2^bits discrete states
         encoder = RealValueEncoder(bits)
 
         # then
-        assert 0 == encoder.encode(0.0)
-        assert 7 == encoder.encode(0.5)
-        assert 15 == encoder.encode(1.0)
+        assert encoder.encode(0.0) == 0
+        assert encoder.encode(0.5) == 8
+        assert encoder.encode(1.0) == 15
 
     def test_should_decode_values(self):
         # given
@@ -54,7 +74,7 @@ class TestRealValueEncoder:
 
         # then
         assert 0.0 == encoder.decode(0)
-        assert abs(0.5 - encoder.decode(7)) < 0.05
+        assert abs(0.5 - encoder.decode(8)) < 0.05
         assert 1.0 == encoder.decode(15)
 
     def test_should_encode_and_decode_approximately(self):
@@ -71,6 +91,7 @@ class TestRealValueEncoder:
         assert abs(observation - decoded) < epsilon
 
     @pytest.mark.parametrize("_bits, _min_range, _max_range", [
+        (1, 0, 1),
         (2, 0, 3),
         (4, 0, 15),
         (8, 0, 255)

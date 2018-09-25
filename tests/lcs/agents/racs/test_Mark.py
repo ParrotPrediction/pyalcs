@@ -3,6 +3,7 @@ import pytest
 from lcs import Perception
 from lcs.agents.racs import Configuration, Mark, Condition
 from lcs.representations import UBR
+from lcs.representations.RealValueEncoder import RealValueEncoder
 
 
 class TestMark:
@@ -11,7 +12,7 @@ class TestMark:
     def cfg(self):
         return Configuration(classifier_length=2,
                              number_of_possible_actions=2,
-                             encoder_bits=4)
+                             encoder=RealValueEncoder(4))
 
     def test_should_initialize_empty_mark(self, cfg):
         # when
@@ -39,7 +40,7 @@ class TestMark:
 
     @pytest.mark.parametrize("initmark, perception, changed", [
         ([[], []], [0.5, 0.5], False),  # shouldn't set mark if empty
-        ([[7], []], [0.5, 0.5], False),  # encoded value already marked
+        ([[8], []], [0.5, 0.5], False),  # encoded value already marked
         ([[5], []], [0.5, 0.5], True)
     ])
     def test_should_complement_mark(self, initmark, perception, changed, cfg):
@@ -94,7 +95,7 @@ class TestMark:
         # One perception is marked - the other should be specified
         ([[8], [4]], [.5, .5], 1),
         # Both perceptions are marked - no differences
-        ([[7], [7]], [.5, .5], 0)
+        ([[8], [8]], [.5, .5], 0)
     ])
     def test_should_handle_unique_differences(self, _m, _p0, _specif, cfg):
         # given
@@ -114,7 +115,7 @@ class TestMark:
         ([[1, 2], [8]], [.5, .5], 1),
         # Two fuzzy attributes (containing perception value) - both
         # should be specified
-        ([[6, 7], [5, 7]], [.5, .5], 2),
+        ([[6, 8], [5, 8]], [.5, .5], 2),
         # Two fuzzy attributes - but one is unique (does not contain
         # perception)
         ([[6, 8], [7, 9]], [.5, .5], 1),
