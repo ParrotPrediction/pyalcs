@@ -69,7 +69,7 @@ class Condition(PerceptionString):
 
         return True
 
-    def get_backwards_anticipation(self, perception):
+    def get_backwards_anticipation(self, perception: Perception):
         """
         Returns the believed backwards anticipation. Hereby, the condition
         is treated like an effect part.
