@@ -5,6 +5,9 @@ from itertools import groupby
 from typing import Optional
 
 
+logger = logging.getLogger(__name__)
+
+
 def choose_action(cll, all_actions: int, epsilon: float) -> Optional[int]:
     """
     Chooses which action to execute given classifier list (match set).
@@ -24,10 +27,10 @@ def choose_action(cll, all_actions: int, epsilon: float) -> Optional[int]:
         number of chosen action
     """
     if random.random() < epsilon:
-        logging.debug("\t\tExploration path")
+        logger.debug("\t\tExploration path")
         return explore(cll, all_actions)
 
-    logging.debug("\t\tExploitation path")
+    logger.debug("\t\tExploitation path")
     return exploit(cll, all_actions)
 
 
