@@ -1,7 +1,8 @@
 import logging
 from typing import Optional
 
-from lcs.strategies.action_planning.action_planning import search_goal_sequence, exists_classifier
+from lcs.strategies.action_planning.action_planning import \
+    search_goal_sequence, exists_classifier
 from . import ClassifiersList, Configuration
 from ...agents import Agent
 from ...agents.Agent import Metric

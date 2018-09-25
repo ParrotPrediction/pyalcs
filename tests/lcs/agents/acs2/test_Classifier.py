@@ -803,74 +803,54 @@ class TestClassifier:
         assert len(cls.specified_unchanging_attributes) == 1
         assert Condition('#####0##') == cls.condition
 
-    def test_does_match_backwards(self, cfg):
+    @pytest.mark.parametrize("_e, _result", [
+        ('#####1#1', True),
+        ('0######1', False),
+        ('#####0#1', False)
+    ])
+    def test_does_match_backwards(self, cfg, _e, _result):
         # given
         percept = Perception('11111111')
-
-        # C1 - matching
-        c1 = Classifier(
-            condition='#####0#0',
-            effect='#####1#1',
-            cfg=cfg)
-
-        # C2 - non-matching
-        c2 = Classifier(
-            condition='#####0#0',
-            effect='0######1',
-            cfg=cfg)
-
-        # C3 - non-matching
-        c3 = Classifier(
-            condition='#####0#0',
-            effect='#####0#1',
-            cfg=cfg)
+        c1 = Classifier(condition='#####0#0', effect=_e, cfg=cfg)
 
         # when
         result1 = c1.does_match_backwards(percept)
-        result2 = c2.does_match_backwards(percept)
-        result3 = c3.does_match_backwards(percept)
 
         # then
-        assert result1 is True
-        assert result2 is False
-        assert result3 is False
+        assert result1 is _result
 
-    def test_get_backwards_anticipation(self, cfg):
+    @pytest.mark.parametrize("_c, _e, _result", [
+        ('#0###1##', '#1###0##', ['0', '0', '1', '1', '1', '1', '1', '0']),
+        ('#0###1##', '#0###0##', None),
+        ('#0###1##', '0####0##', None)
+    ])
+    def test_get_backwards_anticipation(self, cfg, _c, _e, _result):
         # given
         p0 = Perception(['0', '1', '1', '1', '1', '0', '1', '0'])
-
-        # C0 - OK
-        c0 = Classifier(condition='#0###1##', effect='#1###0##', cfg=cfg)
-
-        # C1 - not OK
-        c1 = Classifier(condition='#0###1##', effect='#0###0##', cfg=cfg)
-
-        # C1 - not OK
-        c2 = Classifier(condition='#0###1##', effect='0####0##', cfg=cfg)
+        c0 = Classifier(condition=_c, effect=_e, cfg=cfg)
 
         # when
         result0 = c0.get_backwards_anticipation(p0)
-        result1 = c1.get_backwards_anticipation(p0)
-        result2 = c2.get_backwards_anticipation(p0)
 
         # then
-        assert result0 == ['0', '0', '1', '1', '1', '1', '1', '0']
-        assert result1 is None
-        assert result2 is None
+        assert result0 == _result
 
-    def test_get_best_anticipation(self, cfg):
+    @pytest.mark.parametrize("_p0, _result", [
+        (['1', '1', '0', '1', '1', '1', '1', '1'],
+         ['1', '1', '0', '1', '1', '0', '1', '1']),
+        (['1', '1', '1', '1', '1', '1', '1', '1'],
+         ['1', '1', '0', '1', '1', '0', '1', '1'])
+    ])
+    def test_get_best_anticipation(self, cfg, _p0, _result):
         # given
-        p0 = Perception(['1', '1', '0', '1', '1', '1', '1', '1'])
-        p1 = Perception(['1', '1', '1', '1', '1', '1', '1', '1'])
+        p0 = Perception(_p0)
         classifier = Classifier(effect='##0##0##', cfg=cfg)
 
         # when
         result0 = classifier.get_best_anticipation(p0)
-        result1 = classifier.get_best_anticipation(p1)
 
         # then
-        assert result0 == ['1', '1', '0', '1', '1', '0', '1', '1']
-        assert result1 == ['1', '1', '0', '1', '1', '0', '1', '1']
+        assert result0 == _result
 
     @pytest.mark.parametrize("_c, _p, _result", [
         ('########', '10011001', True),
