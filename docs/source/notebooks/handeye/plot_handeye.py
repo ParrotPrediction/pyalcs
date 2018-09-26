@@ -136,7 +136,7 @@ def plot_handeye(env_name='HandEye3-v0', filename='images/handeye.pdf', do_actio
 
     plot_performance(agent_he, hand_eye, maze5_metrics_df, cfg, env_name,
                      '\n{} Action Planning'.format(message))
-    plt.savefig(filename, format='pdf', dpi=100)
+    plt.savefig(filename.replace(" ", "_"), format='pdf', dpi=100)
 
 
 if __name__ == "__main__":
