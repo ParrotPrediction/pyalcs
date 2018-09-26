@@ -56,6 +56,17 @@ class Classifier:
         self.tga = tga
         self.tav = tav
 
+    def __eq__(self, other):
+        if self.condition == other.condition and \
+                self.action == other.action and \
+                self.effect == other.effect:
+            return True
+
+        return False
+
+    def __hash__(self):
+        return hash((str(self.condition), self.action, str(self.effect)))
+
     @classmethod
     def copy_from(cls, old_cls: Classifier, time: int):
         """
@@ -91,6 +102,10 @@ class Classifier:
         return new_cls
 
     @property
+    def fitness(self):
+        return self.q * self.r
+
+    @property
     def specified_unchanging_attributes(self) -> List[int]:
         """
         Determines the number of specified unchanging attributes in
@@ -110,24 +125,6 @@ class Classifier:
                 indices.append(idx)
 
         return indices
-
-    @property
-    def is_subsumer(self) -> bool:
-        """
-        Determines whether the classifier satisfies the subsumer criteria.
-
-        Returns
-        -------
-        bool
-            True is classifier can be considered as subsumer,
-            False otherwise
-        """
-        if self.exp > self.cfg.theta_exp:
-            if self.is_reliable():
-                if not self.is_marked():
-                    return True
-
-        return False
 
     def specialize(self,
                    p0: Perception,
@@ -171,14 +168,6 @@ class Classifier:
 
     def is_inadequate(self) -> bool:
         return self.q < self.cfg.theta_i
-
-    def update_reward(self, p: float) -> float:
-        self.r += self.cfg.beta * (p - self.r)
-        return self.r
-
-    def update_intermediate_reward(self, rho) -> float:
-        self.ir += self.cfg.beta * (rho - self.ir)
-        return self.ir
 
     def increase_experience(self) -> int:
         self.exp += 1
@@ -310,31 +299,10 @@ class Classifier:
         bool
             True if attribute was generalized, False otherwise
         """
+        # TODO: this might be too aggressive. Consider slight mutation
         if len(self.specified_unchanging_attributes) > 0:
             ridx = randomfunc(self.specified_unchanging_attributes)
             self.condition.generalize(ridx)
-            return True
-
-        return False
-
-    def does_subsume(self, other: Classifier) -> bool:
-        """
-        Returns if a classifier subsumes `other` classifier
-
-        Parameters
-        ----------
-        other: Classifier
-            other classifier
-
-        Returns
-        -------
-        bool
-            True if `other` classifier is subsumed, False otherwise
-        """
-        if self.is_subsumer and \
-            self.is_more_general(other) and \
-            self.condition.does_match_condition(other.condition) and \
-                self.effect == other.effect:
             return True
 
         return False

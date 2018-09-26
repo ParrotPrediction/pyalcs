@@ -29,7 +29,7 @@ Effect
 Components
 ^^^^^^^^^^
 * ALP implemented
-* Custom mutation in GA
+* Custom mutation in GA (condition and effect)
 
 Thoughts
 ^^^^^^^^
@@ -38,3 +38,5 @@ Thoughts
 * Maybe ``u_max`` should hold information how specific condition should be (not just wildcards but spread)
 * In the end of ALP phase we should perform something like classifier merge
 * There is still very aggressive``generalize`` function in Condition part.
+* favour most general condition and least general effect
+* majority voting for best action

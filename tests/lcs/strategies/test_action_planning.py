@@ -39,13 +39,13 @@ class TestActionPlanning:
         # then
         assert seq == []
 
-    def test_search_goal_sequence_1(self, cfg):
+    def test_search_goal_sequence_1(self):
         # given
         gs = GoalSequenceSearcher()
         start = Perception("11111111")
         goal = Perception("11111110")
 
-        empty_list = ClassifiersList(cfg=cfg)
+        empty_list = ClassifiersList()
 
         # when
         result = gs.search_goal_sequence(empty_list, start=start, goal=goal)
@@ -59,7 +59,7 @@ class TestActionPlanning:
     def test_form_new_classifiers_1(self, cfg):
         # given
         gs = GoalSequenceSearcher()
-        cls_list = [ClassifiersList(cfg=cfg)]
+        cls_list = [ClassifiersList()]
         cl = Classifier(condition="01010101", action=2, effect="0000000",
                         cfg=cfg)
         i = 0
@@ -78,7 +78,7 @@ class TestActionPlanning:
                          cfg=cfg)
         cl1 = Classifier(condition="11111111", action=0, effect="0000000",
                          cfg=cfg)
-        cls_list = [ClassifiersList(cl0, cfg=cfg)]
+        cls_list = [ClassifiersList(cl0)]
         i = 1
 
         # when
@@ -111,7 +111,7 @@ class TestActionPlanning:
                          cfg=cfg)
         cl1 = Classifier(condition="11111111", action=0, effect="0000000",
                          cfg=cfg)
-        gs.forward_classifiers = [ClassifiersList(cl0, cfg=cfg)]
+        gs.forward_classifiers = [ClassifiersList(cl0)]
         i = 1
         idx = 0
 
@@ -131,7 +131,7 @@ class TestActionPlanning:
                          cfg=cfg)
         cl1 = Classifier(condition="11111111", action=0, effect="0000000",
                          cfg=cfg)
-        gs.backward_classifiers = [ClassifiersList(cl0, cfg=cfg)]
+        gs.backward_classifiers = [ClassifiersList(cl0)]
         i = 0
         idx = 1
 
@@ -153,8 +153,8 @@ class TestActionPlanning:
                          cfg=cfg)
         cl2 = Classifier(condition="11111111", action=1, effect="0000000",
                          cfg=cfg)
-        gs.forward_classifiers = [ClassifiersList(cl0, cfg=cfg)]
-        gs.backward_classifiers = [ClassifiersList(cl1, cl0, cfg=cfg)]
+        gs.forward_classifiers = [ClassifiersList(cl0)]
+        gs.backward_classifiers = [ClassifiersList(cl1, cl0)]
         i = 1
         idx = 1
 
@@ -177,8 +177,8 @@ class TestActionPlanning:
                          cfg=cfg)
         cl2 = Classifier(condition="11111111", action=1, effect="0000000",
                          cfg=cfg)
-        gs.forward_classifiers = [ClassifiersList(cl0, cfg=cfg),
-                                  ClassifiersList(cl0, cl1, cfg=cfg)]
+        gs.forward_classifiers = [ClassifiersList(cl0),
+                                  ClassifiersList(cl0, cl1)]
         i = 2
         idx = 0
 
@@ -214,7 +214,7 @@ class TestActionPlanning:
                          cfg=cfg)
         cl1 = Classifier(condition="11111111", action=0, effect="0000000",
                          cfg=cfg)
-        gs.backward_classifiers = [ClassifiersList(cl0, cfg=cfg)]
+        gs.backward_classifiers = [ClassifiersList(cl0)]
         i = 1
         idx = 0
 
@@ -234,7 +234,7 @@ class TestActionPlanning:
                          cfg=cfg)
         cl1 = Classifier(condition="11111111", action=0, effect="0000000",
                          cfg=cfg)
-        gs.forward_classifiers = [ClassifiersList(cl0, cfg=cfg)]
+        gs.forward_classifiers = [ClassifiersList(cl0)]
         i = 0
         idx = 1
 
@@ -256,8 +256,8 @@ class TestActionPlanning:
                          cfg=cfg)
         cl2 = Classifier(condition="11111111", action=1, effect="0000000",
                          cfg=cfg)
-        gs.forward_classifiers = [ClassifiersList(cl0, cfg=cfg)]
-        gs.backward_classifiers = [ClassifiersList(cl1, cl0, cfg=cfg)]
+        gs.forward_classifiers = [ClassifiersList(cl0)]
+        gs.backward_classifiers = [ClassifiersList(cl1, cl0)]
         i = 1
         idx = 1
 
@@ -280,8 +280,8 @@ class TestActionPlanning:
                          cfg=cfg)
         cl2 = Classifier(condition="11111111", action=1, effect="0000000",
                          cfg=cfg)
-        gs.backward_classifiers = [ClassifiersList(cl0, cfg=cfg),
-                                   ClassifiersList(cl0, cl1, cfg=cfg)]
+        gs.backward_classifiers = [ClassifiersList(cl0),
+                                   ClassifiersList(cl0, cl1)]
         i = 2
         idx = 0
 

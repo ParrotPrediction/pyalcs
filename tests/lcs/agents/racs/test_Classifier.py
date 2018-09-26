@@ -5,6 +5,7 @@ import pytest
 from lcs import Perception
 from lcs.agents.racs import Configuration, Condition, Effect, Classifier
 from lcs.representations import UBR
+from lcs.representations.RealValueEncoder import RealValueEncoder
 
 
 class TestClassifier:
@@ -13,7 +14,7 @@ class TestClassifier:
     def cfg(self):
         return Configuration(classifier_length=2,
                              number_of_possible_actions=2,
-                             encoder_bits=4)
+                             encoder=RealValueEncoder(4))
 
     def test_should_initialize_without_arguments(self, cfg):
         # when
@@ -26,6 +27,29 @@ class TestClassifier:
         assert c.exp == 1
         assert c.talp is None
         assert c.tav == 0.0
+
+    def test_should_detect_identical_classifier(self, cfg):
+        cl_1 = Classifier(
+            condition=Condition([UBR(0, 1), UBR(0, 2)], cfg=cfg),
+            action=1,
+            effect=Effect([UBR(2, 3), UBR(4, 5)], cfg=cfg),
+            cfg=cfg)
+
+        cl_2 = Classifier(
+            condition=Condition([UBR(0, 1), UBR(0, 2)], cfg=cfg),
+            action=1,
+            effect=Effect([UBR(2, 3), UBR(4, 5)], cfg=cfg),
+            cfg=cfg)
+
+        assert cl_1 == cl_2
+
+    @pytest.mark.parametrize("_q, _r, _fitness", [
+        (0.0, 0.0, 0.0),
+        (0.3, 0.5, 0.15),
+        (1.0, 1.0, 1.0),
+    ])
+    def test_should_calculate_fitness(self, _q, _r, _fitness, cfg):
+        assert Classifier(quality=_q, reward=_r, cfg=cfg).fitness == _fitness
 
     @pytest.mark.parametrize("_effect, _p0, _p1, _result", [
         # Classifier with default pass-through effect
@@ -44,30 +68,6 @@ class TestClassifier:
 
         # then
         assert c.does_anticipate_correctly(p0, p1) is _result
-
-    @pytest.mark.parametrize("_exp, _q, _is_subsumer", [
-        (1, .5, False),  # too young classifier
-        (30, .92, True),  # enough experience and quality
-        (15, .92, False),  # not experienced enough
-    ])
-    def test_should_distinguish_classifier_as_subsumer(
-            self, _exp, _q, _is_subsumer, cfg):
-        # given
-        cl = Classifier(experience=_exp, quality=_q, cfg=cfg)
-
-        # when & then
-        # general classifier should not be considered as subsumer
-        assert cl.is_subsumer is _is_subsumer
-
-    def test_should_not_distinguish_marked_classifier_as_subsumer(self, cfg):
-        # given
-        # Now check if the fact that classifier is marked will block
-        # it from being considered as a subsumer
-        cl = Classifier(experience=30, quality=0.92, cfg=cfg)
-        cl.mark[0].add(4)
-
-        # when & then
-        assert cl.is_subsumer is False
 
     @pytest.mark.parametrize("_q, _reliable", [
         (.5, False),
@@ -93,32 +93,6 @@ class TestClassifier:
 
         # then
         assert cl.is_inadequate() is _inadequate
-
-    @pytest.mark.parametrize("_r0, _r1, _p", [
-        (0.5, 50.475, 1000)
-    ])
-    def test_should_update_reward(self, _r0, _r1, _p, cfg):
-        # given
-        cls = Classifier(reward=_r0, cfg=cfg)
-
-        # when
-        cls.update_reward(_p)
-
-        # then
-        assert cls.r == _r1
-
-    @pytest.mark.parametrize("_ir0, _ir1, _p", [
-        (0.0, 50.0, 1000)
-    ])
-    def test_should_update_intermediate_reward(self, _ir0, _ir1, _p, cfg):
-        # given
-        cls = Classifier(intermediate_reward=_ir0, cfg=cfg)
-
-        # when
-        cls.update_intermediate_reward(_p)
-
-        # then
-        assert cls.ir == _ir1
 
     def test_should_increase_quality(self, cfg):
         # given
@@ -236,46 +210,6 @@ class TestClassifier:
 
         # then
         assert cl1.is_more_general(cl2) is _result
-
-    @pytest.mark.parametrize(
-        "_e1, _e2, _exp1, _marked, _reliable,"
-        "_more_general, _condition_matching, _result", [
-            ([UBR(2, 4), UBR(5, 6)], [UBR(2, 4), UBR(5, 6)], 30, False, True,
-             True, True, True),  # all good
-            ([UBR(2, 4), UBR(5, 6)], [UBR(2, 4), UBR(5, 6)], 30, False, False,
-             True, True, False),  # not reliable
-            ([UBR(2, 4), UBR(5, 6)], [UBR(2, 4), UBR(5, 6)], 30, True, True,
-             True, True, False),  # marked
-            ([UBR(2, 4), UBR(5, 6)], [UBR(2, 4), UBR(5, 6)], 30, False, True,
-             False, True, False),  # less general
-            ([UBR(2, 4), UBR(5, 6)], [UBR(2, 4), UBR(5, 6)], 30, False, True,
-             True, False, False),  # condition not matching
-            ([UBR(2, 4), UBR(5, 6)], [UBR(2, 4), UBR(5, 7)], 30, False, True,
-             True, True, False),  # different effects
-            ([UBR(2, 4), UBR(5, 6)], [UBR(2, 4), UBR(5, 7)], 10, False, True,
-             True, True, False),  # not experienced
-        ])
-    def test_should_detect_subsumption(self, _e1, _e2, _exp1, _marked,
-                                       _reliable, _more_general,
-                                       _condition_matching, _result,
-                                       mocker, cfg):
-        # given
-        cl1 = Classifier(effect=Effect(_e1, cfg), experience=_exp1, cfg=cfg)
-        cl2 = Classifier(effect=Effect(_e2, cfg), cfg=cfg)
-
-        # when
-        mocker.patch.object(cl1, "is_reliable")
-        mocker.patch.object(cl1, "is_marked")
-        mocker.patch.object(cl1, "is_more_general")
-        mocker.patch.object(cl1.condition, "does_match_condition")
-
-        cl1.is_reliable.return_value = _reliable
-        cl1.is_marked.return_value = _marked
-        cl1.is_more_general.return_value = _more_general
-        cl1.condition.does_match_condition.return_value = _condition_matching
-
-        # then
-        assert cl1.does_subsume(cl2) == _result
 
     @staticmethod
     def _random_ubr(lower=0, upper=15):

@@ -10,6 +10,8 @@ from lcs.agents.acs2 import ACS2, Configuration
 # Configure logger
 logging.basicConfig(level=logging.INFO)
 
+logger = logging.getLogger("integration")
+
 
 if __name__ == '__main__':
 
@@ -21,7 +23,7 @@ if __name__ == '__main__':
                         epsilon=1.0,
                         do_ga=False,
                         performance_fcn=calculate_performance)
-    logging.info(cfg)
+    logger.info(cfg)
 
     # Explore the environment
     agent = ACS2(cfg)
@@ -32,4 +34,4 @@ if __name__ == '__main__':
     population, exploit_metric = agent.exploit(maze, 10)
 
     for metric in exploit_metric:
-        logging.info(metric)
+        logger.info(metric)

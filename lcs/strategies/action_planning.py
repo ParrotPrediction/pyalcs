@@ -158,10 +158,10 @@ class GoalSequenceSearcher:
         :return: new size of classifiers
         """
         if i > 0:
-            new_classifiers = ClassifiersList.ClassifiersList(cfg=cfg)
+            new_classifiers = ClassifiersList.ClassifiersList()
             new_classifiers.extend(classifiers_lists[i - 1])
         else:
-            new_classifiers = ClassifiersList.ClassifiersList(cfg=cfg)
+            new_classifiers = ClassifiersList.ClassifiersList()
         new_classifiers.append(match_set_el)
         return new_classifiers
 

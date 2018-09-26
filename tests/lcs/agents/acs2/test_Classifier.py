@@ -11,19 +11,30 @@ class TestClassifier:
     def cfg(self):
         return Configuration(8, 8)
 
-    def test_equality(self, cfg):
+    @pytest.mark.parametrize("_c1, _a1, _e1, _c2, _a2, _e2, _result", [
+        # Similar classifiers - everything the same
+        ('00001111', 1, '0000111#', '00001111', 1, '0000111#', True),
+        # Different condition
+        ('00001111', 1, '0000111#', '000#1111', 1, '0000111#', False),
+        # Different action
+        ('00001111', 1, '0000111#', '00001111', 2, '0000111#', False),
+        # Different effect
+        ('00001111', 1, '0000111#', '00001111', 1, '00001111', False),
+    ])
+    def test_equality(self, _c1, _a1, _e1, _c2, _a2, _e2, _result, cfg):
         # given
-        cl = Classifier(action=1, numerosity=2, cfg=cfg)
+        cl1 = Classifier(condition=_c1, action=_a1, effect=_e1, cfg=cfg)
+        cl2 = Classifier(condition=_c2, action=_a2, effect=_e2, cfg=cfg)
 
-        # when & then
-        assert Classifier(action=1, numerosity=2, cfg=cfg) == cl
+        # then
+        assert (cl1 == cl2) is _result
 
     def test_should_calculate_fitness(self, cfg):
         # given
         cls = Classifier(reward=0.25, cfg=cfg)
 
         # then
-        assert 0.125 == cls.fitness
+        assert cls.fitness == 0.125
 
     def test_should_anticipate_change(self, cfg):
         # given
@@ -85,32 +96,6 @@ class TestClassifier:
 
         # then
         assert cls.is_inadequate() is True
-
-    @pytest.mark.parametrize("_r0, _r1, _p", [
-        (0.5, 50.475, 1000)
-    ])
-    def test_should_update_reward(self, _r0, _r1, _p, cfg):
-        # given
-        cls = Classifier(reward=_r0, cfg=cfg)
-
-        # when
-        cls.update_reward(_p)
-
-        # then
-        assert cls.r == _r1
-
-    @pytest.mark.parametrize("_ir0, _ir1, _p", [
-        (0.0, 50.0, 1000)
-    ])
-    def test_should_update_intermediate_reward(self, _ir0, _ir1, _p, cfg):
-        # given
-        cls = Classifier(intermediate_reward=_ir0, cfg=cfg)
-
-        # when
-        cls.update_intermediate_reward(_p)
-
-        # then
-        assert cls.ir == _ir1
 
     def test_should_increase_experience(self, cfg):
         # given
@@ -582,84 +567,6 @@ class TestClassifier:
 
         # when & then
         assert c1.is_more_general(c2) is _result
-
-    @pytest.mark.parametrize("_exp, _q, _is_subsumer", [
-        (1, .5, False),  # too young classifier
-        (30, .92, True),  # enough experience and quality
-        (15, .92, False),  # not experienced enough
-    ])
-    def test_should_distinguish_classifier_as_subsumer(
-            self, _exp, _q, _is_subsumer, cfg):
-        # given
-        cls = Classifier(experience=_exp, quality=_q, cfg=cfg)
-
-        # when & then
-        # general classifier should not be considered as subsumer
-        assert cls.is_subsumer is _is_subsumer
-
-    def test_should_not_distinguish_marked_classifier_as_subsumer(self, cfg):
-        # given
-        # Now check if the fact that classifier is marked will block
-        # it from being considered as a subsumer
-        cls = Classifier(experience=30, quality=0.92, cfg=cfg)
-        cls.mark[3].add('1')
-
-        # when & then
-        assert cls.is_subsumer is False
-
-    def test_should_subsume_another_classifier_1(self, cfg):
-        # given
-        cls = Classifier(quality=0.93, reward=1.35, experience=23, cfg=cfg)
-        cls.condition[3] = '0'
-        cls.action = 3
-        cls.effect[2] = '1'
-
-        other = Classifier(quality=0.5, reward=0.35, experience=1, cfg=cfg)
-        other.condition[0] = '1'
-        other.condition[3] = '0'
-        other.action = 3
-        other.effect[2] = '1'
-
-        # when & then
-        assert cls.does_subsume(other) is True
-
-    def test_should_subsume_another_classifier_2(self, cfg):
-        # given
-        cls = Classifier(quality=0.84, reward=0.33, experience=3, cfg=cfg)
-        cls.condition[0] = '1'
-        cls.condition[1] = '0'
-        cls.condition[4] = '0'
-        cls.condition[6] = '1'
-        cls.action = 6
-        cls.effect[0] = '0'
-        cls.effect[1] = '1'
-        cls.effect[6] = '0'
-
-        other = Classifier(quality=0.5, reward=0.41, experience=1, cfg=cfg)
-        other.condition[0] = '1'
-        other.condition[1] = '0'
-        other.condition[6] = '2'
-        other.action = 3
-        other.effect[0] = '0'
-        other.effect[1] = '1'
-        other.effect[6] = '0'
-
-        # when & then
-        assert cls.does_subsume(other) is False
-
-    def test_should_subsume_another_classifier_3(self, cfg):
-        # Given
-        cls = Classifier(quality=0.99, reward=11.4, experience=32, cfg=cfg)
-        cls.condition[6] = '0'
-        cls.action = 6
-
-        other = Classifier(quality=0.5, reward=9.89, experience=1, cfg=cfg)
-        other.condition[3] = '1'
-        other.condition[6] = '0'
-        other.action = 6
-
-        # when & then
-        assert cls.does_subsume(other) is True
 
     def test_should_set_mark_from_condition_1(self, cfg):
         # given

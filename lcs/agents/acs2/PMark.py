@@ -85,3 +85,9 @@ class PMark(TypedList):
                     diff[idx] = p0[idx]
 
         return diff
+
+    def __repr__(self):
+        if self.is_marked():
+            return "Marked"
+        else:
+            return "Empty"

@@ -1,10 +1,10 @@
 import gym
-import pytest
-
 # noinspection PyUnresolvedReferences
 import gym_maze
-from lcs.agents.acs2 import ACS2, Configuration
+import pytest
+
 from examples.acs2.maze.utils import calculate_performance
+from lcs.agents.acs2 import ACS2, Configuration
 from .utils import count_microclassifiers, \
     count_macroclassifiers, \
     count_reliable
@@ -42,7 +42,9 @@ class TestMaze:
     def test_should_traverse_with_ga(self, env):
         # given
         cfg = Configuration(8, 8,
-                            epsilon=1.0,
+                            epsilon=0.8,
+                            mu=0.3,
+                            chi=0.0,
                             do_ga=True,
                             performance_fcn=calculate_performance)
         agent = ACS2(cfg)
@@ -51,17 +53,16 @@ class TestMaze:
         population, metrics = agent.explore(env, 300)
 
         # then
-        assert abs(250 - count_macroclassifiers(population)) < 55
-
-        assert 100 == self._get_knowledge(metrics)
+        assert abs(380 - count_macroclassifiers(population)) < 55
+        assert abs(100 - self._get_knowledge(metrics)) < 5
 
         assert count_macroclassifiers(population) \
             > count_reliable(population)
 
         assert count_macroclassifiers(population) \
-            <= count_microclassifiers(population)
+            < count_microclassifiers(population)
 
-        assert self._get_total_steps(metrics) > 5000
+        assert self._get_total_steps(metrics) > 2500
 
     @pytest.mark.skip(reason="implement it")
     def test_should_exploit_maze(self):

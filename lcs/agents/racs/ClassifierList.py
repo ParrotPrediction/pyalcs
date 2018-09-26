@@ -1,11 +1,17 @@
 from __future__ import annotations
 
-from typing import Optional
+import random
+from itertools import chain
+from typing import Optional, List
 
+import lcs.agents.racs.components.alp as alp_racs
+import lcs.strategies.anticipatory_learning_process as alp
+import lcs.strategies.genetic_algorithms as ga
+import lcs.strategies.reinforcement_learning as rl
 from lcs import TypedList, Perception
 from lcs.agents.racs import Configuration
+from lcs.agents.racs.components.genetic_algorithm import mutate
 from . import Classifier
-from .components.alp import expected_case, unexpected_case, cover
 
 
 class ClassifierList(TypedList):
@@ -21,13 +27,46 @@ class ClassifierList(TypedList):
         matching = [cl for cl in self if cl.action == action]
         return ClassifierList(*matching)
 
-    def apply_alp(self,
+    def expand(self) -> List[Classifier]:
+        """
+        Returns an array containing all micro-classifiers
+
+        Returns
+        -------
+        List[Classifier]
+            list of all expanded classifiers
+        """
+        list2d = [[cl] * cl.num for cl in self]
+        return list(chain.from_iterable(list2d))
+
+    def get_maximum_fitness(self) -> float:
+        """
+        Returns the maximum fitness value amongst those classifiers
+        that anticipated a change in environment.
+
+        Returns
+        -------
+        float
+            fitness value
+        """
+        anticipated_change_cls = [cl for cl in self
+                                  if cl.does_anticipate_change()]
+
+        if len(anticipated_change_cls) > 0:
+            best_cl = max(anticipated_change_cls, key=lambda cl: cl.fitness)
+            return best_cl.fitness
+
+        return 0.0
+
+    @staticmethod
+    def apply_alp(population: ClassifierList,
+                  match_set: ClassifierList,
+                  action_set: ClassifierList,
                   p0: Perception,
                   action: int,
                   p1: Perception,
                   time: int,
-                  population: ClassifierList,
-                  match_set: ClassifierList,
+                  theta_exp: int,
                   cfg: Configuration) -> None:
 
         new_list = ClassifierList()
@@ -35,34 +74,34 @@ class ClassifierList(TypedList):
         was_expected_case = False
         delete_counter = 0
 
-        for cl in self:
+        for cl in action_set:
             cl.increase_experience()
             cl.set_alp_timestamp(time)
 
             if cl.does_anticipate_correctly(p0, p1):
-                new_cl = expected_case(cl, p0, time)
+                new_cl = alp_racs.expected_case(cl, p0, time)
                 was_expected_case = True
             else:
-                new_cl = unexpected_case(cl,
-                                         p0,
-                                         p1,
-                                         time)
+                new_cl = alp_racs.unexpected_case(cl, p0, p1, time)
                 if cl.is_inadequate():
                     delete_counter += 1
-                    for lst in [population, match_set, self]:
+
+                    lists = [x for x in [population, match_set, action_set]
+                             if x]
+                    for lst in lists:
                         lst.safe_remove(cl)
 
             if new_cl is not None:
                 new_cl.tga = time
-                self.add_alp_classifier(new_cl, new_list)
+                alp.add_classifier(new_cl, action_set, new_list, theta_exp)
 
         # No classifier anticipated correctly - generate new one
         if not was_expected_case:
-            new_cl = cover(p0, action, p1, time, cfg)
-            self.add_alp_classifier(new_cl, new_list)
+            new_cl = alp_racs.cover(p0, action, p1, time, cfg)
+            alp.add_classifier(new_cl, action_set, new_list, theta_exp)
 
         # Merge classifiers from new_list into self and population
-        self.extend(new_list)
+        action_set.extend(new_list)
         population.extend(new_list)
 
         if match_set is not None:
@@ -70,62 +109,65 @@ class ClassifierList(TypedList):
                             cl.condition.does_match(p1)]
             match_set.extend(new_matching)
 
-    def apply_reinforcement_learning(self, reward: int, p: float) -> None:
-        """
-        Reinforcement Learning. Applies RL according to
-        current reinforcement `reward` and back-propagated reinforcement
-        `maximum_fitness`.
+    @staticmethod
+    def apply_reinforcement_learning(action_set: ClassifierList,
+                                     reward: int,
+                                     p: float,
+                                     beta: float,
+                                     gamma: float) -> None:
+        for cl in action_set:
+            rl.update_classifier(cl, reward, p, beta, gamma)
 
-        Parameters
-        ----------
-        reward: int
-            current reward obtained from the environment
-        p: float
-            maximum fitness - back-propagated reinforcement
-        """
-        for cl in self:
-            cl.update_reward(reward + cl.cfg.gamma * p)
-            cl.update_intermediate_reward(reward)
+    @staticmethod
+    def apply_ga(time: int,
+                 population: ClassifierList,
+                 match_set: ClassifierList,
+                 action_set: ClassifierList,
+                 p: Perception,
+                 theta_ga: int,
+                 mu: float,
+                 chi: float,
+                 theta_as: int,
+                 do_subsumption: bool,
+                 theta_exp: int) -> None:
 
-    def add_alp_classifier(self,
-                           child: Classifier,
-                           new_list: ClassifierList) -> None:
-        """
-        Looks for subsuming / similar classifiers in the current set and
-        those created in the current ALP run.
+        if ga.should_apply(action_set, time, theta_ga):
+            ga.set_timestamps(action_set, time)
 
-        If a similar classifier was found it's quality is increased,
-        otherwise `child_cl` is added to `new_list`.
+            # Select parents
+            parent1, parent2 = ga.roulette_wheel_selection(
+                action_set, lambda cl: pow(cl.q, 3) * cl.num)
 
-        Parameters
-        ----------
-        child:  Classifier
-            New classifier to examine
-        new_list: ClassifiersList
-            A list of newly created classifiers in this ALP run
-        """
-        # TODO: p0: write tests
-        old_cl = None
+            child1 = Classifier.copy_from(parent1, time)
+            child2 = Classifier.copy_from(parent2, time)
 
-        # Look if there is a classifier that subsumes the insertion candidate
-        for cl in self:
-            if cl.does_subsume(child):
-                if old_cl is None or cl.is_more_general(old_cl):
-                    old_cl = cl
+            # Execute mutation
+            attribute_range = child1.cfg.encoder.range
+            mutate(child1, attribute_range, mu)
+            mutate(child2, attribute_range, mu)
 
-        # Check if any similar classifier was in this ALP run
-        if old_cl is None:
-            for cl in new_list:
-                if cl == child:
-                    old_cl = cl
+            # Execute cross-over
+            if random.random() < chi:
+                if child1.effect == child2.effect:
+                    ga.two_point_crossover(child1, child2)
 
-        # Check if there is similar classifier already
-        if old_cl is None:
-            for cl in self:
-                if cl == child:
-                    old_cl = cl
+                    # Update quality and reward
+                    child1.q = child2.q = float(sum([child1.q, child2.q]) / 2)
+                    child2.r = child2.r = float(sum([child1.r, child2.r]) / 2)
 
-        if old_cl is None:
-            new_list.append(child)
-        else:
-            old_cl.increase_quality()
+            child1.q /= 2
+            child2.q /= 2
+
+            # We are interested only in classifiers with specialized condition
+            unique_children = {cl for cl in [child1, child2]
+                               if cl.condition.specificity > 0}
+
+            ga.delete_classifiers(
+                population, match_set, action_set,
+                len(unique_children), theta_as)
+
+            # check for subsumers / similar classifiers
+            for child in unique_children:
+                ga.add_classifier(child, p,
+                                  population, match_set, action_set,
+                                  do_subsumption, theta_exp)

@@ -16,7 +16,7 @@ class TestActionSelection:
     def test_should_return_all_possible_actions(self, cfg):
         # given
         all_actions = cfg.number_of_possible_actions
-        population = ClassifiersList(cfg=cfg)
+        population = ClassifiersList()
         actions = set()
 
         # when
@@ -32,7 +32,7 @@ class TestActionSelection:
     def test_should_return_best_fitness_action(self, cfg):
         # given
         all_actions = cfg.number_of_possible_actions
-        population = ClassifiersList(cfg=cfg)
+        population = ClassifiersList()
 
         # when & then
         # C1 - does not anticipate change
@@ -87,7 +87,7 @@ class TestActionSelection:
     def test_should_return_latest_action(self, cfg):
         # given
         all_actions = cfg.number_of_possible_actions
-        population = ClassifiersList(cfg=cfg)
+        population = ClassifiersList()
         c0 = Classifier(action=0, cfg=cfg)
         c0.talp = 1
 
@@ -119,7 +119,7 @@ class TestActionSelection:
     def test_should_return_worst_quality_action(self, cfg):
         # given
         all_actions = cfg.number_of_possible_actions
-        population = ClassifiersList(cfg=cfg)
+        population = ClassifiersList()
         c0 = Classifier(action=0, cfg=cfg)
         population.append(c0)
 

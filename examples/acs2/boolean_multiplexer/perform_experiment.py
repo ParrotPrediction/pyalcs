@@ -10,6 +10,8 @@ from lcs.agents.acs2 import ACS2, Configuration
 
 logging.basicConfig(level=logging.INFO)
 
+logger = logging.getLogger(__name__)
+
 
 def evaluate_performance(env, population, ctrl_bits):
     p1 = env.render()  # state after executing action
@@ -56,8 +58,8 @@ TRIALS = 250_000
 population, metrics = perform_experiment(*get_actors(), trials=TRIALS)
 
 # Dump data to file
-logging.info("Dumping data to files")
+logger.info("Dumping data to files")
 pickle.dump(population, open("population.p", "wb"))
 pickle.dump(metrics, open("metrics.p", "wb"))
 
-logging.info("Experiment completed")
+logger.info("Experiment completed")

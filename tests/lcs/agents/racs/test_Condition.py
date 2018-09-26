@@ -3,6 +3,7 @@ import pytest
 from lcs import Perception
 from lcs.agents.racs import Configuration, Condition
 from lcs.representations import UBR
+from lcs.representations.RealValueEncoder import RealValueEncoder
 
 
 class TestCondition:
@@ -11,7 +12,7 @@ class TestCondition:
     def cfg(self):
         return Configuration(classifier_length=2,
                              number_of_possible_actions=2,
-                             encoder_bits=4)
+                             encoder=RealValueEncoder(4))
 
     def test_should_create_generic_condition(self, cfg):
         # when
@@ -98,7 +99,7 @@ class TestCondition:
     @pytest.mark.parametrize("_condition, _perception, _result", [
         ([UBR(0, 15), UBR(0, 15)], [0.2, 0.4], True),
         ([UBR(0, 15), UBR(0, 2)], [0.5, 0.5], False),
-        ([UBR(7, 7), UBR(10, 10)], [0.5, 0.7], True)
+        ([UBR(8, 8), UBR(10, 10)], [0.5, 0.7], True)
     ])
     def test_should_match_perception(
             self, _condition, _perception, _result, cfg):

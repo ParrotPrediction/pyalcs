@@ -116,6 +116,7 @@ def unexpected_case(cl: Classifier,
     cl.decrease_quality()
     cl.set_mark(p0)
 
+    # TODO: think
     if not cl.effect.is_specializable(p0, p1):
         return None
 
