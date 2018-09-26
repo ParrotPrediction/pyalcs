@@ -1,5 +1,7 @@
 from lcs import Perception
-from lcs.agents.acs2 import ClassifiersList
+from lcs.agents.acs2 import Configuration, Classifier
+from lcs.agents.acs2.ClassifiersList import ClassifiersList
+from typing import List, Optional, Tuple
 
 
 class GoalSequenceSearcher:
@@ -9,7 +11,10 @@ class GoalSequenceSearcher:
         self.forward_perceptions = []
         self.backward_perceptions = []
 
-    def search_goal_sequence(self, reliable_classifiers, start, goal):
+    def search_goal_sequence(self,
+                             reliable_classifiers: ClassifiersList,
+                             start: str,
+                             goal: str) -> list:
         """
         Searches a path from start to goal using a bidirectional method in the
         environmental model (i.e. the list of reliable classifiers).
@@ -19,7 +24,7 @@ class GoalSequenceSearcher:
         :return: Sequence of actions
         """
         if len(reliable_classifiers) < 1:
-            return self.empty_sequence()
+            return []
 
         max_depth = 6
         forward_size = 1
@@ -58,10 +63,13 @@ class GoalSequenceSearcher:
                 return action_sequence
 
         # depth limit was reached -> return empty action sequence
-        return self.empty_sequence()
+        return []
 
-    def _search_one_forward_step(self, reliable_classifiers, forward_size,
-                                 forward_point):
+    def _search_one_forward_step(self,
+                                 reliable_classifiers: ClassifiersList,
+                                 forward_size: int,
+                                 forward_point: int) -> Tuple[Optional[list],
+                                                              int]:
         """
         Serches one step forward in the reliable_classifiers classifier list.
         Returns None if nothing was found so far, a sequence with a -1 element
@@ -96,15 +104,18 @@ class GoalSequenceSearcher:
                         size += 1
                         if size > 10001:
                             # logging.debug("Arrays are full")
-                            return self.empty_sequence(), size
+                            return [], size
                     else:
                         # sequence found
                         return self._form_sequence_forwards(
                             i, backward_sequence_idx, match_set_element), size
         return None, size
 
-    def _search_one_backward_step(self, reliable_classifiers, backward_size,
-                                  backward_point):
+    def _search_one_backward_step(self,
+                                  reliable_classifiers: ClassifiersList,
+                                  backward_size: int,
+                                  backward_point: int) -> Tuple[Optional[list],
+                                                                int]:
         """
         Searches one step backward in the reliable_classifiers classifiers list
         Returns None if nothing was found so far, a sequence with a -1 element
@@ -139,14 +150,17 @@ class GoalSequenceSearcher:
                         size += 1
                         if size > 10001:
                             # logging.debug("Arrays are full")
-                            return self.empty_sequence(), size
+                            return [], size
                     else:
                         return self._form_sequence_backwards(
                             i, forward_sequence_idx, match_set_el), size
         return None, size
 
     @staticmethod
-    def _form_new_classifiers(classifiers_lists, i, match_set_el):
+    def _form_new_classifiers(classifiers_lists: List[ClassifiersList],
+                              i: int,
+                              match_set_el: Classifier) \
+            -> ClassifiersList:
         """
         Executes actions after sequence was not detected.
         :param classifiers_lists: list of ClassifiersLists
@@ -155,14 +169,16 @@ class GoalSequenceSearcher:
         :return: new size of classifiers
         """
         if i > 0:
-            new_classifiers = ClassifiersList.ClassifiersList()
+            new_classifiers = ClassifiersList()
             new_classifiers.extend(classifiers_lists[i - 1])
         else:
-            new_classifiers = ClassifiersList.ClassifiersList()
+            new_classifiers = ClassifiersList()
         new_classifiers.append(match_set_el)
         return new_classifiers
 
-    def _form_sequence_forwards(self, i, backward_sequence_idx, match_set_el):
+    def _form_sequence_forwards(self, i: int,
+                                backward_sequence_idx: int,
+                                match_set_el: Classifier) -> List[int]:
         """
         Forms sequence when it was found forwards.
         :param i:
@@ -195,7 +211,9 @@ class GoalSequenceSearcher:
                 act_seq[k + j] = cl.action
         return act_seq
 
-    def _form_sequence_backwards(self, i, forward_sequence_idx, match_set_el):
+    def _form_sequence_backwards(self, i: int,
+                                 forward_sequence_idx: int,
+                                 match_set_el: Classifier) -> List[int]:
         """
         Forms sequence when it was found backwards.
         :param i: int
@@ -229,7 +247,8 @@ class GoalSequenceSearcher:
         return act_seq
 
     @staticmethod
-    def does_contain_state(perceptions, state):
+    def does_contain_state(perceptions: List[Perception],
+                           state: Perception) -> Optional[int]:
         """
         Returns the position in the perception list where 'state' is stored or
         None if state is not found
@@ -241,15 +260,3 @@ class GoalSequenceSearcher:
             if percept == state:
                 return i
         return None
-
-    @staticmethod
-    def empty_sequence():
-        """
-        Returns empty sequence.
-        This function might be deleted in later versions of code, but it is
-        useful if we decide to change the definition
-        of an empty sequence (it used to be [-1], because it was more alike
-        the original code in C++).
-        :return: empty action sequence
-        """
-        return []

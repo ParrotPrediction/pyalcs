@@ -349,7 +349,7 @@ class Classifier(object):
     def is_marked(self):
         return self.mark.is_marked()
 
-    def does_match(self, situation):
+    def does_match(self, situation: Perception) -> bool:
         """
         Returns if the classifier matches the situation.
         :param situation:
@@ -357,7 +357,7 @@ class Classifier(object):
         """
         return self.condition.does_match(situation)
 
-    def does_match_backwards(self, situation):
+    def does_match_backwards(self, situation: Perception) -> bool:
         """
         Returns if 'situation' is matched by the anticipations.
         This is only the case if the specified conditions that have #-symbols
@@ -370,7 +370,7 @@ class Classifier(object):
             return True
         return False
 
-    def get_best_anticipation(self, perception):
+    def get_best_anticipation(self, perception: Perception) -> Perception:
         """
         Returns the anticipation, the classifier believes to happen most
         probably. This is usually the normal anticipation.
@@ -381,7 +381,8 @@ class Classifier(object):
         """
         return self.effect.get_best_anticipation(perception)
 
-    def get_backwards_anticipation(self, perception):
+    def get_backwards_anticipation(self, perception: Perception) \
+            -> Optional[Perception]:
         """
         Returns the backwards anticipation.
         Returns -1 if the backwards anticipation was impossible to create.

@@ -1,11 +1,14 @@
 import logging
 from typing import Optional
 
+from lcs.strategies.action_planning.action_planning import \
+    search_goal_sequence, exists_classifier
 from . import ClassifiersList, Configuration
 from ...agents import Agent
 from ...agents.Agent import Metric
 from ...strategies.action_selection import choose_action
 from ...utils import parse_state, parse_action
+from typing import Tuple
 
 
 logger = logging.getLogger(__name__)
@@ -110,7 +113,7 @@ class ACS2(Agent):
 
         while not done:
             if self.cfg.do_action_planning and \
-                    (steps + time) % self.cfg.action_planning_frequency == 0:
+                    self._time_for_action_planning(steps + time):
                 # Action Planning for increased model learning
                 steps_ap, state, prev_state, action_set, reward = \
                     self._run_action_planning(env, steps + time, state,
@@ -241,8 +244,15 @@ class ACS2(Agent):
 
         return steps
 
-    def _run_action_planning(self, env, time, state,
-                             prev_state, action_set, action, reward):
+
+    def _run_action_planning(self, env,
+                             time: int,
+                             state: str,
+                             prev_state: str,
+                             action_set: ClassifiersList,
+                             action: int,
+                             reward: int) -> Tuple[int, str, str,
+                                                   ClassifiersList, int]:
         """
         Executes action planning for model learning speed up.
         Method requests goals from 'goal generator' provided by
@@ -276,9 +286,8 @@ class ACS2(Agent):
             if goal_situation is None:
                 break
 
-            act_sequence = self.population.search_goal_sequence(state,
-                                                                goal_situation,
-                                                                self.cfg)
+            act_sequence = search_goal_sequence(self.population, state,
+                                                goal_situation, self.cfg)
 
             # Execute the found sequence and learn during executing
             i = 0
@@ -325,10 +334,8 @@ class ACS2(Agent):
                 prev_state = state
                 state = parse_state(raw_state)
 
-                if not action_set.exists_classifier(prev_state,
-                                                    action,
-                                                    state,
-                                                    self.cfg.theta_r):
+                if not exists_classifier(action_set, prev_state,
+                                         action, state, self.cfg.theta_r):
                     # no reliable classifier was able to anticipate
                     # such a change
                     break
@@ -340,6 +347,9 @@ class ACS2(Agent):
                 break
 
         return steps, state, prev_state, action_set, reward
+
+    def _time_for_action_planning(self, time):
+        return time % self.cfg.action_planning_frequency == 0
 
     def _collect_agent_metrics(self, trial, steps, total_steps) -> Metric:
         return {

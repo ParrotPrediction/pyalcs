@@ -1,14 +1,12 @@
-from random import randint
-
 import pytest
 
 from lcs import Perception
 from lcs.agents.acs2 import Configuration, ClassifiersList, Classifier
-from lcs.strategies.action_planning import GoalSequenceSearcher
+from lcs.strategies.action_planning.goal_sequence_searcher \
+    import GoalSequenceSearcher
 
 
-class TestActionPlanning:
-
+class TestGoalSequenceSearcher:
     @pytest.fixture
     def cfg(self):
         return Configuration(8, 8)
@@ -32,13 +30,6 @@ class TestActionPlanning:
         assert result_1 == 1
         assert result_none is None
 
-    def test_empty_sequence(self):
-        # given, when
-        seq = GoalSequenceSearcher.empty_sequence()
-
-        # then
-        assert seq == []
-
     def test_search_goal_sequence_1(self):
         # given
         gs = GoalSequenceSearcher()
@@ -50,7 +41,7 @@ class TestActionPlanning:
         # when
         result = gs.search_goal_sequence(empty_list, start=start, goal=goal)
 
-        assert result == gs.empty_sequence()
+        assert result == []
 
     @pytest.mark.skip(reason="not implemented yet")
     def test_search_goal_sequence(self):
@@ -65,7 +56,7 @@ class TestActionPlanning:
         i = 0
 
         # when
-        new_classifiers = gs._form_new_classifiers(cls_list, i, cl, cfg)
+        new_classifiers = gs._form_new_classifiers(cls_list, i, cl)
 
         # then
         assert len(new_classifiers) == 1
@@ -82,7 +73,7 @@ class TestActionPlanning:
         i = 1
 
         # when
-        new_classifiers = gs._form_new_classifiers(cls_list, i, cl1, cfg)
+        new_classifiers = gs._form_new_classifiers(cls_list, i, cl1)
 
         # then
         assert len(new_classifiers) == 2

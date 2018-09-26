@@ -311,6 +311,10 @@ int startActionPlanning(ClassifierList *population, Environment *env, int time, 
         } else {
             Action **actSequence = population->searchGoalSequence(situation, goalSituation);
             int i;
+            //cout<<situation<<"->";
+            //for(act=actSequence[0], i=0; act!=0; ++i, act=actSequence[i])
+            // cout<<act<<"->";
+            //cout<<goalSituation<<endl;
 
             //Execute the found sequence and learn during executing
             for (i = 0; actSequence[i] != 0; i++, steps++) {

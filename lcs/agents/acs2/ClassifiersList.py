@@ -9,7 +9,6 @@ import lcs.strategies.anticipatory_learning_process as alp
 import lcs.strategies.genetic_algorithms as ga
 import lcs.strategies.reinforcement_learning as rl
 from lcs import Perception, TypedList
-from lcs.strategies.action_planning import GoalSequenceSearcher
 from lcs.agents.acs2 import Configuration
 from . import Classifier
 
@@ -200,51 +199,3 @@ class ClassifiersList(TypedList):
                 ga.add_classifier(child, p,
                                   population, match_set, action_set,
                                   do_subsumption, theta_exp)
-
-    def exists_classifier(self, previous_situation, action, situation,
-                          quality):
-        """
-        Returns True if there is a classifier in this list with a quality
-        higher than 'quality' that matches previous_situation,
-        specifies action, and predicts situation.
-        Returns False otherwise.
-        :param previous_situation:
-        :param action:
-        :param situation:
-        :param quality:
-        :return:
-        """
-        for cl in self:
-            if cl.q > quality and cl.does_match(previous_situation) \
-                and cl.action == action \
-                and cl.does_anticipate_correctly(previous_situation,
-                                                 situation):
-                return True
-        return False
-
-    def get_quality_classifiers_list(self, quality):
-        """
-        Constructs classifier list out of a list with q > quality.
-        :param quality:
-        :param cfg:
-        :return: ClassifiersList with only quality classifiers.
-        """
-        listp = ClassifiersList()
-        for item in self:
-            if item.q > quality:
-                listp.append(item)
-        return listp
-
-    def search_goal_sequence(self, start, goal, cfg):
-        """
-        Searches a path from start to goal using a bidirectional method in the
-        environmental model (i.e. the list of reliable classifiers).
-        :param start: Perception
-        :param goal: Perception
-        :return: Sequence of actions
-        """
-        reliable_classifiers = self. \
-            get_quality_classifiers_list(quality=cfg.theta_r)
-
-        return GoalSequenceSearcher().search_goal_sequence(
-            reliable_classifiers, start, goal)
