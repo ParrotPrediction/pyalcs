@@ -1,7 +1,7 @@
 from lcs import Perception
 from lcs.agents.acs2 import Configuration
 from lcs.agents.acs2.ClassifiersList import ClassifiersList
-from typing import List
+from typing import List, Optional, Tuple
 
 
 class GoalSequenceSearcher:
@@ -68,7 +68,8 @@ class GoalSequenceSearcher:
     def _search_one_forward_step(self,
                                  reliable_classifiers: ClassifiersList,
                                  forward_size: int,
-                                 forward_point: int):
+                                 forward_point: int) -> Tuple[Optional[list],
+                                                              int]:
         """
         Serches one step forward in the reliable_classifiers classifier list.
         Returns None if nothing was found so far, a sequence with a -1 element
@@ -111,9 +112,11 @@ class GoalSequenceSearcher:
                             i, backward_sequence_idx, match_set_element), size
         return None, size
 
-    def _search_one_backward_step(self, reliable_classifiers: ClassifiersList,
+    def _search_one_backward_step(self,
+                                  reliable_classifiers: ClassifiersList,
                                   backward_size: int,
-                                  backward_point: int):
+                                  backward_point: int) -> Tuple[Optional[list],
+                                                                int]:
         """
         Searches one step backward in the reliable_classifiers classifiers list
         Returns None if nothing was found so far, a sequence with a -1 element
@@ -157,7 +160,8 @@ class GoalSequenceSearcher:
         return None, size
 
     @staticmethod
-    def _form_new_classifiers(classifiers_lists: List[ClassifiersList], i: int,
+    def _form_new_classifiers(classifiers_lists: List[ClassifiersList],
+                              i: int,
                               match_set_el: ClassifiersList,
                               cfg: Configuration) -> ClassifiersList:
         """
@@ -175,8 +179,9 @@ class GoalSequenceSearcher:
         new_classifiers.append(match_set_el)
         return new_classifiers
 
-    def _form_sequence_forwards(self, i: int, backward_sequence_idx: int,
-                                match_set_el: ClassifiersList) -> list:
+    def _form_sequence_forwards(self, i: int,
+                                backward_sequence_idx: int,
+                                match_set_el: ClassifiersList) -> List[int]:
         """
         Forms sequence when it was found forwards.
         :param i:
@@ -209,8 +214,9 @@ class GoalSequenceSearcher:
                 act_seq[k + j] = cl.action
         return act_seq
 
-    def _form_sequence_backwards(self, i: int, forward_sequence_idx: int,
-                                 match_set_el: ClassifiersList) -> list:
+    def _form_sequence_backwards(self, i: int,
+                                 forward_sequence_idx: int,
+                                 match_set_el: ClassifiersList) -> List[int]:
         """
         Forms sequence when it was found backwards.
         :param i: int
@@ -245,7 +251,7 @@ class GoalSequenceSearcher:
 
     @staticmethod
     def does_contain_state(perceptions: List[Perception],
-                           state: Perception) -> int:
+                           state: Perception) -> Optional[int]:
         """
         Returns the position in the perception list where 'state' is stored or
         None if state is not found

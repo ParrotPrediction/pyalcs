@@ -48,8 +48,8 @@ def get_quality_classifiers_list(classifiers: ClassifiersList,
 
 
 def search_goal_sequence(classifiers: ClassifiersList,
-                         start: Perception,
-                         goal: Perception) -> list:
+                         start: str,
+                         goal: str) -> list:
     """
     Searches a path from start to goal using a bidirectional method in the
     environmental model (i.e. the list of reliable classifiers).

@@ -30,7 +30,7 @@ class ClassifiersList(TypedList):
 
     def form_match_set_backwards(self,
                                  situation: Perception,
-                                 cfg: Configuration):
+                                 cfg: Configuration) -> ClassifiersList:
         matching = [cl for cl in self if cl.does_match_backwards(situation)]
         return ClassifiersList(*matching, cfg=cfg)
 

@@ -429,7 +429,8 @@ class Classifier(object):
         """
         return self.effect.get_best_anticipation(perception)
 
-    def get_backwards_anticipation(self, perception: Perception) -> Perception:
+    def get_backwards_anticipation(self, perception: Perception) \
+            -> Optional[Perception]:
         """
         Returns the backwards anticipation.
         Returns -1 if the backwards anticipation was impossible to create.

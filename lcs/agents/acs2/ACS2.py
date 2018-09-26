@@ -8,6 +8,7 @@ from ...agents import Agent
 from ...agents.Agent import Metric
 from ...strategies.action_selection import choose_action
 from ...utils import parse_state, parse_action
+from typing import Tuple
 
 
 class ACS2(Agent):
@@ -214,7 +215,8 @@ class ACS2(Agent):
                              previous_situation: str,
                              action_set: ClassifiersList,
                              action: int,
-                             reward: int):
+                             reward: int) -> Tuple[int, str, str,
+                                                   ClassifiersList, int]:
         """
         Executes action planning for model learning speed up.
         Method requests goals from 'goal generator' provided by
