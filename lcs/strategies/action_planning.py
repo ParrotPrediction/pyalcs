@@ -76,8 +76,7 @@ class GoalSequenceSearcher:
         size = forward_size
         for i in range(forward_point, forward_size):
             match_forward = reliable_classifiers. \
-                form_match_set(situation=self.forward_perceptions[i],
-                               cfg=reliable_classifiers.cfg)
+                form_match_set(situation=self.forward_perceptions[i])
             for match_set_element in match_forward:
                 anticipation = match_set_element. \
                     get_best_anticipation(self.forward_perceptions[i])
@@ -92,8 +91,8 @@ class GoalSequenceSearcher:
                         self.forward_perceptions.append(anticipation)
                         self.forward_classifiers.append(
                             self._form_new_classifiers(
-                                self.forward_classifiers, i, match_set_element,
-                                reliable_classifiers.cfg))
+                                self.forward_classifiers, i,
+                                match_set_element))
                         size += 1
                         if size > 10001:
                             # logging.debug("Arrays are full")
@@ -120,8 +119,7 @@ class GoalSequenceSearcher:
         size = backward_size
         for i in range(backward_point, backward_size):
             match_backward = reliable_classifiers.form_match_set_backwards(
-                situation=self.backward_perceptions[i],
-                cfg=reliable_classifiers.cfg)
+                situation=self.backward_perceptions[i])
             for match_set_el in match_backward:
                 anticipation = match_set_el. \
                     get_backwards_anticipation(self.backward_perceptions[i])
@@ -137,8 +135,7 @@ class GoalSequenceSearcher:
                         self.backward_perceptions.append(anticipation)
                         self.backward_classifiers.append(
                             self._form_new_classifiers(
-                                self.backward_classifiers, i, match_set_el,
-                                reliable_classifiers.cfg))
+                                self.backward_classifiers, i, match_set_el))
                         size += 1
                         if size > 10001:
                             # logging.debug("Arrays are full")
@@ -149,7 +146,7 @@ class GoalSequenceSearcher:
         return None, size
 
     @staticmethod
-    def _form_new_classifiers(classifiers_lists, i, match_set_el, cfg):
+    def _form_new_classifiers(classifiers_lists, i, match_set_el):
         """
         Executes actions after sequence was not detected.
         :param classifiers_lists: list of ClassifiersLists

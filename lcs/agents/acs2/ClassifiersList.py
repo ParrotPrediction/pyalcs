@@ -222,7 +222,7 @@ class ClassifiersList(TypedList):
                 return True
         return False
 
-    def get_quality_classifiers_list(self, quality, cfg=None):
+    def get_quality_classifiers_list(self, quality):
         """
         Constructs classifier list out of a list with q > quality.
         :param quality:
@@ -235,7 +235,7 @@ class ClassifiersList(TypedList):
                 listp.append(item)
         return listp
 
-    def search_goal_sequence(self, start, goal):
+    def search_goal_sequence(self, start, goal, cfg):
         """
         Searches a path from start to goal using a bidirectional method in the
         environmental model (i.e. the list of reliable classifiers).
@@ -244,8 +244,7 @@ class ClassifiersList(TypedList):
         :return: Sequence of actions
         """
         reliable_classifiers = self. \
-            get_quality_classifiers_list(quality=self.cfg.theta_r,
-                                         cfg=self.cfg)
+            get_quality_classifiers_list(quality=cfg.theta_r)
 
         return GoalSequenceSearcher().search_goal_sequence(
             reliable_classifiers, start, goal)

@@ -277,7 +277,8 @@ class ACS2(Agent):
                 break
 
             act_sequence = self.population.search_goal_sequence(state,
-                                                                goal_situation)
+                                                                goal_situation,
+                                                                self.cfg)
 
             # Execute the found sequence and learn during executing
             i = 0
