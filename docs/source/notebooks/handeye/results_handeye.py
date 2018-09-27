@@ -159,7 +159,7 @@ def plot_handeye(number_of_tests=50, env_name='HandEye3-v0', filename='images/ha
         # explore
         agent_he = ACS2(cfg)
         population_he_explore, metrics_he_explore = agent_he.explore(
-            hand_eye, 14)
+            hand_eye, 50)
 
         # exploit
         agent_he = ACS2(cfg, population_he_explore)
