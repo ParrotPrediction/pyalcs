@@ -104,6 +104,21 @@ def plot_performance(metrics_df, env_name, additional_info):
     plt.subplots_adjust(top=0.86, wspace=0.3, hspace=0.3)
 
 
+def plot_both_performances(metrics_ap, metrics_no_ap, env_name,
+                           additional_info):
+    plt.figure(figsize=(13, 10), dpi=100)
+    plt.suptitle(f'ACS2 Performance in {env_name} environment '
+                 f'{additional_info}', fontsize=32)
+
+    ax2 = plt.subplot(211)
+    plot_knowledge(metrics_ap, ax2)
+
+    ax3 = plt.subplot(212)
+    plot_knowledge(metrics_no_ap, ax3)
+
+    plt.subplots_adjust(top=0.86, wspace=0.3, hspace=0.3)
+
+
 def mean(i, row_mean, row, first, second):
     return (row_mean[first][second]
             * i + row[first][second]) / (i + 1)
@@ -128,7 +143,7 @@ def count_mean_values(i: int, metrics, mean_metrics):
     return new_metrics
 
 
-def plot_handeye(env_name='HandEye3-v0', filename='images/handeye.pdf',
+def plot_handeye(number_of_tests=50, env_name='HandEye3-v0', filename='images/handeye.pdf',
                  do_action_planning=True):
     hand_eye = gym.make(env_name)
     cfg = Configuration(hand_eye.observation_space.n, hand_eye.action_space.n,
@@ -140,9 +155,7 @@ def plot_handeye(env_name='HandEye3-v0', filename='images/handeye.pdf',
     mean_metrics_he_exploit = []
     mean_metrics_he_explore = []
 
-    agent_he = ACS2(cfg)
-
-    for i in range(50):
+    for i in range(number_of_tests):
         # explore
         agent_he = ACS2(cfg)
         population_he_explore, metrics_he_explore = agent_he.explore(
@@ -160,30 +173,38 @@ def plot_handeye(env_name='HandEye3-v0', filename='images/handeye.pdf',
     he_metrics_df = parse_metrics_to_df(mean_metrics_he_explore,
                                         mean_metrics_he_exploit)
 
-    if do_action_planning:
-        message = 'with'
-    else:
-        message = 'without'
-
     plot_performance(he_metrics_df, env_name,
-                     '\n{} Action Planning'.format(message))
+                     '\nwith and without Action Planning')
+    plt.savefig(filename.replace(" ", "_"), format='pdf', dpi=100)
+    return he_metrics_df
+
+
+def plot_with_without_ap(filename, metrics_ap, metrics_no_ap):
+    plot_both_performances(metrics_ap, metrics_no_ap, env_name,
+                           '\nwith and without Action Planning')
     plt.savefig(filename.replace(" ", "_"), format='pdf', dpi=100)
 
 
 if __name__ == "__main__":
     env_name = 'HandEye2-v0'
+    number_of_tests = 50
 
     start = datetime.datetime.now()
     print("time start: {}".format(start))
 
-    plot_handeye(env_name, 'plots/{}_ap_{}.pdf'.format(env_name, start),
-                 do_action_planning=True)
+    metrics_ap = plot_handeye(number_of_tests, env_name, 'plots/{}_ap_{}.pdf'.
+                              format(env_name, start),
+                              do_action_planning=True)
 
     middle = datetime.datetime.now()
     print("done with AP, time: {}, elapsed: {}".format(middle, middle-start))
 
-    plot_handeye(env_name, 'plots/{}_no_ap_{}.pdf'.format(env_name, start),
-                 do_action_planning=False)
+    metrics_no_ap = plot_handeye(number_of_tests, env_name, 'plots/{}_no_ap_{}.pdf'.
+                                 format(env_name, start),
+                                 do_action_planning=False)
 
     end = datetime.datetime.now()
     print("done without AP, time: {}, elapsed: {}".format(end, end-middle))
+
+    plot_with_without_ap('plots/{}_both_{}.pdf'.format(env_name, start),
+                         metrics_ap, metrics_no_ap)
