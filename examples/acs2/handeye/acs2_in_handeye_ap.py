@@ -19,6 +19,7 @@ if __name__ == '__main__':
                         epsilon=1.0,
                         do_ga=False,
                         do_action_planning=True,
+                        action_planning_frequency=50,
                         performance_fcn=calculate_performance)
     logging.info(cfg)
 

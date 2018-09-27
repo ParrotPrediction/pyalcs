@@ -244,7 +244,6 @@ class ACS2(Agent):
 
         return steps
 
-
     def _run_action_planning(self, env,
                              time: int,
                              state: str,

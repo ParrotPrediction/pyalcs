@@ -94,22 +94,17 @@ def plot_performance(agent, env, metrics_df, cfg, env_name, additional_info):
     plt.suptitle(f'ACS2 Performance in {env_name} environment '
                  f'{additional_info}', fontsize=32)
 
-    # ax1 = plt.subplot(221)
-    # plot_policy(env, agent, cfg, ax1)
-
     ax2 = plt.subplot(211)
     plot_knowledge(metrics_df, ax2)
 
     ax3 = plt.subplot(212)
     plot_classifiers(metrics_df, ax3)
 
-    # ax4 = plt.subplot(224)
-    # plot_steps(metrics_df, ax4)
-
     plt.subplots_adjust(top=0.86, wspace=0.3, hspace=0.3)
 
 
-def plot_handeye(env_name='HandEye3-v0', filename='images/handeye.pdf', do_action_planning=True):
+def plot_handeye(env_name='HandEye3-v0', filename='images/handeye.pdf',
+                 do_action_planning=True):
     hand_eye = gym.make(env_name)
     cfg = Configuration(hand_eye.observation_space.n, hand_eye.action_space.n,
                         epsilon=1.0,
