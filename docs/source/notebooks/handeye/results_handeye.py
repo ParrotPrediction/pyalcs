@@ -199,7 +199,8 @@ if __name__ == "__main__":
     middle = datetime.datetime.now()
     print("done with AP, time: {}, elapsed: {}".format(middle, middle-start))
 
-    metrics_no_ap = plot_handeye(number_of_tests, env_name, 'plots/{}_no_ap_{}.pdf'.
+    metrics_no_ap = plot_handeye(number_of_tests, env_name,
+                                 'plots/{}_no_ap_{}.pdf'.
                                  format(env_name, start),
                                  do_action_planning=False)
 
