@@ -186,8 +186,8 @@ def plot_with_without_ap(filename, metrics_ap, metrics_no_ap):
 
 
 if __name__ == "__main__":
-    env_name = 'HandEye2-v0'
-    number_of_tests = 50
+    env_name = 'HandEye3-v0'
+    number_of_tests = 100
 
     start = datetime.datetime.now()
     print("time start: {}".format(start))
