@@ -12,9 +12,9 @@ import matplotlib.pyplot as plt
 
 from examples.acs2.handeye.utils import calculate_performance
 
-TITLE_TEXT_SIZE=24
-AXIS_TEXT_SIZE=18
-LEGEND_TEXT_SIZE=16
+TITLE_TEXT_SIZE = 24
+AXIS_TEXT_SIZE = 18
+LEGEND_TEXT_SIZE = 16
 
 
 def parse_metrics_to_df(explore_metrics, exploit_metrics):
@@ -70,6 +70,7 @@ def plot_knowledge(df, ax=None):
     ax.set_ylabel("Knowledge [%]", fontsize=AXIS_TEXT_SIZE)
     ax.set_ylim([0, 105])
     ax.legend(fontsize=LEGEND_TEXT_SIZE)
+
 
 def plot_classifiers(df, ax=None):
     if ax is None:
@@ -144,10 +145,10 @@ if __name__ == "__main__":
                  do_action_planning=True)
 
     middle = datetime.datetime.now()
-    print("done with AP, time: {}, elapsed: {}".format(middle, middle-start))
+    print("done with AP, time: {}, elapsed: {}".format(middle, middle - start))
 
     plot_handeye(env_name, 'results/{}_no_ap_{}.pdf'.format(env_name, start),
                  do_action_planning=False)
 
     end = datetime.datetime.now()
-    print("done without AP, time: {}, elapsed: {}".format(end, end-middle))
+    print("done without AP, time: {}, elapsed: {}".format(end, end - middle))

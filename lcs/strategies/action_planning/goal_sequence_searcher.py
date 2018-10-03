@@ -177,7 +177,7 @@ class GoalSequenceSearcher:
 
     def _form_sequence_forwards(self, i: int,
                                 backward_sequence_idx: int,
-                                match_set_el: Classifier) -> List[int]:
+                                match_set_el: Classifier) -> list:
         """
         Forms sequence when it was found forwards.
         :param i:
@@ -195,13 +195,14 @@ class GoalSequenceSearcher:
         sequence_size += 1
 
         # construct sequence
-        act_seq = [-1] * sequence_size
+        act_seq: list = [-1] * sequence_size
         j = 0
         if i > 0:
             for j, cl in enumerate(self.forward_classifiers[i - 1]):
                 act_seq[len(self.forward_classifiers[i - 1]) - j - 1] \
                     = cl.action
             j += 1
+
         act_seq[j] = match_set_el.action
         j += 1
         if backward_sequence_idx > 0:
@@ -212,7 +213,7 @@ class GoalSequenceSearcher:
 
     def _form_sequence_backwards(self, i: int,
                                  forward_sequence_idx: int,
-                                 match_set_el: Classifier) -> List[int]:
+                                 match_set_el: Classifier) -> list:
         """
         Forms sequence when it was found backwards.
         :param i: int
@@ -230,7 +231,7 @@ class GoalSequenceSearcher:
         sequence_size += 1
 
         # construct sequence
-        act_seq = [-1] * sequence_size
+        act_seq: list = [-1] * sequence_size
         j = 0
         if forward_sequence_idx > 0:
             for j, cl in enumerate(self.forward_classifiers[

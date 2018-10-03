@@ -12,9 +12,9 @@ import matplotlib.pyplot as plt
 
 from examples.acs2.handeye.utils import calculate_performance
 
-TITLE_TEXT_SIZE=24
-AXIS_TEXT_SIZE=18
-LEGEND_TEXT_SIZE=16
+TITLE_TEXT_SIZE = 24
+AXIS_TEXT_SIZE = 18
+LEGEND_TEXT_SIZE = 16
 
 
 def parse_metrics_to_df(explore_metrics, exploit_metrics):
@@ -65,7 +65,8 @@ def plot_knowledge(df, ax=None, additional_info=""):
     exploit_df['knowledge'].plot(ax=ax, c='red')
     ax.axvline(x=len(explore_df), c='black', linestyle='dashed')
 
-    ax.set_title("Achieved knowledge{}".format(additional_info), fontsize=TITLE_TEXT_SIZE)
+    ax.set_title("Achieved knowledge{}".format(additional_info),
+                 fontsize=TITLE_TEXT_SIZE)
     ax.set_xlabel("Trial", fontsize=AXIS_TEXT_SIZE)
     ax.set_ylabel("Knowledge [%]", fontsize=AXIS_TEXT_SIZE)
     ax.set_ylim([0, 105])
@@ -121,8 +122,7 @@ def plot_both_performances(metrics_ap, metrics_no_ap, env_name,
 
 
 def mean(i, row_mean, row, first, second):
-    return (row_mean[first][second]
-            * i + row[first][second]) / (i + 1)
+    return (row_mean[first][second] * i + row[first][second]) / (i + 1)
 
 
 def count_mean_values(i: int, metrics, mean_metrics):
@@ -145,8 +145,10 @@ def count_mean_values(i: int, metrics, mean_metrics):
 
 
 def plot_handeye_mean(number_of_tests=50, env_name='HandEye3-v0',
-                      filename='mean_results/handeye.pdf', do_action_planning=True,
-                      number_of_trials_explore=50, number_of_trials_exploit=2):
+                      filename='mean_results/handeye.pdf',
+                      do_action_planning=True,
+                      number_of_trials_explore=50,
+                      number_of_trials_exploit=2):
     hand_eye = gym.make(env_name)
     cfg = Configuration(hand_eye.observation_space.n, hand_eye.action_space.n,
                         epsilon=1.0,
@@ -202,31 +204,23 @@ if __name__ == "__main__":
     start = datetime.datetime.now()
     print("time start: {}".format(start))
 
-    metrics_ap = plot_handeye_mean(number_of_tests, env_name,
-                                   'mean_results/{}_ap_{}_{}.pdf'.
-                                   format(env_name, number_of_tests, start),
-                                   do_action_planning=True,
-                                   number_of_trials_explore=
-                                   number_of_trials_explore,
-                                   number_of_trials_exploit=
-                                   number_of_trials_exploit)
+    metrics_ap = plot_handeye_mean(
+        number_of_tests, env_name, 'mean_results/{}_ap_{}_{}.pdf'
+        .format(env_name, number_of_tests, start), do_action_planning=True,
+        number_of_trials_explore=number_of_trials_explore,
+        number_of_trials_exploit=number_of_trials_exploit)
 
     middle = datetime.datetime.now()
-    print("done with AP, time: {}, elapsed: {}".format(middle, middle-start))
+    print("done with AP, time: {}, elapsed: {}".format(middle, middle - start))
 
-    metrics_no_ap = plot_handeye_mean(number_of_tests, env_name,
-                                      'mean_results/{}_no_ap_{}_{}.pdf'.
-                                      format(env_name, number_of_tests, start),
-                                      do_action_planning=False,
-                                      number_of_trials_explore=
-                                      number_of_trials_explore,
-                                      number_of_trials_exploit=
-                                      number_of_trials_exploit)
+    metrics_no_ap = plot_handeye_mean(
+        number_of_tests, env_name, 'mean_results/{}_no_ap_{}_{}.pdf'.
+        format(env_name, number_of_tests, start), do_action_planning=False,
+        number_of_trials_explore=number_of_trials_explore,
+        number_of_trials_exploit=number_of_trials_exploit)
 
     end = datetime.datetime.now()
-    print("done without AP, time: {}, elapsed: {}".format(end, end-middle))
+    print("done without AP, time: {}, elapsed: {}".format(end, end - middle))
 
-    plot_with_without_ap('mean_results/{}_both_{}_{}.pdf'.format(env_name,
-                                                          number_of_tests,
-                                                          start),
-                         metrics_ap, metrics_no_ap)
+    plot_with_without_ap('mean_results/{}_both_{}_{}.pdf'.format(
+        env_name, number_of_tests, start), metrics_ap, metrics_no_ap)

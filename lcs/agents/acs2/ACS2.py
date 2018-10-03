@@ -294,12 +294,12 @@ class ACS2(Agent):
                 if act == -1:
                     break
 
-                match_set = self.population.form_match_set(situation=
-                                                           Perception(state))
+                match_set = self.population.form_match_set(
+                    situation=Perception(state))
                 if action_set is not None and prev_state is not None:
-                    action_set.apply_alp(
+                    ClassifiersList.apply_alp(
                         self.population,
-                        None,
+                        match_set,
                         action_set,
                         Perception(prev_state),
                         action,
@@ -307,17 +307,17 @@ class ACS2(Agent):
                         time + steps,
                         self.cfg.theta_exp,
                         self.cfg)
-                    action_set.apply_reinforcement_learning(
+                    ClassifiersList.apply_reinforcement_learning(
                         action_set,
                         reward,
                         0,
                         self.cfg.beta,
                         self.cfg.gamma)
                     if self.cfg.do_ga:
-                        action_set.apply_ga(
+                        ClassifiersList.apply_ga(
                             time + steps,
                             self.population,
-                            None,
+                            match_set,
                             action_set,
                             Perception(state),
                             self.cfg.theta_ga,
