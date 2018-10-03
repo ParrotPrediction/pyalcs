@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 class ACS2(Agent):
     def __init__(self,
                  cfg: Configuration,
-                 population: ClassifiersList = None) -> None:
+                 population: ClassifiersList=None) -> None:
         self.cfg = cfg
 
         if population:
@@ -51,7 +51,6 @@ class ACS2(Agent):
         :param trials: number of trials
         :return: population of classifiers and metrics
         """
-
         def switch_phases(env, steps, current_trial):
             if current_trial % 2 == 0:
                 return self._run_trial_explore(env, steps)
