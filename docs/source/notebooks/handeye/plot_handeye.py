@@ -103,7 +103,7 @@ def plot_performance(agent, env, metrics_df, cfg, env_name, additional_info):
     plt.subplots_adjust(top=0.86, wspace=0.3, hspace=0.3)
 
 
-def plot_handeye(env_name='HandEye3-v0', filename='images/handeye.pdf',
+def plot_handeye(env_name='HandEye3-v0', filename='results/handeye.pdf',
                  do_action_planning=True):
     hand_eye = gym.make(env_name)
     cfg = Configuration(hand_eye.observation_space.n, hand_eye.action_space.n,
@@ -140,13 +140,13 @@ if __name__ == "__main__":
     start = datetime.datetime.now()
     print("time start: {}".format(start))
 
-    plot_handeye(env_name, 'images/{}_ap_{}.pdf'.format(env_name, start),
+    plot_handeye(env_name, 'results/{}_ap_{}.pdf'.format(env_name, start),
                  do_action_planning=True)
 
     middle = datetime.datetime.now()
     print("done with AP, time: {}, elapsed: {}".format(middle, middle-start))
 
-    plot_handeye(env_name, 'images/{}_no_ap_{}.pdf'.format(env_name, start),
+    plot_handeye(env_name, 'results/{}_no_ap_{}.pdf'.format(env_name, start),
                  do_action_planning=False)
 
     end = datetime.datetime.now()
