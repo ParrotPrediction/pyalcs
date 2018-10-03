@@ -9,7 +9,6 @@ import lcs.strategies.anticipatory_learning_process as alp
 import lcs.strategies.genetic_algorithms as ga
 import lcs.strategies.reinforcement_learning as rl
 from lcs import Perception, TypedList
-
 from lcs.agents.acs2 import Configuration
 from . import Classifier
 
