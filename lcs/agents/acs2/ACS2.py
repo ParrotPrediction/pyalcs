@@ -1,6 +1,7 @@
 import logging
 from typing import Optional
 
+from lcs import Perception
 from lcs.strategies.action_planning.action_planning import \
     search_goal_sequence, exists_classifier
 from . import ClassifiersList, Configuration
@@ -9,7 +10,6 @@ from ...agents.Agent import Metric
 from ...strategies.action_selection import choose_action
 from ...utils import parse_state, parse_action
 from typing import Tuple
-
 
 logger = logging.getLogger(__name__)
 
@@ -294,15 +294,16 @@ class ACS2(Agent):
                 if act == -1:
                     break
 
-                match_set = self.population.form_match_set(situation=state)
+                match_set = self.population.form_match_set(situation=
+                                                           Perception(state))
                 if action_set is not None and prev_state is not None:
                     action_set.apply_alp(
                         self.population,
                         None,
                         action_set,
-                        prev_state,
+                        Perception(prev_state),
                         action,
-                        state,
+                        Perception(state),
                         time + steps,
                         self.cfg.theta_exp,
                         self.cfg)
@@ -318,7 +319,7 @@ class ACS2(Agent):
                             self.population,
                             None,
                             action_set,
-                            state,
+                            Perception(state),
                             self.cfg.theta_ga,
                             self.cfg.mu,
                             self.cfg.chi,
@@ -333,8 +334,10 @@ class ACS2(Agent):
                 prev_state = state
                 state = parse_state(raw_state)
 
-                if not exists_classifier(action_set, prev_state,
-                                         action, state, self.cfg.theta_r):
+                if not exists_classifier(action_set, Perception(prev_state),
+                                         action, Perception(state),
+                                         self.cfg.theta_r):
+
                     # no reliable classifier was able to anticipate
                     # such a change
                     break

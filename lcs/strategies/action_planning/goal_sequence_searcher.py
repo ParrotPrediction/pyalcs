@@ -159,8 +159,7 @@ class GoalSequenceSearcher:
     @staticmethod
     def _form_new_classifiers(classifiers_lists: List[ClassifiersList],
                               i: int,
-                              match_set_el: Classifier) \
-            -> ClassifiersList:
+                              match_set_el: Classifier) -> ClassifiersList:
         """
         Executes actions after sequence was not detected.
         :param classifiers_lists: list of ClassifiersLists

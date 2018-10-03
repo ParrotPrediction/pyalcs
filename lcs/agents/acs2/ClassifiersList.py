@@ -9,6 +9,7 @@ import lcs.strategies.anticipatory_learning_process as alp
 import lcs.strategies.genetic_algorithms as ga
 import lcs.strategies.reinforcement_learning as rl
 from lcs import Perception, TypedList
+
 from lcs.agents.acs2 import Configuration
 from . import Classifier
 
@@ -27,6 +28,7 @@ class ClassifiersList(TypedList):
 
     def form_match_set_backwards(self,
                                  situation: Perception) -> ClassifiersList:
+
         matching = [cl for cl in self if cl.does_match_backwards(situation)]
         return ClassifiersList(*matching)
 

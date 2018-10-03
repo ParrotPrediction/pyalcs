@@ -148,4 +148,3 @@ class TestClassifierList:
         assert 2 == len(match_set)
         assert c1 in match_set
         assert c2 in match_set
-
