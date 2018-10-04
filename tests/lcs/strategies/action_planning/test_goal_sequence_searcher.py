@@ -30,23 +30,6 @@ class TestGoalSequenceSearcher:
         assert result_1 == 1
         assert result_none is None
 
-    def test_search_goal_sequence_1(self):
-        # given
-        gs = GoalSequenceSearcher()
-        start = Perception("11111111")
-        goal = Perception("11111110")
-
-        empty_list = ClassifiersList()
-
-        # when
-        result = gs.search_goal_sequence(empty_list, start=start, goal=goal)
-
-        assert result == []
-
-    @pytest.mark.skip(reason="not implemented yet")
-    def test_search_goal_sequence(self):
-        pass
-
     def test_form_new_classifiers_1(self, cfg):
         # given
         gs = GoalSequenceSearcher()
@@ -285,3 +268,214 @@ class TestGoalSequenceSearcher:
         assert cl1.action in seq
         assert cl2.action in seq
         assert seq == [cl2.action, cl0.action, cl1.action]
+
+    def test_search_one_forward_step_1(self, cfg):
+        # given
+        gs = GoalSequenceSearcher()
+        start = "01111111"
+        goal = "00111111"
+        gs.forward_perceptions.append(Perception(start))
+        gs.backward_perceptions.append(Perception(goal))
+        reliable_classifiers = ClassifiersList(Classifier(condition="#1######",
+                                                          action=1,
+                                                          effect="#0######",
+                                                          cfg=cfg))
+        forward_size = 1
+        forward_point = 0
+
+        # when
+        act_seq, size = gs._search_one_forward_step(reliable_classifiers,
+                                                    forward_size,
+                                                    forward_point)
+
+        # then
+        assert act_seq == [1]
+
+    def test_search_one_forward_step_2(self, cfg):
+        # given
+        gs = GoalSequenceSearcher()
+        start = "01111111"
+        goal = "10111111"
+        gs.forward_perceptions.append(Perception(start))
+        gs.backward_perceptions.append(Perception(goal))
+        reliable_classifiers = ClassifiersList(
+            Classifier(condition="#1######", action=1, effect="#0######",
+                       cfg=cfg)
+        )
+        forward_size = 1
+        forward_point = 0
+
+        # when
+        act_seq, size = gs._search_one_forward_step(reliable_classifiers,
+                                                    forward_size,
+                                                    forward_point)
+
+        # then
+        assert act_seq is None
+        assert len(gs.forward_classifiers) == 1
+
+    def test_search_one_forward_step_3(self, cfg):
+        # given
+        gs = GoalSequenceSearcher()
+        start = "01111111"
+        goal = "10111111"
+        gs.forward_perceptions.append(Perception(start))
+        gs.backward_perceptions.append(Perception(goal))
+        reliable_classifiers = ClassifiersList(
+            Classifier(condition="#1######", action=1, effect="#0######",
+                       cfg=cfg),
+            Classifier(condition="0#######", action=1, effect="1#######",
+                       cfg=cfg)
+        )
+        forward_size = 1
+        forward_point = 0
+
+        # when
+        act_seq, size = gs._search_one_forward_step(reliable_classifiers,
+                                                    forward_size,
+                                                    forward_point)
+
+        # then
+        assert act_seq is None
+        assert len(gs.forward_classifiers) == 2
+
+    def test_search_one_backward_step_1(self, cfg):
+        # given
+        gs = GoalSequenceSearcher()
+        start = "01111111"
+        goal = "00111111"
+        gs.forward_perceptions.append(Perception(start))
+        gs.backward_perceptions.append(Perception(goal))
+        reliable_classifiers = ClassifiersList(Classifier(condition="#1######",
+                                                          action=1,
+                                                          effect="#0######",
+                                                          cfg=cfg))
+        forward_size = 1
+        forward_point = 0
+
+        # when
+        act_seq, size = gs._search_one_backward_step(reliable_classifiers,
+                                                    forward_size,
+                                                    forward_point)
+
+        # then
+        assert act_seq == [1]
+
+    def test_search_one_backward_step_2(self, cfg):
+        # given
+        gs = GoalSequenceSearcher()
+        start = "01111111"
+        goal = "10111111"
+        gs.forward_perceptions.append(Perception(start))
+        gs.backward_perceptions.append(Perception(goal))
+        reliable_classifiers = ClassifiersList(
+            Classifier(condition="#1######", action=1, effect="#0######",
+                       cfg=cfg)
+        )
+        forward_size = 1
+        forward_point = 0
+
+        # when
+        act_seq, size = gs._search_one_backward_step(reliable_classifiers,
+                                                    forward_size,
+                                                    forward_point)
+
+        # then
+        assert act_seq is None
+        assert len(gs.backward_classifiers) == 1
+
+    def test_search_one_backward_step_3(self, cfg):
+        # given
+        gs = GoalSequenceSearcher()
+        start = "01111111"
+        goal = "10111111"
+        gs.forward_perceptions.append(Perception(start))
+        gs.backward_perceptions.append(Perception(goal))
+        reliable_classifiers = ClassifiersList(
+            Classifier(condition="#1######", action=1, effect="#0######",
+                       cfg=cfg),
+            Classifier(condition="0#######", action=1, effect="1#######",
+                       cfg=cfg)
+        )
+        forward_size = 1
+        forward_point = 0
+
+        # when
+        act_seq, size = gs._search_one_backward_step(reliable_classifiers,
+                                                    forward_size,
+                                                    forward_point)
+
+        # then
+        assert act_seq is None
+        assert len(gs.backward_classifiers) == 2
+
+    def test_search_goal_sequence_1(self):
+        # given
+        gs = GoalSequenceSearcher()
+        start = Perception("11111111")
+        goal = Perception("11111110")
+
+        empty_list = ClassifiersList()
+
+        # when
+        result = gs.search_goal_sequence(empty_list, start=start, goal=goal)
+
+        # then
+        assert result == []
+
+    def test_search_goal_sequence_2(self, cfg):
+        # given
+        gs = GoalSequenceSearcher()
+        start = "01111111"
+        goal = "10111111"
+
+        reliable_classifiers = ClassifiersList(
+            Classifier(condition="#1######", action=1, effect="#0######",
+                       cfg=cfg),
+            Classifier(condition="0#######", action=2, effect="1#######",
+                       cfg=cfg)
+        )
+
+        # when
+        result = gs.search_goal_sequence(reliable_classifiers, start=start,
+                                         goal=goal)
+        # then
+        assert 1 in result
+        assert 2 in result
+        assert len(result) == 2
+
+    def test_search_goal_sequence_3(self, cfg):
+        # given
+        gs = GoalSequenceSearcher()
+        start = "01111111"
+        goal = "10111111"
+
+        reliable_classifiers = ClassifiersList(
+            Classifier(condition="#1######", action=1, effect="#0######",
+                       cfg=cfg),
+            Classifier(condition="#0######", action=3, effect="#1######",
+                       cfg=cfg),
+        )
+
+        # when
+        result = gs.search_goal_sequence(reliable_classifiers, start=start,
+                                         goal=goal)
+        # then
+        assert result == []
+
+    def test_search_goal_sequence_4(self, cfg):
+        # given
+        gs = GoalSequenceSearcher()
+        start = "01111111"
+        goal = "00111111"
+
+        reliable_classifiers = ClassifiersList(
+            Classifier(condition="#1######", action=1, effect="#0######",
+                       cfg=cfg)
+        )
+
+        # when
+        result = gs.search_goal_sequence(reliable_classifiers, start=start,
+                                         goal=goal)
+        # then
+        assert result == [1]

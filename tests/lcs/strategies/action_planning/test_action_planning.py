@@ -5,14 +5,14 @@ import pytest
 from lcs import Perception
 from lcs.agents.acs2 import Configuration, ClassifiersList, Classifier
 from lcs.strategies.action_planning.action_planning import \
-    get_quality_classifiers_list, exists_classifier
+    get_quality_classifiers_list, exists_classifier, search_goal_sequence
 
 
 class TestActionPlanning:
 
     @pytest.fixture
     def cfg(self):
-        return Configuration(8, 8)
+        return Configuration(8, 8, theta_r=0.9)
 
     def test_get_quality_classifiers_list(self, cfg):
         # given
@@ -89,3 +89,59 @@ class TestActionPlanning:
         # then
         assert result0 is False
         assert result1 is True
+
+    def test_search_goal_sequence_1(self, cfg):
+        # given
+        start = "01111111"
+        goal = "00111111"
+
+        classifiers = ClassifiersList(
+            Classifier(condition="#1######", action=1, effect="#0######",
+                       quality=0.88, cfg=cfg),
+            Classifier(condition="#1######", action=1, effect="#0######",
+                       quality=0.92, cfg=cfg)
+        )
+
+        # when
+        result = search_goal_sequence(classifiers, start, goal, cfg)
+
+        # then
+        assert result == [1]
+
+    def test_search_goal_sequence_2(self, cfg):
+        # given
+        start = "01111111"
+        goal = "00111111"
+
+        classifiers = ClassifiersList(
+            Classifier(condition="#1######", action=1, effect="#0######",
+                       quality=0.88, cfg=cfg),
+            Classifier(condition="#0######", action=1, effect="#1######",
+                       quality=0.98, cfg=cfg)
+        )
+
+        # when
+        result = search_goal_sequence(classifiers, start, goal, cfg)
+
+        # then
+        assert result == []
+
+    def test_search_goal_sequence_3(self, cfg):
+        # given
+        start = "01111111"
+        goal = "10111111"
+
+        classifiers = ClassifiersList(
+            Classifier(condition="#1######", action=1, effect="#0######",
+                       quality=0.94, cfg=cfg),
+            Classifier(condition="0#######", action=2, effect="1#######",
+                       quality=0.98, cfg=cfg),
+        )
+
+        # when
+        result = search_goal_sequence(classifiers, start, goal, cfg)
+
+        # then
+        assert len(result) == 2
+        assert 1 in result
+        assert 2 in result
