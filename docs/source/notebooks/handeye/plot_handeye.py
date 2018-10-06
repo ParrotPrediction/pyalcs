@@ -52,7 +52,7 @@ def parse_metrics_to_df(explore_metrics, exploit_metrics):
     return df
 
 
-def plot_knowledge(df, ax=None):
+def plot_knowledge(df, ax=None, additional_info=""):
     if ax is None:
         ax = plt.gca()
 
@@ -65,7 +65,8 @@ def plot_knowledge(df, ax=None):
     exploit_df['knowledge'].plot(ax=ax, c='red')
     ax.axvline(x=len(explore_df), c='black', linestyle='dashed')
 
-    ax.set_title("Achieved knowledge", fontsize=TITLE_TEXT_SIZE)
+    ax.set_title("Achieved knowledge{}".format(additional_info),
+                 fontsize=TITLE_TEXT_SIZE)
     ax.set_xlabel("Trial", fontsize=AXIS_TEXT_SIZE)
     ax.set_ylabel("Knowledge [%]", fontsize=AXIS_TEXT_SIZE)
     ax.set_ylim([0, 105])
@@ -90,13 +91,14 @@ def plot_classifiers(df, ax=None):
     ax.legend(fontsize=LEGEND_TEXT_SIZE)
 
 
-def plot_performance(agent, env, metrics_df, cfg, env_name, additional_info):
+def plot_performance(metrics_df, env_name, additional_info,
+                     with_ap=""):
     plt.figure(figsize=(13, 10), dpi=100)
     plt.suptitle(f'ACS2 Performance in {env_name} environment '
                  f'{additional_info}', fontsize=32)
 
     ax2 = plt.subplot(211)
-    plot_knowledge(metrics_df, ax2)
+    plot_knowledge(metrics_df, ax2, with_ap)
 
     ax3 = plt.subplot(212)
     plot_classifiers(metrics_df, ax3)
@@ -105,7 +107,8 @@ def plot_performance(agent, env, metrics_df, cfg, env_name, additional_info):
 
 
 def plot_handeye(env_name='HandEye3-v0', filename='results/handeye.pdf',
-                 do_action_planning=True):
+                 do_action_planning=True, number_of_trials_explore=50,
+                 number_of_trials_exploit=10):
     hand_eye = gym.make(env_name)
     cfg = Configuration(hand_eye.observation_space.n, hand_eye.action_space.n,
                         epsilon=1.0,
@@ -115,40 +118,47 @@ def plot_handeye(env_name='HandEye3-v0', filename='results/handeye.pdf',
 
     # explore
     agent_he = ACS2(cfg)
-    population_maze5_explore, metrics_maze5_explore = agent_he.explore(
-        hand_eye, 50)
+    population_he_explore, metrics_he_explore = agent_he.explore(
+        hand_eye, number_of_trials_explore)
 
     # exploit
-    agent_he = ACS2(cfg, population_maze5_explore)
-    _, metrics_maze5_exploit = agent_he.exploit(hand_eye, 10)
+    agent_he = ACS2(cfg, population_he_explore)
+    _, metrics_he_exploit = agent_he.exploit(hand_eye,
+                                             number_of_trials_exploit)
 
-    maze5_metrics_df = parse_metrics_to_df(metrics_maze5_explore,
-                                           metrics_maze5_exploit)
+    he_metrics_df = parse_metrics_to_df(metrics_he_explore,
+                                        metrics_he_exploit)
 
     if do_action_planning:
         message = 'with'
     else:
         message = 'without'
 
-    plot_performance(agent_he, hand_eye, maze5_metrics_df, cfg, env_name,
+    plot_performance(he_metrics_df, env_name,
                      '\n{} Action Planning'.format(message))
     plt.savefig(filename.replace(" ", "_"), format='pdf', dpi=100)
 
 
 if __name__ == "__main__":
     env_name = 'HandEye3-v0'
+    number_of_trials_explore = 50
+    number_of_trials_exploit = 10
 
     start = datetime.datetime.now()
     print("time start: {}".format(start))
 
     plot_handeye(env_name, 'results/{}_ap_{}.pdf'.format(env_name, start),
-                 do_action_planning=True)
+                 do_action_planning=True,
+                 number_of_trials_explore=number_of_trials_explore,
+                 number_of_trials_exploit=number_of_trials_exploit)
 
     middle = datetime.datetime.now()
     print("done with AP, time: {}, elapsed: {}".format(middle, middle - start))
 
     plot_handeye(env_name, 'results/{}_no_ap_{}.pdf'.format(env_name, start),
-                 do_action_planning=False)
+                 do_action_planning=False,
+                 number_of_trials_explore=number_of_trials_explore,
+                 number_of_trials_exploit=number_of_trials_exploit)
 
     end = datetime.datetime.now()
     print("done without AP, time: {}, elapsed: {}".format(end, end - middle))

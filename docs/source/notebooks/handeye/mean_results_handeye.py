@@ -92,13 +92,13 @@ def plot_classifiers(df, ax=None):
 
 
 def plot_performance(metrics_df, env_name, additional_info,
-                     with_AP=""):
+                     with_ap=""):
     plt.figure(figsize=(13, 10), dpi=100)
     plt.suptitle(f'ACS2 Performance in {env_name} environment '
                  f'{additional_info}', fontsize=32)
 
     ax2 = plt.subplot(211)
-    plot_knowledge(metrics_df, ax2, with_AP)
+    plot_knowledge(metrics_df, ax2, with_ap)
 
     ax3 = plt.subplot(212)
     plot_classifiers(metrics_df, ax3)
@@ -148,7 +148,7 @@ def plot_handeye_mean(number_of_tests=50, env_name='HandEye3-v0',
                       filename='mean_results/handeye.pdf',
                       do_action_planning=True,
                       number_of_trials_explore=50,
-                      number_of_trials_exploit=2):
+                      number_of_trials_exploit=10):
     hand_eye = gym.make(env_name)
     cfg = Configuration(hand_eye.observation_space.n, hand_eye.action_space.n,
                         epsilon=1.0,
