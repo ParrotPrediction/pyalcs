@@ -31,8 +31,7 @@ def exists_classifier(classifiers: ClassifiersList,
 
 
 def get_quality_classifiers_list(classifiers: ClassifiersList,
-                                 quality: float,
-                                 cfg: Configuration = None) -> ClassifiersList:
+                                 quality: float) -> ClassifiersList:
     """
     Constructs classifier list out of a list with q > quality.
     :param classifiers:
@@ -50,18 +49,19 @@ def get_quality_classifiers_list(classifiers: ClassifiersList,
 def search_goal_sequence(classifiers: ClassifiersList,
                          start: str,
                          goal: str,
-                         cfg: Configuration) -> list:
+                         theta_r: int) -> list:
     """
     Searches a path from start to goal using a bidirectional method in the
     environmental model (i.e. the list of reliable classifiers).
     :param classifiers:
     :param start: Perception
     :param goal: Perception
+    :param theta_r: quality theta_r
     :return: Sequence of actions
     """
     reliable_classifiers = \
         get_quality_classifiers_list(classifiers,
-                                     quality=cfg.theta_r)
+                                     quality=theta_r)
 
     return GoalSequenceSearcher().search_goal_sequence(
         reliable_classifiers, start, goal)

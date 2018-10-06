@@ -355,8 +355,8 @@ class TestGoalSequenceSearcher:
 
         # when
         act_seq, size = gs._search_one_backward_step(reliable_classifiers,
-                                                    forward_size,
-                                                    forward_point)
+                                                     forward_size,
+                                                     forward_point)
 
         # then
         assert act_seq == [1]
@@ -377,8 +377,8 @@ class TestGoalSequenceSearcher:
 
         # when
         act_seq, size = gs._search_one_backward_step(reliable_classifiers,
-                                                    forward_size,
-                                                    forward_point)
+                                                     forward_size,
+                                                     forward_point)
 
         # then
         assert act_seq is None
@@ -402,8 +402,8 @@ class TestGoalSequenceSearcher:
 
         # when
         act_seq, size = gs._search_one_backward_step(reliable_classifiers,
-                                                    forward_size,
-                                                    forward_point)
+                                                     forward_size,
+                                                     forward_point)
 
         # then
         assert act_seq is None

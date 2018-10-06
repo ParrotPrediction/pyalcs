@@ -160,6 +160,9 @@ def plot_handeye_mean(number_of_tests=50, env_name='HandEye3-v0',
     mean_metrics_he_explore = []
 
     for i in range(number_of_tests):
+        # the below line can be un-commented for experiments
+        # print(i, datetime.datetime.now())
+
         # explore
         agent_he = ACS2(cfg)
         population_he_explore, metrics_he_explore = agent_he.explore(
@@ -224,3 +227,11 @@ if __name__ == "__main__":
 
     plot_with_without_ap('mean_results/{}_both_{}_{}.pdf'.format(
         env_name, number_of_tests, start), metrics_ap, metrics_no_ap)
+
+    metrics_ap.to_csv('mean_results/{}_ap_{}_{}.csv'.
+                      format(env_name, number_of_tests, start).
+                      replace(' ', '_'))
+
+    metrics_no_ap.to_csv('mean_results/{}_no_ap_{}_{}.txt'.
+                         format(env_name, number_of_tests, start).
+                         replace(' ', '_'))

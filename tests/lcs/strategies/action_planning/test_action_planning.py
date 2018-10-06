@@ -36,7 +36,7 @@ class TestActionPlanning:
         population.append(c4)
 
         # when
-        match_set = get_quality_classifiers_list(population, 0.5, cfg)
+        match_set = get_quality_classifiers_list(population, 0.5)
 
         # then
         assert 2 == len(match_set)
@@ -103,7 +103,7 @@ class TestActionPlanning:
         )
 
         # when
-        result = search_goal_sequence(classifiers, start, goal, cfg)
+        result = search_goal_sequence(classifiers, start, goal, cfg.theta_r)
 
         # then
         assert result == [1]
@@ -121,7 +121,7 @@ class TestActionPlanning:
         )
 
         # when
-        result = search_goal_sequence(classifiers, start, goal, cfg)
+        result = search_goal_sequence(classifiers, start, goal, cfg.theta_r)
 
         # then
         assert result == []
@@ -139,7 +139,7 @@ class TestActionPlanning:
         )
 
         # when
-        result = search_goal_sequence(classifiers, start, goal, cfg)
+        result = search_goal_sequence(classifiers, start, goal, cfg.theta_r)
 
         # then
         assert len(result) == 2
