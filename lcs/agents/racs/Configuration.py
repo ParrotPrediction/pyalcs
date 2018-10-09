@@ -1,5 +1,4 @@
 from lcs.representations import UBR
-from lcs.representations.RealValueEncoder import RealValueEncoder
 
 
 class Configuration:

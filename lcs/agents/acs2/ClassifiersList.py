@@ -1,16 +1,14 @@
-from __future__ import annotations
-
 import random
 from itertools import chain
 from typing import Optional, List
 
-import lcs.agents.acs2.components.alp as alp_acs2
 import lcs.strategies.anticipatory_learning_process as alp
 import lcs.strategies.genetic_algorithms as ga
 import lcs.strategies.reinforcement_learning as rl
 from lcs import Perception, TypedList
 from lcs.agents.acs2 import Configuration
 from . import Classifier
+from .components import alp as alp_acs2
 
 
 class ClassifiersList(TypedList):
@@ -20,11 +18,11 @@ class ClassifiersList(TypedList):
     def __init__(self, *args) -> None:
         super().__init__((Classifier, ), *args)
 
-    def form_match_set(self, situation: Perception) -> ClassifiersList:
+    def form_match_set(self, situation: Perception) -> "ClassifiersList":
         matching = [cl for cl in self if cl.condition.does_match(situation)]
         return ClassifiersList(*matching)
 
-    def form_action_set(self, action: int) -> ClassifiersList:
+    def form_action_set(self, action: int) -> "ClassifiersList":
         matching = [cl for cl in self if cl.action == action]
         return ClassifiersList(*matching)
 
@@ -60,9 +58,9 @@ class ClassifiersList(TypedList):
         return 0.0
 
     @staticmethod
-    def apply_alp(population: ClassifiersList,
-                  match_set: ClassifiersList,
-                  action_set: ClassifiersList,
+    def apply_alp(population: "ClassifiersList",
+                  match_set: "ClassifiersList",
+                  action_set: "ClassifiersList",
                   p0: Perception,
                   action: int,
                   p1: Perception,
@@ -133,7 +131,7 @@ class ClassifiersList(TypedList):
             match_set.extend(new_matching)
 
     @staticmethod
-    def apply_reinforcement_learning(action_set: ClassifiersList,
+    def apply_reinforcement_learning(action_set: "ClassifiersList",
                                      reward: int,
                                      p: float,
                                      beta: float,
@@ -143,9 +141,9 @@ class ClassifiersList(TypedList):
 
     @staticmethod
     def apply_ga(time: int,
-                 population: ClassifiersList,
-                 match_set: ClassifiersList,
-                 action_set: ClassifiersList,
+                 population: "ClassifiersList",
+                 match_set: "ClassifiersList",
+                 action_set: "ClassifiersList",
                  p: Perception,
                  theta_ga: int,
                  mu: float,

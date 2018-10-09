@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from dataclasses import dataclass
 
 
@@ -23,7 +21,7 @@ class UBR:
     def bound_span(self) -> int:
         return sum(1 for _ in range(self.lower_bound, self.upper_bound))
 
-    def incorporates(self, other: UBR) -> bool:
+    def incorporates(self, other: "UBR") -> bool:
         """
         Checks whether current UBR incorporates other.
 

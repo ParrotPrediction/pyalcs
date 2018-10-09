@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import random
 from typing import Optional, Union, Callable, List
 
@@ -86,7 +84,7 @@ class Classifier(object):
                                       hex(id(self)))
 
     @classmethod
-    def copy_from(cls, old_cls: Classifier, time: int):
+    def copy_from(cls, old_cls: "Classifier", time: int):
         """
         Copies old classifier with given time (tga, talp).
         Old tav gets replaced with new value.
@@ -306,7 +304,7 @@ class Classifier(object):
 
         self.talp = time
 
-    def is_more_general(self, other: Classifier) -> bool:
+    def is_more_general(self, other: "Classifier") -> bool:
         """
         Checks if the classifiers condition is formally
         more general than `other`s.
