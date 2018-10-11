@@ -69,3 +69,16 @@ class Condition(PerceptionString):
 
     def does_match_condition(self, other: "Condition") -> bool:
         return self.does_match(other)
+
+    def get_backwards_anticipation(self, perception: Perception) -> Perception:
+        """
+        Returns the believed backwards anticipation. Hereby, the condition
+        is treated like an effect part.
+        :param perception:
+        :return:
+        """
+        ant = list(perception)
+        for idx, item in enumerate(self):
+            if item != self.wildcard:
+                ant[idx] = item
+        return Perception(ant)

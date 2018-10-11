@@ -44,3 +44,60 @@ class Effect(PerceptionString):
                     return False
 
         return True
+
+    def get_best_anticipation(self, perception: Perception) -> Perception:
+        """
+        Returns the most probable anticipation of the effect part.
+        This is usually the normal anticipation. However, if PEEs are
+        activated, the most probable value of each attribute is
+        taken as the anticipation.
+        :param perception: Perception
+        :return:
+        """
+        # TODO: implement the rest after PEEs are implemented
+        # ('getBestChar' function)
+        ant = list(perception)
+        for idx, item in enumerate(self):
+            if item != self.wildcard:
+                ant[idx] = item
+        return Perception(ant)
+
+    def does_specify_only_changes_backwards(self,
+                                            back_anticipation: Perception,
+                                            situation: Perception) -> bool:
+        """
+        Returns if the effect part specifies at least one of the percepts.
+        An PEE attribute never specifies the corresponding percept.
+        :param back_anticipation: Perception
+        :param situation: Perception
+        :return:
+        """
+        for item, back_ant, sit in zip(self, back_anticipation, situation):
+            if item == self.wildcard and back_ant != sit:
+                # change anticipated backwards although no change should occur
+                return False
+            # TODO: if PEEs are implemented, 'isEnhanced()' should be added
+            # to the condition below
+            if item != self.wildcard and item == back_ant:
+                return False
+        return True
+
+    def does_match(self,
+                   perception: Perception,
+                   other_perception: Perception) -> bool:
+        """
+        Returns if the effect matches the perception.
+        Hereby, the specified attributes are compared with perception.
+        Where the effect part has got #-symbols perception and other_perception
+        are compared. If they are not equal the effect part does not match.
+        :param perception: Perception
+        :param other_perception: Perception
+        :return:
+        """
+        for (item, percept, percept2) in zip(self, perception,
+                                             other_perception):
+            if item == self.wildcard and percept != percept2:
+                return False
+            elif item != self.wildcard and item != percept:
+                return False
+        return True

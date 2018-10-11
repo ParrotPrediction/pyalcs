@@ -346,3 +346,56 @@ class Classifier(object):
 
     def is_marked(self):
         return self.mark.is_marked()
+
+    def does_match(self, situation: Perception) -> bool:
+        """
+        Returns if the classifier matches the situation.
+        :param situation:
+        :return:
+        """
+        return self.condition.does_match(situation)
+
+    def does_match_backwards(self, situation: Perception) -> bool:
+        """
+        Returns if 'situation' is matched by the anticipations.
+        This is only the case if the specified conditions that have #-symbols
+        in the effect part are also matched!
+        :param situation:
+        :return:
+        """
+        p = self.condition.get_backwards_anticipation(situation)
+        if self.effect.does_match(situation, p):
+            return True
+        return False
+
+    def get_best_anticipation(self, perception: Perception) -> Perception:
+        """
+        Returns the anticipation, the classifier believes to happen most
+        probably. This is usually the normal anticipation.
+        However, if PEEs are activated, the most probable
+        value of each attribute is returned.
+        :param perception: Perception
+        :return:
+        """
+        return self.effect.get_best_anticipation(perception)
+
+    def get_backwards_anticipation(self, perception: Perception) \
+            -> Optional[Perception]:
+        """
+        Returns the backwards anticipation.
+        Returns -1 if the backwards anticipation was impossible to create.
+        This is the case if changing attributes are not specified
+        in the conditions.
+        :param perception:
+        :return:
+        """
+        back_anticipation = self.condition.\
+            get_backwards_anticipation(perception)
+        if not self.effect.\
+                does_specify_only_changes_backwards(back_anticipation,
+                                                    perception):
+            # If a specified attribute in the effect part matches
+            # the anticipated 'back_anticipation', the backward anticipation
+            # fails, because a specified attribute in Effect means a change!
+            return None
+        return back_anticipation
