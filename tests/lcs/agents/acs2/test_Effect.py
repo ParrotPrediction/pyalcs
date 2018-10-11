@@ -115,3 +115,76 @@ class TestEffect:
     def test_eq(self):
         assert Effect('00001111') == Effect('00001111')
         assert Effect('00001111') != Effect('0000111#')
+
+    @pytest.mark.parametrize("_p0, _p1, _e, _result", [
+        (['1', '1', '0', '1', '1', '1', '0', '1'],
+         ['1', '1', '1', '1', '1', '0', '0', '1'],
+         ['#', '#', '0', '#', '#', '1', '#', '#'],
+         True),
+        (['1', '0', '1', '1', '1', '0', '0', '1'],
+         ['1', '1', '0', '1', '1', '1', '0', '1'],
+         ['#', '#', '0', '#', '#', '1', '#', '#'],
+         False),
+        (['1', '1', '1', '1', '0', '0', '0', '1'],
+         ['1', '1', '0', '1', '1', '1', '0', '1'],
+         ['#', '#', '0', '#', '#', '1', '#', '#'],
+         False),
+        (['1', '1', '1', '1', '1', '0', '1', '1'],
+         ['1', '1', '1', '1', '1', '1', '0', '1'],
+         ['#', '#', '0', '#', '#', '1', '#', '#'],
+         False)
+    ])
+    def test_does_match(self, _p0, _p1, _e, _result):
+        # given
+        p0 = Perception(_p0)
+        p1 = Perception(_p1)
+        effect = Effect(_e)
+
+        # when
+        result = effect.does_match(p0, p1)
+
+        # then
+        assert result is _result
+
+    @pytest.mark.parametrize("_p0, _result", [
+        (['1', '1', '0', '1', '1', '1', '1', '1'],
+         ['1', '1', '0', '1', '1', '0', '1', '1']),
+        (['1', '1', '1', '1', '1', '1', '1', '1'],
+         ['1', '1', '0', '1', '1', '0', '1', '1'])
+    ])
+    def test_get_best_anticipation(self, _p0, _result):
+        # given
+        p0 = Perception(_p0)
+        effect = Effect(['#', '#', '0', '#', '#', '0', '#', '#'])
+
+        # when
+        result0 = effect.get_best_anticipation(p0)
+
+        # then
+        assert result0 == _result
+
+    @pytest.mark.parametrize("_p0, _p1, _e, _result", [
+        (['1', '1', '0', '1', '1', '1', '1', '0'],
+         ['1', '1', '1', '1', '1', '1', '1', '0'],
+         ['#', '#', '1', '#', '#', '0', '#', '#'],
+         True),
+        (['1', '1', '0', '1', '1', '1', '1', '0'],
+         ['1', '1', '1', '1', '1', '1', '0', '0'],
+         ['#', '#', '1', '#', '#', '0', '#', '#'],
+         False),
+        (['1', '1', '0', '1', '1', '0', '1', '0'],
+         ['1', '1', '1', '1', '1', '1', '1', '0'],
+         ['#', '#', '1', '#', '#', '0', '#', '#'],
+         False)
+    ])
+    def test_does_specify_only_changes_backwards(self, _p0, _p1, _e, _result):
+        # given
+        back_ant = Perception(_p0)
+        sit = Perception(_p1)
+        effect = Effect(_e)
+
+        # when
+        result = effect.does_specify_only_changes_backwards(back_ant, sit)
+
+        # then
+        assert result is _result

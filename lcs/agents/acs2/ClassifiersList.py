@@ -17,11 +17,18 @@ class ClassifiersList(TypedList):
     """
     Represents overall population, match/action sets
     """
+
     def __init__(self, *args) -> None:
         super().__init__((Classifier, ), *args)
 
     def form_match_set(self, situation: Perception) -> ClassifiersList:
         matching = [cl for cl in self if cl.condition.does_match(situation)]
+        return ClassifiersList(*matching)
+
+    def form_match_set_backwards(self,
+                                 situation: Perception) -> ClassifiersList:
+
+        matching = [cl for cl in self if cl.does_match_backwards(situation)]
         return ClassifiersList(*matching)
 
     def form_action_set(self, action: int) -> ClassifiersList:

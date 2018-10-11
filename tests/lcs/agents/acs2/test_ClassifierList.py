@@ -118,3 +118,33 @@ class TestClassifierList:
         # then
         assert abs(33.94 - cl.r) < 0.1
         assert abs(10.74 - cl.ir) < 0.1
+
+    def test_should_form_match_set_backwards(self, cfg):
+        # given
+        population = ClassifiersList()
+        situation = Perception('11110000')
+
+        # C1 - general condition
+        c1 = Classifier(cfg=cfg)
+
+        # C2 - matching
+        c2 = Classifier(condition='0##0####', effect='1##1####', cfg=cfg)
+
+        # C3 - non-matching
+        c3 = Classifier(condition='0###1###', effect='1######0', cfg=cfg)
+
+        # C4 - non-matching
+        c4 = Classifier(condition='0###0###', effect='1###1###', cfg=cfg)
+
+        population.append(c1)
+        population.append(c2)
+        population.append(c3)
+        population.append(c4)
+
+        # when
+        match_set = ClassifiersList.form_match_set_backwards(population,
+                                                             situation)
+        # then
+        assert 2 == len(match_set)
+        assert c1 in match_set
+        assert c2 in match_set

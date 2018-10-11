@@ -23,7 +23,7 @@
 #include"Perception.h"
 #include"Action.h"
 
-#define HE_GRID_SIZE 4 /* x size of the 2-D quadratic plane */
+#define HE_GRID_SIZE 3 /* x size of the 2-D quadratic plane */
 #define NOTE_IN_HAND 1 /*specifies if feeler should switch to '2' when block is in hand */
 
 #define HE_TEST_NO 100 /* number of tests during testing mode */
