@@ -52,7 +52,6 @@ def _mutate_attribute(ubr: UBR, bounds: Tuple[int, int], mu: float) -> UBR:
             nub = _draw(ub, spread)
             if ub <= nub <= rmax:
                 break
-
     return UBR(nlb, nub)
 
 

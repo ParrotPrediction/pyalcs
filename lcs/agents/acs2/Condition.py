@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import random
 from typing import Callable, Union
 
@@ -23,7 +21,7 @@ class Condition(PerceptionString):
         """
         return sum(1 for comp in self if comp != self.wildcard)
 
-    def specialize_with_condition(self, other: Condition) -> None:
+    def specialize_with_condition(self, other: "Condition") -> None:
         for idx, new_el in enumerate(other):
             if new_el != self.wildcard:
                 self[idx] = new_el
@@ -48,7 +46,7 @@ class Condition(PerceptionString):
             ridx = func(specific_ids)
             self.generalize(ridx)
 
-    def does_match(self, other: Union[Perception, Condition]) -> bool:
+    def does_match(self, other: Union[Perception, "Condition"]) -> bool:
         """
         Check if condition match other list such as perception or another
         condition.
@@ -69,7 +67,7 @@ class Condition(PerceptionString):
 
         return True
 
-    def does_match_condition(self, other: Condition) -> bool:
+    def does_match_condition(self, other: "Condition") -> bool:
         return self.does_match(other)
 
     def get_backwards_anticipation(self, perception: Perception) -> Perception:

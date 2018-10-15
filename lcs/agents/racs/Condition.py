@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import random
 import statistics
 from copy import copy
@@ -48,7 +46,7 @@ class Condition(PerceptionString):
         maximum_span = self.cfg.encoder.range[1]
         return statistics.mean(r.bound_span / maximum_span for r in self)
 
-    def specialize_with_condition(self, other: Condition) -> None:
+    def specialize_with_condition(self, other: "Condition") -> None:
         """
         Specializes the existing condition with specified attributes from
         new condition string.
@@ -95,7 +93,7 @@ class Condition(PerceptionString):
         encoded_perception = map(self.cfg.encoder.encode, perception)
         return all(p in ubr for p, ubr in zip(encoded_perception, self))
 
-    def does_match_condition(self, other: Condition):
+    def does_match_condition(self, other: "Condition"):
         """
         Checks if self conditions matches other one.
 

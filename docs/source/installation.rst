@@ -1,12 +1,12 @@
 Installation
 ============
-Use a **Python 3.7** environment for development.
+Use a **Python 3.6** environment for development.
 
 Creating environment with Conda (example)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Having a Conda distribution (i.e. Anacoda, Minicoda etc) create environment like::
 
-    conda create --name pyalcs python=3.7
+    conda create --name pyalcs python=3.6
 
 Then activate it with::
 
