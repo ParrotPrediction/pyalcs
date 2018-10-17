@@ -10,6 +10,9 @@ from . import Condition, Effect, Mark, Configuration
 
 class Classifier:
 
+    __slots__ = ['condition', 'action', 'effect', 'mark', 'q', 'r',
+                 'ir', 'num', 'exp', 'talp', 'tga', 'tav', 'ee', 'cfg']
+
     def __init__(self,
                  condition: Optional[Condition] = None,
                  action: Optional[int] = None,
@@ -55,6 +58,9 @@ class Classifier:
         self.talp = talp
         self.tga = tga
         self.tav = tav
+
+        # TODO: not used yet
+        self.ee = 0
 
     def __eq__(self, other):
         if self.condition == other.condition and \

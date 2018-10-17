@@ -124,3 +124,9 @@ class TestCondition:
 
         # then
         assert cond1.does_match_condition(cond2) == _result
+
+    @pytest.mark.parametrize("_cond, _result", [
+        ([UBR(0, 15), UBR(0, 7)], 'OOOOOOOOOO|OOOOO.....')
+    ])
+    def test_should_visualize(self, _cond, _result, cfg):
+        assert repr(Condition(_cond, cfg=cfg)) == _result

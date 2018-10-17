@@ -1,11 +1,31 @@
+from dataclasses import dataclass
+
 import pytest
 
 import lcs.agents.acs2 as acs2
 import lcs.agents.racs as racs
+from lcs.agents.racs import Effect, Condition
 from lcs.representations import UBR
 from lcs.representations.RealValueEncoder import RealValueEncoder
 from lcs.strategies.subsumption import find_subsumers, \
     is_subsumer, does_subsume
+
+
+@dataclass
+class SimpleRACSClassifier:
+    condition: Condition
+    effect: Effect
+    action: int = 0
+    exp: int = 0
+
+    def is_reliable(self):
+        pass
+
+    def is_marked(self):
+        pass
+
+    def is_more_general(self):
+        pass
 
 
 class TestSubsumption:
@@ -336,11 +356,11 @@ class TestSubsumption:
                                        _condition_matching, _result,
                                        mocker, racs_cfg):
         # given
-        cl1 = racs.Classifier(effect=racs.Effect(_e1, racs_cfg),
-                              experience=_exp1,
-                              cfg=racs_cfg)
-        cl2 = racs.Classifier(effect=racs.Effect(_e2, racs_cfg),
-                              cfg=racs_cfg)
+        cl1 = SimpleRACSClassifier(condition=racs.Condition.generic(racs_cfg),
+                                   effect=racs.Effect(_e1, racs_cfg),
+                                   exp=_exp1)
+        cl2 = SimpleRACSClassifier(condition=racs.Condition.generic(racs_cfg),
+                                   effect=racs.Effect(_e2, racs_cfg))
 
         # when
         mocker.patch.object(cl1, "is_reliable")

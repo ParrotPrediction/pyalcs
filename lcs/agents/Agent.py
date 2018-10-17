@@ -16,14 +16,15 @@ class Agent:
     def _collect_environment_metrics(self, env) -> Optional[Metric]:
         raise NotImplementedError()
 
-    def _collect_performance_metrics(self, env) -> Optional[Metric]:
+    def _collect_performance_metrics(self, env, reward) -> Optional[Metric]:
         raise NotImplementedError()
 
     def _collect_metrics(self,
                          env,
                          current_trial: int,
                          steps_in_trial: int,
-                         steps: int) -> Dict[str, Optional[Metric]]:
+                         steps: int,
+                         reward: int) -> Dict[str, Optional[Metric]]:
         """
 
         Parameters
@@ -36,6 +37,8 @@ class Agent:
             steps in given trial
         steps:
             total steps so far (all trials)
+        reward: int
+            final reward obtained
 
         Returns
         -------
@@ -44,7 +47,7 @@ class Agent:
         agent_stats = self._collect_agent_metrics(
             current_trial, steps_in_trial, steps)
         env_stats = self._collect_environment_metrics(env)
-        performance_stats = self._collect_performance_metrics(env)
+        performance_stats = self._collect_performance_metrics(env, reward)
 
         return {
             'agent': agent_stats,

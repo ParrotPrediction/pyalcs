@@ -51,3 +51,9 @@ class TestEffect:
 
         # then
         assert effect.is_specializable(p0, p1) is is_specializable
+
+    @pytest.mark.parametrize("_effect, _result", [
+        ([UBR(0, 15), UBR(0, 7)], 'OOOOOOOOOO|OOOOO.....')
+    ])
+    def test_should_visualize(self, _effect, _result, cfg):
+        assert repr(Effect(_effect, cfg=cfg)) == _result

@@ -2,7 +2,7 @@ import logging
 
 import gym
 # noinspection PyUnresolvedReferences
-import gym_multiplexer
+import gym_checkerboard
 
 from lcs.representations.RealValueEncoder import RealValueEncoder
 from lcs.agents.racs import Configuration, RACS
@@ -13,12 +13,12 @@ logging.basicConfig(level=logging.INFO)
 if __name__ == '__main__':
 
     # Load desired environment
-    rmpx = gym.make('real-multiplexer-3bit-v0')
+    chckb = gym.make('checkerboard-2D-3div-v0')
 
     # Create agent
-    encoder = RealValueEncoder(resolution_bits=2)
-    cfg = Configuration(rmpx.observation_space.shape[0],
-                        rmpx.action_space.n,
+    encoder = RealValueEncoder(resolution_bits=4)
+    cfg = Configuration(chckb.observation_space.shape[0],
+                        chckb.action_space.n,
                         encoder=encoder,
                         epsilon=0.5,
                         do_ga=True,
@@ -29,4 +29,4 @@ if __name__ == '__main__':
                         mu=0.15)
 
     agent = RACS(cfg)
-    population, _ = agent.explore(rmpx, 100)
+    population, metrics = agent.explore_exploit(chckb, 5_000)

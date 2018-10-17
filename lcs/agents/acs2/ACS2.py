@@ -1,5 +1,5 @@
 import logging
-from typing import Optional
+from typing import Optional, Dict
 
 from lcs import Perception
 from lcs.strategies.action_planning.action_planning import \
@@ -9,7 +9,7 @@ from ...agents import Agent
 from ...agents.Agent import Metric
 from ...strategies.action_selection import choose_action
 from ...utils import parse_state, parse_action
-from typing import Tuple
+from typing import Tuple, Any
 
 logger = logging.getLogger(__name__)
 
@@ -84,11 +84,11 @@ class ACS2(Agent):
 
         metrics = []
         while current_trial < max_trials:
-            steps_in_trial = func(env, steps, current_trial)
+            steps_in_trial, reward = func(env, steps, current_trial)
             steps += steps_in_trial
 
             trial_metrics = self._collect_metrics(
-                env, current_trial, steps_in_trial, steps)
+                env, current_trial, steps_in_trial, steps, reward)
             metrics.append(trial_metrics)
 
             if current_trial % 25 == 0:
@@ -200,7 +200,7 @@ class ACS2(Agent):
 
             steps += 1
 
-        return steps
+        return steps, reward
 
     def _run_trial_exploit(self, env, time=None, current_trial=None):
         logger.debug("** Running trial exploit **")
@@ -241,7 +241,7 @@ class ACS2(Agent):
 
             steps += 1
 
-        return steps
+        return steps, reward
 
     def _run_action_planning(self, env,
                              time: int,
@@ -372,8 +372,15 @@ class ACS2(Agent):
 
         return None
 
-    def _collect_performance_metrics(self, env) -> Optional[Metric]:
+    def _collect_performance_metrics(self, env, reward) -> Optional[Metric]:
+        basic_metrics = {
+            'reward': reward
+        }
+
+        extra_metrics: Dict[str, Any] = {}
+
         if self.cfg.performance_fcn:
-            return self.cfg.performance_fcn(
+            extra_metrics = self.cfg.performance_fcn(
                 env, self.population, **self.cfg.performance_fcn_params)
-        return None
+
+        return {**basic_metrics, **extra_metrics}

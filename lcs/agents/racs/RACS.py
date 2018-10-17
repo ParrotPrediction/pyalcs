@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, Callable, Tuple, List
+from typing import Optional, Callable, Tuple, List, Dict, Any
 
 from lcs.strategies.action_selection import choose_action
 from ...agents import Agent
@@ -24,6 +24,21 @@ class RACS(Agent):
 
     def exploit(self, env, trials):
         return self._evaluate(env, trials, self._run_trial_exploit)
+
+    def explore_exploit(self, env, trials):
+        """
+        Alternates between exploration and exploitation phases.
+        :param env: environment
+        :param trials: number of trials
+        :return: population of classifiers and metrics
+        """
+        def switch_phases(env, steps, current_trial):
+            if current_trial % 2 == 0:
+                return self._run_trial_explore(env, steps)
+            else:
+                return self._run_trial_exploit(env, None)
+
+        return self._evaluate(env, trials, switch_phases)
 
     def _evaluate(self, env, max_trials: int, func: Callable) -> Tuple:
         """
@@ -50,11 +65,11 @@ class RACS(Agent):
 
         metrics: List = []
         while current_trial < max_trials:
-            steps_in_trial = func(env, steps, current_trial)
+            steps_in_trial, reward = func(env, steps, current_trial)
             steps += steps_in_trial
 
             trial_metrics = self._collect_metrics(
-                env, current_trial, steps_in_trial, steps)
+                env, current_trial, steps_in_trial, steps, reward)
             metrics.append(trial_metrics)
 
             if current_trial % 25 == 0:
@@ -65,6 +80,20 @@ class RACS(Agent):
         return self.population, metrics
 
     def _run_trial_explore(self, env, time, current_trial=None):
+        """
+        Executes explore trial
+
+        Parameters
+        ----------
+        env
+        time
+        current_trial
+
+        Returns
+        -------
+        Tuple[int, int]
+            Tuple of total steps taken and final reward
+        """
         logger.debug("** Running trial explore ** ")
 
         # Initial conditions
@@ -157,7 +186,7 @@ class RACS(Agent):
                         self.cfg.theta_exp)
             steps += 1
 
-        return steps
+        return steps, reward
 
     def _run_trial_exploit(self, env, time=None, current_trial=None):
         logger.debug("** Running trial exploit **")
@@ -202,7 +231,7 @@ class RACS(Agent):
 
             steps += 1
 
-        return steps
+        return steps, reward
 
     def _collect_agent_metrics(self, trial, steps, total_steps) -> Metric:
         return {
@@ -214,6 +243,10 @@ class RACS(Agent):
                         len(self.population)),
             'cover_ratio': (sum(cl.condition.cover_ratio for cl
                                 in self.population) / len(self.population)),
+            'region_1': None,  # TODO
+            'region_2': None,
+            'region_3': None,
+            'region_4': None,
             'trial': trial,
             'steps': steps,
             'total_steps': total_steps
@@ -225,9 +258,15 @@ class RACS(Agent):
 
         return None
 
-    def _collect_performance_metrics(self, env) -> Optional[Metric]:
+    def _collect_performance_metrics(self, env, reward) -> Optional[Metric]:
+        basic_metrics = {
+            'reward': reward
+        }
+
+        extra_metrics: Dict[str, Any] = {}
+
         if self.cfg.performance_fcn:
-            return self.cfg.performance_fcn(
+            extra_metrics = self.cfg.performance_fcn(
                 env, self.population, **self.cfg.performance_fcn_params)
 
-        return None
+        return {**basic_metrics, **extra_metrics}

@@ -1,6 +1,7 @@
 from copy import copy
 
 from lcs import Perception
+from lcs.representations.visualization import visualize
 from . import Configuration
 from .. import PerceptionString
 
@@ -73,3 +74,8 @@ class Effect(PerceptionString):
                     return False
 
         return True
+
+    def __repr__(self):
+        return "|".join(visualize(
+            (ubr.lower_bound, ubr.upper_bound),
+            self.cfg.encoder.range) for ubr in self)

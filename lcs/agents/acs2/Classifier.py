@@ -65,7 +65,7 @@ class Classifier(object):
         # Application average
         self.tav = tav
 
-        # I don't know yet what it is
+        # TODO: not used yet
         self.ee = 0
 
     def __eq__(self, other):
