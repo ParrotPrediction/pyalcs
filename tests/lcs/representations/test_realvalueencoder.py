@@ -1,4 +1,4 @@
-from random import random
+import random
 
 import numpy as np
 import pytest
@@ -8,20 +8,14 @@ from lcs.representations.RealValueEncoder import RealValueEncoder
 
 class TestRealValueEncoder:
 
-    def test_should_deny_illegal_values_when_encoding(self):
-        # given
-        encoder = RealValueEncoder(2)
-
-        # when
-        with pytest.raises(ValueError) as e1:
-            encoder.encode(-0.1)
-
-        with pytest.raises(ValueError) as e2:
-            encoder.encode(1.1)
-
-        # then
-        assert e1 is not None
-        assert e2 is not None
+    @pytest.mark.parametrize("_bits, _val, _encoded", [
+        (2, -0.5, 0),
+        (2, 1.0, 3),
+        (2, 2.0, 3),
+        (2, 3.0, 3),
+    ])
+    def test_should_clip_values_outside_range(self, _bits, _val, _encoded):
+        assert RealValueEncoder(_bits).encode(_val) == _encoded
 
     def test_should_deny_illegal_values_when_decoding(self):
         # given
@@ -38,35 +32,13 @@ class TestRealValueEncoder:
         assert e1 is not None
         assert e2 is not None
 
-    def test_should_encode_with_one_bit(self):
-        # given
-        encoder = RealValueEncoder(1)
-
-        # then
-        assert encoder.encode(0.0) == 0
-        assert encoder.encode(0.5) == 0
-        assert encoder.encode(0.51) == 1
-        assert encoder.encode(1.0) == 1
-
-    def test_should_encode_with_two_bits(self):
-        # given
-        encoder = RealValueEncoder(2)
-
-        # then
-        assert encoder.encode(0.0) == 0
-        assert encoder.encode(0.33) == 1
-        assert encoder.encode(0.66) == 2
-        assert encoder.encode(1.0) == 3
-
-    def test_should_encode_with_four_bits(self):
-        # given
-        bits = 4  # 2^bits discrete states
-        encoder = RealValueEncoder(bits)
-
-        # then
-        assert encoder.encode(0.0) == 0
-        assert encoder.encode(0.5) == 8
-        assert encoder.encode(1.0) == 15
+    @pytest.mark.parametrize("_bits, _val, _encoded", [
+        (1, 0.0, 0), (1, 0.5, 0), (1, 0.51, 1), (1, 1.0, 1),
+        (2, 0.0, 0), (2, 0.33, 1), (2, 0.66, 2), (2, 1.0, 3),
+        (4, 0.0, 0), (4, 0.5, 8), (4, 1.0, 15),
+    ])
+    def test_should_encode(self, _bits, _val, _encoded):
+        assert RealValueEncoder(_bits).encode(_val) == _encoded
 
     def test_should_decode_values(self):
         # given
@@ -82,7 +54,7 @@ class TestRealValueEncoder:
         # given
         encoder = RealValueEncoder(8)
         epsilon = 0.01
-        observation = random()
+        observation = random.random()
 
         # when
         encoded = encoder.encode(observation)
@@ -120,3 +92,33 @@ class TestRealValueEncoder:
 
         # then
         assert type(encoded) is int
+
+    def test_should_encode_with_noise_added(self):
+        # given
+        encoder = RealValueEncoder(16)
+        noise_max = 0.1
+
+        for _ in range(100):
+            # when
+            val = random.random()
+            encoded = encoder.encode(val)
+            encoded_with_noise = encoder.encode(val, noise_max)
+
+            # then
+            assert encoded_with_noise <= encoder.range[1]
+            assert encoded_with_noise >= encoded
+
+    def test_should_encode_with_noise_subtracted(self):
+        # given
+        encoder = RealValueEncoder(16)
+        noise_max = -0.1
+
+        for _ in range(100):
+            # when
+            val = random.random()
+            encoded = encoder.encode(val)
+            encoded_with_noise = encoder.encode(val, noise_max)
+
+            # then
+            assert encoded_with_noise >= encoder.range[0]
+            assert encoded_with_noise <= encoded

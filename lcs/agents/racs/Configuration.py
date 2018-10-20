@@ -1,5 +1,4 @@
 from lcs.representations import UBR
-from lcs.representations.RealValueEncoder import RealValueEncoder
 
 
 class Configuration:
@@ -19,6 +18,7 @@ class Configuration:
                  theta_i=0.1,
                  theta_r=0.9,
                  epsilon=0.5,
+                 cover_noise: float = 0.1,
                  u_max=100000,
                  theta_exp=20,
                  theta_ga=100,
@@ -50,6 +50,9 @@ class Configuration:
         self.theta_i = theta_i
         self.theta_r = theta_r
         self.epsilon = epsilon
+        # Max range of uniform noise distribution that can be added
+        # to perception during covering U[0, cover_noise]
+        self.cover_noise = cover_noise
         self.u_max = u_max
 
         self.theta_exp = theta_exp

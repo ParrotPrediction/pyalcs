@@ -1,5 +1,5 @@
-from typing import Optional
 import random
+from typing import Optional
 
 from lcs import Perception
 from lcs.agents.racs import Configuration, Classifier

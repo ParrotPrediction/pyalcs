@@ -1,5 +1,6 @@
 import random
 
+import numpy as np
 import pytest
 
 from lcs import Perception
@@ -165,17 +166,20 @@ class TestClassifier:
 
     def test_should_specialize(self, cfg):
         # given
-        p0 = Perception([random.random()] * 2, oktypes=(float,))
-        p1 = Perception([random.random()] * 2, oktypes=(float,))
+        p0 = Perception(np.random.random(2), oktypes=(float,))
+        p1 = Perception(np.random.random(2), oktypes=(float,))
         cl = Classifier(cfg=cfg)
 
         # when
         cl.specialize(p0, p1)
 
         # then
-        for condition_ubr, effect_ubr in zip(cl.condition, cl.effect):
-            assert condition_ubr.lower_bound == condition_ubr.upper_bound
-            assert effect_ubr.lower_bound == effect_ubr.upper_bound
+        enc_p0 = list(map(cfg.encoder.encode, p0))
+        enc_p1 = list(map(cfg.encoder.encode, p1))
+
+        for i, (c_ubr, e_ubr) in enumerate(zip(cl.condition, cl.effect)):
+            assert c_ubr.lower_bound <= enc_p0[i] <= c_ubr.upper_bound
+            assert e_ubr.lower_bound <= enc_p1[i] <= e_ubr.upper_bound
 
     @pytest.mark.parametrize("_condition, _effect, _soa_before, _soa_after", [
         ([UBR(4, 15), UBR(2, 15)], [UBR(0, 15), UBR(0, 15)], 2, 1),

@@ -141,7 +141,7 @@ class Classifier:
     def specialize(self,
                    p0: Perception,
                    p1: Perception,
-                   leave_specialized=False) -> None:
+                   leave_specialized: bool = False) -> None:
         """
         Specializes the effect part where necessary to correctly anticipate
         the changes from p0 to p1 and returns a condition which specifies
@@ -149,8 +149,8 @@ class Classifier:
         The specific attributes in the returned conditions are set to
         the necessary values.
 
-        For real-valued representation a narrow, fixed point UBR is created
-        for condition and effect part using the encoded perceptions.
+        For real-valued representation a random noise might be added to both
+        `p0` and `p1` (see `Configuration`, `cover_noise` parameter).
 
         Parameters
         ----------
@@ -165,15 +165,19 @@ class Classifier:
         p0_enc = list(map(self.cfg.encoder.encode, p0))
         p1_enc = list(map(self.cfg.encoder.encode, p1))
 
-        for idx, item in enumerate(p1_enc):
+        for idx, item in enumerate(p1):
             if leave_specialized:
                 if self.effect[idx] != self.cfg.classifier_wildcard:
                     # If we have a specialized attribute don't change it.
                     continue
 
             if p0_enc[idx] != p1_enc[idx]:
-                self.effect[idx] = UBR(p1_enc[idx], p1_enc[idx])
-                self.condition[idx] = UBR(p0_enc[idx], p0_enc[idx])
+                self.condition[idx] = UBR(
+                    self.cfg.encoder.encode(p0[idx], -self.cfg.cover_noise),
+                    self.cfg.encoder.encode(p0[idx], self.cfg.cover_noise))
+                self.effect[idx] = UBR(
+                    self.cfg.encoder.encode(p1[idx], -self.cfg.cover_noise),
+                    self.cfg.encoder.encode(p1[idx], self.cfg.cover_noise))
 
     def is_reliable(self) -> bool:
         return self.q > self.cfg.theta_r

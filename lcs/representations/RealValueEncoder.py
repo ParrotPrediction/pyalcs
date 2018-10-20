@@ -1,5 +1,7 @@
 from typing import Tuple
 
+import numpy as np
+
 
 class RealValueEncoder:
     r"""
@@ -28,24 +30,27 @@ class RealValueEncoder:
         """
         return 0, self.resolution
 
-    def encode(self, val: float) -> int:
+    def encode(self, val: float, noise_max: float = 0.0) -> int:
         """
         Encodes the float value into `[0, 2^bits]` states.
-        This results in `2^bits + 1` different states
+        This results in `2^bits + 1` different states.
 
         Parameters
         ----------
         val : float
             real-valued number in range [0,1]
+        noise_max: float
+            maximum noise that can be appended to the `val`. Noise is
+            drawn from U[0, noise_max] uniform distribution
 
         Returns
         -------
         int
             discrete state within resolution
         """
-        if val < 0 or val > 1:
-            raise ValueError("Value is not normalized within [0,1] range")
-
+        # Disturb value and limit it within range
+        noise = np.random.uniform(0, noise_max)
+        val = np.clip(val + noise, 0, 1)
         return int(round(val * self.resolution))
 
     def decode(self, encoded_val: int) -> float:
