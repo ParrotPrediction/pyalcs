@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import random
-from typing import Optional, List, Callable
+from typing import Optional, List, Callable, Dict
 
 from lcs import Perception
 from lcs.representations import UBR
@@ -72,6 +72,12 @@ class Classifier:
 
     def __hash__(self):
         return hash((str(self.condition), self.action, str(self.effect)))
+
+    def __repr__(self):
+        return "{}\t{}\t{} x {}".format(self.condition,
+                                        self.action,
+                                        self.effect,
+                                        self.num)
 
     @classmethod
     def copy_from(cls, old_cls: Classifier, time: int):
@@ -288,6 +294,38 @@ class Classifier:
 
     def is_marked(self):
         return self.mark.is_marked()
+
+    def get_interval_proportions(self) -> Dict[int, int]:
+        """
+        Returns a region to which classifier is assigned based on the
+        classifier condition.
+
+        See "For Real! XCS with Continuous-Valued Inputs" by C. Stone and
+        L. Bull for a reference.
+
+        Returns
+        -------
+        Dict[int, int]
+            A dictionary with interval region counts within condition part
+        """
+        counts = {1: 0, 2: 0, 3: 0, 4: 0}
+
+        r = self.cfg.encoder.range
+
+        for i in self.condition:
+            if i.lower_bound != r[0] and i.upper_bound != r[1]:
+                counts[1] += 1
+
+            if i.lower_bound == r[0] and i.upper_bound != r[1]:
+                counts[2] += 1
+
+            if i.lower_bound != r[0] and i.upper_bound == r[1]:
+                counts[3] += 1
+
+            if i.lower_bound == r[0] and i.upper_bound == r[1]:
+                counts[4] += 1
+
+        return counts
 
     def generalize_unchanging_condition_attribute(
             self, randomfunc: Callable=random.choice) -> bool:

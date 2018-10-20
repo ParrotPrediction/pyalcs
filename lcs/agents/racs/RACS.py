@@ -72,7 +72,7 @@ class RACS(Agent):
                 env, current_trial, steps_in_trial, steps, reward)
             metrics.append(trial_metrics)
 
-            if current_trial % 25 == 0:
+            if current_trial % 1000 == 0:
                 logger.info(trial_metrics)
 
             current_trial += 1
@@ -234,6 +234,8 @@ class RACS(Agent):
         return steps, reward
 
     def _collect_agent_metrics(self, trial, steps, total_steps) -> Metric:
+        regions = self._count_averaged_regions()
+
         return {
             'population': len(self.population),
             'numerosity': sum(cl.num for cl in self.population),
@@ -243,10 +245,10 @@ class RACS(Agent):
                         len(self.population)),
             'cover_ratio': (sum(cl.condition.cover_ratio for cl
                                 in self.population) / len(self.population)),
-            'region_1': None,  # TODO
-            'region_2': None,
-            'region_3': None,
-            'region_4': None,
+            'region_1': regions[1],
+            'region_2': regions[2],
+            'region_3': regions[3],
+            'region_4': regions[4],
             'trial': trial,
             'steps': steps,
             'total_steps': total_steps
@@ -270,3 +272,14 @@ class RACS(Agent):
                 env, self.population, **self.cfg.performance_fcn_params)
 
         return {**basic_metrics, **extra_metrics}
+
+    def _count_averaged_regions(self) -> Dict[int, float]:
+        region_counts = {1: 0, 2: 0, 3: 0, 4: 0}
+
+        for cl in self.population:
+            for region, counts in cl.get_interval_proportions().items():
+                region_counts[region] += counts
+
+        all_elems = sum(i for r, i in region_counts.items())
+
+        return {r: i / all_elems for r, i in region_counts.items()}

@@ -30,3 +30,8 @@ if __name__ == '__main__':
 
     agent = RACS(cfg)
     population, _ = agent.explore_exploit(rmpx, 100)
+
+    # filter reliable classifiers
+    reliable = [cl for cl in population if cl.is_reliable]
+    for cl in reliable:
+        print(cl)

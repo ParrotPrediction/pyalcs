@@ -211,6 +211,20 @@ class TestClassifier:
         # then
         assert cl1.is_more_general(cl2) is _result
 
+    @pytest.mark.parametrize("_cond, _res", [
+        ([UBR(4, 6), UBR(1, 5)], {1: 2, 2: 0, 3: 0, 4: 0}),
+        ([UBR(0, 6), UBR(1, 5)], {1: 1, 2: 1, 3: 0, 4: 0}),
+        ([UBR(0, 4), UBR(6, 15)], {1: 0, 2: 1, 3: 1, 4: 0}),
+        ([UBR(0, 15), UBR(6, 14)], {1: 1, 2: 0, 3: 0, 4: 1}),
+        ([UBR(0, 15), UBR(0, 15)], {1: 0, 2: 0, 3: 0, 4: 2}),
+    ])
+    def test_count_regions(self, _cond, _res, cfg):
+        # given
+        cl = Classifier(condition=Condition(_cond, cfg), cfg=cfg)
+
+        # then
+        assert cl.get_interval_proportions() == _res
+
     @staticmethod
     def _random_ubr(lower=0, upper=15):
         return UBR(random.randint(lower, upper), random.randint(lower, upper))

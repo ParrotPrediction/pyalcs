@@ -29,4 +29,9 @@ if __name__ == '__main__':
                         mu=0.15)
 
     agent = RACS(cfg)
-    population, metrics = agent.explore_exploit(chckb, 5_000)
+    population, metrics = agent.explore_exploit(chckb, 100)
+
+    # filter reliable classifiers
+    reliable = [cl for cl in population if cl.is_reliable()]
+    for cl in reliable:
+        print(cl)

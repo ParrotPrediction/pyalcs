@@ -22,6 +22,8 @@ def mutate(cl: Classifier, bounds: Tuple[int, int], mu: float) -> None:
     mu: float
         probability of executing mutation on single bound
     """
+    # TODO: mutation on phenotype level by adding random noise U[0, m]
+    # m = 0.1 (paper) and encoding back
     for idx, (c, e) in enumerate(zip(cl.condition, cl.effect)):
         if c != cl.cfg.classifier_wildcard:
             cl.condition[idx] = _mutate_attribute(c, bounds, mu)

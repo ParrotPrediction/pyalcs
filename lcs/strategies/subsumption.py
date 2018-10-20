@@ -42,12 +42,12 @@ def does_subsume(cl, other_cl, theta_exp: int) -> bool:
     bool
         True if `other_cl` classifier is subsumed, False otherwise
     """
+    # TODO: this might happen on the phenotype level
     if is_subsumer(cl, theta_exp) and \
         cl.is_more_general(other_cl) and \
         cl.condition.does_match_condition(other_cl.condition) and \
             cl.action == other_cl.action and \
-            cl.effect == other_cl.effect:  # TODO: for rACS this
-        # should be more liberate
+            cl.effect == other_cl.effect:
         return True
 
     return False
