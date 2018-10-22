@@ -69,7 +69,7 @@ class Condition(PerceptionString):
 
         return True
 
-    def does_match_condition(self, other: Condition) -> bool:
+    def subsumes(self, other: Condition) -> bool:
         return self.does_match(other)
 
     def get_backwards_anticipation(self, perception: Perception) -> Perception:

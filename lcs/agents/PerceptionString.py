@@ -40,6 +40,22 @@ class PerceptionString(TypedList):
         ps_str = [copy(wildcard) for _ in range(length)]
         return cls(ps_str, wildcard=wildcard, oktypes=oktypes)
 
+    def subsumes(self, other) -> bool:
+        """
+        Checks if given perception string subsumes other one.
+
+        Parameters
+        ----------
+        other: PerceptionString
+            other perception string
+
+        Returns
+        -------
+        bool
+            True if `other` is subsumed by `self`, False otherwise
+        """
+        raise NotImplementedError()
+
     def __eq__(self, other):
         return self._items == other._items
 

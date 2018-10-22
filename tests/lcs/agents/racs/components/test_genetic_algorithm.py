@@ -43,8 +43,11 @@ class TestGeneticAlgorithm:
         range_min, range_max = cfg.encoder.range
         for idx, (c, e) in enumerate(zip(cl.condition, cl.effect)):
             # assert that we have new locus
-            assert condition[idx] != c
-            assert effect[idx] != e
+            if condition[idx] != cfg.classifier_wildcard:
+                assert condition[idx] != c
+
+            if effect[idx] != cfg.classifier_wildcard:
+                assert effect[idx] != e
 
             # assert if condition values are in ranges
             assert c.lower_bound >= range_min

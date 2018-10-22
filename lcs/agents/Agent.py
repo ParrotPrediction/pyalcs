@@ -44,14 +44,13 @@ class Agent:
         -------
         Dict[str, Metric]
         """
-        return {}
-        # agent_stats = self._collect_agent_metrics(
-        #     current_trial, steps_in_trial, steps)
-        # env_stats = self._collect_environment_metrics(env)
-        # performance_stats = self._collect_performance_metrics(env, reward)
-        #
-        # return {
-        #     'agent': agent_stats,
-        #     'environment': env_stats,
-        #     'performance': performance_stats
-        # }
+        agent_stats = self._collect_agent_metrics(
+            current_trial, steps_in_trial, steps)
+        env_stats = self._collect_environment_metrics(env)
+        performance_stats = self._collect_performance_metrics(env, reward)
+
+        return {
+            'agent': agent_stats,
+            'environment': env_stats,
+            'performance': performance_stats
+        }

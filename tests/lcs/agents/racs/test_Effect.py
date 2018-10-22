@@ -52,6 +52,20 @@ class TestEffect:
         # then
         assert effect.is_specializable(p0, p1) is is_specializable
 
+    @pytest.mark.parametrize("_effect1, _effect2, _result", [
+        ([UBR(0, 15), UBR(0, 15)], [UBR(2, 4), UBR(5, 10)], True),
+        ([UBR(6, 10), UBR(0, 15)], [UBR(2, 4), UBR(5, 10)], False),
+        ([UBR(0, 15), UBR(4, 10)], [UBR(2, 4), UBR(6, 12)], False),
+        ([UBR(2, 4), UBR(5, 5)], [UBR(2, 4), UBR(5, 5)], True),
+    ])
+    def test_should_subsume_effect(self, _effect1, _effect2, _result, cfg):
+        # given
+        effect1 = Effect(_effect1, cfg=cfg)
+        effect2 = Effect(_effect2, cfg=cfg)
+
+        # then
+        assert effect1.subsumes(effect2) == _result
+
     @pytest.mark.parametrize("_effect, _result", [
         ([UBR(0, 15), UBR(0, 7)], 'OOOOOOOOOO|OOOOO.....')
     ])

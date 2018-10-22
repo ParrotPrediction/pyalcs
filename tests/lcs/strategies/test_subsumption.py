@@ -366,12 +366,12 @@ class TestSubsumption:
         mocker.patch.object(cl1, "is_reliable")
         mocker.patch.object(cl1, "is_marked")
         mocker.patch.object(cl1, "is_more_general")
-        mocker.patch.object(cl1.condition, "does_match_condition")
+        mocker.patch.object(cl1.condition, "subsumes")
 
         cl1.is_reliable.return_value = _reliable
         cl1.is_marked.return_value = _marked
         cl1.is_more_general.return_value = _more_general
-        cl1.condition.does_match_condition.return_value = _condition_matching
+        cl1.condition.subsumes.return_value = _condition_matching
 
         # then
         assert does_subsume(cl1, cl2, racs_cfg.theta_exp) == _result

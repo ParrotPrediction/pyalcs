@@ -81,3 +81,6 @@ class Effect(PerceptionString):
                     return False
 
         return True
+
+    def subsumes(self, other: Effect) -> bool:
+        return all(ei.incorporates(oi) for ei, oi in zip(self, other))
