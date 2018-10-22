@@ -105,7 +105,8 @@ class Classifier(object):
             copied classifier
         """
         new_cls = cls(
-            condition=Condition(old_cls.condition, old_cls.cfg),
+            condition=Condition(old_cls.condition,
+                                old_cls.cfg.classifier_wildcard),
             action=old_cls.action,
             effect=old_cls.effect,
             quality=old_cls.q,
