@@ -19,6 +19,7 @@ class Configuration:
                  theta_r=0.9,
                  epsilon=0.5,
                  cover_noise: float = 0.1,
+                 mutation_noise: float = 0.1,
                  u_max=100000,
                  theta_exp=20,
                  theta_ga=100,
@@ -50,9 +51,13 @@ class Configuration:
         self.theta_i = theta_i
         self.theta_r = theta_r
         self.epsilon = epsilon
-        # Max range of uniform noise distribution that can be added
-        # to perception during covering U[0, cover_noise]
+        # Max range of uniform noise distribution that can alter
+        # the perception during covering U[0, cover_noise]
         self.cover_noise = cover_noise
+
+        # Max range of uniform noise distribution that can broaden the
+        # phenotype interval range.
+        self.mutation_noise = mutation_noise
         self.u_max = u_max
 
         self.theta_exp = theta_exp

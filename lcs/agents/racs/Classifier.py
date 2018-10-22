@@ -3,6 +3,8 @@ from __future__ import annotations
 import random
 from typing import Optional, List, Callable, Dict
 
+import numpy as np
+
 from lcs import Perception
 from lcs.representations import UBR
 from . import Condition, Effect, Mark, Configuration
@@ -74,10 +76,8 @@ class Classifier:
         return hash((str(self.condition), self.action, str(self.effect)))
 
     def __repr__(self):
-        return "{}\t{}\t{} x {}".format(self.condition,
-                                        self.action,
-                                        self.effect,
-                                        self.num)
+        return "{}\t{}\t{} x {} fitness: {:.2f}".format(
+            self.condition, self.action, self.effect, self.num, self.fitness)
 
     @classmethod
     def copy_from(cls, old_cls: Classifier, time: int):
@@ -172,12 +172,13 @@ class Classifier:
                     continue
 
             if p0_enc[idx] != p1_enc[idx]:
+                noise = np.random.uniform(0, self.cfg.cover_noise)
                 self.condition[idx] = UBR(
-                    self.cfg.encoder.encode(p0[idx], -self.cfg.cover_noise),
-                    self.cfg.encoder.encode(p0[idx], self.cfg.cover_noise))
+                    self.cfg.encoder.encode(p0[idx], -noise),
+                    self.cfg.encoder.encode(p0[idx], noise))
                 self.effect[idx] = UBR(
-                    self.cfg.encoder.encode(p1[idx], -self.cfg.cover_noise),
-                    self.cfg.encoder.encode(p1[idx], self.cfg.cover_noise))
+                    self.cfg.encoder.encode(p1[idx], -noise),
+                    self.cfg.encoder.encode(p1[idx], noise))
 
     def is_reliable(self) -> bool:
         return self.q > self.cfg.theta_r

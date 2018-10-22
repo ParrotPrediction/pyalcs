@@ -30,7 +30,7 @@ class RealValueEncoder:
         """
         return 0, self.resolution
 
-    def encode(self, val: float, noise_max: float = 0.0) -> int:
+    def encode(self, val: float, noise: float = 0.0) -> int:
         """
         Encodes the float value into `[0, 2^bits]` states.
         This results in `2^bits + 1` different states.
@@ -39,9 +39,8 @@ class RealValueEncoder:
         ----------
         val : float
             real-valued number in range [0,1]
-        noise_max: float
-            maximum noise that can be appended to the `val`. Noise is
-            drawn from U[0, noise_max] uniform distribution
+        noise: float
+            noise that is appended to the perception
 
         Returns
         -------
@@ -49,7 +48,6 @@ class RealValueEncoder:
             discrete state within resolution
         """
         # Disturb value and limit it within range
-        noise = np.random.uniform(0, noise_max)
         val = np.clip(val + noise, 0, 1)
         return int(round(val * self.resolution))
 

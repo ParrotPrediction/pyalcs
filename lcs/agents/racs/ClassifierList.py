@@ -142,9 +142,8 @@ class ClassifierList(TypedList):
             child2 = Classifier.copy_from(parent2, time)
 
             # Execute mutation
-            attribute_range = child1.cfg.encoder.range
-            mutate(child1, attribute_range, mu)
-            mutate(child2, attribute_range, mu)
+            mutate(child1, mu)
+            mutate(child2, mu)
 
             # Execute cross-over
             if random.random() < chi:
