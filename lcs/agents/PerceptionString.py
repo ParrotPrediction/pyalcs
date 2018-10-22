@@ -10,6 +10,7 @@ class PerceptionString(TypedList):
 
     def __init__(self, observation, wildcard='#', oktypes=(str,)):
         super().__init__(oktypes, *observation)
+        assert type(wildcard) in self.oktypes
         self.wildcard = wildcard
 
     @classmethod
