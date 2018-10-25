@@ -1,3 +1,6 @@
+from typing import Callable
+
+
 class Configuration:
     def __init__(self,
                  classifier_length,
@@ -8,6 +11,8 @@ class Configuration:
                  environment_metrics_fcn=None,
                  performance_fcn=None,
                  performance_fcn_params={},
+                 user_metrics_collector_fcn: Callable = None,
+                 metrics_trial_frequency: int = 5,
                  do_ga=False,
                  do_subsumption=True,
                  do_action_planning=False,
@@ -22,7 +27,7 @@ class Configuration:
                  theta_ga=100,
                  theta_as=20,
                  mu=0.3,
-                 chi=0.8):
+                 chi=0.8) -> None:
         """
         Creates the configuration object used during training the ACS2 agent.
 
@@ -62,6 +67,8 @@ class Configuration:
         self.environment_metrics_fcn = environment_metrics_fcn
         self.performance_fcn = performance_fcn
         self.performance_fcn_params = performance_fcn_params
+        self.metrics_trial_frequency = metrics_trial_frequency
+        self.user_metrics_collector_fcn = user_metrics_collector_fcn
         self.do_ga = do_ga
         self.do_subsumption = do_subsumption
         self.do_action_planning = do_action_planning

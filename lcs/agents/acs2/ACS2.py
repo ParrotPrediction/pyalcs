@@ -1,104 +1,33 @@
 import logging
-from typing import Optional, Dict
+from typing import Tuple
 
 from lcs import Perception
+from lcs.agents.Agent import TrialMetrics
 from lcs.strategies.action_planning.action_planning import \
     search_goal_sequence, exists_classifier
 from . import ClassifiersList, Configuration
 from ...agents import Agent
-from ...agents.Agent import Metric
 from ...strategies.action_selection import choose_action
 from ...utils import parse_state, parse_action
-from typing import Tuple, Any
 
 logger = logging.getLogger(__name__)
 
 
 class ACS2(Agent):
+
     def __init__(self,
                  cfg: Configuration,
                  population: ClassifiersList=None) -> None:
         self.cfg = cfg
+        self.population = population or ClassifiersList()
 
-        if population:
-            self.population = population
-        else:
-            self.population = ClassifiersList()
+    def get_population(self):
+        return self.population
 
-    def explore(self, env, trials):
-        """
-        Explores the environment in given set of trials.
-        :param env: environment
-        :param trials: number of trials
-        :return: population of classifiers and metrics
-        """
-        return self._evaluate(env, trials, self._run_trial_explore)
+    def get_cfg(self):
+        return self.cfg
 
-    def exploit(self, env, trials):
-        """
-        Exploits the environments in given set of trials (always executing
-        best possible action - no exploration).
-        :param env: environment
-        :param trials: number of trials
-        :return: population of classifiers and metrics
-        """
-        return self._evaluate(env, trials, self._run_trial_exploit)
-
-    def explore_exploit(self, env, trials):
-        """
-        Alternates between exploration and exploitation phases.
-        :param env: environment
-        :param trials: number of trials
-        :return: population of classifiers and metrics
-        """
-        def switch_phases(env, steps, current_trial):
-            if current_trial % 2 == 0:
-                return self._run_trial_explore(env, steps)
-            else:
-                return self._run_trial_exploit(env, None)
-
-        return self._evaluate(env, trials, switch_phases)
-
-    def _evaluate(self, env, max_trials, func):
-        """
-        Runs the classifier in desired strategy (see `func`) and collects
-        metrics.
-
-        Parameters
-        ----------
-        env:
-            OpenAI Gym environment
-        max_trials: int
-            maximum number of trials
-        func: Callable
-            Function accepting three parameters: env, steps already made,
-             current trial
-
-        Returns
-        -------
-        tuple
-            population of classifiers and metrics
-        """
-        current_trial = 0
-        steps = 0
-
-        metrics = []
-        while current_trial < max_trials:
-            steps_in_trial, reward = func(env, steps, current_trial)
-            steps += steps_in_trial
-
-            trial_metrics = self._collect_metrics(
-                env, current_trial, steps_in_trial, steps, reward)
-            metrics.append(trial_metrics)
-
-            if current_trial % 25 == 0:
-                logger.info(trial_metrics)
-
-            current_trial += 1
-
-        return self.population, metrics
-
-    def _run_trial_explore(self, env, time, current_trial=None):
+    def _run_trial_explore(self, env, time, current_trial=None) -> TrialMetrics:
         logger.debug("** Running trial explore ** ")
         # Initial conditions
         steps = 0
@@ -200,9 +129,9 @@ class ACS2(Agent):
 
             steps += 1
 
-        return steps, reward
+        return TrialMetrics(steps, reward)
 
-    def _run_trial_exploit(self, env, time=None, current_trial=None):
+    def _run_trial_exploit(self, env, time=None, current_trial=None) -> TrialMetrics:
         logger.debug("** Running trial exploit **")
         # Initial conditions
         steps = 0
@@ -241,7 +170,7 @@ class ACS2(Agent):
 
             steps += 1
 
-        return steps, reward
+        return TrialMetrics(steps, reward)
 
     def _run_action_planning(self, env,
                              time: int,
@@ -352,35 +281,3 @@ class ACS2(Agent):
 
     def _time_for_action_planning(self, time):
         return time % self.cfg.action_planning_frequency == 0
-
-    def _collect_agent_metrics(self, trial, steps, total_steps) -> Metric:
-        return {
-            'population': len(self.population),
-            'numerosity': sum(cl.num for cl in self.population),
-            'reliable': len([cl for cl in
-                             self.population if cl.is_reliable()]),
-            'fitness': (sum(cl.fitness for cl in self.population) /
-                        len(self.population)),
-            'trial': trial,
-            'steps': steps,
-            'total_steps': total_steps
-        }
-
-    def _collect_environment_metrics(self, env) -> Optional[Metric]:
-        if self.cfg.environment_metrics_fcn:
-            return self.cfg.environment_metrics_fcn(env)
-
-        return None
-
-    def _collect_performance_metrics(self, env, reward) -> Optional[Metric]:
-        basic_metrics = {
-            'reward': reward
-        }
-
-        extra_metrics: Dict[str, Any] = {}
-
-        if self.cfg.performance_fcn:
-            extra_metrics = self.cfg.performance_fcn(
-                env, self.population, **self.cfg.performance_fcn_params)
-
-        return {**basic_metrics, **extra_metrics}

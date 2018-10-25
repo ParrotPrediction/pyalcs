@@ -4,8 +4,8 @@ import gym
 # noinspection PyUnresolvedReferences
 import gym_checkerboard
 
-from lcs.representations.RealValueEncoder import RealValueEncoder
 from lcs.agents.racs import Configuration, RACS
+from lcs.representations.RealValueEncoder import RealValueEncoder
 
 # Configure logger
 logging.basicConfig(level=logging.INFO)

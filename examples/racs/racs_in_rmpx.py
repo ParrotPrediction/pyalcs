@@ -4,8 +4,8 @@ import gym
 # noinspection PyUnresolvedReferences
 import gym_multiplexer
 
-from lcs.representations.RealValueEncoder import RealValueEncoder
 from lcs.agents.racs import Configuration, RACS
+from lcs.representations.RealValueEncoder import RealValueEncoder
 
 # Configure logger
 logging.basicConfig(level=logging.INFO)
@@ -16,7 +16,7 @@ if __name__ == '__main__':
     rmpx = gym.make('real-multiplexer-3bit-v0')
 
     # Create agent
-    encoder = RealValueEncoder(resolution_bits=7)
+    encoder = RealValueEncoder(resolution_bits=5)
     cfg = Configuration(rmpx.observation_space.shape[0],
                         rmpx.action_space.n,
                         encoder=encoder,
@@ -29,7 +29,7 @@ if __name__ == '__main__':
                         mu=0.15)
 
     agent = RACS(cfg)
-    population, _ = agent.explore_exploit(rmpx, 10_000)
+    population, _ = agent.explore_exploit(rmpx, 100)
 
     # filter reliable classifiers
     reliable = [cl for cl in population if cl.is_reliable()]

@@ -1,56 +1,103 @@
-from typing import Dict, Any, Optional
+import logging
+from collections import namedtuple
+from typing import Callable, List, Tuple
 
-Metric = Dict[str, Any]
+from lcs.metrics import basic_metrics
+
+TrialMetrics = namedtuple('TrialMetrics', ['steps', 'reward'])
+
+logger = logging.getLogger(__name__)
 
 
 class Agent:
-    def explore(self, env, trials):
+
+    def _run_trial_explore(self, env, trials, current_trial) -> TrialMetrics:
         raise NotImplementedError()
+
+    def _run_trial_exploit(self, env, trials, current_trial) -> TrialMetrics:
+        raise NotImplementedError()
+
+    def get_population(self):
+        raise NotImplementedError()
+
+    def get_cfg(self):
+        raise NotImplementedError()
+
+    def explore(self, env, trials):
+        """
+        Explores the environment in given set of trials.
+        :param env: environment
+        :param trials: number of trials
+        :return: population of classifiers and metrics
+        """
+        return self._evaluate(env, trials, self._run_trial_explore)
 
     def exploit(self, env, trials):
-        raise NotImplementedError()
-
-    def _collect_agent_metrics(self, trial, steps, total_steps) -> Metric:
-        raise NotImplementedError()
-
-    def _collect_environment_metrics(self, env) -> Optional[Metric]:
-        raise NotImplementedError()
-
-    def _collect_performance_metrics(self, env, reward) -> Optional[Metric]:
-        raise NotImplementedError()
-
-    def _collect_metrics(self,
-                         env,
-                         current_trial: int,
-                         steps_in_trial: int,
-                         steps: int,
-                         reward: int) -> Dict[str, Optional[Metric]]:
         """
+        Exploits the environments in given set of trials (always executing
+        best possible action - no exploration).
+        :param env: environment
+        :param trials: number of trials
+        :return: population of classifiers and metrics
+        """
+        return self._evaluate(env, trials, self._run_trial_exploit)
+
+    def explore_exploit(self, env, trials):
+        """
+        Alternates between exploration and exploitation phases.
+        :param env: environment
+        :param trials: number of trials
+        :return: population of classifiers and metrics
+        """
+        def switch_phases(env, steps, current_trial):
+            if current_trial % 2 == 0:
+                return self._run_trial_explore(env, steps)
+            else:
+                return self._run_trial_exploit(env, None)
+
+        return self._evaluate(env, trials, switch_phases)
+
+    def _evaluate(self, env, max_trials: int, func: Callable) -> Tuple:
+        """
+        Runs the classifier in desired strategy (see `func`) and collects
+        metrics.
 
         Parameters
         ----------
-        env
-            current environment
-        current_trial: int
-            trial the agent is currently executing
-        steps_in_trial: int
-            steps in given trial
-        steps:
-            total steps so far (all trials)
-        reward: int
-            final reward obtained
+        env:
+            OpenAI Gym environment
+        max_trials: int
+            maximum number of trials
+        func: Callable
+            Function accepting three parameters: env, steps already made,
+             current trial
 
         Returns
         -------
-        Dict[str, Metric]
+        tuple
+            population of classifiers and metrics
         """
-        agent_stats = self._collect_agent_metrics(
-            current_trial, steps_in_trial, steps)
-        env_stats = self._collect_environment_metrics(env)
-        performance_stats = self._collect_performance_metrics(env, reward)
+        current_trial = 0
+        steps = 0
 
-        return {
-            'agent': agent_stats,
-            'environment': env_stats,
-            'performance': performance_stats
-        }
+        metrics: List = []
+        while current_trial < max_trials:
+            steps_in_trial, reward = func(env, steps, current_trial)
+            steps += steps_in_trial
+
+            if current_trial % self.get_cfg().metrics_trial_frequency == 0:
+                m = basic_metrics(current_trial, steps_in_trial, reward)
+
+                user_metrics = self.get_cfg().user_metrics_collector_fcn
+                if user_metrics is not None:
+                    m.update(user_metrics(self.get_population(), env))
+
+                metrics.append(m)
+
+            # Print last metric
+            if current_trial % 5000 == 0:
+                logger.info(metrics[-1])
+
+            current_trial += 1
+
+        return self.get_population(), metrics
