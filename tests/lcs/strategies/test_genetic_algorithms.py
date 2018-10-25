@@ -1,6 +1,7 @@
 import itertools
 from dataclasses import dataclass
 
+import numpy as np
 import pytest
 
 import lcs.agents.acs2 as acs2
@@ -65,21 +66,25 @@ class TestGeneticAlgorithms:
         # then
         assert cl.condition == acs2.Condition(_cond2)
 
-    def test_two_point_crossover(self):
+    @pytest.mark.parametrize("_seed, _c1, _c2, _rc1, _rc2", [
+        (111, '1111', '2222', '1211', '2122'),  # left=1, right=2
+        (335, '1111', '2222', '2211', '1122'),  # left=0, right=2
+        (575, '1111', '2222', '2222', '1111'),  # left=0, right=4
+    ])
+    def test_two_point_crossover(self, _seed, _c1, _c2, _rc1, _rc2):
         # given
         cfg = acs2.Configuration(
             classifier_length=4, number_of_possible_actions=2)
-        cl1 = acs2.Classifier(condition='1111', cfg=cfg)
-        cl2 = acs2.Classifier(condition='2222', cfg=cfg)
+        cl1 = acs2.Classifier(condition=_c1, cfg=cfg)
+        cl2 = acs2.Classifier(condition=_c2, cfg=cfg)
 
         # when
+        np.random.seed(_seed)
         ga.two_point_crossover(cl1, cl2)
 
         # then
-        assert '1' in cl1.condition
-        assert '2' in cl1.condition
-        assert '1' in cl2.condition
-        assert '2' in cl2.condition
+        assert cl1.condition == acs2.Condition(_rc1)
+        assert cl2.condition == acs2.Condition(_rc2)
 
     @pytest.mark.parametrize(
         "_cl_del_q, _cl_del_marked, _cl_del_tav," +

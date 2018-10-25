@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 if __name__ == '__main__':
 
     # Load desired environment
-    rmpx = gym.make('real-multiplexer-6bit-v0')
+    rmpx = gym.make('real-multiplexer-3bit-v0')
 
     # Create agent
     encoder = RealValueEncoder(resolution_bits=7)
@@ -29,7 +29,7 @@ if __name__ == '__main__':
                         mu=0.15)
 
     agent = RACS(cfg)
-    population, _ = agent.explore_exploit(rmpx, 3000)
+    population, _ = agent.explore_exploit(rmpx, 10_000)
 
     # filter reliable classifiers
     reliable = [cl for cl in population if cl.is_reliable()]

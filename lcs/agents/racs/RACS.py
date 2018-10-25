@@ -72,7 +72,7 @@ class RACS(Agent):
                 env, current_trial, steps_in_trial, steps, reward)
             metrics.append(trial_metrics)
 
-            if current_trial % 1000 == 0:
+            if current_trial % 500 == 0:
                 logger.info(trial_metrics)
 
             current_trial += 1
@@ -234,7 +234,7 @@ class RACS(Agent):
         return steps, reward
 
     def _collect_agent_metrics(self, trial, steps, total_steps) -> Metric:
-        regions = self._count_averaged_regions()
+        # regions = self._count_averaged_regions()
 
         return {
             'population': len(self.population),
@@ -245,10 +245,10 @@ class RACS(Agent):
                         len(self.population)),
             'cover_ratio': (sum(cl.condition.cover_ratio for cl
                                 in self.population) / len(self.population)),
-            'region_1': regions[1],
-            'region_2': regions[2],
-            'region_3': regions[3],
-            'region_4': regions[4],
+            # 'region_1': regions[1],
+            # 'region_2': regions[2],
+            # 'region_3': regions[3],
+            # 'region_4': regions[4],
             'trial': trial,
             'steps': steps,
             'total_steps': total_steps

@@ -1,9 +1,11 @@
 from copy import deepcopy
 
+import numpy as np
 import pytest
 
 from lcs.agents.racs import Classifier, Configuration, Condition, Effect
-from lcs.agents.racs.components.genetic_algorithm import mutate
+from lcs.agents.racs.components.genetic_algorithm import mutate, crossover, \
+    _flatten, _unflatten
 from lcs.representations import UBR
 from lcs.representations.RealValueEncoder import RealValueEncoder
 
@@ -79,3 +81,47 @@ class TestGeneticAlgorithm:
             assert c.upper_bound == condition[idx].upper_bound
             assert e.lower_bound == effect[idx].lower_bound
             assert e.upper_bound == effect[idx].upper_bound
+
+    def test_crossover(self, cfg):
+        # given
+        parent = Classifier(
+            condition=Condition([UBR(1, 1), UBR(1, 1), UBR(1, 1)], cfg),
+            effect=Effect([UBR(1, 1), UBR(1, 1), UBR(1, 1)], cfg),
+            cfg=cfg)
+        donor = Classifier(
+            condition=Condition([UBR(2, 2), UBR(2, 2), UBR(2, 2)], cfg),
+            effect=Effect([UBR(2, 2), UBR(2, 2), UBR(2, 2)], cfg),
+            cfg=cfg)
+
+        # when
+        np.random.seed(12345)  # left: 3, right: 6
+        crossover(parent, donor)
+
+        # then
+        assert parent.condition == \
+            Condition([UBR(1, 1), UBR(1, 2), UBR(2, 2)], cfg)
+        assert parent.effect == \
+            Effect([UBR(1, 1), UBR(1, 2), UBR(2, 2)], cfg)
+        assert donor.condition == \
+            Condition([UBR(2, 2), UBR(2, 1), UBR(1, 1)], cfg)
+        assert donor.effect == \
+            Effect([UBR(2, 2), UBR(2, 1), UBR(1, 1)], cfg)
+
+    @pytest.mark.parametrize("_cond, _result", [
+        ([UBR(1, 3), UBR(2, 4)], [1, 3, 2, 4])
+    ])
+    def test_should_flatten_condition(self, _cond, _result, cfg):
+        assert _flatten(Condition(_cond, cfg=cfg)) == _result
+
+    @pytest.mark.parametrize("_effect, _result", [
+        ([UBR(1, 3), UBR(2, 4)], [1, 3, 2, 4])
+    ])
+    def test_should_flatten_effect(self, _effect, _result, cfg):
+        assert _flatten(Effect(_effect, cfg=cfg)) == _result
+
+    @pytest.mark.parametrize("_flat, _result", [
+        ([1, 3], [UBR(1, 3)]),
+        ([1, 3, 2, 4], [UBR(1, 3), UBR(2, 4)])
+    ])
+    def test_should_unflatten(self, _flat, _result):
+        assert _unflatten(_flat) == _result
