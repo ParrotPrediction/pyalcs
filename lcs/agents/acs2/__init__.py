@@ -1,4 +1,5 @@
 from .Configuration import Configuration
+from .ProbabilityEnhancedAttribute import ProbabilityEnhancedAttribute
 from .Condition import Condition
 from .Effect import Effect
 from .PMark import PMark
