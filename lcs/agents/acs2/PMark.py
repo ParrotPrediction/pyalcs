@@ -87,7 +87,15 @@ class PMark(TypedList):
         return diff
 
     def __repr__(self):
+        def compact_set_str(s):
+            if len(s) == 0:
+                return self.cfg.classifier_wildcard
+            elif len(s) == 1:
+                return next(iter(s)) # the only element in set
+            else:
+                return "{" + "".join(x for x in s) + "}"
+
         if self.is_marked():
-            return "Marked"
+            return "".join(compact_set_str(x) for x in self)
         else:
-            return "Empty"
+            return "empty"
