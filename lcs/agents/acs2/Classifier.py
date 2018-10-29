@@ -14,7 +14,7 @@ class Classifier(object):
                  effect: Union[Effect, str, None]=None,
                  quality: float=0.5,
                  reward: float=0.5,
-                 intermediate_reward: float=0.0,
+                 immediate_reward: float=0.0,
                  numerosity: int=1,
                  experience: int=1,
                  talp=None,
@@ -49,7 +49,7 @@ class Classifier(object):
         self.r = reward
 
         # Intermediate reward
-        self.ir = intermediate_reward
+        self.ir = immediate_reward
 
         # Numerosity
         self.num = numerosity
@@ -111,7 +111,7 @@ class Classifier(object):
             effect=old_cls.effect,
             quality=old_cls.q,
             reward=old_cls.r,
-            intermediate_reward=old_cls.ir,
+            immediate_reward=old_cls.ir,
             cfg=old_cls.cfg)
 
         new_cls.tga = time
