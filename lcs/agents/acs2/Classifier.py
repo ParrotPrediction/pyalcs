@@ -48,7 +48,7 @@ class Classifier(object):
         # the execution of action A given condition C
         self.r = reward
 
-        # Intermediate reward
+        # Immediate reward
         self.ir = immediate_reward
 
         # Numerosity
