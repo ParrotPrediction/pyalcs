@@ -27,15 +27,17 @@ class ACS2(Agent):
     def get_cfg(self):
         return self.cfg
 
-    def _run_trial_explore(self, env, time, current_trial=None) -> TrialMetrics:
+    def _run_trial_explore(self, env, time, current_trial=None) \
+            -> TrialMetrics:
+
         logger.debug("** Running trial explore ** ")
         # Initial conditions
         steps = 0
         raw_state = env.reset()
         state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
-        action = None
-        reward = None
-        prev_state = None
+        action = env.action_space.sample()
+        reward = 0
+        prev_state = Perception.empty()
         action_set = ClassifiersList()
         done = False
 
@@ -99,7 +101,7 @@ class ACS2(Agent):
             if done:
                 ClassifiersList.apply_alp(
                     self.population,
-                    None,
+                    ClassifiersList(),
                     action_set,
                     prev_state,
                     action,
@@ -117,7 +119,7 @@ class ACS2(Agent):
                 ClassifiersList.apply_ga(
                     time + steps,
                     self.population,
-                    None,
+                    ClassifiersList(),
                     action_set,
                     state,
                     self.cfg.theta_ga,
@@ -131,14 +133,16 @@ class ACS2(Agent):
 
         return TrialMetrics(steps, reward)
 
-    def _run_trial_exploit(self, env, time=None, current_trial=None) -> TrialMetrics:
+    def _run_trial_exploit(self, env, time=None, current_trial=None) \
+            -> TrialMetrics:
+
         logger.debug("** Running trial exploit **")
         # Initial conditions
         steps = 0
         raw_state = env.reset()
         state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
 
-        reward = None
+        reward = 0
         action_set = ClassifiersList()
         done = False
 
@@ -172,13 +176,14 @@ class ACS2(Agent):
 
         return TrialMetrics(steps, reward)
 
-    def _run_action_planning(self, env,
+    def _run_action_planning(self,
+                             env,
                              time: int,
-                             state: str,
-                             prev_state: str,
+                             state: Perception,
+                             prev_state: Perception,
                              action_set: ClassifiersList,
                              action: int,
-                             reward: int) -> Tuple[int, str, str,
+                             reward: int) -> Tuple[int, Perception, Perception,
                                                    ClassifiersList, int]:
         """
         Executes action planning for model learning speed up.
@@ -187,14 +192,20 @@ class ACS2(Agent):
         a goal sequence in the current model (only the reliable classifiers).
         This is done as long as goals are provided and ACS2 finds a sequence
         and successfully reaches the goal.
-        :param env:
-        :param time:
-        :param state:
-        :param prev_state:
-        :param action_set:
-        :param action:
-        :param reward:
-        :return:
+
+        Parameters
+        ----------
+        env
+        time
+        state
+        prev_state
+        action_set
+        action
+        reward
+
+        Returns
+        -------
+
         """
         logging.debug("** Running action planning **")
 

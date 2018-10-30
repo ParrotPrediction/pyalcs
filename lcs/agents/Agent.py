@@ -23,37 +23,64 @@ class Agent:
     def get_cfg(self):
         raise NotImplementedError()
 
-    def explore(self, env, trials):
+    def explore(self, env, trials) -> Tuple:
         """
         Explores the environment in given set of trials.
-        :param env: environment
-        :param trials: number of trials
-        :return: population of classifiers and metrics
+
+        Parameters
+        ----------
+        env
+            environment
+        trials
+            number of trials
+
+        Returns
+        -------
+        Tuple
+            population of classifiers and metrics
         """
         return self._evaluate(env, trials, self._run_trial_explore)
 
-    def exploit(self, env, trials):
+    def exploit(self, env, trials) -> Tuple:
         """
         Exploits the environments in given set of trials (always executing
         best possible action - no exploration).
-        :param env: environment
-        :param trials: number of trials
-        :return: population of classifiers and metrics
+
+        Parameters
+        ----------
+        env
+            environment
+        trials
+            number of trials
+
+        Returns
+        -------
+        Tuple
+            population of classifiers and metrics
         """
         return self._evaluate(env, trials, self._run_trial_exploit)
 
-    def explore_exploit(self, env, trials):
+    def explore_exploit(self, env, trials) -> Tuple:
         """
         Alternates between exploration and exploitation phases.
-        :param env: environment
-        :param trials: number of trials
-        :return: population of classifiers and metrics
+
+        Parameters
+        ----------
+        env
+            environment
+        trials
+            number of trials
+
+        Returns
+        -------
+        Tuple
+            population of classifiers and metrics
         """
         def switch_phases(env, steps, current_trial):
             if current_trial % 2 == 0:
-                return self._run_trial_explore(env, steps)
+                return self._run_trial_explore(env, steps, current_trial)
             else:
-                return self._run_trial_exploit(env, None)
+                return self._run_trial_exploit(env, None, current_trial)
 
         return self._evaluate(env, trials, switch_phases)
 

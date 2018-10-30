@@ -1,6 +1,7 @@
 import logging
 from typing import Tuple
 
+from lcs import Perception
 from lcs.agents.Agent import TrialMetrics
 from lcs.strategies.action_selection import choose_action
 from ...agents import Agent
@@ -25,7 +26,8 @@ class RACS(Agent):
     def get_cfg(self):
         return self.cfg
 
-    def _run_trial_explore(self, env, time, current_trial=None) -> TrialMetrics:
+    def _run_trial_explore(self, env, time, current_trial=None) \
+            -> TrialMetrics:
         """
         Executes explore trial
 
@@ -46,9 +48,9 @@ class RACS(Agent):
         raw_state = env.reset()
         state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
 
-        action = None
-        reward = None
-        prev_state = None
+        action = env.action_space.sample()
+        reward = 0
+        prev_state = Perception.empty()
         action_set = ClassifierList()
         done = False
 
@@ -102,7 +104,7 @@ class RACS(Agent):
             if done:
                 ClassifierList.apply_alp(
                     self.population,
-                    None,
+                    ClassifierList(),
                     action_set,
                     prev_state,
                     action,
@@ -133,14 +135,15 @@ class RACS(Agent):
 
         return TrialMetrics(steps, reward)
 
-    def _run_trial_exploit(self, env, time=None, current_trial=None) -> TrialMetrics:
+    def _run_trial_exploit(self, env, time=None, current_trial=None) \
+            -> TrialMetrics:
         logger.debug("** Running trial exploit **")
 
         steps = 0
         raw_state = env.reset()
         state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
 
-        reward = None
+        reward = 0
         action_set = ClassifierList()
         done = False
 

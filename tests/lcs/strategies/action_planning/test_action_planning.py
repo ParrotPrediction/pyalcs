@@ -78,13 +78,13 @@ class TestActionPlanning:
 
         # when
         result0 = exists_classifier(population,
-                                    previous_situation=prev_situation,
-                                    situation=situation, action=act, quality=q)
+                                    p0=prev_situation,
+                                    p1=situation, action=act, quality=q)
 
         population.append(c1)
         result1 = exists_classifier(population,
-                                    previous_situation=prev_situation,
-                                    situation=situation, action=act, quality=q)
+                                    p0=prev_situation,
+                                    p1=situation, action=act, quality=q)
 
         # then
         assert result0 is False

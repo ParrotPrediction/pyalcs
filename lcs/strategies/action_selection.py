@@ -1,14 +1,13 @@
 import logging
 import random
-
 from itertools import groupby
-from typing import Optional
 
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
 
-def choose_action(cll, all_actions: int, epsilon: float) -> Optional[int]:
+def choose_action(cll, all_actions: int, epsilon: float) -> int:
     """
     Chooses which action to execute given classifier list (match set).
 
@@ -23,7 +22,7 @@ def choose_action(cll, all_actions: int, epsilon: float) -> Optional[int]:
 
     Returns
     -------
-    Optional[int]
+    int
         number of chosen action
     """
     if random.random() < epsilon:
@@ -34,7 +33,7 @@ def choose_action(cll, all_actions: int, epsilon: float) -> Optional[int]:
     return exploit(cll, all_actions)
 
 
-def explore(cll, all_actions: int, pb: float = 0.5) -> Optional[int]:
+def explore(cll, all_actions: int, pb: float = 0.5) -> int:
     """
     Chooses action according to current exploration policy
 
@@ -93,7 +92,7 @@ def exploit(cll, all_actions: int) -> int:
     return choose_random_action(all_actions)
 
 
-def choose_latest_action(cll, all_actions: int) -> Optional[int]:
+def choose_latest_action(cll, all_actions: int) -> int:
     """
     Chooses latest executed action ("action delay bias")
 
@@ -129,7 +128,8 @@ def choose_latest_action(cll, all_actions: int) -> Optional[int]:
     if last_executed_cls:
         return last_executed_cls.action
 
-    return None
+    # if there is no classifiers - select random action
+    return choose_random_action(all_actions)
 
 
 def choose_action_from_knowledge_array(cll, all_actions: int) -> int:
@@ -182,4 +182,4 @@ def choose_random_action(all_actions: int) -> int:
     int
         random action number
     """
-    return random.choice(range(all_actions))
+    return np.random.randint(all_actions)
