@@ -9,8 +9,6 @@ class Configuration:
                  perception_mapper_fcn=None,
                  action_mapping_fcn=None,
                  environment_metrics_fcn=None,
-                 performance_fcn=None,
-                 performance_fcn_params={},
                  user_metrics_collector_fcn: Callable = None,
                  metrics_trial_frequency: int = 5,
                  do_ga=False,
@@ -38,9 +36,6 @@ class Configuration:
         :param perception_mapper_fcn:
         :param action_mapping_fcn:
         :param environment_metrics_fcn:
-        :param performance_fcn: function for estimating agent performance
-        :param performance_fcn_params: optional parameters needed for
-            calculating agent performance
         :param do_ga: switch *Genetic Generalization* module
         :param do_subsumption:
         :param do_action_planning: switch Action Planning phase
@@ -57,16 +52,12 @@ class Configuration:
         :param mu:
         :param chi: GA crossover probability
         """
-        if performance_fcn_params is None:
-            performance_fcn_params = {}
         self.classifier_length = classifier_length
         self.number_of_possible_actions = number_of_possible_actions
         self.classifier_wildcard = classifier_wildcard
         self.perception_mapper_fcn = perception_mapper_fcn
         self.action_mapping_fcn = action_mapping_fcn
         self.environment_metrics_fcn = environment_metrics_fcn
-        self.performance_fcn = performance_fcn
-        self.performance_fcn_params = performance_fcn_params
         self.metrics_trial_frequency = metrics_trial_frequency
         self.user_metrics_collector_fcn = user_metrics_collector_fcn
         self.do_ga = do_ga
@@ -93,7 +84,6 @@ class Configuration:
                "\n\t- Perception mapper function: [{}]" \
                "\n\t- Action mapping function: [{}]" \
                "\n\t- Environment metrics function: [{}]" \
-               "\n\t- Performance calculation function: [{}] " \
                "\n\t- Do GA: [{}]" \
                "\n\t- Do subsumption: [{}]" \
                "\n\t- Do Action Planning: [{}]" \
@@ -107,7 +97,6 @@ class Configuration:
                     self.perception_mapper_fcn,
                     self.action_mapping_fcn,
                     self.environment_metrics_fcn,
-                    self.performance_fcn,
                     self.do_ga,
                     self.do_subsumption,
                     self.do_action_planning,

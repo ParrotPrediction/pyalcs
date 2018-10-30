@@ -3,7 +3,7 @@ import gym
 import gym_handeye
 import pytest
 
-from examples.acs2.handeye.utils import calculate_performance
+from examples.acs2.handeye.utils import handeye_metrics
 from lcs.agents.acs2 import Configuration, ACS2
 
 
@@ -24,7 +24,7 @@ class TestHandEye:
                             do_ga=False,
                             do_action_planning=True,
                             action_planning_frequency=50,
-                            performance_fcn=calculate_performance)
+                            performance_fcn=handeye_metrics)
         agent = ACS2(cfg)
 
         # when
@@ -43,7 +43,7 @@ class TestHandEye:
                             do_ga=False,
                             do_action_planning=True,
                             action_planning_frequency=50,
-                            performance_fcn=calculate_performance)
+                            performance_fcn=handeye_metrics)
         agent = ACS2(cfg)
 
         # when

@@ -10,8 +10,6 @@ class Configuration:
                  encoder=None,
                  perception_mapper_fcn=None,
                  action_mapping_fcn=None,
-                 performance_fcn=None,
-                 performance_fcn_params={},
                  user_metrics_collector_fcn: Callable=None,
                  metrics_trial_frequency: int = 5,
                  do_ga=False,
@@ -42,8 +40,6 @@ class Configuration:
 
         self.perception_mapper_fcn = perception_mapper_fcn
         self.action_mapping_fcn = action_mapping_fcn
-        self.performance_fcn = performance_fcn
-        self.performance_fcn_params = performance_fcn_params
 
         self.metrics_trial_frequency = metrics_trial_frequency
         self.user_metrics_collector_fcn = user_metrics_collector_fcn

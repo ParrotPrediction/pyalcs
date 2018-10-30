@@ -1,22 +1,36 @@
-def calculate_performance(hand_eye, population):
+from typing import Dict
+
+
+def handeye_metrics(population, environment) -> Dict:
     """
     Analyzes all possible transition in maze environment and checks if there
     is a reliable classifier for it.
+
     Note: knowledge with/without block only works if env has note_in_hand
     set to True
-    :param hand_eye: maze object
-    :param population: list of classifiers
-    :return:
-            knowledge - percentage of transitions we are able to anticipate
+
+    Parameters
+    ----------
+    population
+        list of classifiers
+    environment
+        handeye environment
+
+    Returns
+    -------
+    Dict
+        knowledge - percentage of transitions we are able to anticipate
             correctly (max 100)
-            with_block - percentage of all transitions involving block -
+
+        with_block - percentage of all transitions involving block -
             gripping, realising or moving block - we are able to anticipate
             correctly (max 100)
-            no_block - percentage of all transitions not involving block -
+
+        no_block - percentage of all transitions not involving block -
             moving the gripper without block - we are able to anticipate
             correctly (max 100)
     """
-    transitions = hand_eye.env.get_all_possible_transitions()
+    transitions = environment.env.get_all_possible_transitions()
 
     # Take into consideration only reliable classifiers
     reliable_classifiers = [c for c in population if c.is_reliable()]

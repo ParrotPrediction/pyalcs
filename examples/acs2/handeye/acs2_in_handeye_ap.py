@@ -1,11 +1,11 @@
 import logging
 
 import gym
-
 # noinspection PyUnresolvedReferences
 import gym_handeye
+
+from examples.acs2.handeye.utils import handeye_metrics
 from lcs.agents.acs2 import ACS2, Configuration
-from examples.acs2.handeye.utils import calculate_performance
 
 # Configure logger
 logging.basicConfig(level=logging.INFO)
@@ -20,7 +20,7 @@ if __name__ == '__main__':
                         do_ga=False,
                         do_action_planning=True,
                         action_planning_frequency=50,
-                        performance_fcn=calculate_performance)
+                        user_metrics_collector_fcn=handeye_metrics)
     logging.info(cfg)
 
     # Explore the environment
@@ -31,5 +31,5 @@ if __name__ == '__main__':
     agent = ACS2(cfg, population)
     population, exploit_metric = agent.exploit(hand_eye, 10)
 
-    # for metric in exploit_metric:
-    #     logging.info(metric)
+    for metric in exploit_metric:
+        logging.info(metric)

@@ -3,7 +3,7 @@ import gym
 import gym_maze
 import pytest
 
-from examples.acs2.maze.utils import calculate_performance
+from examples.acs2.maze.utils import maze_knowledge
 from lcs.agents.acs2 import ACS2, Configuration
 from .utils import count_microclassifiers, \
     count_macroclassifiers, \
@@ -21,7 +21,7 @@ class TestMaze:
         cfg = Configuration(8, 8,
                             epsilon=1.0,
                             do_ga=False,
-                            performance_fcn=calculate_performance)
+                            performance_fcn=maze_knowledge)
         agent = ACS2(cfg)
 
         # when
@@ -46,7 +46,7 @@ class TestMaze:
                             mu=0.3,
                             chi=0.0,
                             do_ga=True,
-                            performance_fcn=calculate_performance)
+                            performance_fcn=maze_knowledge)
         agent = ACS2(cfg)
 
         # when
