@@ -1,10 +1,12 @@
+from .EnvironmentAdapter import EnvironmentAdapter
+
+
 class Configuration:
     def __init__(self,
                  classifier_length,
                  number_of_possible_actions,
                  classifier_wildcard='#',
-                 perception_mapper_fcn=None,
-                 action_mapping_fcn=None,
+                 environment_adapter=EnvironmentAdapter,
                  environment_metrics_fcn=None,
                  performance_fcn=None,
                  performance_fcn_params={},
@@ -30,8 +32,8 @@ class Configuration:
         :param number_of_possible_actions: number of possible actions to
             be executed
         :param classifier_wildcard: wildcard symbol
-        :param perception_mapper_fcn:
-        :param action_mapping_fcn:
+        :param environment_adapter: EnvironmentAdapter class ACS2 needs to use
+            to interact with the environment
         :param environment_metrics_fcn:
         :param performance_fcn: function for estimating agent performance
         :param performance_fcn_params: optional parameters needed for
@@ -57,8 +59,7 @@ class Configuration:
         self.classifier_length = classifier_length
         self.number_of_possible_actions = number_of_possible_actions
         self.classifier_wildcard = classifier_wildcard
-        self.perception_mapper_fcn = perception_mapper_fcn
-        self.action_mapping_fcn = action_mapping_fcn
+        self.environment_adapter = environment_adapter
         self.environment_metrics_fcn = environment_metrics_fcn
         self.performance_fcn = performance_fcn
         self.performance_fcn_params = performance_fcn_params
@@ -83,8 +84,7 @@ class Configuration:
                "\n\t- Classifier length: [{}]" \
                "\n\t- Number of possible actions: [{}]" \
                "\n\t- Classifier wildcard: [{}]" \
-               "\n\t- Perception mapper function: [{}]" \
-               "\n\t- Action mapping function: [{}]" \
+               "\n\t- Environment adapter: [{}]" \
                "\n\t- Environment metrics function: [{}]" \
                "\n\t- Performance calculation function: [{}] " \
                "\n\t- Do GA: [{}]" \
@@ -97,8 +97,7 @@ class Configuration:
             .format(self.classifier_length,
                     self.number_of_possible_actions,
                     self.classifier_wildcard,
-                    self.perception_mapper_fcn,
-                    self.action_mapping_fcn,
+                    self.environment_adapter,
                     self.environment_metrics_fcn,
                     self.performance_fcn,
                     self.do_ga,
