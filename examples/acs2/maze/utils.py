@@ -34,3 +34,16 @@ def maze_knowledge(population, environment) -> float:
             nr_correct += 1
 
     return nr_correct / len(transitions) * 100.0
+
+
+def print_detailed_knowledge(maze, population):
+    transitions = maze.env.get_all_possible_transitions()
+
+    # For all possible destinations from each path cell
+    for start, action, end in transitions:
+
+        p0 = maze.env.maze.perception(*start)
+        p1 = maze.env.maze.perception(*end)
+
+        print("\n{}-{}-\n{}".format("".join(p0), action, "".join(p1)))
+        print(population.form_match_set(p0).form_action_set(action))
