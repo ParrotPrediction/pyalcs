@@ -108,7 +108,7 @@ class TestClassifierList:
 
     def test_should_apply_reinforcement_learning(self, cfg):
         # given
-        cl = Classifier(reward=34.29, intermediate_reward=11.29, cfg=cfg)
+        cl = Classifier(reward=34.29, immediate_reward=11.29, cfg=cfg)
         population = ClassifiersList(*[cl])
 
         # when
