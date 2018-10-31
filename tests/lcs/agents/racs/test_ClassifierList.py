@@ -138,7 +138,7 @@ class TestClassifierList:
         # given
         cl = Classifier(
             reward=34.29,
-            intermediate_reward=11.29,
+            immediate_reward=11.29,
             cfg=cfg)
 
         population = ClassifierList(*[cl])

@@ -146,7 +146,7 @@ class TestClassifier:
         cl = Classifier(condition, action, effect,
                         quality=random.random(),
                         reward=random.random(),
-                        intermediate_reward=random.random(),
+                        immediate_reward=random.random(),
                         cfg=cfg)
         # when
         copied_cl = Classifier.copy_from(cl, operation_time)
