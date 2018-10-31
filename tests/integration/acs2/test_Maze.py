@@ -21,7 +21,8 @@ class TestMaze:
         cfg = Configuration(8, 8,
                             epsilon=1.0,
                             do_ga=False,
-                            performance_fcn=maze_knowledge)
+                            metrics_trial_frequency=1,
+                            user_metrics_collector_fcn=self._maze_metrics)
         agent = ACS2(cfg)
 
         # when
@@ -30,7 +31,7 @@ class TestMaze:
         # then
         assert 90 < count_macroclassifiers(population) < 200
 
-        assert 100 == self._get_knowledge(metrics)
+        assert self._get_knowledge(metrics) == 100
 
         assert count_macroclassifiers(population) == count_reliable(population)
 
@@ -46,7 +47,8 @@ class TestMaze:
                             mu=0.3,
                             chi=0.0,
                             do_ga=True,
-                            performance_fcn=maze_knowledge)
+                            metrics_trial_frequency=1,
+                            user_metrics_collector_fcn=self._maze_metrics)
         agent = ACS2(cfg)
 
         # when
@@ -70,8 +72,14 @@ class TestMaze:
 
     @staticmethod
     def _get_knowledge(metrics):
-        return metrics[-1]['performance']['knowledge']
+        return metrics[-1]['knowledge']
 
     @staticmethod
     def _get_total_steps(metrics):
-        return metrics[-1]['agent']['total_steps']
+        return sum(m['steps_in_trial'] for m in metrics)
+
+    @staticmethod
+    def _maze_metrics(population, environment):
+        return {
+            'knowledge': maze_knowledge(population, environment)
+        }

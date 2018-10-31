@@ -51,4 +51,3 @@ if __name__ == '__main__':
 
     if DUMP_DATA_TO_FILE:
         dump_data(population, metrics, env, TRIALS)
-
