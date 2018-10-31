@@ -4,16 +4,27 @@ import gym
 # noinspection PyUnresolvedReferences
 import gym_checkerboard
 
-from examples.racs.checkerboard.metrics import checkerboard_metrics
 from lcs.agents.racs import Configuration, RACS
+from lcs.agents.racs.metrics import count_averaged_regions
+from lcs.metrics import population_metrics
 from lcs.representations.RealValueEncoder import RealValueEncoder
 
 # Configure logger
 logging.basicConfig(level=logging.INFO)
 
 
-if __name__ == '__main__':
+def _checkerboard_metrics(population, environment):
+    metrics = {
+        'regions': count_averaged_regions(population)
+    }
 
+    # Add basic population metrics
+    metrics.update(population_metrics(population, environment))
+
+    return metrics
+
+
+if __name__ == '__main__':
     # Load desired environment
     chckb = gym.make('checkerboard-2D-3div-v0')
 
@@ -22,7 +33,7 @@ if __name__ == '__main__':
     cfg = Configuration(chckb.observation_space.shape[0],
                         chckb.action_space.n,
                         encoder=encoder,
-                        user_metrics_collector_fcn=checkerboard_metrics,
+                        user_metrics_collector_fcn=_checkerboard_metrics,
                         epsilon=0.5,
                         do_ga=True,
                         theta_r=0.9,

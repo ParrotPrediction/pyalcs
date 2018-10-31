@@ -1,12 +1,13 @@
 import pytest
 
-from lcs.agents.racs import RACS, Configuration, ClassifierList, \
+from lcs.agents.racs import Configuration, ClassifierList, \
     Classifier, Condition
+from lcs.agents.racs.metrics import count_averaged_regions
 from lcs.representations import UBR
 from lcs.representations.RealValueEncoder import RealValueEncoder
 
 
-class TestRACS:
+class TestMetrics:
 
     @pytest.fixture
     def cfg(self):
@@ -25,10 +26,9 @@ class TestRACS:
         cl4 = Classifier(condition=Condition([UBR(0, 13), UBR(0, 15)], cfg),
                          cfg=cfg)
         population = ClassifierList(*[cl1, cl2, cl3, cl4])
-        agent = RACS(cfg, population)
 
         # when
-        result = agent._count_averaged_regions()
+        result = count_averaged_regions(population)
 
         # then
         assert type(result) is dict
