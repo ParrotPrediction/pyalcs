@@ -1,15 +1,15 @@
 class EnvironmentAdapter:
     """
     Sometimes the observation returned by the OpenAI Gym environment
-    does not suit the observation representation as used by the ACS2.
-    In that case there's a need for converter functions that map the ACS2
+    does not suit the observation representation as used by the LCS.
+    In that case there's a need for converter functions that map the LCS
     representation to the environment representation and vice versa.
 
     The same goes for action representation.
 
     This class realizes this conversion.
 
-    This implementation works for environments which provide ACS2-compatible
+    This implementation works for environments which provide LCS-compatible
     state and action representations (no conversion needed).
 
     Subclass this class in pyALCS integration to provide an adapter
@@ -17,33 +17,33 @@ class EnvironmentAdapter:
     """
 
     @staticmethod
-    def env_action_to_acs(env_action):
+    def to_lcs_action(env_action):
         """
-        Converts environment representation of an action to ACS2
+        Converts environment representation of an action to LCS
         representation.
         """
         return env_action
 
     @staticmethod
-    def env_state_to_acs(env_state):
+    def to_genotype(phenotype):
         """
-        Converts environment representation of a state to ACS2
+        Converts environment representation of a state to LCS
         representation.
         """
-        return env_state
+        return phenotype
 
     @staticmethod
-    def acs_action_to_env(acs_action):
+    def to_env_action(lcs_action):
         """
-        Converts ACS2 representation of an action to environment
+        Converts LCS representation of an action to environment
         representation.
         """
-        return acs_action
+        return lcs_action
 
     @staticmethod
-    def acs_state_to_env(acs_state):
+    def to_phenotype(genotype):
         """
-        Converts ACS2 representation of a state to environment
+        Converts LCS representation of a state to environment
         representation.
         """
-        return acs_state
+        return genotype
