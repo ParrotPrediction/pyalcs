@@ -209,7 +209,6 @@ class ACS2(Agent):
         """
         logging.debug("** Running action planning **")
 
-        # The environment has to have a function "get_goal_state"
         if not hasattr(env.env, "get_goal_state"):
             logging.debug("Action planning stopped - "
                           "no function get_goal_state in env")
@@ -234,16 +233,16 @@ class ACS2(Agent):
                 if act == -1:
                     break
 
-                match_set = self.population.form_match_set(
-                    situation=Perception(state))
-                if action_set is not None and prev_state is not None:
+                match_set = self.population.form_match_set(state)
+
+                if action_set is not None and len(prev_state) != 0:
                     ClassifiersList.apply_alp(
                         self.population,
                         match_set,
                         action_set,
-                        Perception(prev_state),
+                        prev_state,
                         action,
-                        Perception(state),
+                        state,
                         time + steps,
                         self.cfg.theta_exp,
                         self.cfg)
@@ -259,7 +258,7 @@ class ACS2(Agent):
                             self.population,
                             match_set,
                             action_set,
-                            Perception(state),
+                            state,
                             self.cfg.theta_ga,
                             self.cfg.mu,
                             self.cfg.chi,
@@ -274,8 +273,8 @@ class ACS2(Agent):
                 prev_state = state
                 state = parse_state(raw_state)
 
-                if not exists_classifier(action_set, Perception(prev_state),
-                                         action, Perception(state),
+                if not exists_classifier(action_set, prev_state,
+                                         action, state,
                                          self.cfg.theta_r):
 
                     # no reliable classifier was able to anticipate
