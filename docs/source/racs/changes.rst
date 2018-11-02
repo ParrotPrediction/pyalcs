@@ -40,3 +40,5 @@ Thoughts
 * There is still very aggressive``generalize`` function in Condition part.
 * favour most general condition and least general effect
 * majority voting for best action
+* mutation should not check for lower/upper bounds. Let it be random (alleles might swap)
+* covering should add some random noise

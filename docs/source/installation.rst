@@ -17,7 +17,7 @@ Dependencies
 You should be fine with::
 
     pip install -r requirements.txt
-    pip install -r requirements-integrations.txt
+    pip install -r requirements-integrations.txt --upgrade
 
 In case of troubles see ``Dockerfile`` and ``.travis.yml`` how the project is built from scratch.
 

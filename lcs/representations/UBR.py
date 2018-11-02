@@ -2,7 +2,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from dataslots import with_slots
 
+
+@with_slots
 @dataclass
 class UBR:
     """

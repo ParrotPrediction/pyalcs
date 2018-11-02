@@ -46,7 +46,7 @@ class RealValueEncoder:
         if val < 0 or val > 1:
             raise ValueError("Value is not normalized within [0,1] range")
 
-        return round(val * self.resolution)
+        return int(round(val * self.resolution))
 
     def decode(self, encoded_val: int) -> float:
         """

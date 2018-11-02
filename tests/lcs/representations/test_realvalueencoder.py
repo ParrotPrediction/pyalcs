@@ -1,5 +1,6 @@
 from random import random
 
+import numpy as np
 import pytest
 
 from lcs.representations.RealValueEncoder import RealValueEncoder
@@ -106,3 +107,16 @@ class TestRealValueEncoder:
         # then
         assert min_val == _min_range
         assert max_val == _max_range
+
+    @pytest.mark.parametrize("_p", [
+        0.8, np.float_(0.2), 0
+    ])
+    def test_encode_should_return_integer(self, _p):
+        # given
+        encoder = RealValueEncoder(2)
+
+        # when
+        encoded = encoder.encode(_p)
+
+        # then
+        assert type(encoded) is int

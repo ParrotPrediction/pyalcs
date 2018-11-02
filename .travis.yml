@@ -1,23 +1,18 @@
 sudo: required
-
 services:
-  - docker
-
+- docker
 language: python
 python:
-  - '3.7-dev'
-
+- 3.7-dev
 install:
-  - docker build -t parrot-prediction/lcs .
-
+- docker build -t parrot-prediction/lcs .
 script:
-  - docker run parrot-prediction/lcs
-
+- docker run parrot-prediction/lcs
 deploy:
   provider: pypi
   user: khozzy
   password:
-    secure: sf1nCbtMTGEJNv0GsKzdJT3zghwUGe8jvvjky377Y7lU2Kk7PKxxti8lNE60ET+KuI7ePuiR4Fb+8UuvCPVfhRu7b5bgyDghstQEoNPuzebHynkWc17d4+i9UwY+SsqamxaBQ8ol+iqRHi6HzYiX7Bpe8eFK8B3Lee14RFWSPTtOUrSv5TZCtShS98JW5qds4TwsMRWNghdcp9o170DSvk8yR9TCSSwZYpXt51xqN413nuw7bwrFreTl2/4lsvM0Z205MkHjAfIgDh5DV8+cy7zlVe2qhCKVBnKYdxOlNSS0K6vKbwr1R0S7Fcw6XTqqZE0pIQLXEMbMFeiOTzkvs2gZiR3GsbQQ4XNevnMS1mcMjA6dc//8mug9fKMbDA0RD/EQB3a0+JTGZovWKSFleg6XkA5mwNC1CwnzMY+ZOjACQQaOpbvE/1tx5m0lfBbIG8vnlnFA53X2VedIILa6Pq+vhfaH8Zrz2MvGFb8+aiI5N5qfOr7eKoBZPQn2g4CjsJLQhfZ3k9FxuDYX+9X90O7yLhEMocP4g2W4Zoi7IDDOxlp7B5ZoRAH0Z2E25COEr/4dl5I1/oax1ZA4bgNKiszyWAST4HjhQ8p2KZNJWRdCjzLbAMAdcHsOUx9Bcj8xJ6pWq/KWMCGOzeD7hIrIp5ur6w1BrKcRS2s0KSLoiIs=
+    secure: dx/FjoNzID/l/tUZ6f4/WJAqtvJo4KiFbTr/aY2IRXKERY7Urrzz4ruL3iSpNHSwDkbJ810yOhnaEKyxfJsIGByRP3Fxc90+vVBggH705WpRL53MrXMEXRIEaSryH4woI4Bww+TZMgC2X+3rg815QxoWzyCB0zs4EkqxGskXuozGJOedPkrZoZAZZSRVROu94dG6sBlUK8iDSreODIPwVK77EnCzTUpPvUr2QsheqVjnEANfkRYKP2S4jtGUOT2Gg5wDRalBZXoUyNfftCRB/JBZbfg2dSdN4Dsy8BrwOq5lRkdZopRJ9piQ6N4zgMmStjS0IQfDpH6kL01sAbi+kmJyukVfoDcq0LPWwzeQb6vAtpn/5c1wmNedhJDjFsVh7L+C+7ERk63utRdsF+xMrlPYsqOJ04fPSMnEKM3CdKKY7rl+fuwnwX5+3GE9Jhl2SBuNJ2mbp+7LZP8B9DriqTMxXi3VNT5xy3p2nMUHdWL1VoUtU1X1B8nUy1GO7DOqPAU0IVJ2pMnlhNEr+b6nmXSYF+/KefrR6HbBe/mmmJqddHklbmz+BRgCtQL3qCLph9Y0Z/LyubROxKOOWvh+yi9qh8aFaIA6Tpwq/a4Z1m+NAfE8YrDyIOpijNtG2FFwxed9qDsrZgymzDxoq7pi58E33F0oXvkJxxBPJYAt+GY=
   on:
     tags: true
     branch: master
