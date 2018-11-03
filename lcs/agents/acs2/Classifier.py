@@ -8,6 +8,10 @@ from . import Configuration, Condition, Effect, PMark
 
 
 class Classifier(object):
+
+    __slots__ = ['condition', 'action', 'effect', 'mark', 'q', 'r',
+                 'ir', 'num', 'exp', 'talp', 'tga', 'tav', 'ee', 'cfg']
+
     def __init__(self,
                  condition: Union[Condition, str, None]=None,
                  action: Optional[int]=None,
