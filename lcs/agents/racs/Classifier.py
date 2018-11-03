@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import random
-from typing import Optional, List, Callable
+from typing import Optional, List, Callable, Dict
+
+import numpy as np
 
 from lcs import Perception
 from lcs.representations import UBR
@@ -9,6 +11,9 @@ from . import Condition, Effect, Mark, Configuration
 
 
 class Classifier:
+
+    __slots__ = ['condition', 'action', 'effect', 'mark', 'q', 'r',
+                 'ir', 'num', 'exp', 'talp', 'tga', 'tav', 'ee', 'cfg']
 
     def __init__(self,
                  condition: Optional[Condition] = None,
@@ -56,6 +61,9 @@ class Classifier:
         self.tga = tga
         self.tav = tav
 
+        # TODO: not used yet
+        self.ee = 0
+
     def __eq__(self, other):
         if self.condition == other.condition and \
                 self.action == other.action and \
@@ -66,6 +74,10 @@ class Classifier:
 
     def __hash__(self):
         return hash((str(self.condition), self.action, str(self.effect)))
+
+    def __repr__(self):
+        return "{}\t{}\t{} x {} fitness: {:.2f}".format(
+            self.condition, self.action, self.effect, self.num, self.fitness)
 
     @classmethod
     def copy_from(cls, old_cls: Classifier, time: int):
@@ -129,7 +141,7 @@ class Classifier:
     def specialize(self,
                    p0: Perception,
                    p1: Perception,
-                   leave_specialized=False) -> None:
+                   leave_specialized: bool = False) -> None:
         """
         Specializes the effect part where necessary to correctly anticipate
         the changes from p0 to p1 and returns a condition which specifies
@@ -137,8 +149,8 @@ class Classifier:
         The specific attributes in the returned conditions are set to
         the necessary values.
 
-        For real-valued representation a narrow, fixed point UBR is created
-        for condition and effect part using the encoded perceptions.
+        For real-valued representation a random noise might be added to both
+        `p0` and `p1` (see `Configuration`, `cover_noise` parameter).
 
         Parameters
         ----------
@@ -153,15 +165,20 @@ class Classifier:
         p0_enc = list(map(self.cfg.encoder.encode, p0))
         p1_enc = list(map(self.cfg.encoder.encode, p1))
 
-        for idx, item in enumerate(p1_enc):
+        for idx, item in enumerate(p1):
             if leave_specialized:
                 if self.effect[idx] != self.cfg.classifier_wildcard:
                     # If we have a specialized attribute don't change it.
                     continue
 
             if p0_enc[idx] != p1_enc[idx]:
-                self.effect[idx] = UBR(p1_enc[idx], p1_enc[idx])
-                self.condition[idx] = UBR(p0_enc[idx], p0_enc[idx])
+                noise = np.random.uniform(0, self.cfg.cover_noise)
+                self.condition[idx] = UBR(
+                    self.cfg.encoder.encode(p0[idx], -noise),
+                    self.cfg.encoder.encode(p0[idx], noise))
+                self.effect[idx] = UBR(
+                    self.cfg.encoder.encode(p1[idx], -noise),
+                    self.cfg.encoder.encode(p1[idx], noise))
 
     def is_reliable(self) -> bool:
         return self.q > self.cfg.theta_r
@@ -282,6 +299,38 @@ class Classifier:
 
     def is_marked(self):
         return self.mark.is_marked()
+
+    def get_interval_proportions(self) -> Dict[int, int]:
+        """
+        Returns a region to which classifier is assigned based on the
+        classifier condition.
+
+        See "For Real! XCS with Continuous-Valued Inputs" by C. Stone and
+        L. Bull for a reference.
+
+        Returns
+        -------
+        Dict[int, int]
+            A dictionary with interval region counts within condition part
+        """
+        counts = {1: 0, 2: 0, 3: 0, 4: 0}
+
+        r = self.cfg.encoder.range
+
+        for i in self.condition:
+            if i.lower_bound != r[0] and i.upper_bound != r[1]:
+                counts[1] += 1
+
+            if i.lower_bound == r[0] and i.upper_bound != r[1]:
+                counts[2] += 1
+
+            if i.lower_bound != r[0] and i.upper_bound == r[1]:
+                counts[3] += 1
+
+            if i.lower_bound == r[0] and i.upper_bound == r[1]:
+                counts[4] += 1
+
+        return counts
 
     def generalize_unchanging_condition_attribute(
             self, randomfunc: Callable=random.choice) -> bool:

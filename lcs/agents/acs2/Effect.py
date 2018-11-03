@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from lcs import Perception
 from .. import PerceptionString
 
@@ -101,3 +103,6 @@ class Effect(PerceptionString):
             elif item != self.wildcard and item != percept:
                 return False
         return True
+
+    def subsumes(self, other: Effect) -> bool:
+        return self == other

@@ -8,6 +8,10 @@ from . import Configuration, Condition, Effect, PMark
 
 
 class Classifier(object):
+
+    __slots__ = ['condition', 'action', 'effect', 'mark', 'q', 'r',
+                 'ir', 'num', 'exp', 'talp', 'tga', 'tav', 'ee', 'cfg']
+
     def __init__(self,
                  condition: Union[Condition, str, None]=None,
                  action: Optional[int]=None,
@@ -65,7 +69,7 @@ class Classifier(object):
         # Application average
         self.tav = tav
 
-        # I don't know yet what it is
+        # TODO: not used yet
         self.ee = 0
 
     def __eq__(self, other):

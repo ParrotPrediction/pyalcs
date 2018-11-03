@@ -1,11 +1,11 @@
 import logging
-from typing import Optional, Callable, Tuple, List
+from typing import Tuple
 
+from lcs import Perception
+from lcs.agents.Agent import TrialMetrics
 from lcs.strategies.action_selection import choose_action
 from ...agents import Agent
-from ...agents.Agent import Metric
 from ...agents.racs import Configuration, ClassifierList
-from ...utils import parse_state, parse_action
 
 logger = logging.getLogger(__name__)
 
@@ -19,62 +19,37 @@ class RACS(Agent):
         self.cfg = cfg
         self.population = population or ClassifierList()
 
-    def explore(self, env, trials) -> Tuple:
-        return self._evaluate(env, trials, self._run_trial_explore)
+    def get_population(self):
+        return self.population
 
-    def exploit(self, env, trials):
-        return self._evaluate(env, trials, self._run_trial_exploit)
+    def get_cfg(self):
+        return self.cfg
 
-    def _evaluate(self, env, max_trials: int, func: Callable) -> Tuple:
+    def _run_trial_explore(self, env, time, current_trial=None) \
+            -> TrialMetrics:
         """
-        Runs the classifier in desired strategy (see `func`) and collects
-        metrics.
+        Executes explore trial
 
         Parameters
         ----------
-        env:
-            OpenAI Gym environment
-        max_trials: int
-            maximum number of trials
-        func: Callable
-            Function accepting three parameters: env, steps already made,
-             current trial
+        env
+        time
 
         Returns
         -------
-        tuple
-            population of classifiers and metrics
+        Tuple[int, int]
+            Tuple of total steps taken and final reward
         """
-        current_trial = 0
-        steps = 0
-
-        metrics: List = []
-        while current_trial < max_trials:
-            steps_in_trial = func(env, steps, current_trial)
-            steps += steps_in_trial
-
-            trial_metrics = self._collect_metrics(
-                env, current_trial, steps_in_trial, steps)
-            metrics.append(trial_metrics)
-
-            if current_trial % 25 == 0:
-                logger.info(trial_metrics)
-
-            current_trial += 1
-
-        return self.population, metrics
-
-    def _run_trial_explore(self, env, time, current_trial=None):
         logger.debug("** Running trial explore ** ")
 
         # Initial conditions
         steps = 0
         raw_state = env.reset()
-        state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
+        state = self.cfg.environment_adapter.to_genotype(raw_state)
 
-        action = None
-        reward = None
-        prev_state = None
+        action = env.action_space.sample()
+        reward = 0
+        prev_state = Perception.empty()
         action_set = ClassifierList()
         done = False
 
@@ -117,18 +92,18 @@ class RACS(Agent):
                 match_set,
                 self.cfg.number_of_possible_actions,
                 self.cfg.epsilon)
-            internal_action = parse_action(action, self.cfg.action_mapping_fcn)
             logger.debug("\tExecuting action: [%d]", action)
             action_set = match_set.form_action_set(action)
 
             prev_state = state
-            raw_state, reward, done, _ = env.step(internal_action)
-            state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
+            iaction = self.cfg.environment_adapter.to_lcs_action(action)
+            raw_state, reward, done, _ = env.step(iaction)
+            state = self.cfg.environment_adapter.to_genotype(raw_state)
 
             if done:
                 ClassifierList.apply_alp(
                     self.population,
-                    None,
+                    ClassifierList(),
                     action_set,
                     prev_state,
                     action,
@@ -157,16 +132,17 @@ class RACS(Agent):
                         self.cfg.theta_exp)
             steps += 1
 
-        return steps
+        return TrialMetrics(steps, reward)
 
-    def _run_trial_exploit(self, env, time=None, current_trial=None):
+    def _run_trial_exploit(self, env, time=None, current_trial=None) \
+            -> TrialMetrics:
         logger.debug("** Running trial exploit **")
 
         steps = 0
         raw_state = env.reset()
-        state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
+        state = self.cfg.environment_adapter.to_genotype(raw_state)
 
-        reward = None
+        reward = 0
         action_set = ClassifierList()
         done = False
 
@@ -186,11 +162,11 @@ class RACS(Agent):
                 match_set,
                 self.cfg.number_of_possible_actions,
                 epsilon=0.0)
-            internal_action = parse_action(action, self.cfg.action_mapping_fcn)
+            iaction = self.cfg.environment_adapter.to_lcs_action(action)
             action_set = match_set.form_action_set(action)
 
-            raw_state, reward, done, _ = env.step(internal_action)
-            state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
+            raw_state, reward, done, _ = env.step(iaction)
+            state = self.cfg.environment_adapter.to_genotype(raw_state)
 
             if done:
                 ClassifierList.apply_reinforcement_learning(
@@ -202,32 +178,4 @@ class RACS(Agent):
 
             steps += 1
 
-        return steps
-
-    def _collect_agent_metrics(self, trial, steps, total_steps) -> Metric:
-        return {
-            'population': len(self.population),
-            'numerosity': sum(cl.num for cl in self.population),
-            'reliable': len([cl for cl in
-                             self.population if cl.is_reliable()]),
-            'fitness': (sum(cl.fitness for cl in self.population) /
-                        len(self.population)),
-            'cover_ratio': (sum(cl.condition.cover_ratio for cl
-                                in self.population) / len(self.population)),
-            'trial': trial,
-            'steps': steps,
-            'total_steps': total_steps
-        }
-
-    def _collect_environment_metrics(self, env) -> Optional[Metric]:
-        if self.cfg.environment_metrics_fcn:
-            return self.cfg.environment_metrics_fcn(env)
-
-        return None
-
-    def _collect_performance_metrics(self, env) -> Optional[Metric]:
-        if self.cfg.performance_fcn:
-            return self.cfg.performance_fcn(
-                env, self.population, **self.cfg.performance_fcn_params)
-
-        return None
+        return TrialMetrics(steps, reward)

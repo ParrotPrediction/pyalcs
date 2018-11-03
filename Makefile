@@ -12,3 +12,6 @@ test: lint
 
 notebook:
 	jupyter notebook
+
+execute_notebooks:
+	find . -name '*Lake.ipynb' -exec jupyter nbconvert --execute {} --inplace --debug --ExecutePreprocessor.timeout=6000 \;

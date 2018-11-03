@@ -19,6 +19,10 @@ class Perception(collections.abc.Sequence):
 
         self._items.extend(list(observation))
 
+    @classmethod
+    def empty(cls):
+        return cls([], oktypes=(None,))
+
     def __getitem__(self, i):
         return self._items[i]
 
@@ -32,4 +36,5 @@ class Perception(collections.abc.Sequence):
         for si, oi in zip(self, other):
             if si != oi:
                 return False
+
         return True

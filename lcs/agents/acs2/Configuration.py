@@ -1,30 +1,31 @@
-from .EnvironmentAdapter import EnvironmentAdapter
+from typing import Callable
+
+from lcs.agents import EnvironmentAdapter
 
 
 class Configuration:
     def __init__(self,
-                 classifier_length,
-                 number_of_possible_actions,
+                 classifier_length: int,
+                 number_of_possible_actions: int,
                  classifier_wildcard='#',
                  environment_adapter=EnvironmentAdapter,
-                 environment_metrics_fcn=None,
-                 performance_fcn=None,
-                 performance_fcn_params={},
-                 do_ga=False,
-                 do_subsumption=True,
-                 do_action_planning=False,
-                 action_planning_frequency=50,
-                 beta=0.05,
-                 gamma=0.95,
-                 theta_i=0.1,
-                 theta_r=0.9,
-                 epsilon=0.5,
-                 u_max=100000,
-                 theta_exp=20,
-                 theta_ga=100,
-                 theta_as=20,
-                 mu=0.3,
-                 chi=0.8):
+                 user_metrics_collector_fcn: Callable = None,
+                 metrics_trial_frequency: int = 5,
+                 do_ga: bool=False,
+                 do_subsumption: bool=True,
+                 do_action_planning: bool=False,
+                 action_planning_frequency: int=50,
+                 beta: float=0.05,
+                 gamma: float=0.95,
+                 theta_i: float=0.1,
+                 theta_r: float=0.9,
+                 epsilon: float=0.5,
+                 u_max: int=100000,
+                 theta_exp: int=20,
+                 theta_ga: int=100,
+                 theta_as: int=20,
+                 mu: float=0.3,
+                 chi: float=0.8) -> None:
         """
         Creates the configuration object used during training the ACS2 agent.
 
@@ -34,10 +35,6 @@ class Configuration:
         :param classifier_wildcard: wildcard symbol
         :param environment_adapter: EnvironmentAdapter class ACS2 needs to use
             to interact with the environment
-        :param environment_metrics_fcn:
-        :param performance_fcn: function for estimating agent performance
-        :param performance_fcn_params: optional parameters needed for
-            calculating agent performance
         :param do_ga: switch *Genetic Generalization* module
         :param do_subsumption:
         :param do_action_planning: switch Action Planning phase
@@ -49,20 +46,17 @@ class Configuration:
         :param epsilon:
         :param u_max:
         :param theta_exp:
-        :param thera_ga:
+        :param theta_as:
         :param theta_as:
         :param mu:
         :param chi: GA crossover probability
         """
-        if performance_fcn_params is None:
-            performance_fcn_params = {}
         self.classifier_length = classifier_length
         self.number_of_possible_actions = number_of_possible_actions
         self.classifier_wildcard = classifier_wildcard
         self.environment_adapter = environment_adapter
-        self.environment_metrics_fcn = environment_metrics_fcn
-        self.performance_fcn = performance_fcn
-        self.performance_fcn_params = performance_fcn_params
+        self.metrics_trial_frequency = metrics_trial_frequency
+        self.user_metrics_collector_fcn = user_metrics_collector_fcn
         self.do_ga = do_ga
         self.do_subsumption = do_subsumption
         self.do_action_planning = do_action_planning
@@ -84,9 +78,7 @@ class Configuration:
                "\n\t- Classifier length: [{}]" \
                "\n\t- Number of possible actions: [{}]" \
                "\n\t- Classifier wildcard: [{}]" \
-               "\n\t- Environment adapter: [{}]" \
-               "\n\t- Environment metrics function: [{}]" \
-               "\n\t- Performance calculation function: [{}] " \
+               "\n\t- Environment adapter function: [{}]" \
                "\n\t- Do GA: [{}]" \
                "\n\t- Do subsumption: [{}]" \
                "\n\t- Do Action Planning: [{}]" \
@@ -98,8 +90,6 @@ class Configuration:
                     self.number_of_possible_actions,
                     self.classifier_wildcard,
                     self.environment_adapter,
-                    self.environment_metrics_fcn,
-                    self.performance_fcn,
                     self.do_ga,
                     self.do_subsumption,
                     self.do_action_planning,

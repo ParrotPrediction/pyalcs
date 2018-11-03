@@ -4,6 +4,7 @@ from lcs import Perception
 
 
 class TestPerception:
+
     def test_should_handle_str_state(self):
         # given
         obs = "foo"
@@ -50,3 +51,10 @@ class TestPerception:
         # when & then
         with pytest.raises(TypeError) as _:
             Perception(obs)
+
+    def test_should_create_empty_perception(self):
+        # when
+        p = Perception.empty()
+
+        # then
+        assert p is not None

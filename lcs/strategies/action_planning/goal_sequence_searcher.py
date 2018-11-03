@@ -1,10 +1,12 @@
-from lcs import Perception
-from lcs.agents.acs2 import Configuration, Classifier
-from lcs.agents.acs2.ClassifiersList import ClassifiersList
 from typing import List, Optional, Tuple
+
+from lcs import Perception
+from lcs.agents.acs2 import Classifier
+from lcs.agents.acs2.ClassifiersList import ClassifiersList
 
 
 class GoalSequenceSearcher:
+
     def __init__(self):
         self.forward_classifiers = []
         self.backward_classifiers = []
@@ -13,15 +15,23 @@ class GoalSequenceSearcher:
 
     def search_goal_sequence(self,
                              reliable_classifiers: ClassifiersList,
-                             start: str,
-                             goal: str) -> list:
+                             start: Perception,
+                             goal: Perception) -> list:
         """
         Searches a path from start to goal using a bidirectional method in the
         environmental model (i.e. the list of reliable classifiers).
-        :param reliable_classifiers: list of reliable classifiers
-        :param start: Perception
-        :param goal: Perception
-        :return: Sequence of actions
+
+        Parameters
+        ----------
+        reliable_classifiers
+            list of reliable classifiers
+        start: Perception
+        goal: Perception
+
+        Returns
+        -------
+        list
+            sequence of actions
         """
         if len(reliable_classifiers) < 1:
             return []
@@ -71,7 +81,7 @@ class GoalSequenceSearcher:
                                  forward_point: int) -> Tuple[Optional[list],
                                                               int]:
         """
-        Serches one step forward in the reliable_classifiers classifier list.
+        Searches one step forward in the reliable_classifiers classifier list.
         Returns None if nothing was found so far, a sequence with a -1 element
         if the search failed completely
         (which is the case if the allowed array size of 10000 is reached),

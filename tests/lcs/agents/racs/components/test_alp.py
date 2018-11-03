@@ -142,6 +142,8 @@ class TestALP:
             self, _p0, _p1, _child_cond, _child_effect, cfg):
 
         # given
+        cfg.cover_noise = 0.0
+
         p0 = Perception(_p0, oktypes=(float,))
         p1 = Perception(_p1, oktypes=(float,))
         action = random.randint(0, cfg.number_of_possible_actions)

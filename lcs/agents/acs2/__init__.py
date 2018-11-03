@@ -1,5 +1,4 @@
 from .Configuration import Configuration
-from .EnvironmentAdapter import EnvironmentAdapter
 from .Condition import Condition
 from .Effect import Effect
 from .PMark import PMark

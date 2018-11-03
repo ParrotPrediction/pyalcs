@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 from copy import copy
 
 from lcs import Perception
+from lcs.representations.visualization import visualize
 from . import Configuration
 from .. import PerceptionString
 
@@ -14,6 +17,11 @@ class Effect(PerceptionString):
     def __init__(self, lst, cfg: Configuration) -> None:
         self.cfg = cfg
         super().__init__(lst, cfg.classifier_wildcard, cfg.oktypes)
+
+    def __repr__(self):
+        return "|".join(visualize(
+            (ubr.lower_bound, ubr.upper_bound),
+            self.cfg.encoder.range) for ubr in self)
 
     @property
     def specify_change(self) -> bool:
@@ -73,3 +81,6 @@ class Effect(PerceptionString):
                     return False
 
         return True
+
+    def subsumes(self, other: Effect) -> bool:
+        return all(ei.incorporates(oi) for ei, oi in zip(self, other))

@@ -2,13 +2,21 @@ import gym
 # noinspection PyUnresolvedReferences
 import gym_multiplexer
 
-from examples.acs2.boolean_multiplexer.utils import calculate_performance
-from lcs.agents.acs2 import ACS2, Configuration, EnvironmentAdapter
+from examples.acs2.boolean_multiplexer.utils import reliable_cl_exists
+from lcs.agents import EnvironmentAdapter
+from lcs.agents.acs2 import ACS2, Configuration
+
+
+def mpx_metrics(pop, env):
+    return {
+        'population': len(pop),
+        'reliable_cl_exists': reliable_cl_exists(env, pop, ctrl_bits=2)
+    }
 
 
 class MultiplexerAdapter(EnvironmentAdapter):
     @staticmethod
-    def env_state_to_acs(env_state):
+    def to_genotype(env_state):
         return [str(x) for x in env_state]
 
 
@@ -20,17 +28,17 @@ if __name__ == '__main__':
     cfg = Configuration(mp.env.observation_space.n, 2,
                         do_ga=False,
                         environment_adapter=MultiplexerAdapter(),
-                        performance_fcn=calculate_performance,
-                        performance_fcn_params={'ctrl_bits': 2})
+                        metrics_trial_frequency=50,
+                        user_metrics_collector_fcn=mpx_metrics)
     agent = ACS2(cfg)
 
     # Explore the environment
-    population, _ = agent.explore(mp, 1500)
+    population, explore_metrics = agent.explore(mp, 1500)
 
     # Exploit the environment
     agent = ACS2(cfg, population)
-    population, metrics = agent.exploit(mp, 50)
+    population, exploit_metrics = agent.exploit(mp, 50)
 
     # See how it went
-    for metric in metrics:
+    for metric in explore_metrics:
         print(metric)

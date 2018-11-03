@@ -1,94 +1,112 @@
-import math
-import random
-from typing import Tuple
+import itertools
+from typing import List
 
-from scipy.stats import norm
+import numpy as np
 
-from lcs.agents.racs import Classifier
+from lcs.agents import PerceptionString
+from lcs.agents.racs import Classifier, Condition, Effect
 from lcs.representations import UBR
+from lcs.representations.RealValueEncoder import RealValueEncoder
 
 
-def mutate(cl: Classifier, bounds: Tuple[int, int], mu: float) -> None:
+def mutate(cl: Classifier, mu: float) -> None:
     """
-    Tries to generalize the classifier condition and effect part.
-    Each attribute (both lower/upper bound) have `mu` chances of being broaden.
+    Tries to alternate the classifier condition and effect part.
+    Each attribute (both lower/upper bound) have `mu` chances of being changed.
 
     Parameters
     ----------
     cl: Classifier
         classifier to be modified
-    bounds: Tuple[int, int]
-        tuple with minimum and maximum encoded value for the attribute
     mu: float
-        probability of executing mutation on single bound
+        probability of executing mutation on single interval bound
     """
-    for idx, (c, e) in enumerate(zip(cl.condition, cl.effect)):
+    # TODO: maybe it should only widen ...
+    encoder = cl.cfg.encoder
+    noise_max = cl.cfg.mutation_noise
+
+    for c, e in zip(cl.condition, cl.effect):
         if c != cl.cfg.classifier_wildcard:
-            cl.condition[idx] = _mutate_attribute(c, bounds, mu)
-
+            _mutate_attribute(c, encoder, noise_max, mu)
         if e != cl.cfg.classifier_wildcard:
-            cl.effect[idx] = _mutate_attribute(e, bounds, mu)
+            _mutate_attribute(e, encoder, noise_max, mu)
 
 
-def _mutate_attribute(ubr: UBR, bounds: Tuple[int, int], mu: float) -> UBR:
-    rmin, rmax = bounds[0], bounds[1]
+def crossover(parent: Classifier, donor: Classifier):
+    assert parent.cfg.classifier_length == donor.cfg.classifier_length
 
-    # Calculate global spread
-    spread = _calculate_spread(rmax)
+    # flatten parent and donor perception strings
+    p_cond_flat = _flatten(parent.condition)
+    d_cond_flat = _flatten(donor.condition)
+    p_effect_flat = _flatten(parent.effect)
+    d_effect_flat = _flatten(donor.effect)
 
-    lb, ub = ubr.lower_bound, ubr.upper_bound
-    nlb, nub = lb, ub
+    # select crossing points
+    left, right = sorted(np.random.choice(
+        range(0, len(p_cond_flat) + 1), 2, replace=False))
 
-    # Generate new lower bound
-    if random.random() < mu:
-        while True:
-            nlb = _draw(lb, spread)
-            if rmin <= nlb <= lb:
-                break
+    assert left < right
 
-    # Generate new upper bound
-    if random.random() < mu:
-        while True:
-            nub = _draw(ub, spread)
-            if ub <= nub <= rmax:
-                break
+    # extract chromosomes
+    p_cond_chromosome = p_cond_flat[left:right]
+    d_cond_chromosome = d_cond_flat[left:right]
+    p_effect_chromosome = p_effect_flat[left:right]
+    d_effect_chromosome = d_effect_flat[left:right]
 
-    return UBR(nlb, nub)
+    # Flip everything
+    p_cond_flat[left:right] = d_cond_chromosome
+    d_cond_flat[left:right] = p_cond_chromosome
+    p_effect_flat[left:right] = d_effect_chromosome
+    d_effect_flat[left:right] = p_effect_chromosome
+
+    # Rebuild proper perception strings
+    parent.condition = Condition(_unflatten(p_cond_flat), cfg=parent.cfg)
+    donor.condition = Condition(_unflatten(d_cond_flat), cfg=donor.cfg)
+    parent.effect = Effect(_unflatten(p_effect_flat), cfg=parent.cfg)
+    donor.effect = Effect(_unflatten(d_effect_flat), cfg=parent.cfg)
 
 
-def _calculate_spread(rmax: int) -> float:
+def _mutate_attribute(ubr: UBR, encoder: RealValueEncoder,
+                      noise_max: float, mu: float):
+
+    if np.random.random() < mu:
+        noise = np.random.uniform(-noise_max, noise_max)
+        x1p = encoder.decode(ubr.x1)
+        ubr.x1 = encoder.encode(x1p, noise)
+
+    if np.random.random() < mu:
+        noise = np.random.uniform(-noise_max, noise_max)
+        x2p = encoder.decode(ubr.x2)
+        ubr.x2 = encoder.encode(x2p, noise)
+
+
+def _flatten(ps: PerceptionString) -> List[int]:
     """
-    Calculates the suggested spread for the neighbouring mutation points.
-    For bigger ranges the spread should also be bigger.
-
-    Parameters
-    ----------
-    rmax: int
-        maximum value in the range
+    Flattens the perception string interval predicate into a flat list
 
     Returns
     -------
-    float
-        spread value according to the range
+    List
+        list of all alleles (encoded)
     """
-    return math.log(rmax)
+    return list(itertools.chain.from_iterable(
+        map(lambda ip: (ip.x1, ip.x2), ps)))
 
 
-def _draw(center: int, spread: float) -> int:
+def _unflatten(flatten: List[int]) -> List[UBR]:
     """
-    Draws a random number using Gaussian distribution and converts it
-    into integer.
+    Unflattens list by creating pairs of UBR using consecutive list items
 
     Parameters
     ----------
-    center: int
-        center for Gaussian distribution generator
-    spread: float
-        spread for Gaussian distribution generator
+    flatten: List[int]
+        Flat list of encoded perceptions
 
     Returns
     -------
-    int
-        random number
+    List[UBR]
+        List of created UBRs
     """
-    return int(norm.rvs(center, spread))
+    # Make sure we are not left with any outliers
+    assert len(flatten) % 2 == 0
+    return [UBR(flatten[i], flatten[i + 1]) for i in range(0, len(flatten), 2)]

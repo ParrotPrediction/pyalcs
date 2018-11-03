@@ -6,6 +6,7 @@ from copy import copy
 from typing import Callable
 
 from lcs import Perception
+from lcs.representations.visualization import visualize
 from . import Configuration
 from .. import PerceptionString
 
@@ -95,18 +96,10 @@ class Condition(PerceptionString):
         encoded_perception = map(self.cfg.encoder.encode, perception)
         return all(p in ubr for p, ubr in zip(encoded_perception, self))
 
-    def does_match_condition(self, other: Condition):
-        """
-        Checks if self conditions matches other one.
-
-        Parameters
-        ----------
-        other: Condition
-            other Condition
-
-        Returns
-        -------
-        bool
-            True if `other` is matched by `self`, False otherwise
-        """
+    def subsumes(self, other: Condition):
         return all(ci.incorporates(oi) for ci, oi in zip(self, other))
+
+    def __repr__(self):
+        return "|".join(visualize(
+            (ubr.lower_bound, ubr.upper_bound),
+            self.cfg.encoder.range) for ubr in self)

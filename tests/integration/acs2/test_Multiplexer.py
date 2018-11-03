@@ -3,14 +3,14 @@ import gym
 import gym_multiplexer
 import pytest
 
-from examples.acs2.boolean_multiplexer.utils import calculate_performance
-from lcs.agents.acs2 import ACS2, Configuration, EnvironmentAdapter
+from lcs.agents import EnvironmentAdapter
+from lcs.agents.acs2 import ACS2, Configuration
 from .utils import count_macroclassifiers, count_microclassifiers
 
 
 class MultiplexerAdapter(EnvironmentAdapter):
     @staticmethod
-    def env_state_to_acs(env_state):
+    def to_genotype(env_state):
         return [str(x) for x in env_state]
 
 
@@ -55,9 +55,7 @@ class TestMultiplexer:
         # given
         cfg = Configuration(mp.env.observation_space.n, 2,
                             do_ga=False,
-                            environment_adapter=MultiplexerAdapter(),
-                            performance_fcn=calculate_performance,
-                            performance_fcn_params={'ctrl_bits': 2})
+                            environment_adapter=MultiplexerAdapter())
         agent = ACS2(cfg)
 
         # when
@@ -65,4 +63,4 @@ class TestMultiplexer:
 
         # then
         for metric in metrics:
-            assert metric['performance']['was_correct'] in {0, 1}
+            assert metric['reward'] in {0, 1000}

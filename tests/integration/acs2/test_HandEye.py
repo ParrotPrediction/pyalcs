@@ -1,8 +1,9 @@
 import gym
+# noinspection PyUnresolvedReferences
 import gym_handeye
 import pytest
 
-from examples.acs2.handeye.utils import calculate_performance
+from examples.acs2.handeye.utils import handeye_metrics
 from lcs.agents.acs2 import Configuration, ACS2
 
 
@@ -23,16 +24,17 @@ class TestHandEye:
                             do_ga=False,
                             do_action_planning=True,
                             action_planning_frequency=50,
-                            performance_fcn=calculate_performance)
+                            metrics_trial_frequency=1,
+                            user_metrics_collector_fcn=handeye_metrics)
         agent = ACS2(cfg)
 
         # when
         population, metrics = agent.explore(env, 10)
 
         # then
-        assert metrics[-1]['performance']['knowledge'] > 0.0
-        assert metrics[-1]['performance']['with_block'] > 0.0
-        assert metrics[-1]['performance']['no_block'] > 0.0
+        assert metrics[-1]['knowledge'] > 0.0
+        assert metrics[-1]['with_block'] > 0.0
+        assert metrics[-1]['no_block'] > 0.0
 
     def test_should_evaluate_knowledge(self, env):
         # given
@@ -42,7 +44,7 @@ class TestHandEye:
                             do_ga=False,
                             do_action_planning=True,
                             action_planning_frequency=50,
-                            performance_fcn=calculate_performance)
+                            user_metrics_collector_fcn=handeye_metrics)
         agent = ACS2(cfg)
 
         # when
@@ -50,9 +52,6 @@ class TestHandEye:
 
         # then
         for metric in metrics:
-            assert metric['performance']['knowledge'] >= 0.0
-            assert metric['performance']['with_block'] >= 0.0
-            assert metric['performance']['no_block'] >= 0.0
-            assert metric['performance']['knowledge'] <= 100.0
-            assert metric['performance']['with_block'] <= 100.0
-            assert metric['performance']['no_block'] <= 100.0
+            assert 0.0 <= metric['knowledge'] <= 100.0
+            assert 0.0 <= metric['with_block'] <= 100.0
+            assert 0.0 <= metric['no_block'] <= 100.0

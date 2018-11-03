@@ -1,6 +1,8 @@
 import random
 from typing import Callable, Dict
 
+import numpy as np
+
 from lcs import Perception
 from lcs.strategies.subsumption import find_subsumers
 
@@ -107,10 +109,10 @@ def two_point_crossover(parent, donor) -> None:
     donor
         Classifier
     """
-    left, right = random.sample(range(0, parent.cfg.classifier_length + 1), 2)
+    left, right = sorted(np.random.choice(
+        range(0, parent.cfg.classifier_length + 1), 2, replace=False))
 
-    if left > right:
-        left, right = right, left
+    assert left < right
 
     # Extract chromosomes from condition parts
     chromosome1 = parent.condition[left:right]
