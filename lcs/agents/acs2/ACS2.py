@@ -8,7 +8,6 @@ from lcs.strategies.action_planning.action_planning import \
 from . import ClassifiersList, Configuration
 from ...agents import Agent
 from ...strategies.action_selection import choose_action
-from ...utils import parse_state, parse_action
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +33,7 @@ class ACS2(Agent):
         # Initial conditions
         steps = 0
         raw_state = env.reset()
-        state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
+        state = self.cfg.environment_adapter.to_genotype(raw_state)
         action = env.action_space.sample()
         reward = 0
         prev_state = Perception.empty()
@@ -90,13 +89,13 @@ class ACS2(Agent):
                 match_set,
                 self.cfg.number_of_possible_actions,
                 self.cfg.epsilon)
-            internal_action = parse_action(action, self.cfg.action_mapping_fcn)
+            iaction = self.cfg.environment_adapter.to_lcs_action(action)
             logger.debug("\tExecuting action: [%d]", action)
             action_set = match_set.form_action_set(action)
 
             prev_state = state
-            raw_state, reward, done, _ = env.step(internal_action)
-            state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
+            raw_state, reward, done, _ = env.step(iaction)
+            state = self.cfg.environment_adapter.to_genotype(raw_state)
 
             if done:
                 ClassifiersList.apply_alp(
@@ -140,7 +139,7 @@ class ACS2(Agent):
         # Initial conditions
         steps = 0
         raw_state = env.reset()
-        state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
+        state = self.cfg.environment_adapter.to_genotype(raw_state)
 
         reward = 0
         action_set = ClassifiersList()
@@ -162,11 +161,11 @@ class ACS2(Agent):
                 match_set,
                 self.cfg.number_of_possible_actions,
                 epsilon=0.0)
-            internal_action = parse_action(action, self.cfg.action_mapping_fcn)
+            iaction = self.cfg.environment_adapter.to_lcs_action(action)
             action_set = match_set.form_action_set(action)
 
-            raw_state, reward, done, _ = env.step(internal_action)
-            state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
+            raw_state, reward, done, _ = env.step(iaction)
+            state = self.cfg.environment_adapter.to_genotype(raw_state)
 
             if done:
                 ClassifiersList.apply_reinforcement_learning(
@@ -269,9 +268,12 @@ class ACS2(Agent):
                 action = act
                 action_set = ClassifiersList.form_action_set(match_set, action)
 
-                raw_state, reward, done, _ = env.step(parse_action(action))
+                iaction = self.cfg.environment_adapter.to_lcs_action(action)
+
+                raw_state, reward, done, _ = env.step(iaction)
                 prev_state = state
-                state = parse_state(raw_state)
+
+                state = self.cfg.environment_adapter.to_genotype(raw_state)
 
                 if not exists_classifier(action_set, prev_state,
                                          action, state,

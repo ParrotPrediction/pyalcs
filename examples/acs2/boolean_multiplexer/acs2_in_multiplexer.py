@@ -3,6 +3,7 @@ import gym
 import gym_multiplexer
 
 from examples.acs2.boolean_multiplexer.utils import reliable_cl_exists
+from lcs.agents import EnvironmentAdapter
 from lcs.agents.acs2 import ACS2, Configuration
 
 
@@ -13,8 +14,10 @@ def mpx_metrics(pop, env):
     }
 
 
-def _map_perception(perception):
-    return [str(x) for x in perception]
+class MultiplexerAdapter(EnvironmentAdapter):
+    @staticmethod
+    def to_genotype(env_state):
+        return [str(x) for x in env_state]
 
 
 if __name__ == '__main__':
@@ -24,7 +27,7 @@ if __name__ == '__main__':
     # Create agent
     cfg = Configuration(mp.env.observation_space.n, 2,
                         do_ga=False,
-                        perception_mapper_fcn=_map_perception,
+                        environment_adapter=MultiplexerAdapter(),
                         metrics_trial_frequency=50,
                         user_metrics_collector_fcn=mpx_metrics)
     agent = ACS2(cfg)

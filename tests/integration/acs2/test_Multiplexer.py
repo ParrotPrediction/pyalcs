@@ -3,12 +3,15 @@ import gym
 import gym_multiplexer
 import pytest
 
+from lcs.agents import EnvironmentAdapter
 from lcs.agents.acs2 import ACS2, Configuration
 from .utils import count_macroclassifiers, count_microclassifiers
 
 
-def _map_perception(perception):
-    return [str(x) for x in perception]
+class MultiplexerAdapter(EnvironmentAdapter):
+    @staticmethod
+    def to_genotype(env_state):
+        return [str(x) for x in env_state]
 
 
 class TestMultiplexer:
@@ -23,7 +26,7 @@ class TestMultiplexer:
     def test_should_be_no_duplicated_classifiers_without_ga(self, mp):
         # given
         cfg = Configuration(mp.env.observation_space.n, 2,
-                            perception_mapper_fcn=_map_perception,
+                            environment_adapter=MultiplexerAdapter(),
                             do_ga=False)
         agent = ACS2(cfg)
 
@@ -36,7 +39,7 @@ class TestMultiplexer:
     def test_should_be_no_duplicated_classifiers_with_ga(self, mp):
         # given
         cfg = Configuration(mp.env.observation_space.n, 2,
-                            perception_mapper_fcn=_map_perception,
+                            environment_adapter=MultiplexerAdapter(),
                             do_ga=True)
         agent = ACS2(cfg)
 
@@ -52,7 +55,7 @@ class TestMultiplexer:
         # given
         cfg = Configuration(mp.env.observation_space.n, 2,
                             do_ga=False,
-                            perception_mapper_fcn=_map_perception)
+                            environment_adapter=MultiplexerAdapter())
         agent = ACS2(cfg)
 
         # when

@@ -6,7 +6,6 @@ from lcs.agents.Agent import TrialMetrics
 from lcs.strategies.action_selection import choose_action
 from ...agents import Agent
 from ...agents.racs import Configuration, ClassifierList
-from ...utils import parse_state, parse_action
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +45,7 @@ class RACS(Agent):
         # Initial conditions
         steps = 0
         raw_state = env.reset()
-        state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
+        state = self.cfg.environment_adapter.to_genotype(raw_state)
 
         action = env.action_space.sample()
         reward = 0
@@ -93,13 +92,13 @@ class RACS(Agent):
                 match_set,
                 self.cfg.number_of_possible_actions,
                 self.cfg.epsilon)
-            internal_action = parse_action(action, self.cfg.action_mapping_fcn)
             logger.debug("\tExecuting action: [%d]", action)
             action_set = match_set.form_action_set(action)
 
             prev_state = state
-            raw_state, reward, done, _ = env.step(internal_action)
-            state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
+            iaction = self.cfg.environment_adapter.to_lcs_action(action)
+            raw_state, reward, done, _ = env.step(iaction)
+            state = self.cfg.environment_adapter.to_genotype(raw_state)
 
             if done:
                 ClassifierList.apply_alp(
@@ -141,7 +140,7 @@ class RACS(Agent):
 
         steps = 0
         raw_state = env.reset()
-        state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
+        state = self.cfg.environment_adapter.to_genotype(raw_state)
 
         reward = 0
         action_set = ClassifierList()
@@ -163,11 +162,11 @@ class RACS(Agent):
                 match_set,
                 self.cfg.number_of_possible_actions,
                 epsilon=0.0)
-            internal_action = parse_action(action, self.cfg.action_mapping_fcn)
+            iaction = self.cfg.environment_adapter.to_lcs_action(action)
             action_set = match_set.form_action_set(action)
 
-            raw_state, reward, done, _ = env.step(internal_action)
-            state = parse_state(raw_state, self.cfg.perception_mapper_fcn)
+            raw_state, reward, done, _ = env.step(iaction)
+            state = self.cfg.environment_adapter.to_genotype(raw_state)
 
             if done:
                 ClassifierList.apply_reinforcement_learning(
