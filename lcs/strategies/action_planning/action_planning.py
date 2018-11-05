@@ -6,11 +6,10 @@ from lcs.strategies.action_planning.goal_sequence_searcher \
     import GoalSequenceSearcher
 
 
-def exists_classifier(classifiers: ClassifiersList,
-                      p0: Perception,
-                      action: int,
-                      p1: Perception,
-                      quality: float) -> bool:
+def suitable_cl_exists(classifiers: ClassifiersList,
+                       p0: Perception,
+                       action: int,
+                       p1: Perception) -> bool:
     """
 
     Parameters
@@ -21,23 +20,22 @@ def exists_classifier(classifiers: ClassifiersList,
     action: int
     p1: Perception
         situation
-    quality: float
 
     Returns
     -------
     bool
-        True if there is a classifier in this list with a quality
-        higher than 'quality' that matches previous_situation,
-        specifies action, and predicts situation.
+        True if there is a reliable classifier in this list
+        that matches previous_situation, specifies action,
+        and predicts situation.
         False otherwise.
     """
-    for cl in classifiers:
-        if cl.q > quality and cl.does_match(p0) \
+    def _ok(cl):
+        return cl.is_reliable() \
+            and cl.does_match(p0) \
             and cl.action == action \
-            and cl.does_anticipate_correctly(p0,
-                                             p1):
-            return True
-    return False
+            and cl.does_anticipate_correctly(p0, p1)
+
+    return any([cl for cl in classifiers if _ok(cl)])
 
 
 def search_goal_sequence(classifiers: ClassifiersList,

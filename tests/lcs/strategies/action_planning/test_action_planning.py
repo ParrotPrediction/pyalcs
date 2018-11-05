@@ -3,7 +3,7 @@ import pytest
 from lcs import Perception
 from lcs.agents.acs2 import Configuration, ClassifiersList, Classifier
 from lcs.strategies.action_planning.action_planning import \
-    exists_classifier, search_goal_sequence
+    suitable_cl_exists, search_goal_sequence
 
 
 class TestActionPlanning:
@@ -12,13 +12,13 @@ class TestActionPlanning:
     def cfg(self):
         return Configuration(8, 8, theta_r=0.9)
 
-    def test_exists_classifier(self, cfg):
+    def test_should_find_suitable_classifier(self, cfg):
         # given
+        cfg.theta_r = 0.5
         population = ClassifiersList()
         prev_situation = Perception('01100000')
         situation = Perception('11110000')
         act = 0
-        q = 0.5
 
         # C1 - OK
         c1 = Classifier(condition='0##0####', action=0, effect='1##1####',
@@ -46,14 +46,14 @@ class TestActionPlanning:
         population.append(c5)
 
         # when
-        result0 = exists_classifier(population,
-                                    p0=prev_situation,
-                                    p1=situation, action=act, quality=q)
+        result0 = suitable_cl_exists(population,
+                                     p0=prev_situation,
+                                     p1=situation, action=act)
 
         population.append(c1)
-        result1 = exists_classifier(population,
-                                    p0=prev_situation,
-                                    p1=situation, action=act, quality=q)
+        result1 = suitable_cl_exists(population,
+                                     p0=prev_situation,
+                                     p1=situation, action=act)
 
         # then
         assert result0 is False
