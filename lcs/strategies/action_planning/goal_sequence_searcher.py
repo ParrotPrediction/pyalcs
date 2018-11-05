@@ -98,12 +98,12 @@ class GoalSequenceSearcher:
             for match_set_element in match_forward:
                 anticipation = match_set_element. \
                     get_best_anticipation(self.forward_perceptions[i])
-                if self.does_contain_state(self.forward_perceptions,
-                                           anticipation) is None:
+                if self.get_state_idx(self.forward_perceptions,
+                                      anticipation) is None:
                     # state not detected forward -> search in backwards
                     backward_sequence_idx = self. \
-                        does_contain_state(self.backward_perceptions,
-                                           anticipation)
+                        get_state_idx(self.backward_perceptions,
+                                      anticipation)
                     if backward_sequence_idx is None:
                         # state neither detected backwards
                         self.forward_perceptions.append(anticipation)
@@ -145,13 +145,13 @@ class GoalSequenceSearcher:
                 anticipation = match_set_el. \
                     get_backwards_anticipation(self.backward_perceptions[i])
                 if anticipation is not None and self. \
-                        does_contain_state(self.backward_perceptions,
-                                           anticipation) is None:
+                        get_state_idx(self.backward_perceptions,
+                                      anticipation) is None:
                     # Backwards anticipation was formable but
                     # not detected backwards
                     forward_sequence_idx = self.\
-                        does_contain_state(self.forward_perceptions,
-                                           anticipation)
+                        get_state_idx(self.forward_perceptions,
+                                      anticipation)
                     if forward_sequence_idx is None:
                         self.backward_perceptions.append(anticipation)
                         self.backward_classifiers.append(
@@ -257,16 +257,24 @@ class GoalSequenceSearcher:
         return act_seq
 
     @staticmethod
-    def does_contain_state(perceptions: List[Perception],
-                           state: Perception) -> Optional[int]:
+    def get_state_idx(perceptions: List[Perception],
+                      state: Perception) -> Optional[int]:
         """
-        Returns the position in the perception list where 'state' is stored or
-        None if state is not found
-        :param perceptions: Perception list
-        :param state: Perception
-        :return:
+        Returns the position of state in list of perception.
+
+        Parameters
+        ----------
+        perceptions: List[Perception]
+            list of perceptions
+        state: Perception
+            sought perception
+
+        Returns
+        -------
+        Optional[int]
+            Position of perception, None if perception was not found
         """
-        for i, percept in enumerate(perceptions):
-            if percept == state:
-                return i
-        return None
+        try:
+            return perceptions.index(state)
+        except ValueError:
+            return None
