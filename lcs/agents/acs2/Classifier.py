@@ -94,19 +94,19 @@ class Classifier(object):
         return "{} {:2} {:16} {:21} q: {:<5.3} r: {:<6.4} ir: {:<6.4} " \
                "f: {:<6.4} exp: {:<3} tga: {:<5} talp: {:<5} tav: {:<6.3} " \
                "num: {}".format(
-                    self.condition,
-                    gym_maze.ACTION_LOOKUP.get(self.action, '?'),
-                    str(self.effect),
-                    "(" + str(self.mark) + ")",
-                    float(self.q),
-                    float(self.r),
-                    float(self.ir),
-                    float(self.fitness),
-                    self.exp,
-                    self.tga,
-                    self.talp,
-                    float(self.tav),
-                    self.num)
+            self.condition,
+            gym_maze.ACTION_LOOKUP.get(self.action, '?'),
+            str(self.effect),
+            "(" + str(self.mark) + ")",
+            float(self.q),
+            float(self.r),
+            float(self.ir),
+            float(self.fitness),
+            self.exp,
+            self.tga,
+            self.talp,
+            float(self.tav),
+            self.num)
 
     @classmethod
     def copy_from(cls, old_cls: Classifier, time: int):
