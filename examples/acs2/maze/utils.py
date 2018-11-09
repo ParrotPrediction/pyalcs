@@ -36,7 +36,19 @@ def maze_knowledge(population, environment) -> float:
     return nr_correct / len(transitions) * 100.0
 
 
-def print_detailed_knowledge(maze, population):
+def detailed_knowledge(maze, population):
+    """
+    Analyze the population of classifiers to determine what classifiers cover
+    all possible condition-action tuples in the maze.
+
+    For every condition-action tuple (i.e., every situation together with
+    all allowed actions), print the classifiers that match it.
+
+    :param maze: The maze to analyze
+    :param population: The classifier population to analyze
+    :return: String describing the population's knowledge as in the original
+    C++ implementation
+    """
     result = ""
     transitions = maze.env.get_all_possible_transitions()
 
