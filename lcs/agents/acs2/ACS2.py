@@ -95,7 +95,8 @@ class ACS2(Agent):
 
             prev_state = state
             raw_state, reward, done, _ = env.step(iaction)
-            state = Perception(self.cfg.environment_adapter.to_genotype(raw_state))
+            state = Perception(
+                self.cfg.environment_adapter.to_genotype(raw_state))
 
             if done:
                 ClassifiersList.apply_alp(
