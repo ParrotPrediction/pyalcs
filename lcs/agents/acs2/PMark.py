@@ -91,7 +91,7 @@ class PMark(TypedList):
             if len(s) == 0:
                 return self.cfg.classifier_wildcard
             elif len(s) == 1:
-                return next(iter(s)) # the only element in set
+                return next(iter(s))  # the only element in set
             else:
                 return "{" + "".join(x for x in s) + "}"
 
