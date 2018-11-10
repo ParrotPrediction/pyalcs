@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import random
+import logging
 from itertools import chain
 from typing import Optional, List
 
@@ -67,6 +68,41 @@ class ClassifiersList(TypedList):
         return 0.0
 
     @staticmethod
+    def apply_enhanced_effect_part_check(action_set: ClassifiersList,
+                                         new_list: ClassifiersList,
+                                         previous_situation: Perception,
+                                         time: int,
+                                         cfg: Configuration):
+        # Create a list of candidates.
+        # Every enhanceable classifier is a candidate.
+        candidates = [classifier for classifier in action_set
+                      if classifier.is_enhanceable()]
+
+        logging.debug(
+            "Applying enhanced effect part; number of candidates={}; " +
+            "previous situation: {}".format(
+                len(candidates), previous_situation))
+
+        # If there are less than 2 candidates, don't do it
+        if len(candidates) < 2:
+            return
+
+        for candidate in candidates:
+            candidates2 = [classifier for classifier in candidates
+                           if candidate != classifier]
+            if len(candidates2) > 0:
+                merger = random.choice(candidates2)
+                new_classifier = candidate.merge_with(merger,
+                                                      previous_situation,
+                                                      time)
+                if new_classifier is not None:
+                    candidate.reverse_increase_quality()
+                    alp.add_classifier(new_classifier, action_set, new_list,
+                                       cfg.theta_exp)
+
+        return new_list
+
+    @staticmethod
     def apply_alp(population: ClassifiersList,
                   match_set: ClassifiersList,
                   action_set: ClassifiersList,
@@ -124,6 +160,13 @@ class ClassifiersList(TypedList):
             if new_cl is not None:
                 new_cl.tga = time
                 alp.add_classifier(new_cl, action_set, new_list, theta_exp)
+
+        if cfg.do_pee:
+            ClassifiersList.apply_enhanced_effect_part_check(action_set,
+                                                             new_list,
+                                                             p0,
+                                                             time,
+                                                             cfg)
 
         # No classifier anticipated correctly - generate new one
         if not was_expected_case:
