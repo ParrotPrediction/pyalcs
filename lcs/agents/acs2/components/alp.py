@@ -61,6 +61,8 @@ def expected_case(cl: Classifier,
     diff = cl.mark.get_differences(p0)
 
     if diff.specificity == 0:
+        if cl.cfg.do_pee and cl.is_marked():
+            cl.ee = True
         cl.increase_quality()
         return None
 
