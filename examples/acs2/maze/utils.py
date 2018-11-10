@@ -60,7 +60,7 @@ def detailed_knowledge(maze, population):
 
         result += "\n{}-{}-\n{}".format("".join(p0), action, "".join(p1))
         result += "\n"
-        result += population.form_match_set(p0).form_action_set(action)
+        result += str(population.form_match_set(p0).form_action_set(action))
         result += "\n"
 
     return result
