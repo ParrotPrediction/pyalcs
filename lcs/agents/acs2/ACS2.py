@@ -33,7 +33,7 @@ class ACS2(Agent):
         # Initial conditions
         steps = 0
         raw_state = env.reset()
-        state = Perception(self.cfg.environment_adapter.to_genotype(raw_state))
+        state = self.cfg.environment_adapter.to_genotype(raw_state)
         action = env.action_space.sample()
         reward = 0
         prev_state = Perception.empty()
@@ -95,7 +95,7 @@ class ACS2(Agent):
 
             prev_state = state
             raw_state, reward, done, _ = env.step(iaction)
-            state = Perception(self.cfg.environment_adapter.to_genotype(raw_state))
+            state = self.cfg.environment_adapter.to_genotype(raw_state)
 
             if done:
                 ClassifiersList.apply_alp(
