@@ -91,22 +91,13 @@ class Classifier(object):
         return hash((str(self.condition), self.action, str(self.effect)))
 
     def __repr__(self):
-        return "{} {:2} {:16} {:21} q: {:<5.3} r: {:<6.4} ir: {:<6.4} " \
-               "f: {:<6.4} exp: {:<3} tga: {:<5} talp: {:<5} tav: {:<6.3} " \
-               "num: {}".format(
-            self.condition,
-            gym_maze.ACTION_LOOKUP.get(self.action, '?'),
-            str(self.effect),
-            "(" + str(self.mark) + ")",
-            float(self.q),
-            float(self.r),
-            float(self.ir),
-            float(self.fitness),
-            self.exp,
-            self.tga,
-            self.talp,
-            float(self.tav),
-            self.num)
+        return f"{self.condition} " \
+               f"{gym_maze.ACTION_LOOKUP.get(self.action, '?'):2} " \
+               f"{str(self.effect):16} " \
+               f"{'(' + str(self.mark) + ')':21} q: {self.q:<5.3} " \
+               f"r: {self.r:<6.4} ir: {self.ir:<6.4} f: {self.fitness:<6.4} " \
+               f"exp: {self.exp:<3} tga: {self.tga:<5} talp: {self.talp:<5} " \
+               f"tav: {self.tav:<6.3} num: {self.num}"
 
     @classmethod
     def copy_from(cls, old_cls: Classifier, time: int):
