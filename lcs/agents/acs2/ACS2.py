@@ -44,7 +44,7 @@ class ACS2(Agent):
             if self.cfg.do_action_planning and \
                     self._time_for_action_planning(steps + time):
                 # Action Planning for increased model learning
-                steps_ap, state, prev_state, action_set, reward = \
+                steps_ap, state, prev_state, action_set, action, reward = \
                     self._run_action_planning(env, steps + time, state,
                                               prev_state, action_set, action,
                                               reward)
@@ -183,7 +183,7 @@ class ACS2(Agent):
                              action_set: ClassifiersList,
                              action: int,
                              reward: int) -> Tuple[int, Perception, Perception,
-                                                   ClassifiersList, int]:
+                                                   ClassifiersList, int, int]:
         """
         Executes action planning for model learning speed up.
         Method requests goals from 'goal generator' provided by
@@ -211,7 +211,7 @@ class ACS2(Agent):
         if not hasattr(env.env, "get_goal_state"):
             logging.debug("Action planning stopped - "
                           "no function get_goal_state in env")
-            return 0, state, prev_state, action_set, reward
+            return 0, state, prev_state, action_set, action, reward
 
         steps = 0
         done = False
@@ -289,7 +289,7 @@ class ACS2(Agent):
             if i == 0:
                 break
 
-        return steps, state, prev_state, action_set, reward
+        return steps, state, prev_state, action_set, action, reward
 
     def _time_for_action_planning(self, time):
         return time % self.cfg.action_planning_frequency == 0
