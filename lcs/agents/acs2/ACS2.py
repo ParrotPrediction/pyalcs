@@ -204,6 +204,12 @@ class ACS2(Agent):
 
         Returns
         -------
+        steps
+        state
+        prev_state
+        action_set
+        action
+        reward
 
         """
         logging.debug("** Running action planning **")
