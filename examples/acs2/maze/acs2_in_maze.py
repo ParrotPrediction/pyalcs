@@ -23,7 +23,7 @@ def maze_metrics(population, environment):
 if __name__ == '__main__':
 
     # Load desired environment
-    maze = gym.make('BMaze4-v0')
+    maze = gym.make('Maze4-v0')
 
     # Configure and create the agent
     cfg = Configuration(8, 8,
