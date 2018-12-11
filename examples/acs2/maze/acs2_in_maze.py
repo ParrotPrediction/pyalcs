@@ -23,7 +23,7 @@ def maze_metrics(population, environment):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("-e", "--environment", default="BMaze4-v0")
+    parser.add_argument("-e", "--environment", default="Maze4-v0")
     parser.add_argument("--epsilon", default=1.0, type=float)
     parser.add_argument("--ga", action="store_true")
     parser.add_argument("--explore-trials", default=50, type=int)
