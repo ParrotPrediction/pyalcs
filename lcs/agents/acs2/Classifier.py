@@ -7,8 +7,6 @@ from typing import Optional, Union, Callable, List
 from lcs import Perception
 from . import Configuration, Condition, Effect, PMark
 
-import gym_maze
-
 
 logger = logging.getLogger(__name__)
 
@@ -92,7 +90,7 @@ class Classifier(object):
 
     def __repr__(self):
         return f"{self.condition} " \
-               f"{gym_maze.ACTION_LOOKUP.get(self.action, '?'):2} " \
+               f"{self.action} " \
                f"{str(self.effect):16} " \
                f"{'(' + str(self.mark) + ')':21} q: {self.q:<5.3} " \
                f"r: {self.r:<6.4} ir: {self.ir:<6.4} f: {self.fitness:<6.4} " \
