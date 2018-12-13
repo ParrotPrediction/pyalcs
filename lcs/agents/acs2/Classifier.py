@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+import logging
 import random
 from typing import Optional, Union, Callable, List
 
 from lcs import Perception
 from . import Configuration, Condition, Effect, PMark
+
+
+logger = logging.getLogger(__name__)
 
 
 class Classifier(object):
@@ -70,7 +74,8 @@ class Classifier(object):
         self.tav = tav
 
         # TODO: not used yet
-        self.ee = 0
+        # Whether classifier is enhanceable
+        self.ee = False
 
     def __eq__(self, other):
         if self.condition == other.condition and \
@@ -84,10 +89,13 @@ class Classifier(object):
         return hash((str(self.condition), self.action, str(self.effect)))
 
     def __repr__(self):
-        return "{}-{}-{} @ {}".format(self.condition,
-                                      self.action,
-                                      self.effect,
-                                      hex(id(self)))
+        return f"{self.condition} " \
+               f"{self.action} " \
+               f"{str(self.effect):16} " \
+               f"{'(' + str(self.mark) + ')':21} q: {self.q:<5.3} " \
+               f"r: {self.r:<6.4} ir: {self.ir:<6.4} f: {self.fitness:<6.4} " \
+               f"exp: {self.exp:<3} tga: {self.tga:<5} talp: {self.talp:<5} " \
+               f"tav: {self.tav:<6.3} num: {self.num}"
 
     @classmethod
     def copy_from(cls, old_cls: Classifier, time: int):
@@ -188,10 +196,7 @@ class Classifier(object):
                    leave_specialized=False) -> None:
         """
         Specializes the effect part where necessary to correctly anticipate
-        the changes from p0 to p1 and returns a condition which specifies
-        the attributes which must be specified in the condition part.
-        The specific attributes in the returned conditions are set to
-        the necessary values.
+        the changes from p0 to p1.
 
         Parameters
         ----------
@@ -291,7 +296,7 @@ class Classifier(object):
             current situation
         """
         if self.mark.set_mark_using_condition(self.condition, perception):
-            self.ee = 0
+            self.ee = False
 
     def set_alp_timestamp(self, time: int) -> None:
         """
