@@ -130,6 +130,7 @@ class ACS2(Agent):
 
             steps += 1
 
+        # Reward is not accumulated; only last step reward is returned
         return TrialMetrics(steps, reward)
 
     def _run_trial_exploit(self, env, time=None, current_trial=None) \
