@@ -43,7 +43,7 @@ if __name__ == '__main__':
 
     # Explore the environment
     agent = ACS2(cfg)
-    population, explore_metrics = agent.explore(environment, 50)
+    population, explore_metrics = agent.explore(environment, 1000)
 
     # Exploit the environment
     agent = ACS2(cfg, population)
