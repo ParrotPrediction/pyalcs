@@ -42,25 +42,27 @@ def taxi_knowledge(population, environment) -> Dict:
 
     # Count how many transitions are anticipated correctly
     nr_correct = 0
+    nr_all = 0
 
     # For all possible destinations from each path cell
     for start in range(500):
         for action in range(6):
             local_transitions = transitions[start][action]
-            if len(local_transitions) > 1:
-                pass
 
             prob, end, reward, done = local_transitions[0]
 
-            p0 = (str(start), )
-            p1 = (str(end), )
+            if start != end:
+                p0 = (str(start), )
+                p1 = (str(end), )
 
-            if any([True for cl in reliable_classifiers
-                    if cl.predicts_successfully(p0, action, p1)]):
-                nr_correct += 1
+                nr_all += 1
+
+                if any([True for cl in reliable_classifiers
+                        if cl.predicts_successfully(p0, action, p1)]):
+                    nr_correct += 1
 
     return {
-            'knowledge': nr_correct / (500.0 * 6) * 100.0
+            'knowledge': nr_correct / nr_all * 100.0
     }
 
 
