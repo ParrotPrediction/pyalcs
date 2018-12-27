@@ -3,9 +3,6 @@ from typing import Dict
 
 import gym
 # noinspection PyUnresolvedReferences
-import sys
-
-sys.path.append("/home/e-dzia/openai-envs/")
 import gym_taxi_goal
 
 from examples.acs2.taxi.TaxiAdapter import TaxiAdapter
