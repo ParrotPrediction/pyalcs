@@ -122,8 +122,7 @@ class Agent:
                 metrics.append(m)
 
             # Print last metric
-            # TODO TMP 5000
-            if current_trial % 1 == 0:
+            if current_trial % 5000 == 0:
                 logger.info(metrics[-1])
 
             current_trial += 1
