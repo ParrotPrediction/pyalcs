@@ -59,7 +59,7 @@ def taxi_knowledge(population, environment) -> Dict:
                     nr_correct += 1
 
     return {
-            'knowledge': nr_correct / nr_all * 100.0
+        'knowledge': nr_correct / nr_all * 100.0
     }
 
 
