@@ -223,7 +223,8 @@ class ACS2(Agent):
         done = False
 
         while not done:
-            goal_situation = env.env.get_goal_state()
+            goal_situation = self.cfg.environment_adapter.to_genotype(
+                env.env.get_goal_state())
 
             if goal_situation is None:
                 break
