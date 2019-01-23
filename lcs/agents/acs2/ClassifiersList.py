@@ -200,3 +200,8 @@ class ClassifiersList(TypedList):
                 ga.add_classifier(child, p,
                                   population, match_set, action_set,
                                   do_subsumption, theta_exp)
+
+    def __str__(self):
+        return "\n".join(str(classifier)
+                         for classifier
+                         in sorted(self, key=lambda cl: -cl.fitness))
