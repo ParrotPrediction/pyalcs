@@ -42,3 +42,4 @@ Thoughts
 * majority voting for best action
 * mutation should not check for lower/upper bounds. Let it be random (alleles might swap)
 * covering should add some random noise
+* mutation can shrink/broad both condition / effect

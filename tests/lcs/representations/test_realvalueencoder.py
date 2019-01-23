@@ -8,16 +8,22 @@ from lcs.representations.RealValueEncoder import RealValueEncoder
 
 class TestRealValueEncoder:
 
-    @pytest.mark.parametrize("_bits, _val, _encoded", [
-        (2, -0.5, 0),
-        (2, 1.0, 3),
-        (2, 2.0, 3),
-        (2, 3.0, 3),
-    ])
-    def test_should_clip_values_outside_range(self, _bits, _val, _encoded):
-        assert RealValueEncoder(_bits).encode(_val) == _encoded
+    def test_should_deny_encoding_illegal_values(self):
+        # given
+        encoder = RealValueEncoder(2)
 
-    def test_should_deny_illegal_values_when_decoding(self):
+        # when
+        with pytest.raises(ValueError) as e1:
+            encoder.encode(-0.2)
+
+        with pytest.raises(ValueError) as e2:
+            encoder.encode(1.1)
+
+        # then
+        assert e1 is not None
+        assert e2 is not None
+
+    def test_should_deny_decoding_illegal_values(self):
         # given
         encoder = RealValueEncoder(2)
 
@@ -33,9 +39,9 @@ class TestRealValueEncoder:
         assert e2 is not None
 
     @pytest.mark.parametrize("_bits, _val, _encoded", [
-        (1, 0.0, 0), (1, 0.5, 0), (1, 0.51, 1), (1, 1.0, 1),
-        (2, 0.0, 0), (2, 0.33, 1), (2, 0.66, 2), (2, 1.0, 3),
-        (4, 0.0, 0), (4, 0.5, 8), (4, 1.0, 15),
+        (1, .0, 0), (1, .5, 1), (1, 1., 1),
+        (2, .0, 0), (2, .25, 1), (2, .5, 2), (2, .75, 3), (2, 1., 3),
+        (3, .0, 0), (3, .5, 4), (3, 1., 7),
     ])
     def test_should_encode(self, _bits, _val, _encoded):
         assert RealValueEncoder(_bits).encode(_val) == _encoded
@@ -98,7 +104,7 @@ class TestRealValueEncoder:
         encoder = RealValueEncoder(16)
         noise_max = 0.1
 
-        for _ in range(100):
+        for _ in range(50):
             # when
             val = random.random()
             encoded = encoder.encode(val)
@@ -113,7 +119,7 @@ class TestRealValueEncoder:
         encoder = RealValueEncoder(16)
         noise_max = -0.1
 
-        for _ in range(100):
+        for _ in range(50):
             # when
             val = random.random()
             encoded = encoder.encode(val)

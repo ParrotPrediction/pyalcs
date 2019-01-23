@@ -87,14 +87,14 @@ class TestCondition:
 
     @pytest.mark.parametrize("_condition, _covered_pct", [
         ([UBR(0, 15), UBR(0, 15)], 1.0),
-        ([UBR(7, 7), UBR(4, 4)], 0.0),
-        ([UBR(7, 8), UBR(4, 5)], 0.06),
-        ([UBR(2, 8), UBR(4, 10)], 0.4),
+        ([UBR(7, 7), UBR(4, 4)], 0.0625),
+        ([UBR(7, 8), UBR(4, 5)], 0.125),
+        ([UBR(2, 8), UBR(4, 10)], 0.4375),
     ])
     def test_should_calculate_cover_ratio(
             self, _condition, _covered_pct, cfg):
         cond = Condition(_condition, cfg=cfg)
-        assert abs(cond.cover_ratio - _covered_pct) < 0.05
+        assert cond.cover_ratio == _covered_pct
 
     @pytest.mark.parametrize("_condition, _perception, _result", [
         ([UBR(0, 15), UBR(0, 15)], [0.2, 0.4], True),

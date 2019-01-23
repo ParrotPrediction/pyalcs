@@ -7,7 +7,7 @@ from lcs import Perception
 from . import Configuration, Condition, Effect, PMark
 
 
-class Classifier(object):
+class Classifier:
 
     __slots__ = ['condition', 'action', 'effect', 'mark', 'q', 'r',
                  'ir', 'num', 'exp', 'talp', 'tga', 'tav', 'ee', 'cfg']

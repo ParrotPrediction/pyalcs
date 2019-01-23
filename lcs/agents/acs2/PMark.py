@@ -56,7 +56,7 @@ class PMark(TypedList):
     def get_differences(self, p0: Perception) -> Condition:
         """
         Determines the strongest differences in between the mark
-        and perception.
+        and current perception.
 
         :param: perception
         :return: condition that specifies all the differences.

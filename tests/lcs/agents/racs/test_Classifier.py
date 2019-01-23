@@ -44,6 +44,25 @@ class TestClassifier:
 
         assert cl_1 == cl_2
 
+    def test_should_find_similar(self):
+        # given
+        cfg = Configuration(3, 2, encoder=RealValueEncoder(2))
+        cl1 = Classifier(
+            condition=Condition([UBR(0, 0), UBR(0, 3), UBR(0, 3)], cfg=cfg),
+            action=0,
+            effect=Effect([UBR(0, 3), UBR(0, 3), UBR(0, 3)], cfg=cfg),
+            cfg=cfg
+        )
+        cl2 = Classifier(
+            condition=Condition([UBR(0, 0), UBR(0, 3), UBR(0, 3)], cfg=cfg),
+            action=0,
+            effect=Effect([UBR(0, 3), UBR(0, 3), UBR(0, 3)], cfg=cfg),
+            cfg=cfg
+        )
+
+        # then
+        assert cl1 == cl2
+
     @pytest.mark.parametrize("_q, _r, _fitness", [
         (0.0, 0.0, 0.0),
         (0.3, 0.5, 0.15),

@@ -65,6 +65,7 @@ class Classifier:
         self.ee = 0
 
     def __eq__(self, other):
+        # TODO: here we should base on intervals somehow
         if self.condition == other.condition and \
                 self.action == other.action and \
                 self.effect == other.effect:
@@ -115,7 +116,8 @@ class Classifier:
 
     @property
     def fitness(self):
-        return self.q * self.r
+        # TODO: write in docs (modification)
+        return self.q * self.r * self.condition.cover_ratio
 
     @property
     def specified_unchanging_attributes(self) -> List[int]:

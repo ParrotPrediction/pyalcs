@@ -42,11 +42,11 @@ class Condition(PerceptionString):
         Returns
         -------
         float
-            A value between [0.0, 1.0], where
-            0.0 means that condition is extremely narrow
+            A value between (0, 1], where
+            0.0 means that condition is nothing is covered
             1.0 means that condition is maximally general
         """
-        maximum_span = self.cfg.encoder.range[1]
+        maximum_span = self.cfg.encoder.range[1] + 1
         return statistics.mean(r.bound_span / maximum_span for r in self)
 
     def specialize_with_condition(self, other: Condition) -> None:
