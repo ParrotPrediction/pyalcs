@@ -11,20 +11,20 @@ class UBR:
     """
     Real-value representation for unordered-bounded values.
     """
-    x1: int
-    x2: int
+    x1: float
+    x2: float
 
     @property
-    def lower_bound(self) -> int:
+    def lower_bound(self) -> float:
         return min(self.x1, self.x2)
 
     @property
-    def upper_bound(self) -> int:
+    def upper_bound(self) -> float:
         return max(self.x1, self.x2)
 
     @property
-    def bound_span(self) -> int:
-        return sum(1 for _ in range(self.lower_bound, self.upper_bound + 1))
+    def bound_span(self) -> float:
+        return self.upper_bound - self.lower_bound
 
     def incorporates(self, other: UBR) -> bool:
         """
