@@ -228,8 +228,10 @@ def _is_preferred_to_delete(cl_del, cl) -> bool:
     return False
 
 
-def _find_old_classifier(
-        population, cl, use_subsumption: bool, theta_exp: int):
+def _find_old_classifier(population,
+                         cl,
+                         use_subsumption: bool,
+                         theta_exp: int):
 
     old_cl = None
 

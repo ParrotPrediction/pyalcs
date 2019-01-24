@@ -29,7 +29,7 @@ class TestHandEye:
         agent = ACS2(cfg)
 
         # when
-        population, metrics = agent.explore(env, 10)
+        population, metrics = agent.explore(env, 20)
 
         # then
         assert metrics[-1]['knowledge'] > 0.0

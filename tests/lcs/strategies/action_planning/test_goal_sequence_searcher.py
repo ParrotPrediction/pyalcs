@@ -7,11 +7,12 @@ from lcs.strategies.action_planning.goal_sequence_searcher \
 
 
 class TestGoalSequenceSearcher:
+
     @pytest.fixture
     def cfg(self):
         return Configuration(8, 8)
 
-    def test_does_contain_state(self):
+    def test_get_state_idx(self):
         # given
         s0 = Perception("11111111")
         s1 = Perception("00000000")
@@ -21,9 +22,9 @@ class TestGoalSequenceSearcher:
         perceptions2 = [s1, s0]
 
         # when
-        result_0 = GoalSequenceSearcher.does_contain_state(perceptions0, s0)
-        result_none = GoalSequenceSearcher.does_contain_state(perceptions1, s0)
-        result_1 = GoalSequenceSearcher.does_contain_state(perceptions2, s0)
+        result_0 = GoalSequenceSearcher.get_state_idx(perceptions0, s0)
+        result_none = GoalSequenceSearcher.get_state_idx(perceptions1, s0)
+        result_1 = GoalSequenceSearcher.get_state_idx(perceptions2, s0)
 
         # then
         assert result_0 == 0

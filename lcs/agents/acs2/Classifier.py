@@ -11,7 +11,7 @@ from . import Configuration, Condition, Effect, PMark
 logger = logging.getLogger(__name__)
 
 
-class Classifier(object):
+class Classifier:
 
     __slots__ = ['condition', 'action', 'effect', 'mark', 'q', 'r',
                  'ir', 'num', 'exp', 'talp', 'tga', 'tav', 'ee', 'cfg']
@@ -73,7 +73,6 @@ class Classifier(object):
         # Application average
         self.tav = tav
 
-        # TODO: not used yet
         # Whether classifier is enhanceable
         self.ee = False
 

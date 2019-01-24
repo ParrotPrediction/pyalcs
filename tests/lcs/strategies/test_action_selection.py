@@ -29,44 +29,45 @@ class TestActionSelection:
         # then
         assert len(actions) == all_actions
 
-    def test_should_return_best_fitness_action(self, cfg):
+    def test_should_exploit_when_no_effect_specified(self, cfg):
+        # given a classifier not anticipating change
+        cl = Classifier(action=1, cfg=cfg)
+        population = ClassifiersList(*[cl])
+
+        # when
+        action = exploit(population, cfg.number_of_possible_actions)
+
+        # then random action is returned
+        assert action is not None
+
+    def test_should_exploit_with_single_classifier(self, cfg):
         # given
-        all_actions = cfg.number_of_possible_actions
-        population = ClassifiersList()
-
-        # when & then
-        # C1 - does not anticipate change
-        c1 = Classifier(action=1, cfg=cfg)
-        population.append(c1)
-
-        # Some random action should be selected here
-        best_action = exploit(population, all_actions)
-        assert best_action is not None
-
-        # when & then
-        # C2 - does anticipate some change
-        c2 = Classifier(action=2,
+        cl = Classifier(action=2,
                         effect='1###0###',
                         reward=0.25,
                         cfg=cfg)
-        population.append(c2)
+        population = ClassifiersList(*[cl])
 
-        # Here C2 action should be selected
-        best_action = exploit(population, all_actions)
-        assert best_action == 2
+        # when
+        action = exploit(population, cfg.number_of_possible_actions)
 
-        # when & then
-        # C3 - does anticipate change and is quite good
-        c3 = Classifier(action=3,
-                        effect='1#######',
-                        quality=0.8,
-                        reward=5,
-                        cfg=cfg)
-        population.append(c3)
+        # then
+        assert action == 2
 
-        # Here C3 has the biggest fitness score
-        best_action = exploit(population, all_actions)
-        assert best_action == 3
+    def test_should_exploit_using_majority_voting(self, cfg):
+        # given
+        cl1 = Classifier(action=1, effect='1###0###',
+                         reward=0.1, quality=0.7, numerosity=9, cfg=cfg)
+
+        cl2 = Classifier(action=2, effect='1###0###',
+                         reward=0.1, quality=0.7, numerosity=10, cfg=cfg)
+        population = ClassifiersList(*[cl1, cl2])
+
+        # when
+        action = exploit(population, cfg.number_of_possible_actions)
+
+        # then
+        assert action == 2
 
     def test_should_return_random_action(self, cfg):
         # given
@@ -128,25 +129,13 @@ class TestActionSelection:
 
         # Add rest of classifiers
         c1 = Classifier(action=1, numerosity=31, quality=0.72, cfg=cfg)
-        population.append(c1)
-
         c2 = Classifier(action=2, numerosity=2, quality=0.6, cfg=cfg)
-        population.append(c2)
-
         c3 = Classifier(action=3, numerosity=2, quality=0.63, cfg=cfg)
-        population.append(c3)
-
         c4 = Classifier(action=4, numerosity=7, quality=0.75, cfg=cfg)
-        population.append(c4)
-
         c5 = Classifier(action=5, numerosity=1, quality=0.63, cfg=cfg)
-        population.append(c5)
-
         c6 = Classifier(action=6, numerosity=6, quality=0.52, cfg=cfg)
-        population.append(c6)
-
         c7 = Classifier(action=7, numerosity=10, quality=0.36, cfg=cfg)
-        population.append(c7)
+        population += ClassifiersList(*[c1, c2, c3, c4, c5, c6, c7])
 
         # then
         # Classifier C7 should be the worst here

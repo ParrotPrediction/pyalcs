@@ -10,7 +10,7 @@ import lcs.strategies.genetic_algorithms as ga
 import lcs.strategies.reinforcement_learning as rl
 from lcs import TypedList, Perception
 from lcs.agents.racs import Configuration
-from lcs.agents.racs.components.genetic_algorithm import mutate
+from lcs.agents.racs.components.genetic_algorithm import mutate, crossover
 from . import Classifier
 
 
@@ -148,7 +148,7 @@ class ClassifierList(TypedList):
             # Execute cross-over
             if random.random() < chi:
                 if child1.effect == child2.effect:
-                    ga.two_point_crossover(child1, child2)
+                    crossover(child1, child2)
 
                     # Update quality and reward
                     child1.q = child2.q = float(sum([child1.q, child2.q]) / 2)

@@ -63,8 +63,14 @@ def explore(cll, all_actions: int, pb: float = 0.5) -> int:
 
 def exploit(cll, all_actions: int) -> int:
     """
-    Chooses best action according to fitness. If there is no classifier
-    in list (or none is predicting change) than a random action is returned
+    Chooses the best action using deterministic action voting.
+
+    All classifiers anticipating change will be compared.
+    Best action will be selected from classifier having the maximum
+    `fitness` x `numerosity` value
+
+    If there is no classifier in list (or none is predicting change)
+    then a random action is returned.
 
     Parameters
     ----------
@@ -84,7 +90,7 @@ def exploit(cll, all_actions: int) -> int:
 
     if len(anticipated_change_cls) > 0:
         best_classifier = max(anticipated_change_cls,
-                              key=lambda cl: cl.fitness)
+                              key=lambda cl: cl.fitness * cl.num)
 
     if best_classifier is not None:
         return best_classifier.action

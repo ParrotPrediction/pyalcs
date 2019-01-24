@@ -1,4 +1,5 @@
 import itertools
+import logging
 from typing import List
 
 import numpy as np
@@ -8,10 +9,12 @@ from lcs.agents.racs import Classifier, Condition, Effect
 from lcs.representations import UBR
 from lcs.representations.RealValueEncoder import RealValueEncoder
 
+logger = logging.getLogger(__name__)
+
 
 def mutate(cl: Classifier, mu: float) -> None:
     """
-    Tries to alternate the classifier condition and effect part.
+    Tries to alternate (widen) the classifier condition and effect part.
     Each attribute (both lower/upper bound) have `mu` chances of being changed.
 
     Parameters
@@ -21,15 +24,14 @@ def mutate(cl: Classifier, mu: float) -> None:
     mu: float
         probability of executing mutation on single interval bound
     """
-    # TODO: maybe it should only widen ...
     encoder = cl.cfg.encoder
     noise_max = cl.cfg.mutation_noise
+    wildcard = cl.cfg.classifier_wildcard
 
     for c, e in zip(cl.condition, cl.effect):
-        if c != cl.cfg.classifier_wildcard:
-            _mutate_attribute(c, encoder, noise_max, mu)
-        if e != cl.cfg.classifier_wildcard:
-            _mutate_attribute(e, encoder, noise_max, mu)
+        if c != wildcard and e != wildcard:
+            _widen_attribute(c, encoder, noise_max, mu)
+            _widen_attribute(e, encoder, noise_max, mu)
 
 
 def crossover(parent: Classifier, donor: Classifier):
@@ -66,9 +68,11 @@ def crossover(parent: Classifier, donor: Classifier):
     donor.effect = Effect(_unflatten(d_effect_flat), cfg=parent.cfg)
 
 
-def _mutate_attribute(ubr: UBR, encoder: RealValueEncoder,
-                      noise_max: float, mu: float):
+def _widen_attribute(ubr: UBR, encoder: RealValueEncoder,
+                     noise_max: float, mu: float):
 
+    # TODO: we should modify both condition and effect parts with the
+    # same noise.
     if np.random.random() < mu:
         noise = np.random.uniform(-noise_max, noise_max)
         x1p = encoder.decode(ubr.x1)

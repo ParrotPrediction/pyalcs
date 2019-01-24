@@ -4,7 +4,7 @@ from typing import Tuple
 from lcs import Perception
 from lcs.agents.Agent import TrialMetrics
 from lcs.strategies.action_planning.action_planning import \
-    search_goal_sequence, exists_classifier
+    search_goal_sequence, suitable_cl_exists
 from . import ClassifiersList, Configuration
 from ...agents import Agent
 from ...strategies.action_selection import choose_action
@@ -230,8 +230,7 @@ class ACS2(Agent):
                 break
 
             act_sequence = search_goal_sequence(self.population, state,
-                                                goal_situation,
-                                                self.cfg.theta_r)
+                                                goal_situation)
 
             # Execute the found sequence and learn during executing
             i = 0
@@ -282,9 +281,8 @@ class ACS2(Agent):
 
                 state = self.cfg.environment_adapter.to_genotype(raw_state)
 
-                if not exists_classifier(action_set, prev_state,
-                                         action, state,
-                                         self.cfg.theta_r):
+                if not suitable_cl_exists(action_set, prev_state,
+                                          action, state):
 
                     # no reliable classifier was able to anticipate
                     # such a change

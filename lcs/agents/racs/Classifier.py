@@ -65,6 +65,7 @@ class Classifier:
         self.ee = 0
 
     def __eq__(self, other):
+        # TODO: here we should base on intervals somehow
         if self.condition == other.condition and \
                 self.action == other.action and \
                 self.effect == other.effect:

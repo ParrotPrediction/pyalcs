@@ -1,11 +1,9 @@
-from random import randint
-
 import pytest
 
 from lcs import Perception
 from lcs.agents.acs2 import Configuration, ClassifiersList, Classifier
 from lcs.strategies.action_planning.action_planning import \
-    get_quality_classifiers_list, exists_classifier, search_goal_sequence
+    suitable_cl_exists, search_goal_sequence
 
 
 class TestActionPlanning:
@@ -14,42 +12,13 @@ class TestActionPlanning:
     def cfg(self):
         return Configuration(8, 8, theta_r=0.9)
 
-    def test_get_quality_classifiers_list(self, cfg):
+    def test_should_find_suitable_classifier(self, cfg):
         # given
-        population = ClassifiersList()
-
-        # C1 - matching
-        c1 = Classifier(quality=0.9, cfg=cfg)
-
-        # C2 - matching
-        c2 = Classifier(quality=0.7, cfg=cfg)
-
-        # C3 - non-matching
-        c3 = Classifier(quality=0.5, cfg=cfg)
-
-        # C4 - non-matching
-        c4 = Classifier(quality=0.1, cfg=cfg)
-
-        population.append(c1)
-        population.append(c2)
-        population.append(c3)
-        population.append(c4)
-
-        # when
-        match_set = get_quality_classifiers_list(population, 0.5)
-
-        # then
-        assert 2 == len(match_set)
-        assert c1 in match_set
-        assert c2 in match_set
-
-    def test_exists_classifier(self, cfg):
-        # given
+        cfg.theta_r = 0.5
         population = ClassifiersList()
         prev_situation = Perception('01100000')
         situation = Perception('11110000')
         act = 0
-        q = 0.5
 
         # C1 - OK
         c1 = Classifier(condition='0##0####', action=0, effect='1##1####',
@@ -77,14 +46,14 @@ class TestActionPlanning:
         population.append(c5)
 
         # when
-        result0 = exists_classifier(population,
-                                    p0=prev_situation,
-                                    p1=situation, action=act, quality=q)
+        result0 = suitable_cl_exists(population,
+                                     p0=prev_situation,
+                                     p1=situation, action=act)
 
         population.append(c1)
-        result1 = exists_classifier(population,
-                                    p0=prev_situation,
-                                    p1=situation, action=act, quality=q)
+        result1 = suitable_cl_exists(population,
+                                     p0=prev_situation,
+                                     p1=situation, action=act)
 
         # then
         assert result0 is False
@@ -92,8 +61,8 @@ class TestActionPlanning:
 
     def test_search_goal_sequence_1(self, cfg):
         # given
-        start = "01111111"
-        goal = "00111111"
+        start = Perception('01111111')
+        goal = Perception('00111111')
 
         classifiers = ClassifiersList(
             Classifier(condition="#1######", action=1, effect="#0######",
@@ -103,15 +72,15 @@ class TestActionPlanning:
         )
 
         # when
-        result = search_goal_sequence(classifiers, start, goal, cfg.theta_r)
+        result = search_goal_sequence(classifiers, start, goal)
 
         # then
         assert result == [1]
 
     def test_search_goal_sequence_2(self, cfg):
         # given
-        start = "01111111"
-        goal = "00111111"
+        start = Perception('01111111')
+        goal = Perception('00111111')
 
         classifiers = ClassifiersList(
             Classifier(condition="#1######", action=1, effect="#0######",
@@ -121,15 +90,15 @@ class TestActionPlanning:
         )
 
         # when
-        result = search_goal_sequence(classifiers, start, goal, cfg.theta_r)
+        result = search_goal_sequence(classifiers, start, goal)
 
         # then
         assert result == []
 
     def test_search_goal_sequence_3(self, cfg):
         # given
-        start = "01111111"
-        goal = "10111111"
+        start = Perception('01111111')
+        goal = Perception('10111111')
 
         classifiers = ClassifiersList(
             Classifier(condition="#1######", action=1, effect="#0######",
@@ -139,7 +108,7 @@ class TestActionPlanning:
         )
 
         # when
-        result = search_goal_sequence(classifiers, start, goal, cfg.theta_r)
+        result = search_goal_sequence(classifiers, start, goal)
 
         # then
         assert len(result) == 2

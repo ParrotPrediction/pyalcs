@@ -24,7 +24,7 @@ class UBR:
 
     @property
     def bound_span(self) -> int:
-        return sum(1 for _ in range(self.lower_bound, self.upper_bound))
+        return sum(1 for _ in range(self.lower_bound, self.upper_bound + 1))
 
     def incorporates(self, other: UBR) -> bool:
         """

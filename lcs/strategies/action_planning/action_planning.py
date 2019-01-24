@@ -1,14 +1,15 @@
+from typing import List
+
 from lcs import Perception
 from lcs.agents.acs2 import ClassifiersList
 from lcs.strategies.action_planning.goal_sequence_searcher \
     import GoalSequenceSearcher
 
 
-def exists_classifier(classifiers: ClassifiersList,
-                      p0: Perception,
-                      action: int,
-                      p1: Perception,
-                      quality: float) -> bool:
+def suitable_cl_exists(classifiers: ClassifiersList,
+                       p0: Perception,
+                       action: int,
+                       p1: Perception) -> bool:
     """
 
     Parameters
@@ -19,53 +20,27 @@ def exists_classifier(classifiers: ClassifiersList,
     action: int
     p1: Perception
         situation
-    quality: float
 
     Returns
     -------
     bool
-        True if there is a classifier in this list with a quality
-        higher than 'quality' that matches previous_situation,
-        specifies action, and predicts situation.
+        True if there is a reliable classifier in this list
+        that matches previous_situation, specifies action,
+        and predicts situation.
         False otherwise.
     """
-    for cl in classifiers:
-        if cl.q > quality and cl.does_match(p0) \
+    def _ok(cl):
+        return cl.is_reliable() \
+            and cl.does_match(p0) \
             and cl.action == action \
-            and cl.does_anticipate_correctly(p0,
-                                             p1):
-            return True
-    return False
+            and cl.does_anticipate_correctly(p0, p1)
 
-
-def get_quality_classifiers_list(classifiers: ClassifiersList,
-                                 quality: float) -> ClassifiersList:
-    """
-    Constructs classifier list out of a list with q > quality.
-
-    Parameters
-    ----------
-    classifiers
-    quality
-
-    Returns
-    -------
-
-    """
-    # TODO: refactor - list comprehension
-    listp = ClassifiersList()
-
-    for item in classifiers:
-        if item.q > quality:
-            listp.append(item)
-
-    return listp
+    return any([cl for cl in classifiers if _ok(cl)])
 
 
 def search_goal_sequence(classifiers: ClassifiersList,
-                         start_state: Perception,
-                         goal: Perception,
-                         theta_r: float) -> list:
+                         p0: Perception,
+                         p1: Perception) -> List:
     """
     Searches a path from start to goal using a bidirectional method in the
     environmental model (i.e. the list of reliable classifiers).
@@ -73,19 +48,17 @@ def search_goal_sequence(classifiers: ClassifiersList,
     Parameters
     ----------
     classifiers: ClassifiersList
-    start_state: Perception
-    goal: Perception
-    theta_r: int
-        quality theta_r
+    p0: Perception
+        start state
+    p1: Perception
+        destination state
 
     Returns
     -------
     list
         sequence of actions
     """
-    reliable_classifiers = \
-        get_quality_classifiers_list(classifiers,
-                                     quality=theta_r)
+    reliable = [cl for cl in classifiers if cl.is_reliable()]
+    gs = GoalSequenceSearcher()
 
-    return GoalSequenceSearcher().search_goal_sequence(
-        reliable_classifiers, start_state, goal)
+    return gs.search_goal_sequence(ClassifiersList(*reliable), p0, p1)
