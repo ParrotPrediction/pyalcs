@@ -17,17 +17,17 @@ class Classifier:
                  'ir', 'num', 'exp', 'talp', 'tga', 'tav', 'ee', 'cfg']
 
     def __init__(self,
-                 condition: Union[Condition, str, None] = None,
-                 action: Optional[int] = None,
-                 effect: Union[Effect, str, None] = None,
-                 quality: float = 0.5,
-                 reward: float = 0.5,
-                 immediate_reward: float = 0.0,
-                 numerosity: int = 1,
-                 experience: int = 1,
+                 condition: Union[Condition, str, None]=None,
+                 action: Optional[int]=None,
+                 effect: Union[Effect, str, None]=None,
+                 quality: float=0.5,
+                 reward: float=0.5,
+                 immediate_reward: float=0.0,
+                 numerosity: int=1,
+                 experience: int=1,
                  talp=None,
-                 tga: int = 0,
-                 tav: float = 0.0,
+                 tga: int=0,
+                 tav: float=0.0,
                  cfg: Optional[Configuration] = None) -> None:
 
         if cfg is None:

@@ -64,12 +64,17 @@ class RealValueEncoder:
             return self.range[1]
 
         # In other cases iterate over splits to find correct bucket
+        bucket = -1
         for i, _ in enumerate(self.splits[:-1]):
             x1 = self.splits[i]
             x2 = self.splits[i + 1]
 
             if x1 <= val < x2:
-                return i
+                bucket = i
+
+        assert bucket != -1
+
+        return bucket
 
     def decode(self, encoded_val: int) -> float:
         """
