@@ -116,8 +116,7 @@ class Classifier:
 
     @property
     def fitness(self):
-        # TODO: write in docs (modification)
-        return self.q * self.r * self.condition.cover_ratio
+        return self.q * self.r
 
     @property
     def specified_unchanging_attributes(self) -> List[int]:
