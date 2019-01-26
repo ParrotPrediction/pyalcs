@@ -3,10 +3,10 @@
 docs:
 	(cd docs && make html)
 
-lint:
+type_check:
 	mypy lcs
 
-test: lint
+test: type_check
 	py.test -n 4 --pep8 -m pep8
 	py.test -n 4 --cov=lcs tests/
 

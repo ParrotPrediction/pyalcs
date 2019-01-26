@@ -1,7 +1,7 @@
 from typing import Callable
 
 from lcs.agents import EnvironmentAdapter
-from lcs.representations import UBR
+from lcs.representations import Interval, FULL_INTERVAL
 
 
 class Configuration:
@@ -27,11 +27,11 @@ class Configuration:
                  mu: float=0.3,
                  chi: float=0.8) -> None:
 
-        self.oktypes = (UBR,)
+        self.oktypes = (Interval,)
 
         self.classifier_length = classifier_length
         self.number_of_possible_actions = number_of_possible_actions
-        self.classifier_wildcard = UBR(*self.encoder.range)  # TODO
+        self.classifier_wildcard = FULL_INTERVAL
 
         self.environment_adapter = environment_adapter
 

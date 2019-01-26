@@ -6,8 +6,7 @@ import numpy as np
 
 from lcs.agents import PerceptionString
 from lcs.agents.racs import Classifier, Condition, Effect
-from lcs.representations import UBR
-from lcs.representations.RealValueEncoder import RealValueEncoder
+from lcs.representations import Interval
 
 logger = logging.getLogger(__name__)
 
@@ -68,8 +67,7 @@ def crossover(parent: Classifier, donor: Classifier):
     donor.effect = Effect(_unflatten(d_effect_flat), cfg=parent.cfg)
 
 
-def _widen_attribute(ubr: UBR, encoder: RealValueEncoder,
-                     noise_max: float, mu: float):
+def _widen_attribute(ubr: Interval, encoder, noise_max: float, mu: float):
 
     # TODO: we should modify both condition and effect parts with the
     # same noise.
@@ -97,7 +95,7 @@ def _flatten(ps: PerceptionString) -> List[int]:
         map(lambda ip: (ip.x1, ip.x2), ps)))
 
 
-def _unflatten(flatten: List[int]) -> List[UBR]:
+def _unflatten(flatten: List[int]) -> List[Interval]:
     """
     Unflattens list by creating pairs of UBR using consecutive list items
 

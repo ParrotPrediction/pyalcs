@@ -40,7 +40,7 @@ class Interval:
 
         if type(item) is Interval:
             return self.left_bound <= item.left_bound and \
-                   self.right_bound >= item.right_bound
+                self.right_bound >= item.right_bound
 
         elif type(item) is float:
             return self.left_bound <= item <= self.right_bound
@@ -55,3 +55,6 @@ class Interval:
         delta_left = abs(self.left_bound - o.left_bound)
         delta_right = abs(self.right_bound - o.right_bound)
         return (delta_left + delta_right) < 0.01
+
+    def __repr__(self):
+        return f"[{self.left_bound:.2f};{self.right_bound:.2f}]"

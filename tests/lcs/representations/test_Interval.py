@@ -84,3 +84,9 @@ class TestInterval:
     ])
     def test_should_compare_intervals(self, _i1, _i2, _the_same):
         assert (_i1 == _i2) == _the_same
+
+    @pytest.mark.parametrize("_interval, _repr", [
+        (Interval(.2412, .5512), "[0.24;0.55]")
+    ])
+    def test_representation(self, _interval, _repr):
+        assert str(_interval) == _repr

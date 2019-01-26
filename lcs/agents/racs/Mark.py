@@ -3,7 +3,7 @@ from typing import List
 
 from lcs import Perception, TypedList
 from lcs.agents.racs import Configuration, Condition
-from lcs.representations import UBR
+from lcs.representations import Interval
 
 
 class Mark(TypedList):

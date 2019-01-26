@@ -6,7 +6,7 @@ from typing import Optional, List, Callable, Dict
 import numpy as np
 
 from lcs import Perception
-from lcs.representations import UBR
+from lcs.representations import Interval
 from . import Condition, Effect, Mark, Configuration
 
 
