@@ -5,3 +5,9 @@ from .Mark import Mark
 from .Classifier import Classifier
 from .ClassifierList import ClassifierList
 from .RACS import RACS
+
+DELTA = 0.001
+
+
+def eq(p0: float, p1: float) -> bool:
+    return abs(p0 - p1) < DELTA

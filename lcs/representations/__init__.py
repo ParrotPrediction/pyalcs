@@ -1,1 +1,1 @@
-from .UBR import UBR
+from .Interval import Interval

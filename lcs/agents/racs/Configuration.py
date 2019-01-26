@@ -8,7 +8,6 @@ class Configuration:
     def __init__(self,
                  classifier_length: int,
                  number_of_possible_actions: int,
-                 encoder=None,
                  environment_adapter=EnvironmentAdapter,
                  user_metrics_collector_fcn: Callable=None,
                  metrics_trial_frequency: int = 5,
@@ -28,15 +27,11 @@ class Configuration:
                  mu: float=0.3,
                  chi: float=0.8) -> None:
 
-        if encoder is None:
-            raise TypeError('Real number encoder should be passed')
-
         self.oktypes = (UBR,)
-        self.encoder = encoder
 
         self.classifier_length = classifier_length
         self.number_of_possible_actions = number_of_possible_actions
-        self.classifier_wildcard = UBR(*self.encoder.range)
+        self.classifier_wildcard = UBR(*self.encoder.range)  # TODO
 
         self.environment_adapter = environment_adapter
 
