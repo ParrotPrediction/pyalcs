@@ -5,7 +5,7 @@ from typing import Optional, List, Callable, Dict
 
 import numpy as np
 
-from lcs import Perception, DELTA
+from lcs import Perception, is_different
 from lcs.representations import Interval, FULL_INTERVAL
 
 from . import Condition, Effect, Mark, Configuration
@@ -170,7 +170,7 @@ class Classifier:
                     # If we have a specialized attribute don't change it.
                     continue
 
-            if self._is_different(p0[idx], p1[idx]):
+            if is_different(p0[idx], p1[idx]):
                 noise = np.random.uniform(0, self.cfg.cover_noise)
                 # TODO: trim values here (maybe np.trim)
                 self.condition[idx] = Interval(
@@ -229,10 +229,10 @@ class Classifier:
         """
         for idx, eitem in enumerate(self.effect):
             if eitem == self.cfg.classifier_wildcard:
-                if self._is_different(p0[idx], p1[idx]):
+                if is_different(p0[idx], p1[idx]):
                     return False
             else:
-                if not self._is_different(p0[idx], p1[idx]):
+                if not is_different(p0[idx], p1[idx]):
                     return False
 
                 if p1[idx] not in eitem:
@@ -352,7 +352,3 @@ class Classifier:
             return True
 
         return False
-
-    @classmethod
-    def _is_different(cls, a: float, b: float):
-        return abs(a - b) > DELTA

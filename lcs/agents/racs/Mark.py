@@ -1,7 +1,7 @@
 import random
 from typing import List
 
-from lcs import Perception, TypedList
+from lcs import Perception, TypedList, is_different
 from lcs.agents.racs import Configuration, Condition
 from lcs.representations import Interval
 
@@ -22,15 +22,14 @@ class Mark(TypedList):
         """
         return any(len(attrib) != 0 for attrib in self)
 
-    def complement_marks(self, perception: Perception) -> bool:
+    def complement_marks(self, p: Perception) -> bool:
         """
         Adds current perception to the corresponding marking attributes.
         Only extends already marked attributes.
-        Perception get's encoded before being stored.
 
         Parameters
         ----------
-        perception: Perception
+        p: Perception
             agent's perception
 
         Returns
@@ -40,11 +39,11 @@ class Mark(TypedList):
 
         """
         changed = False
-        encoded_perception = list(map(self.cfg.encoder.encode, perception))
 
-        for idx, attrib in enumerate(self):
-            new_elem = encoded_perception[idx]
-            if len(attrib) > 0 and new_elem not in self[idx]:
+        for idx, mark in enumerate(self):
+            new_elem = p[idx]
+
+            if len(mark) > 0 and self._not_in_mark(new_elem, self[idx]):
                 self[idx].add(new_elem)
                 changed = True
 
@@ -52,7 +51,7 @@ class Mark(TypedList):
 
     def set_mark_using_condition(self,
                                  condition: Condition,
-                                 perception: Perception) -> bool:
+                                 p: Perception) -> bool:
         """
         Set's the mark using classifier condition.
         If it is already marked, it gets complemented using perception only.
@@ -63,7 +62,7 @@ class Mark(TypedList):
         ----------
         condition: Condition
             classifier condition
-        perception: Perception
+        p: Perception
             agent's perception
 
         Returns
@@ -72,19 +71,18 @@ class Mark(TypedList):
             True if any attribute was marked, False otherwise
         """
         if self.is_marked():
-            return self.complement_marks(perception)
+            return self.complement_marks(p)
 
         changed = False
-        encoded_perception = list(map(self.cfg.encoder.encode, perception))
 
         for idx, item in enumerate(condition):
             if item == self.cfg.classifier_wildcard:
-                self[idx].add(encoded_perception[idx])
+                self[idx].add(p[idx])
                 changed = True
 
         return changed
 
-    def get_differences(self, p0: Perception) -> Condition:
+    def get_differences(self, p: Perception) -> Condition:
         """
         Difference determination is run when the classifier anticipated the
         change correctly.
@@ -103,7 +101,7 @@ class Mark(TypedList):
 
         Parameters
         ----------
-        p0: Perception
+        p: Perception
 
         Returns
         -------
@@ -115,27 +113,31 @@ class Mark(TypedList):
         diff = Condition.generic(self.cfg)
 
         if self.is_marked():
-            enc_p0 = list(map(self.cfg.encoder.encode, p0))
 
             # Unique and fuzzy difference counts
             nr1, nr2 = 0, 0
 
             # Count difference types
             for idx, item in enumerate(self):
-                if len(item) > 0 and enc_p0[idx] not in item:
+                if len(item) > 0 and self._not_in_mark(p[idx], item):
                     nr1 += 1
                 elif len(item) > 1:
                     nr2 += 1
 
             if nr1 > 0:
-                possible_idx = [pi for pi, p in enumerate(enc_p0) if
-                                p not in self[pi] and len(self[pi]) > 0]
+                possible_idx = [p_idx for p_idx, p in enumerate(p) if
+                                self._not_in_mark(p, self[p_idx]) and len(self[p_idx]) > 0]
+
                 rand_idx = random.choice(possible_idx)
-                p = enc_p0[rand_idx]
-                diff[rand_idx] = UBR(p, p)
+                diff[rand_idx] = Interval(p[rand_idx], p[rand_idx])
             elif nr2 > 0:
-                for pi, p in enumerate(enc_p0):
+                for pi, p in enumerate(p):
                     if len(self[pi]) > 1:
-                        diff[pi] = UBR(p, p)
+                        diff[pi] = Interval(p, p)
 
         return diff
+
+    @staticmethod
+    def _not_in_mark(val: float, mark):
+        assert type(val) is float
+        return all(is_different(val, attrib) for attrib in mark)

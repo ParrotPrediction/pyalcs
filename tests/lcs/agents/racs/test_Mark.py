@@ -2,8 +2,7 @@ import pytest
 
 from lcs import Perception
 from lcs.agents.racs import Configuration, Mark, Condition
-from lcs.representations import UBR
-from lcs.representations.RealValueEncoder import RealValueEncoder
+from lcs.representations import Interval
 
 
 class TestMark:
@@ -11,8 +10,7 @@ class TestMark:
     @pytest.fixture
     def cfg(self):
         return Configuration(classifier_length=2,
-                             number_of_possible_actions=2,
-                             encoder=RealValueEncoder(4))
+                             number_of_possible_actions=2)
 
     def test_should_initialize_empty_mark(self, cfg):
         # when
@@ -33,15 +31,15 @@ class TestMark:
         mark = Mark(cfg)
 
         # when
-        mark[0].add(UBR(2, 5))
+        mark[0].add(Interval(.2, .2))
 
         # then
         assert mark.is_marked() is True
 
     @pytest.mark.parametrize("initmark, perception, changed", [
-        ([[], []], [0.5, 0.5], False),  # shouldn't set mark if empty
-        ([[8], []], [0.5, 0.5], False),  # encoded value already marked
-        ([[5], []], [0.5, 0.5], True)
+        ([[], []], [.5, .5], False),  # shouldn't set mark if not marked
+        ([[.5], []], [.5, .5], False),  # perception value already marked
+        ([[.2], []], [.5, .5], True)
     ])
     def test_should_complement_mark(self, initmark, perception, changed, cfg):
         # given
@@ -56,13 +54,13 @@ class TestMark:
 
     @pytest.mark.parametrize("initmark, _p0, initcond, marked_count", [
         # not marked, all generic classifier, should mark two positions
-        ([[], []], [0.5, 0.5], [], 2),
+        ([[], []], [.5, .5], [], 2),
         # not marked, specified condition, shouldn't get marked
-        ([[], []], [0.5, 0.5], [UBR(1, 3), UBR(2, 3)], 0),
+        ([[], []], [.5, .5], [Interval(.1, .3), Interval(.2, .3)], 0),
         # not marked, one don't care, should mark one
-        ([[], []], [0.5, 0.5], [UBR(1, 3), UBR(0, 15)], 1),
+        ([[], []], [.5, .5], [Interval(.1, .3), Interval(0., 1.)], 1),
         # already marked, should use perception, one mark
-        ([[4], []], [0.5, 0.5], [], 1),
+        ([[.4], []], [.5, .5], [], 1),
     ])
     def test_should_set_mark_using_condition(self, initmark, _p0,
                                              initcond, marked_count, cfg):
@@ -91,11 +89,11 @@ class TestMark:
     @pytest.mark.parametrize("_m, _p0, _specif", [
         # There is no perception in mark - one attribute should be
         # randomly specified
-        ([[2], [4]], [.5, .5], 1),
+        ([[.2], [.4]], [.5, .5], 1),
         # One perception is marked - the other should be specified
-        ([[8], [4]], [.5, .5], 1),
+        ([[.5], [.2]], [.5, .5], 1),
         # Both perceptions are marked - no differences
-        ([[8], [8]], [.5, .5], 0)
+        ([[.5], [.5]], [.5, .5], 0)
     ])
     def test_should_handle_unique_differences(self, _m, _p0, _specif, cfg):
         # given
@@ -110,15 +108,15 @@ class TestMark:
 
     @pytest.mark.parametrize("_m, _p0, _specificity", [
         # There are two marks in one attribute - it should be specified.
-        ([[1, 2], [4]], [.5, .5], 1),
+        ([[.1, .2], [.4]], [.5, .5], 1),
         # Here we have clear unique difference - specify it first
-        ([[1, 2], [8]], [.5, .5], 1),
+        ([[.1, .2], [.5]], [.5, .5], 1),
         # Two fuzzy attributes (containing perception value) - both
         # should be specified
-        ([[6, 8], [5, 8]], [.5, .5], 2),
+        ([[.4, .5], [.3, .5]], [.5, .5], 2),
         # Two fuzzy attributes - but one is unique (does not contain
         # perception)
-        ([[6, 8], [7, 9]], [.5, .5], 1),
+        ([[.4, .5], [.4, .6]], [.5, .5], 1),
     ])
     def test_should_handle_fuzzy_differences(self, _m, _p0, _specificity, cfg):
         # given
@@ -136,6 +134,7 @@ class TestMark:
         mark = Mark(cfg)
         for idx, attribs in enumerate(vals):
             for attrib in attribs:
+                assert type(attrib) is float
                 mark[idx].add(attrib)
 
         return mark
