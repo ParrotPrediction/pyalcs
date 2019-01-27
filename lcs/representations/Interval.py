@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from lcs import DELTA
+
 
 def _assert_proper_value(val: float):
     assert type(val) is float
@@ -24,37 +26,37 @@ class Interval:
         self.x2 = x2
 
     @property
-    def left_bound(self) -> float:
+    def left(self) -> float:
         return min(self.x1, self.x2)
 
     @property
-    def right_bound(self) -> float:
+    def right(self) -> float:
         return max(self.x1, self.x2)
 
     @property
     def span(self) -> float:
-        return self.right_bound - self.left_bound
+        return self.right - self.left
 
     def __contains__(self, item):
         assert type(item) in [Interval, float]
 
         if type(item) is Interval:
-            return self.left_bound <= item.left_bound and \
-                self.right_bound >= item.right_bound
+            return self.left <= item.left and \
+                   self.right >= item.right
 
         elif type(item) is float:
-            return self.left_bound <= item <= self.right_bound
+            return self.left <= item <= self.right
 
         else:
             return False
 
     def __hash__(self):
-        return hash((self.left_bound, self.right_bound))
+        return hash((self.left, self.right))
 
     def __eq__(self, o) -> bool:
-        delta_left = abs(self.left_bound - o.left_bound)
-        delta_right = abs(self.right_bound - o.right_bound)
-        return (delta_left + delta_right) < 0.01
+        delta_left = abs(self.left - o.left)
+        delta_right = abs(self.right - o.right)
+        return (delta_left + delta_right) < DELTA * 2
 
     def __repr__(self):
-        return f"[{self.left_bound:.2f};{self.right_bound:.2f}]"
+        return f"[{self.left:.2f};{self.right:.2f}]"

@@ -41,14 +41,14 @@ class TestInterval:
         (0.5, 0.2, 0.2),
     ])
     def test_should_determine_left_bound(self, x1, x2, left):
-        assert Interval(x1, x2).left_bound == left
+        assert Interval(x1, x2).left == left
 
     @pytest.mark.parametrize("x1, x2, right", [
         (0.2, 0.5, 0.5),
         (0.5, 0.2, 0.5),
     ])
     def test_should_determine_right_bound(self, x1, x2, right):
-        assert Interval(x1, x2).right_bound == right
+        assert Interval(x1, x2).right == right
 
     @pytest.mark.parametrize("_i, _span", [
         (Interval(.0, 1.), 1),

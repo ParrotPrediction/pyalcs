@@ -5,8 +5,7 @@ import pytest
 
 from lcs import Perception
 from lcs.agents.racs import Configuration, Condition, Effect, Classifier
-from lcs.representations import UBR
-from lcs.representations.RealValueEncoder import RealValueEncoder
+from lcs.representations import Interval
 
 
 class TestClassifier:
@@ -14,8 +13,7 @@ class TestClassifier:
     @pytest.fixture
     def cfg(self):
         return Configuration(classifier_length=2,
-                             number_of_possible_actions=2,
-                             encoder=RealValueEncoder(4))
+                             number_of_possible_actions=2)
 
     def test_should_initialize_without_arguments(self, cfg):
         # when
@@ -31,37 +29,18 @@ class TestClassifier:
 
     def test_should_detect_identical_classifier(self, cfg):
         cl_1 = Classifier(
-            condition=Condition([UBR(0, 1), UBR(0, 2)], cfg=cfg),
+            condition=Condition([Interval(0., 1.), Interval(0., 1.)], cfg=cfg),
             action=1,
-            effect=Effect([UBR(2, 3), UBR(4, 5)], cfg=cfg),
+            effect=Effect([Interval(.2, .3), Interval(.4, .5)], cfg=cfg),
             cfg=cfg)
 
         cl_2 = Classifier(
-            condition=Condition([UBR(0, 1), UBR(0, 2)], cfg=cfg),
+            condition=Condition([Interval(0., 1.), Interval(0., 1.)], cfg=cfg),
             action=1,
-            effect=Effect([UBR(2, 3), UBR(4, 5)], cfg=cfg),
+            effect=Effect([Interval(.2, .3), Interval(.4, .5)], cfg=cfg),
             cfg=cfg)
 
         assert cl_1 == cl_2
-
-    def test_should_find_similar(self):
-        # given
-        cfg = Configuration(3, 2, encoder=RealValueEncoder(2))
-        cl1 = Classifier(
-            condition=Condition([UBR(0, 0), UBR(0, 3), UBR(0, 3)], cfg=cfg),
-            action=0,
-            effect=Effect([UBR(0, 3), UBR(0, 3), UBR(0, 3)], cfg=cfg),
-            cfg=cfg
-        )
-        cl2 = Classifier(
-            condition=Condition([UBR(0, 0), UBR(0, 3), UBR(0, 3)], cfg=cfg),
-            action=0,
-            effect=Effect([UBR(0, 3), UBR(0, 3), UBR(0, 3)], cfg=cfg),
-            cfg=cfg
-        )
-
-        # then
-        assert cl1 == cl2
 
     @pytest.mark.parametrize("_q, _r, _fitness", [
         (0.0, 0.0, 0.0),
@@ -74,10 +53,10 @@ class TestClassifier:
     @pytest.mark.parametrize("_effect, _p0, _p1, _result", [
         # Classifier with default pass-through effect
         (None, [0.5, 0.5], [0.5, 0.5], True),
-        ([UBR(0, 15), UBR(10, 12)], [0.5, 0.5], [0.5, 0.5], False),
-        ([UBR(0, 4), UBR(10, 12)], [0.8, 0.8], [0.2, 0.7], True),
-        # second perception attribute is unchanged - should be a wildcard
-        ([UBR(0, 4), UBR(10, 12)], [0.8, 0.8], [0.2, 0.8], False),
+        ([Interval(0., 1.), Interval(.7, .8)], [0.5, 0.5], [0.5, 0.5], False),
+        ([Interval(0., .3), Interval(.6, .8)], [0.8, 0.8], [0.2, 0.7], True),
+        # second effect attribute is unchanged - should be a wildcard
+        ([Interval(0., .3), Interval(.7, .9)], [0.8, 0.8], [0.2, 0.8], False),
     ])
     def test_should_anticipate_change(self, _effect, _p0, _p1, _result, cfg):
         # given
@@ -137,11 +116,16 @@ class TestClassifier:
         assert cl.q == 0.475
 
     @pytest.mark.parametrize("_condition, _effect, _sua", [
-        ([UBR(4, 15), UBR(2, 15)], [UBR(0, 15), UBR(0, 15)], 2),
-        ([UBR(4, 15), UBR(0, 15)], [UBR(0, 15), UBR(0, 15)], 1),
-        ([UBR(0, 15), UBR(0, 15)], [UBR(0, 15), UBR(0, 15)], 0),
-        ([UBR(4, 15), UBR(0, 15)], [UBR(0, 15), UBR(5, 15)], 1),
-        ([UBR(4, 15), UBR(6, 15)], [UBR(4, 15), UBR(6, 15)], 0),
+        ([Interval(.4, 1.), Interval(.2, 1.)],
+         [Interval(0., 1.), Interval(0., 1.)], 2),
+        ([Interval(.4, 1.), Interval(0., 1.)],
+         [Interval(0., 1.), Interval(0., 1.)], 1),
+        ([Interval(0., 1.), Interval(0., 1.)],
+         [Interval(0., 1.), Interval(0., 1.)], 0),
+        ([Interval(.4, 1.), Interval(0., 1.)],
+         [Interval(0., 1.), Interval(.5, 1.)], 1),
+        ([Interval(.4, 1.), Interval(.6, 1.)],
+         [Interval(.4, 1.), Interval(.6, 1.)], 0),
     ])
     def test_should_count_specified_unchanging_attributes(
             self, _condition, _effect, _sua, cfg):
@@ -157,10 +141,12 @@ class TestClassifier:
     def test_should_create_copy(self, cfg):
         # given
         operation_time = random.randint(0, 100)
-        condition = Condition([self._random_ubr(), self._random_ubr()],
+        condition = Condition([self._random_interval(),
+                               self._random_interval()],
                               cfg=cfg)
         action = random.randint(0, 2)
-        effect = Effect([self._random_ubr(), self._random_ubr()], cfg=cfg)
+        effect = Effect([self._random_interval(),
+                         self._random_interval()], cfg=cfg)
 
         cl = Classifier(condition, action, effect,
                         quality=random.random(),
@@ -185,33 +171,34 @@ class TestClassifier:
 
     def test_should_specialize(self, cfg):
         # given
-        p0 = Perception(np.random.random(2), oktypes=(float,))
-        p1 = Perception(np.random.random(2), oktypes=(float,))
+        p0 = Perception(np.random.random(2).tolist(), oktypes=(float,))
+        p1 = Perception(np.random.random(2).tolist(), oktypes=(float,))
         cl = Classifier(cfg=cfg)
 
         # when
         cl.specialize(p0, p1)
 
         # then
-        enc_p0 = list(map(cfg.encoder.encode, p0))
-        enc_p1 = list(map(cfg.encoder.encode, p1))
-
-        for i, (c_ubr, e_ubr) in enumerate(zip(cl.condition, cl.effect)):
-            assert c_ubr.lower_bound <= enc_p0[i] <= c_ubr.upper_bound
-            assert e_ubr.lower_bound <= enc_p1[i] <= e_ubr.upper_bound
+        for i, (c_int, e_int) in enumerate(zip(cl.condition, cl.effect)):
+            assert p0[i] in c_int
+            assert p1[i] in e_int
 
     @pytest.mark.parametrize("_condition, _effect, _soa_before, _soa_after", [
-        ([UBR(4, 15), UBR(2, 15)], [UBR(0, 15), UBR(0, 15)], 2, 1),
-        ([UBR(4, 15), UBR(0, 15)], [UBR(0, 15), UBR(0, 15)], 1, 0),
-        ([UBR(0, 15), UBR(0, 15)], [UBR(0, 15), UBR(0, 15)], 0, 0),
+        ([Interval(.4, 1.), Interval(.2, 1.)],
+         [Interval(0., 1.), Interval(0., 1.)], 2, 1),
+        ([Interval(.4, 1.), Interval(0., 1.)],
+         [Interval(0., 1.), Interval(0., 1.)], 1, 0),
+        ([Interval(0., 1.), Interval(0., 1.)],
+         [Interval(0., 1.), Interval(0., 1.)], 0, 0),
     ])
     def test_should_generalize_randomly_unchanging_condition_attribute(
             self, _condition, _effect, _soa_before, _soa_after, cfg):
 
         # given
-        condition = Condition(_condition, cfg)
-        effect = Effect(_effect, cfg)
-        cl = Classifier(condition=condition, effect=effect, cfg=cfg)
+        cl = Classifier(condition=Condition(_condition, cfg),
+                        effect=Effect(_effect, cfg),
+                        cfg=cfg)
+
         assert len(cl.specified_unchanging_attributes) == _soa_before
 
         # when
@@ -221,10 +208,13 @@ class TestClassifier:
         assert (len(cl.specified_unchanging_attributes)) == _soa_after
 
     @pytest.mark.parametrize("_c1, _c2, _result", [
-        ([UBR(4, 6), UBR(1, 5)], [UBR(4, 6), UBR(1, 4)], True),
-        ([UBR(4, 6), UBR(1, 5)], [UBR(4, 6), UBR(1, 6)], False),
+        ([Interval(.4, .6), Interval(.1, .5)],
+         [Interval(.4, .6), Interval(.1, .4)], True),
+        ([Interval(.4, .6), Interval(.1, .5)],
+         [Interval(.4, .6), Interval(.1, .6)], False),
         # The same classifiers
-        ([UBR(4, 6), UBR(1, 5)], [UBR(4, 6), UBR(1, 5)], False)
+        ([Interval(.4, .6), Interval(.1, .5)],
+         [Interval(.4, .6), Interval(.1, .5)], False)
     ])
     def test_should_find_more_general(self, _c1, _c2, _result, cfg):
         # given
@@ -235,11 +225,11 @@ class TestClassifier:
         assert cl1.is_more_general(cl2) is _result
 
     @pytest.mark.parametrize("_cond, _res", [
-        ([UBR(4, 6), UBR(1, 5)], {1: 2, 2: 0, 3: 0, 4: 0}),
-        ([UBR(0, 6), UBR(1, 5)], {1: 1, 2: 1, 3: 0, 4: 0}),
-        ([UBR(0, 4), UBR(6, 15)], {1: 0, 2: 1, 3: 1, 4: 0}),
-        ([UBR(0, 15), UBR(6, 14)], {1: 1, 2: 0, 3: 0, 4: 1}),
-        ([UBR(0, 15), UBR(0, 15)], {1: 0, 2: 0, 3: 0, 4: 2}),
+        ([Interval(.4, .6), Interval(.1, .5)], {1: 2, 2: 0, 3: 0, 4: 0}),
+        ([Interval(0., .6), Interval(.1, .5)], {1: 1, 2: 1, 3: 0, 4: 0}),
+        ([Interval(0., .4), Interval(.6, 1.)], {1: 0, 2: 1, 3: 1, 4: 0}),
+        ([Interval(0., 1.), Interval(.4, .9)], {1: 1, 2: 0, 3: 0, 4: 1}),
+        ([Interval(0., 1.), Interval(0., 1.)], {1: 0, 2: 0, 3: 0, 4: 2}),
     ])
     def test_count_regions(self, _cond, _res, cfg):
         # given
@@ -249,5 +239,5 @@ class TestClassifier:
         assert cl.get_interval_proportions() == _res
 
     @staticmethod
-    def _random_ubr(lower=0, upper=15):
-        return UBR(random.randint(lower, upper), random.randint(lower, upper))
+    def _random_interval():
+        return Interval(*np.random.random(2).tolist())
