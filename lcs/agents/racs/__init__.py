@@ -3,7 +3,7 @@ from .Condition import Condition
 from .Effect import Effect
 from .Mark import Mark
 from .Classifier import Classifier
-from .ClassifierList import ClassifierList
+from .ClassifiersList import ClassifiersList
 from .RACS import RACS
 
 DELTA = 0.001

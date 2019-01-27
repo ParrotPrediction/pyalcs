@@ -5,7 +5,7 @@ from lcs import Perception
 from lcs.agents.Agent import TrialMetrics
 from lcs.strategies.action_selection import choose_action
 from ...agents import Agent
-from ...agents.racs import Configuration, ClassifierList
+from ...agents.racs import Configuration, ClassifiersList
 
 logger = logging.getLogger(__name__)
 
@@ -15,9 +15,9 @@ class RACS(Agent):
 
     def __init__(self,
                  cfg: Configuration,
-                 population: ClassifierList=None) -> None:
+                 population: ClassifiersList=None) -> None:
         self.cfg = cfg
-        self.population = population or ClassifierList()
+        self.population = population or ClassifiersList()
 
     def get_population(self):
         return self.population
@@ -50,7 +50,7 @@ class RACS(Agent):
         action = env.action_space.sample()
         reward = 0
         prev_state = Perception.empty()
-        action_set = ClassifierList()
+        action_set = ClassifiersList()
         done = False
 
         while not done:
@@ -58,7 +58,7 @@ class RACS(Agent):
 
             if steps > 0:
                 # Apply learning in the last action set
-                ClassifierList.apply_alp(
+                ClassifiersList.apply_alp(
                     self.population,
                     match_set,
                     action_set,
@@ -68,14 +68,14 @@ class RACS(Agent):
                     time + steps,
                     self.cfg.theta_exp,
                     self.cfg)
-                ClassifierList.apply_reinforcement_learning(
+                ClassifiersList.apply_reinforcement_learning(
                     action_set,
                     reward,
                     match_set.get_maximum_fitness(),
                     self.cfg.beta,
                     self.cfg.gamma)
                 if self.cfg.do_ga:
-                    ClassifierList.apply_ga(
+                    ClassifiersList.apply_ga(
                         time + steps,
                         self.population,
                         match_set,
@@ -101,9 +101,9 @@ class RACS(Agent):
             state = self.cfg.environment_adapter.to_genotype(raw_state)
 
             if done:
-                ClassifierList.apply_alp(
+                ClassifiersList.apply_alp(
                     self.population,
-                    ClassifierList(),
+                    ClassifiersList(),
                     action_set,
                     prev_state,
                     action,
@@ -111,14 +111,14 @@ class RACS(Agent):
                     time + steps,
                     self.cfg.theta_exp,
                     self.cfg)
-                ClassifierList.apply_reinforcement_learning(
+                ClassifiersList.apply_reinforcement_learning(
                     action_set,
                     reward,
                     0,
                     self.cfg.beta,
                     self.cfg.gamma)
                 if self.cfg.do_ga:
-                    ClassifierList.apply_ga(
+                    ClassifiersList.apply_ga(
                         time + steps,
                         self.population,
                         match_set,
@@ -143,14 +143,14 @@ class RACS(Agent):
         state = self.cfg.environment_adapter.to_genotype(raw_state)
 
         reward = 0
-        action_set = ClassifierList()
+        action_set = ClassifiersList()
         done = False
 
         while not done:
             match_set = self.population.form_match_set(state)
 
             if steps > 0:
-                ClassifierList.apply_reinforcement_learning(
+                ClassifiersList.apply_reinforcement_learning(
                     action_set,
                     reward,
                     match_set.get_maximum_fitness(),
@@ -169,7 +169,7 @@ class RACS(Agent):
             state = self.cfg.environment_adapter.to_genotype(raw_state)
 
             if done:
-                ClassifierList.apply_reinforcement_learning(
+                ClassifiersList.apply_reinforcement_learning(
                     action_set,
                     reward,
                     0,

@@ -1,6 +1,6 @@
 import pytest
 
-from lcs.agents.racs import Configuration, ClassifierList, \
+from lcs.agents.racs import Configuration, ClassifiersList, \
     Classifier, Condition
 from lcs.agents.racs.metrics import count_averaged_regions
 from lcs.representations import Interval
@@ -27,7 +27,7 @@ class TestMetrics:
         cl4 = Classifier(
             condition=Condition([Interval(0., .9), Interval(0., 1.)], cfg),
             cfg=cfg)
-        population = ClassifierList(*[cl1, cl2, cl3, cl4])
+        population = ClassifiersList(*[cl1, cl2, cl3, cl4])
 
         # when
         result = count_averaged_regions(population)
