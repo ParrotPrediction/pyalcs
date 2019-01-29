@@ -1,5 +1,5 @@
 from lcs.agents import PerceptionString
-from lcs.representations import UBR
+from lcs.representations import Interval
 
 
 class TestPerceptionString:
@@ -16,13 +16,13 @@ class TestPerceptionString:
         assert len(ps) == 3
         assert repr(ps) == '###'
 
-    def test_should_create_empty_for_ubr(self):
+    def test_should_create_empty_for_interval(self):
         # given
         length = 3
-        wildcard = UBR(0, 16)
+        wildcard = Interval(0., 1.)
 
         # when
-        ps = PerceptionString.empty(length, wildcard, oktypes=(UBR,))
+        ps = PerceptionString.empty(length, wildcard, oktypes=(Interval,))
 
         # then
         assert len(ps) == 3
@@ -32,11 +32,11 @@ class TestPerceptionString:
     def test_should_safely_modify_single_attribute(self):
         # given
         length = 3
-        wildcard = UBR(0, 16)
-        ps = PerceptionString.empty(length, wildcard, oktypes=(UBR, ))
+        wildcard = Interval(0., 1.)
+        ps = PerceptionString.empty(length, wildcard, oktypes=(Interval, ))
 
         # when
-        ps[0].x1 = 2
+        ps[0].x1 = .5
 
         # then (check if objects are not stored using references)
-        assert ps[1].x1 == 0
+        assert ps[1].x1 == 0.

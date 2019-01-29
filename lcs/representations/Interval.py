@@ -41,8 +41,7 @@ class Interval:
         assert type(item) in [Interval, float]
 
         if type(item) is Interval:
-            return self.left <= item.left and \
-                   self.right >= item.right
+            return self.left <= item.left and self.right >= item.right
 
         elif type(item) is float:
             return self.left <= item <= self.right

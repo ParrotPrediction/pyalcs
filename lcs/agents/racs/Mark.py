@@ -126,14 +126,15 @@ class Mark(TypedList):
 
             if nr1 > 0:
                 possible_idx = [p_idx for p_idx, p in enumerate(p) if
-                                self._not_in_mark(p, self[p_idx]) and len(self[p_idx]) > 0]
+                                self._not_in_mark(p, self[p_idx]) and
+                                len(self[p_idx]) > 0]
 
                 rand_idx = random.choice(possible_idx)
                 diff[rand_idx] = Interval(p[rand_idx], p[rand_idx])
             elif nr2 > 0:
-                for pi, p in enumerate(p):
+                for pi, p_val in enumerate(p):
                     if len(self[pi]) > 1:
-                        diff[pi] = Interval(p, p)
+                        diff[pi] = Interval(p_val, p_val)
 
         return diff
 

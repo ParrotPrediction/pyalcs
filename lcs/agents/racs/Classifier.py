@@ -5,7 +5,7 @@ from typing import Optional, List, Callable, Dict
 
 import numpy as np
 
-from lcs import Perception, is_different
+from lcs import Perception, is_different, clip
 from lcs.representations import Interval, FULL_INTERVAL
 
 from . import Condition, Effect, Mark, Configuration
@@ -172,13 +172,12 @@ class Classifier:
 
             if is_different(p0[idx], p1[idx]):
                 noise = np.random.uniform(0, self.cfg.cover_noise)
-                # TODO: trim values here (maybe np.trim)
                 self.condition[idx] = Interval(
-                    p0[idx] - noise,
-                    p0[idx] + noise)
+                    clip(p0[idx] - noise),
+                    clip(p0[idx] + noise))
                 self.effect[idx] = Interval(
-                    p1[idx] - noise,
-                    p1[idx] + noise)
+                    clip(p1[idx] - noise),
+                    clip(p1[idx] + noise))
 
     def is_reliable(self) -> bool:
         return self.q > self.cfg.theta_r
