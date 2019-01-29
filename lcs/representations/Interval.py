@@ -14,37 +14,42 @@ class Interval:
     Representation of interval for real-valued boundaries. Can work
     for both OBR (ordered-bounded representation) and UBR (unordered-bounded
     representation).
+
+    An interval is half-opened from the right side - [p, q)
     """
 
-    __slots__ = ['x1', 'x2']
+    __slots__ = ['p', 'q']
 
-    def __init__(self, x1: float, x2: float) -> None:
-        _assert_proper_value(x1)
-        _assert_proper_value(x2)
+    def __init__(self, p: float, q: float) -> None:
+        _assert_proper_value(p)
+        _assert_proper_value(q)
 
-        self.x1 = x1
-        self.x2 = x2
+        self.p = p
+        self.q = q
 
     @property
     def left(self) -> float:
-        return min(self.x1, self.x2)
+        return min(self.p, self.q)
 
     @property
     def right(self) -> float:
-        return max(self.x1, self.x2)
+        return max(self.p, self.q)
 
     @property
     def span(self) -> float:
         return self.right - self.left
 
     def __contains__(self, item):
-        assert type(item) in [Interval, float]
+        assert type(item) in [Interval, float, int]
 
         if type(item) is Interval:
             return self.left <= item.left and self.right >= item.right
 
         elif type(item) is float:
-            return self.left <= item <= self.right
+            return self.left <= item < self.right
+
+        elif type(item) is int:
+            return self.left <= item < self.right
 
         else:
             return False

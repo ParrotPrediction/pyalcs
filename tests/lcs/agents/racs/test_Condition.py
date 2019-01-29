@@ -99,8 +99,8 @@ class TestCondition:
     @pytest.mark.parametrize("_condition, _perception, _result", [
         ([Interval(0., 1.), Interval(0., 1.)], [0.2, 0.4], True),
         ([Interval(0., 1.), Interval(0., .2)], [0.5, 0.5], False),
-        ([Interval(.5, .5), Interval(.65, .65)], [0.5, 0.65], True),
-        ([Interval(.49, .51), Interval(.64, .65)], [0.5, 0.65], True),
+        ([Interval(.5, .55), Interval(.65, .75)], [0.5, 0.65], True),
+        ([Interval(.49, .51), Interval(.64, .66)], [0.5, 0.65], True),
     ])
     def test_should_match_perception(
             self, _condition, _perception, _result, cfg):

@@ -29,14 +29,14 @@ class TestPerceptionString:
         assert ps[0] == ps[1] == ps[2] == wildcard
         assert ps[0] is not ps[1] is not ps[2]
 
-    def test_should_safely_modify_single_attribute(self):
+    def test_should_safely_modify_single_boundary(self):
         # given
         length = 3
         wildcard = Interval(0., 1.)
         ps = PerceptionString.empty(length, wildcard, oktypes=(Interval, ))
 
         # when
-        ps[0].x1 = .5
+        ps[0].p = .5
 
         # then (check if objects are not stored using references)
-        assert ps[1].x1 == 0.
+        assert ps[1].p == 0.

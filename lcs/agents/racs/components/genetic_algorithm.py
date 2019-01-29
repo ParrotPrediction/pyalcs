@@ -74,11 +74,11 @@ def _widen_attribute(interval: Interval, noise_max: float, mu: float):
     # This mutation can also create non suitable classifier!
     if np.random.random() < mu:
         noise = np.random.uniform(-noise_max, noise_max)
-        interval.x1 = clip(interval.x1 + noise)
+        interval.p = clip(interval.p + noise)
 
     if np.random.random() < mu:
         noise = np.random.uniform(-noise_max, noise_max)
-        interval.x2 = clip(interval.x2 + noise)
+        interval.q = clip(interval.q + noise)
 
 
 def _flatten(ps: PerceptionString) -> List:
@@ -91,7 +91,7 @@ def _flatten(ps: PerceptionString) -> List:
         list of all alleles (encoded)
     """
     return list(itertools.chain.from_iterable(
-        map(lambda ip: (ip.x1, ip.x2), ps)))
+        map(lambda ip: (ip.p, ip.q), ps)))
 
 
 def _unflatten(flatten: List) -> List[Interval]:
