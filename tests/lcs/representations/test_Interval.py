@@ -73,7 +73,7 @@ class TestInterval:
     @pytest.mark.parametrize("_interval, _val", [
         (Interval(0.2, 0.5), 0.3),
         (Interval(0.53, 0.52), 0.525),
-        (Interval(0., 1.), 0),
+        (Interval(0., 1.), 0.),
     ])
     def test_should_detect_value_in_interval(self, _interval, _val):
         assert _val in _interval
@@ -89,7 +89,7 @@ class TestInterval:
     @pytest.mark.parametrize("_interval, _val", [
         (Interval(0.2, 0.5), 0.5),
         (Interval(0.53, 0.52), 0.53),
-        (Interval(0., 1.), 1),
+        (Interval(0., 1.), 1.),
     ])
     def test_should_not_be_strict_on_right_boundary(self, _interval, _val):
         assert _val not in _interval

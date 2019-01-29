@@ -40,15 +40,12 @@ class Interval:
         return self.right - self.left
 
     def __contains__(self, item):
-        assert type(item) in [Interval, float, int]
+        assert type(item) in [Interval, float]
 
         if type(item) is Interval:
             return self.left <= item.left and self.right >= item.right
 
         elif type(item) is float:
-            return self.left <= item < self.right
-
-        elif type(item) is int:
             return self.left <= item < self.right
 
         else:
