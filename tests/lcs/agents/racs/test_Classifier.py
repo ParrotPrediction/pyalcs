@@ -238,6 +238,7 @@ class TestClassifier:
         # then
         assert cl.get_interval_proportions() == _res
 
+
     @staticmethod
     def _random_interval():
         return Interval(*np.random.random(2).tolist())

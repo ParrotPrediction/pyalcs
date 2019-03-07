@@ -65,7 +65,6 @@ class Classifier:
         self.ee = False
 
     def __eq__(self, other):
-        # TODO: here we should base on intervals somehow
         if self.condition == other.condition and \
                 self.action == other.action and \
                 self.effect == other.effect:
@@ -171,6 +170,8 @@ class Classifier:
                     continue
 
             if is_different(p0[idx], p1[idx]):
+                # For single step environments that is
+                # most often the validation bit case
                 noise = np.random.uniform(0, self.cfg.cover_noise)
                 self.condition[idx] = Interval(
                     clip(p0[idx] - noise),

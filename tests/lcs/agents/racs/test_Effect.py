@@ -67,6 +67,21 @@ class TestEffect:
 
         # then
         assert effect1.subsumes(effect2) == _result
+
+    @pytest.mark.parametrize("_effect1, _effect2, _result", [
+        ([Interval(0., 1.), Interval(0., 1.)],
+         [Interval(.01, 1.), Interval(0., .99)], True),
+        ([Interval(0., 1.), Interval(0., 1.)],
+         [Interval(.5, .7), Interval(0., 1.)], False)
+    ])
+    def test_should_detect_equal(self, _effect1, _effect2, _result, cfg):
+        # given
+        effect1 = Effect(_effect1, cfg=cfg)
+        effect2 = Effect(_effect2, cfg=cfg)
+
+        # then
+        assert (effect1 == effect2) is _result
+
     #
     # @pytest.mark.parametrize("_effect, _result", [
     #     ([UBR(0, 15), UBR(0, 7)], 'OOOOOOOOOO|OOOOO.....')

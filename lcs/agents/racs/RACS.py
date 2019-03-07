@@ -15,7 +15,7 @@ class RACS(Agent):
 
     def __init__(self,
                  cfg: Configuration,
-                 population: ClassifiersList=None) -> None:
+                 population: ClassifiersList = None) -> None:
         self.cfg = cfg
         self.population = population or ClassifiersList()
 

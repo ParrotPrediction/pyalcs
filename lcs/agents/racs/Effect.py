@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from copy import copy
 
-from lcs import Perception
+from lcs import Perception, is_different
 from . import Configuration
 from .. import PerceptionString
 
@@ -74,7 +74,7 @@ class Effect(PerceptionString):
 
         for p0i, p1i, ei in zip(p0, p1, self):
             if ei != self.wildcard:
-                if p1i not in ei or p0i == p1i:
+                if p1i not in ei or not is_different(p0i, p1i):
                     return False
 
         return True

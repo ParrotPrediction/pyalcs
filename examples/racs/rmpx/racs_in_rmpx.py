@@ -41,7 +41,7 @@ if __name__ == '__main__':
                         mu=0.15)
 
     agent = RACS(cfg)
-    population, metrics = agent.explore_exploit(rmpx, 100)
+    population, metrics = agent.explore(rmpx, 1000)
     logging.info("Done")
 
     # print reliable classifiers
@@ -52,5 +52,6 @@ if __name__ == '__main__':
         logging.info(cl)
 
     # print metrics
+    logging.info("Printing metrics")
     for m in metrics:
         logging.info(m)
