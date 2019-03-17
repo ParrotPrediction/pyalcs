@@ -7,7 +7,6 @@ import gym_multiplexer
 
 from lcs.agents.racs import Configuration, RACS
 from lcs.metrics import population_metrics
-from lcs.representations.RealValueEncoder import RealValueEncoder
 
 # Configure logger
 logging.basicConfig(level=logging.INFO)
@@ -30,10 +29,8 @@ if __name__ == '__main__':
     rmpx = gym.make('real-multiplexer-3bit-v0')
 
     # Create agent
-    encoder = RealValueEncoder(resolution_bits=5)
     cfg = Configuration(rmpx.observation_space.shape[0],
                         rmpx.action_space.n,
-                        encoder=encoder,
                         user_metrics_collector_fcn=_rmpx_metrics,
                         epsilon=1.0,
                         do_ga=True,
@@ -44,7 +41,7 @@ if __name__ == '__main__':
                         mu=0.15)
 
     agent = RACS(cfg)
-    population, metrics = agent.explore_exploit(rmpx, 100)
+    population, metrics = agent.explore(rmpx, 1000)
     logging.info("Done")
 
     # print reliable classifiers
@@ -55,5 +52,6 @@ if __name__ == '__main__':
         logging.info(cl)
 
     # print metrics
+    logging.info("Printing metrics")
     for m in metrics:
         logging.info(m)

@@ -4,10 +4,10 @@ from typing import List
 
 import numpy as np
 
+from lcs import clip
 from lcs.agents import PerceptionString
 from lcs.agents.racs import Classifier, Condition, Effect
-from lcs.representations import UBR
-from lcs.representations.RealValueEncoder import RealValueEncoder
+from lcs.representations import Interval
 
 logger = logging.getLogger(__name__)
 
@@ -24,14 +24,13 @@ def mutate(cl: Classifier, mu: float) -> None:
     mu: float
         probability of executing mutation on single interval bound
     """
-    encoder = cl.cfg.encoder
     noise_max = cl.cfg.mutation_noise
     wildcard = cl.cfg.classifier_wildcard
 
     for c, e in zip(cl.condition, cl.effect):
         if c != wildcard and e != wildcard:
-            _widen_attribute(c, encoder, noise_max, mu)
-            _widen_attribute(e, encoder, noise_max, mu)
+            _widen_attribute(c, noise_max, mu)
+            _widen_attribute(e, noise_max, mu)
 
 
 def crossover(parent: Classifier, donor: Classifier):
@@ -68,23 +67,21 @@ def crossover(parent: Classifier, donor: Classifier):
     donor.effect = Effect(_unflatten(d_effect_flat), cfg=parent.cfg)
 
 
-def _widen_attribute(ubr: UBR, encoder: RealValueEncoder,
-                     noise_max: float, mu: float):
+def _widen_attribute(interval: Interval, noise_max: float, mu: float):
 
     # TODO: we should modify both condition and effect parts with the
     # same noise.
+    # This mutation can also create non suitable classifier!
     if np.random.random() < mu:
         noise = np.random.uniform(-noise_max, noise_max)
-        x1p = encoder.decode(ubr.x1)
-        ubr.x1 = encoder.encode(x1p, noise)
+        interval.p = clip(interval.p + noise)
 
     if np.random.random() < mu:
         noise = np.random.uniform(-noise_max, noise_max)
-        x2p = encoder.decode(ubr.x2)
-        ubr.x2 = encoder.encode(x2p, noise)
+        interval.q = clip(interval.q + noise)
 
 
-def _flatten(ps: PerceptionString) -> List[int]:
+def _flatten(ps: PerceptionString) -> List:
     """
     Flattens the perception string interval predicate into a flat list
 
@@ -94,23 +91,24 @@ def _flatten(ps: PerceptionString) -> List[int]:
         list of all alleles (encoded)
     """
     return list(itertools.chain.from_iterable(
-        map(lambda ip: (ip.x1, ip.x2), ps)))
+        map(lambda ip: (ip.p, ip.q), ps)))
 
 
-def _unflatten(flatten: List[int]) -> List[UBR]:
+def _unflatten(flatten: List) -> List[Interval]:
     """
-    Unflattens list by creating pairs of UBR using consecutive list items
+    Unflattens list by creating pairs of Intervals using consecutive list items
 
     Parameters
     ----------
-    flatten: List[int]
-        Flat list of encoded perceptions
+    flatten: List[float]
+        Flat list of perceptions
 
     Returns
     -------
-    List[UBR]
-        List of created UBRs
+    List[Interval]
+        List of created Intervals
     """
     # Make sure we are not left with any outliers
     assert len(flatten) % 2 == 0
-    return [UBR(flatten[i], flatten[i + 1]) for i in range(0, len(flatten), 2)]
+    return [Interval(flatten[i], flatten[i + 1])
+            for i in range(0, len(flatten), 2)]

@@ -5,8 +5,7 @@ import pytest
 import lcs.agents.acs2 as acs2
 import lcs.agents.racs as racs
 from lcs.agents.racs import Effect, Condition
-from lcs.representations import UBR
-from lcs.representations.RealValueEncoder import RealValueEncoder
+from lcs.representations import Interval
 from lcs.strategies.subsumption import find_subsumers, \
     is_subsumer, does_subsume
 
@@ -37,8 +36,7 @@ class TestSubsumption:
     @pytest.fixture
     def racs_cfg(self):
         return racs.Configuration(classifier_length=2,
-                                  number_of_possible_actions=2,
-                                  encoder=RealValueEncoder(4))
+                                  number_of_possible_actions=2)
 
     def test_should_find_subsumer(self, acs2_cfg):
         # given
@@ -336,20 +334,27 @@ class TestSubsumption:
     @pytest.mark.parametrize(
         "_e1, _e2, _exp1, _marked, _reliable,"
         "_more_general, _condition_matching, _result", [
-            ([UBR(2, 4), UBR(5, 6)], [UBR(2, 4), UBR(5, 6)], 30, False, True,
-             True, True, True),  # all good
-            ([UBR(2, 4), UBR(5, 6)], [UBR(2, 4), UBR(5, 6)], 30, False, False,
-             True, True, False),  # not reliable
-            ([UBR(2, 4), UBR(5, 6)], [UBR(2, 4), UBR(5, 6)], 30, True, True,
-             True, True, False),  # marked
-            ([UBR(2, 4), UBR(5, 6)], [UBR(2, 4), UBR(5, 6)], 30, False, True,
-             False, True, False),  # less general
-            ([UBR(2, 4), UBR(5, 6)], [UBR(2, 4), UBR(5, 6)], 30, False, True,
-             True, False, False),  # condition not matching
-            ([UBR(2, 4), UBR(5, 6)], [UBR(2, 4), UBR(5, 7)], 30, False, True,
-             True, True, False),  # different effects
-            ([UBR(2, 4), UBR(5, 6)], [UBR(2, 4), UBR(5, 7)], 10, False, True,
-             True, True, False),  # not experienced
+            ([Interval(.2, .4), Interval(.5, .6)],
+             [Interval(.2, .4), Interval(.5, .6)],
+             30, False, True, True, True, True),  # all good
+            ([Interval(.2, .4), Interval(.5, .6)],
+             [Interval(.2, .4), Interval(.5, .6)],
+             30, False, False, True, True, False),  # not reliable
+            ([Interval(.2, .4), Interval(.5, .6)],
+             [Interval(.2, .4), Interval(.5, .6)],
+             30, True, True, True, True, False),  # marked
+            ([Interval(.2, .4), Interval(.5, .6)],
+             [Interval(.2, .4), Interval(.5, .6)],
+             30, False, True, False, True, False),  # less general
+            ([Interval(.2, .4), Interval(.5, .6)],
+             [Interval(.2, .4), Interval(.5, .6)],
+             30, False, True, True, False, False),  # condition not matching
+            ([Interval(.2, .4), Interval(.5, .6)],
+             [Interval(.2, .4), Interval(.5, .7)],
+             30, False, True, True, True, False),  # different effects
+            ([Interval(.2, .4), Interval(.5, .6)],
+             [Interval(.2, .4), Interval(.5, .6)],
+             10, False, True, True, True, False),  # not experienced
         ])
     def test_should_detect_subsumption(self, _e1, _e2, _exp1, _marked,
                                        _reliable, _more_general,

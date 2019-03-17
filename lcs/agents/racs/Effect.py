@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from copy import copy
 
-from lcs import Perception
-from lcs.representations.visualization import visualize
+from lcs import Perception, is_different
 from . import Configuration
 from .. import PerceptionString
 
@@ -18,10 +17,10 @@ class Effect(PerceptionString):
         self.cfg = cfg
         super().__init__(lst, cfg.classifier_wildcard, cfg.oktypes)
 
-    def __repr__(self):
-        return "|".join(visualize(
-            (ubr.lower_bound, ubr.upper_bound),
-            self.cfg.encoder.range) for ubr in self)
+    # def __repr__(self):
+    #     return "|".join(visualize(
+    #         (interval.left_bound, interval.right_bound),
+    #         self.cfg.encoder.range) for interval in self)
 
     @property
     def specify_change(self) -> bool:
@@ -72,15 +71,13 @@ class Effect(PerceptionString):
         bool
             True if specializable, false otherwise
         """
-        encoded_p0 = list(map(self.cfg.encoder.encode, p0))
-        encoded_p1 = list(map(self.cfg.encoder.encode, p1))
 
-        for p0i, p1i, ei in zip(encoded_p0, encoded_p1, self):
+        for p0i, p1i, ei in zip(p0, p1, self):
             if ei != self.wildcard:
-                if p1i not in ei or p0i == p1i:
+                if p1i not in ei or not is_different(p0i, p1i):
                     return False
 
         return True
 
     def subsumes(self, other: Effect) -> bool:
-        return all(ei.incorporates(oi) for ei, oi in zip(self, other))
+        return all(oi in ei for ei, oi in zip(self, other))

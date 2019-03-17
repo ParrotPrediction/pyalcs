@@ -77,6 +77,7 @@ def expected_case(cl: Classifier,
             diff.generalize_specific_attribute_randomly()
             no_spec_new -= 1
 
+    # TODO: here very specific intervals are inserted [p, p)
     child.condition.specialize_with_condition(diff)
 
     if child.q < 0.5:
@@ -121,6 +122,7 @@ def unexpected_case(cl: Classifier,
         return None
 
     child = cl.copy_from(cl, time)
+    # TODO: maybe here we can also create some interval (instead of generics)
     child.specialize(p0, p1, leave_specialized=True)
 
     if child.q < .5:

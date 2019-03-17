@@ -6,7 +6,7 @@ from copy import copy
 from typing import Callable
 
 from lcs import Perception
-from lcs.representations.visualization import visualize
+from lcs.representations import FULL_INTERVAL
 from . import Configuration
 from .. import PerceptionString
 
@@ -16,6 +16,11 @@ class Condition(PerceptionString):
     def __init__(self, lst, cfg: Configuration) -> None:
         self.cfg = cfg
         super().__init__(lst, cfg.classifier_wildcard, cfg.oktypes)
+
+    # def __repr__(self):
+    #     return "|".join(visualize(
+    #         (ubr.left_bound, ubr.right_bound),
+    #         self.cfg.encoder.range) for ubr in self)
 
     @classmethod
     def generic(cls, cfg: Configuration):
@@ -46,8 +51,7 @@ class Condition(PerceptionString):
             0.0 means that condition is nothing is covered
             1.0 means that condition is maximally general
         """
-        maximum_span = self.cfg.encoder.range[1] + 1
-        return statistics.mean(r.bound_span / maximum_span for r in self)
+        return statistics.mean(r.span / FULL_INTERVAL.span for r in self)
 
     def specialize_with_condition(self, other: Condition) -> None:
         """
@@ -76,7 +80,7 @@ class Condition(PerceptionString):
         self[idx] = self.cfg.classifier_wildcard
 
     def generalize_specific_attribute_randomly(
-            self, func: Callable=random.choice) -> None:
+            self, func: Callable = random.choice) -> None:
         """
         Generalizes one randomly selected specified attribute.
 
@@ -89,17 +93,11 @@ class Condition(PerceptionString):
         specific_ids = [ci for ci, c in enumerate(self) if c != self.wildcard]
 
         if len(specific_ids) > 0:
-            ridx = func(specific_ids)
-            self.generalize(ridx)
+            r_idx = func(specific_ids)
+            self.generalize(r_idx)
 
     def does_match(self, perception: Perception):
-        encoded_perception = map(self.cfg.encoder.encode, perception)
-        return all(p in ubr for p, ubr in zip(encoded_perception, self))
+        return all(p in interval for p, interval in zip(perception, self))
 
     def subsumes(self, other: Condition):
-        return all(ci.incorporates(oi) for ci, oi in zip(self, other))
-
-    def __repr__(self):
-        return "|".join(visualize(
-            (ubr.lower_bound, ubr.upper_bound),
-            self.cfg.encoder.range) for ubr in self)
+        return all(oi in ci for ci, oi in zip(self, other))
