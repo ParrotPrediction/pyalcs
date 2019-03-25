@@ -1,5 +1,6 @@
 import itertools
 import logging
+import math
 from typing import List
 
 import numpy as np
@@ -7,6 +8,7 @@ import numpy as np
 from lcs.agents import PerceptionString
 from lcs.agents.racs import Classifier, Condition, Effect
 from lcs.representations import UBR
+from lcs.representations.utils import add_from_both_sides
 from lcs.representations.RealValueEncoder import RealValueEncoder
 
 logger = logging.getLogger(__name__)
@@ -25,13 +27,11 @@ def mutate(cl: Classifier, mu: float) -> None:
         probability of executing mutation on single interval bound
     """
     encoder = cl.cfg.encoder
-    noise_max = cl.cfg.mutation_noise
     wildcard = cl.cfg.classifier_wildcard
 
     for c, e in zip(cl.condition, cl.effect):
         if c != wildcard and e != wildcard:
-            _widen_attribute(c, encoder, noise_max, mu)
-            _widen_attribute(e, encoder, noise_max, mu)
+            _widen(c, e, encoder, mu)
 
 
 def crossover(parent: Classifier, donor: Classifier):
@@ -68,20 +68,31 @@ def crossover(parent: Classifier, donor: Classifier):
     donor.effect = Effect(_unflatten(d_effect_flat), cfg=parent.cfg)
 
 
-def _widen_attribute(ubr: UBR, encoder: RealValueEncoder,
-                     noise_max: float, mu: float):
+def _widen(c_ubr: UBR, e_ubr: UBR, encoder: RealValueEncoder, mu: float):
+    """
+    This method add the same noise to condition and effect interval.
+    Noise is added in genotype space (encoded) to both sides of the interval
 
-    # TODO: we should modify both condition and effect parts with the
-    # same noise.
+    Parameters
+    ----------
+    c_ubr: UBR
+        condition allele
+    e_ubr: UBR
+        effect allele
+    encoder: RealValueEncoder
+    mu: float
+    """
     if np.random.random() < mu:
-        noise = np.random.uniform(-noise_max, noise_max)
-        x1p = encoder.decode(ubr.x1)
-        ubr.x1 = encoder.encode(x1p, noise)
+        # max noise is 10% of available range
+        max_noise = math.ceil(encoder.range[1] / 10)
 
-    if np.random.random() < mu:
-        noise = np.random.uniform(-noise_max, noise_max)
-        x2p = encoder.decode(ubr.x2)
-        ubr.x2 = encoder.encode(x2p, noise)
+        # divide generated noise by half to add to each interval side
+        noise = math.ceil(np.random.randint(0, max_noise + 1) / 2)
+
+        (lb, ub) = encoder.range
+
+        add_from_both_sides(c_ubr, noise, lb, ub)
+        add_from_both_sides(e_ubr, noise, lb, ub)
 
 
 def _flatten(ps: PerceptionString) -> List[int]:

@@ -7,6 +7,7 @@ import numpy as np
 
 from lcs import Perception
 from lcs.representations import UBR
+from lcs.representations.utils import cover_ratio
 from . import Condition, Effect, Mark, Configuration
 
 
@@ -296,7 +297,8 @@ class Classifier:
         bool
             True is current classifier is more general, False otherwise
         """
-        return self.condition.cover_ratio > other.condition.cover_ratio
+        return cover_ratio(self.condition, self.cfg.encoder) > \
+            cover_ratio(other.condition, other.cfg.encoder)
 
     def is_marked(self):
         return self.mark.is_marked()

@@ -24,8 +24,8 @@ def visualize(interval: Tuple[int, int],
 
         return 'O'
 
-    mapped = {val: _scale(val, max_range=val_range[1]+1, n=buckets) for
-              val in range(val_range[0], val_range[1]+1)}
+    mapped = {val: _scale(val, max_range=val_range[1] + 1, n=buckets) for
+              val in range(val_range[0], val_range[1] + 1)}
     rep = map(partial(select_value, interval=interval, mapped=mapped),
               range(0, buckets))
     return "".join(rep)

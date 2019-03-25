@@ -30,7 +30,7 @@ if __name__ == '__main__':
     rmpx = gym.make('real-multiplexer-3bit-v0')
 
     # Create agent
-    encoder = RealValueEncoder(resolution_bits=5)
+    encoder = RealValueEncoder(resolution_bits=4)
     cfg = Configuration(rmpx.observation_space.shape[0],
                         rmpx.action_space.n,
                         encoder=encoder,
@@ -44,16 +44,20 @@ if __name__ == '__main__':
                         mu=0.15)
 
     agent = RACS(cfg)
-    population, metrics = agent.explore_exploit(rmpx, 100)
+    population, metrics = agent.explore_exploit(rmpx, 2000)
     logging.info("Done")
 
     # print reliable classifiers
+    logging.info("Reliable classifiers:")
     reliable = [cl for cl in population if cl.is_reliable()]
     reliable = sorted(reliable, key=lambda cl: -cl.fitness)
 
     for cl in reliable[:10]:
         logging.info(cl)
 
-    # print metrics
-    for m in metrics:
-        logging.info(m)
+    logging.info("Population first 10")
+    for cl in population[:10]:
+        logging.info(cl)
+
+    # print last metric
+    logging.info(metrics[-1])

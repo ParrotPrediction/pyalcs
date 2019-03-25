@@ -7,6 +7,7 @@ from lcs.agents.racs import Classifier, Configuration, Condition, Effect
 from lcs.agents.racs.components.genetic_algorithm import mutate, crossover, \
     _flatten, _unflatten
 from lcs.representations import UBR
+from lcs.representations.utils import cover_ratio as cover
 from lcs.representations.RealValueEncoder import RealValueEncoder
 
 
@@ -17,6 +18,33 @@ class TestGeneticAlgorithm:
         return Configuration(classifier_length=2,
                              number_of_possible_actions=2,
                              encoder=RealValueEncoder(4))
+
+    @pytest.mark.parametrize("_cond, _effect", [
+        ([UBR(12, 40), UBR(4, 25)], [UBR(12, 40), UBR(4, 25)]),
+    ])
+    def test_should_increase_the_covering_range_when_mutating(
+            self, _cond, _effect, cfg):
+        # given
+        cfg.encoder = RealValueEncoder(8)  # more precise encoder
+
+        condition = Condition(_cond, cfg)
+        effect = Effect(_effect, cfg)
+        prev_condition_cover_ratio = cover(condition, cfg.encoder)
+        prev_effect_cover_ratio = cover(effect, cfg.encoder)
+
+        mu = 1.0  # try to mutate every attribute
+
+        cl = Classifier(
+            condition=deepcopy(condition),
+            effect=deepcopy(effect),
+            cfg=cfg)
+
+        # when
+        mutate(cl, mu)
+
+        # then
+        assert prev_condition_cover_ratio < cover(cl.condition, cfg.encoder)
+        assert prev_effect_cover_ratio < cover(cl.effect, cfg.encoder)
 
     @pytest.mark.parametrize("_cond, _effect", [
         ([UBR(2, 5), UBR(5, 10)], [UBR(2, 5), UBR(5, 10)]),

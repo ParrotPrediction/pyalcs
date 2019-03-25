@@ -3,6 +3,7 @@ import pytest
 from lcs import Perception
 from lcs.agents.racs import Configuration, Condition
 from lcs.representations import UBR
+from lcs.representations.utils import cover_ratio
 from lcs.representations.RealValueEncoder import RealValueEncoder
 
 
@@ -94,7 +95,7 @@ class TestCondition:
     def test_should_calculate_cover_ratio(
             self, _condition, _covered_pct, cfg):
         cond = Condition(_condition, cfg=cfg)
-        assert cond.cover_ratio == _covered_pct
+        assert cover_ratio(cond, cfg.encoder) == _covered_pct
 
     @pytest.mark.parametrize("_condition, _perception, _result", [
         ([UBR(0, 15), UBR(0, 15)], [0.2, 0.4], True),
@@ -126,7 +127,7 @@ class TestCondition:
         assert cond1.subsumes(cond2) == _result
 
     @pytest.mark.parametrize("_cond, _result", [
-        ([UBR(0, 15), UBR(0, 7)], 'OOOOOOOOOO|OOOOO.....')
+        ([UBR(0, 15), UBR(0, 7)], 'OOOOOOOOOo|OOOOo.....')
     ])
     def test_should_visualize(self, _cond, _result, cfg):
         assert repr(Condition(_cond, cfg=cfg)) == _result
