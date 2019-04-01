@@ -161,7 +161,7 @@ class ACS2(Agent):
                 match_set,
                 self.cfg.number_of_possible_actions,
                 epsilon=0.0)
-            iaction = self.cfg.environment_adapter.to_lcs_action(action)
+            iaction = self.cfg.environment_adapter.to_env_action(action)
             action_set = match_set.form_action_set(action)
 
             raw_state, reward, done, _ = env.step(iaction)
