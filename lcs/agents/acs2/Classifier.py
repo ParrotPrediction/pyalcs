@@ -268,18 +268,24 @@ class Classifier:
             True if classifier's effect pat anticipates correctly,
             False otherwise
         """
-        for idx, eitem in enumerate(self.effect):
-            if eitem == self.cfg.classifier_wildcard:
-                if previous_situation[idx] != situation[idx]:
+        def effect_item_is_correct(effect_item, p0_item, p1_item):
+            if effect_item == self.cfg.classifier_wildcard:
+                if p0_item != p1_item:
                     return False
             else:
-                if previous_situation[idx] == situation[idx]:
+                if p0_item == p1_item:
                     return False
 
-                if eitem != situation[idx]:
+                if effect_item != p1_item:
                     return False
 
-        return True
+            # All checks passed
+            return True
+
+        return all(effect_item_is_correct(eitem,
+                                          previous_situation[idx],
+                                          situation[idx])
+                   for idx, eitem in enumerate(self.effect))
 
     def set_mark(self, perception: Perception) -> None:
         """
