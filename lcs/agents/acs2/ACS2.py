@@ -44,7 +44,8 @@ class ACS2(Agent):
             if self.cfg.do_action_planning and \
                     self._time_for_action_planning(steps + time):
                 # Action Planning for increased model learning
-                steps_ap, state, prev_state, action_set, action, last_reward = \
+                steps_ap, state, prev_state, action_set, \
+                    action, last_reward = \
                     self._run_action_planning(env, steps + time, state,
                                               prev_state, action_set, action,
                                               last_reward)
@@ -183,7 +184,9 @@ class ACS2(Agent):
                              action_set: ClassifiersList,
                              action: int,
                              last_reward: int) -> Tuple[int, Perception,
-                                        Perception, ClassifiersList, int, int]:
+                                                        Perception,
+                                                        ClassifiersList,
+                                                        int, int]:
         """
         Executes action planning for model learning speed up.
         Method requests goals from 'goal generator' provided by
