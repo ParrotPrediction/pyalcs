@@ -35,7 +35,7 @@ class ACS2(Agent):
         raw_state = env.reset()
         state = self.cfg.environment_adapter.to_genotype(raw_state)
         action = env.action_space.sample()
-        reward = 0
+        last_reward = 0
         prev_state = Perception.empty()
         action_set = ClassifiersList()
         done = False
@@ -44,10 +44,10 @@ class ACS2(Agent):
             if self.cfg.do_action_planning and \
                     self._time_for_action_planning(steps + time):
                 # Action Planning for increased model learning
-                steps_ap, state, prev_state, action_set, action, reward = \
+                steps_ap, state, prev_state, action_set, action, last_reward = \
                     self._run_action_planning(env, steps + time, state,
                                               prev_state, action_set, action,
-                                              reward)
+                                              last_reward)
                 steps += steps_ap
 
             match_set = self.population.form_match_set(state)
@@ -66,7 +66,7 @@ class ACS2(Agent):
                     self.cfg)
                 ClassifiersList.apply_reinforcement_learning(
                     action_set,
-                    reward,
+                    last_reward,
                     match_set.get_maximum_fitness(),
                     self.cfg.beta,
                     self.cfg.gamma
@@ -94,7 +94,7 @@ class ACS2(Agent):
             action_set = match_set.form_action_set(action)
 
             prev_state = state
-            raw_state, reward, done, _ = env.step(iaction)
+            raw_state, last_reward, done, _ = env.step(iaction)
             state = self.cfg.environment_adapter.to_genotype(raw_state)
 
             if done:
@@ -110,7 +110,7 @@ class ACS2(Agent):
                     self.cfg)
                 ClassifiersList.apply_reinforcement_learning(
                     action_set,
-                    reward,
+                    last_reward,
                     0,
                     self.cfg.beta,
                     self.cfg.gamma)
@@ -130,8 +130,7 @@ class ACS2(Agent):
 
             steps += 1
 
-        # Reward is not accumulated; only last step reward is returned
-        return TrialMetrics(steps, reward)
+        return TrialMetrics(steps, last_reward)
 
     def _run_trial_exploit(self, env, time=None, current_trial=None) \
             -> TrialMetrics:
@@ -142,7 +141,7 @@ class ACS2(Agent):
         raw_state = env.reset()
         state = self.cfg.environment_adapter.to_genotype(raw_state)
 
-        reward = 0
+        last_reward = 0
         action_set = ClassifiersList()
         done = False
 
@@ -152,7 +151,7 @@ class ACS2(Agent):
             if steps > 0:
                 ClassifiersList.apply_reinforcement_learning(
                     action_set,
-                    reward,
+                    last_reward,
                     match_set.get_maximum_fitness(),
                     self.cfg.beta,
                     self.cfg.gamma)
@@ -165,16 +164,16 @@ class ACS2(Agent):
             iaction = self.cfg.environment_adapter.to_lcs_action(action)
             action_set = match_set.form_action_set(action)
 
-            raw_state, reward, done, _ = env.step(iaction)
+            raw_state, last_reward, done, _ = env.step(iaction)
             state = self.cfg.environment_adapter.to_genotype(raw_state)
 
             if done:
                 ClassifiersList.apply_reinforcement_learning(
-                    action_set, reward, 0, self.cfg.beta, self.cfg.gamma)
+                    action_set, last_reward, 0, self.cfg.beta, self.cfg.gamma)
 
             steps += 1
 
-        return TrialMetrics(steps, reward)
+        return TrialMetrics(steps, last_reward)
 
     def _run_action_planning(self,
                              env,
@@ -183,8 +182,8 @@ class ACS2(Agent):
                              prev_state: Perception,
                              action_set: ClassifiersList,
                              action: int,
-                             reward: int) -> Tuple[int, Perception, Perception,
-                                                   ClassifiersList, int, int]:
+                             last_reward: int) -> Tuple[int, Perception,
+                                        Perception, ClassifiersList, int, int]:
         """
         Executes action planning for model learning speed up.
         Method requests goals from 'goal generator' provided by
@@ -201,7 +200,7 @@ class ACS2(Agent):
         prev_state
         action_set
         action
-        reward
+        last_reward
 
         Returns
         -------
@@ -210,7 +209,7 @@ class ACS2(Agent):
         prev_state
         action_set
         action
-        reward
+        last_reward
 
         """
         logging.debug("** Running action planning **")
@@ -218,7 +217,7 @@ class ACS2(Agent):
         if not hasattr(env.env, "get_goal_state"):
             logging.debug("Action planning stopped - "
                           "no function get_goal_state in env")
-            return 0, state, prev_state, action_set, action, reward
+            return 0, state, prev_state, action_set, action, last_reward
 
         steps = 0
         done = False
@@ -254,7 +253,7 @@ class ACS2(Agent):
                         self.cfg)
                     ClassifiersList.apply_reinforcement_learning(
                         action_set,
-                        reward,
+                        last_reward,
                         0,
                         self.cfg.beta,
                         self.cfg.gamma)
@@ -277,7 +276,7 @@ class ACS2(Agent):
 
                 iaction = self.cfg.environment_adapter.to_lcs_action(action)
 
-                raw_state, reward, done, _ = env.step(iaction)
+                raw_state, last_reward, done, _ = env.step(iaction)
                 prev_state = state
 
                 state = self.cfg.environment_adapter.to_genotype(raw_state)
@@ -295,7 +294,7 @@ class ACS2(Agent):
             if i == 0:
                 break
 
-        return steps, state, prev_state, action_set, action, reward
+        return steps, state, prev_state, action_set, action, last_reward
 
     def _time_for_action_planning(self, time):
         return time % self.cfg.action_planning_frequency == 0
