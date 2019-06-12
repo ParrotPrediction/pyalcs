@@ -1,4 +1,8 @@
+from lcs.agents.racs.components.merging import merge
 from lcs.strategies.subsumption import does_subsume
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def add_classifier(child, population, new_list, theta_exp: int) -> None:
@@ -42,6 +46,13 @@ def add_classifier(child, population, new_list, theta_exp: int) -> None:
                 old_cl = cl
 
     if old_cl is None:
-        new_list.append(child)
+        to_add = [child]
+        # try to merge classifiers
+        if child.cfg.do_merging:
+            to_add += merge(child, new_list)
+
+        # add all classifiers
+        for cl in to_add:
+            new_list.append(cl)
     else:
         old_cl.increase_quality()

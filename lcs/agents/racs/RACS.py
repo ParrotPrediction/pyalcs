@@ -3,6 +3,7 @@ from typing import Tuple
 
 from lcs import Perception
 from lcs.agents.Agent import TrialMetrics
+from lcs.agents.racs.components.removal import remove
 from lcs.strategies.action_selection import choose_action
 from ...agents import Agent
 from ...agents.racs import Configuration, ClassifierList
@@ -15,7 +16,7 @@ class RACS(Agent):
 
     def __init__(self,
                  cfg: Configuration,
-                 population: ClassifierList=None) -> None:
+                 population: ClassifierList = None) -> None:
         self.cfg = cfg
         self.population = population or ClassifierList()
 
@@ -26,7 +27,7 @@ class RACS(Agent):
         return self.cfg
 
     def _run_trial_explore(self, env, time, current_trial=None) \
-            -> TrialMetrics:
+        -> TrialMetrics:
         """
         Executes explore trial
 
@@ -88,6 +89,9 @@ class RACS(Agent):
                         self.cfg.do_subsumption,
                         self.cfg.theta_exp)
 
+            if self.cfg.do_merging:
+                remove(50, self.population, match_set, action_set)
+
             action = choose_action(
                 match_set,
                 self.cfg.number_of_possible_actions,
@@ -135,7 +139,7 @@ class RACS(Agent):
         return TrialMetrics(steps, reward)
 
     def _run_trial_exploit(self, env, time=None, current_trial=None) \
-            -> TrialMetrics:
+        -> TrialMetrics:
         logger.debug("** Running trial exploit **")
 
         steps = 0

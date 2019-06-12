@@ -10,13 +10,18 @@ from lcs.metrics import population_metrics
 from lcs.representations.RealValueEncoder import RealValueEncoder
 
 # Configure logger
+from lcs.representations.utils import cover_ratio
+
 logging.basicConfig(level=logging.INFO)
+
+encoder = RealValueEncoder(resolution_bits=4)
 
 
 def _rmpx_metrics(pop, env) -> Dict:
     metrics = {
         'fitness': (sum(cl.fitness for cl in pop) / len(pop)),
-        'cover_ratio': (sum(cl.condition.cover_ratio for cl in pop) / len(pop))
+        'cover_ratio': (sum(cover_ratio(cl.condition, encoder) for cl in pop) /
+                        len(pop))
     }
 
     # Add basic population metrics
@@ -30,13 +35,13 @@ if __name__ == '__main__':
     rmpx = gym.make('real-multiplexer-3bit-v0')
 
     # Create agent
-    encoder = RealValueEncoder(resolution_bits=4)
     cfg = Configuration(rmpx.observation_space.shape[0],
                         rmpx.action_space.n,
                         encoder=encoder,
                         user_metrics_collector_fcn=_rmpx_metrics,
                         epsilon=1.0,
                         do_ga=True,
+                        do_merging=True,
                         theta_r=0.9,
                         theta_i=0.3,
                         theta_ga=100,

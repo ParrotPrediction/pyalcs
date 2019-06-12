@@ -43,6 +43,15 @@ class UBR:
         return self.lower_bound <= other.lower_bound and \
             self.upper_bound >= other.upper_bound
 
+    def can_be_merged(self, other: UBR) -> bool:
+        if self.lower_bound in [other.lower_bound, other.upper_bound]:
+            return True
+
+        if self.upper_bound in [other.lower_bound, other.upper_bound]:
+            return True
+
+        return False
+
     def __contains__(self, item):
         return self.lower_bound <= item <= self.upper_bound
 

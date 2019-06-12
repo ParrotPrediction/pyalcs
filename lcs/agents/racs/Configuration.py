@@ -10,24 +10,24 @@ class Configuration:
                  number_of_possible_actions: int,
                  encoder=None,
                  environment_adapter=EnvironmentAdapter,
-                 user_metrics_collector_fcn: Callable=None,
+                 user_metrics_collector_fcn: Callable = None,
                  metrics_trial_frequency: int = 5,
-                 do_ga: bool=False,
-                 do_subsumption: bool=True,
-                 beta: float=0.05,
-                 gamma: float=0.95,
-                 theta_i: float=0.1,
-                 theta_r: float=0.9,
-                 epsilon: float=0.5,
+                 do_ga: bool = False,
+                 do_subsumption: bool = True,
+                 do_merging: bool = False,
+                 beta: float = 0.05,
+                 gamma: float = 0.95,
+                 theta_i: float = 0.1,
+                 theta_r: float = 0.9,
+                 epsilon: float = 0.5,
                  cover_noise: float = 0.1,
                  mutation_noise: float = 0.1,
-                 u_max: int=100000,
-                 theta_exp: int=20,
-                 theta_ga: int=100,
-                 theta_as: int=20,
-                 mu: float=0.3,
-                 chi: float=0.8) -> None:
-
+                 u_max: int = 100000,
+                 theta_exp: int = 20,
+                 theta_ga: int = 100,
+                 theta_as: int = 20,
+                 mu: float = 0.3,
+                 chi: float = 0.8) -> None:
         if encoder is None:
             raise TypeError('Real number encoder should be passed')
 
@@ -45,6 +45,7 @@ class Configuration:
 
         self.do_ga = do_ga
         self.do_subsumption = do_subsumption
+        self.do_merging = do_merging
 
         self.beta = beta
         self.gamma = gamma
