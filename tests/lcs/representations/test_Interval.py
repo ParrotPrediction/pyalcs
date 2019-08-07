@@ -58,6 +58,22 @@ class TestInterval:
     def test_should_calculate_bound_span(self, _i, _span):
         assert abs(_i.span - _span) < 0.00001
 
+    @pytest.mark.parametrize("_i, _val, _result", [
+        (Interval(.5, .6), .1, Interval(.4, .6)),
+        (Interval(.7, .2), .1, Interval(.7, .1)),
+        (Interval(.4, .4), .1, Interval(.3, .4)),
+    ])
+    def test_should_add_to_left_bound(self, _i, _val, _result):
+        assert _i.add_to_left(_val) == _result
+
+    @pytest.mark.parametrize("_i, _val, _result", [
+        (Interval(.5, .6), .1, Interval(.5, .7)),
+        (Interval(.7, .2), .1, Interval(.8, .2)),
+        (Interval(.4, .4), .1, Interval(.4, .5)),
+    ])
+    def test_should_add_to_right_bound(self, _i, _val, _result):
+        assert _i.add_to_right(_val) == _result
+
     @pytest.mark.parametrize("i1, i2, _result", [
         (Interval(.0, 1.), Interval(.2, .4), True),
         (Interval(.4, .6), Interval(.6, .7), False),

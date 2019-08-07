@@ -39,6 +39,22 @@ class Interval:
     def span(self) -> float:
         return self.right - self.left
 
+    def add_to_left(self, val) -> Interval:
+        if self.p < self.q:
+            self.p -= val
+        else:
+            self.q -= val
+
+        return self
+
+    def add_to_right(self, val) -> Interval:
+        if self.p < self.q:
+            self.q += val
+        else:
+            self.p += val
+
+        return self
+
     def __contains__(self, item):
         assert type(item) in [Interval, float]
 

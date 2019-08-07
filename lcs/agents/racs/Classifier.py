@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import random
 from typing import Optional, List, Callable, Dict
+from copy import deepcopy
 
 import numpy as np
 
@@ -99,9 +100,9 @@ class Classifier:
             copied classifier
         """
         new_cls = cls(
-            condition=Condition(old_cls.condition, old_cls.cfg),
+            condition=deepcopy(old_cls.condition),
             action=old_cls.action,
-            effect=old_cls.effect,
+            effect=deepcopy(old_cls.effect),
             quality=old_cls.q,
             reward=old_cls.r,
             immediate_reward=old_cls.ir,

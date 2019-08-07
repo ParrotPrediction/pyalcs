@@ -17,6 +17,34 @@ class TestGeneticAlgorithm:
                              number_of_possible_actions=2)
 
     @pytest.mark.parametrize("_cond, _effect", [
+        ([Interval(.2, .5), Interval(.5, .7)],
+         [Interval(.2, .5), Interval(.5, .7)]),
+        ([Interval(.5, .2), Interval(.8, .5)],
+         [Interval(.5, .2), Interval(.8, .5)])
+    ])
+    def test_if_elements_are_mutated(self, _cond, _effect, cfg):
+        # given
+        np.random.seed(12345)
+        condition = Condition(_cond, cfg)
+        effect = Effect(_effect, cfg)
+
+        cfg.mutation_noise = 0.5  # strong noise mutation range
+        mu = 1.0  # mutate every attribute
+
+        cl = Classifier(
+            condition=deepcopy(condition),
+            effect=deepcopy(effect),
+            cfg=cfg)
+
+        # when
+        mutate(cl, mu)
+
+        # then
+        for idx, (c, e) in enumerate(zip(cl.condition, cl.effect)):
+            assert condition[idx] != c
+            assert effect[idx] != e
+
+    @pytest.mark.parametrize("_cond, _effect", [
         ([Interval(.2, .5), Interval(.5, 1.)],
          [Interval(.2, .5), Interval(.5, 1.)]),
         ([Interval(.5, .2), Interval(.8, .5)],
@@ -26,7 +54,7 @@ class TestGeneticAlgorithm:
         ([Interval(0., 1.), Interval(0., 1.)],
          [Interval(0., 1.), Interval(0., 1.)]),
     ])
-    def test_aggressive_mutation(self, _cond, _effect, cfg):
+    def test_if_range_is_not_exceeded_in_mutation(self, _cond, _effect, cfg):
         # given
         condition = Condition(_cond, cfg)
         effect = Effect(_effect, cfg)
@@ -44,13 +72,6 @@ class TestGeneticAlgorithm:
 
         # then
         for idx, (c, e) in enumerate(zip(cl.condition, cl.effect)):
-            # assert that we have new locus
-            if condition[idx] != cfg.classifier_wildcard:
-                assert condition[idx] != c
-
-            if effect[idx] != cfg.classifier_wildcard:
-                assert effect[idx] != e
-
             # assert if condition values are in ranges
             assert c.left >= FULL_INTERVAL.left
             assert c.right <= FULL_INTERVAL.right
@@ -61,7 +82,7 @@ class TestGeneticAlgorithm:
 
     @pytest.mark.parametrize("_cond, _effect", [
         ([Interval(.2, .5), Interval(.5, .8)],
-         [Interval(.3, .6), Interval(1., 1.)]),
+         [Interval(.2, .5), Interval(.5, .8)]),
     ])
     def test_disabled_mutation(self, _cond, _effect, cfg):
         # given

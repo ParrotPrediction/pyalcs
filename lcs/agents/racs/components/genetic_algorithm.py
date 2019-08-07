@@ -29,8 +29,20 @@ def mutate(cl: Classifier, mu: float) -> None:
 
     for c, e in zip(cl.condition, cl.effect):
         if c != wildcard and e != wildcard:
-            _widen_attribute(c, noise_max, mu)
-            _widen_attribute(e, noise_max, mu)
+            if np.random.random() < mu:
+                noise = np.random.uniform(0, noise_max)
+                if np.random.rand() < .5:
+                    c.add_to_left(noise)
+                    e.add_to_left(noise)
+                else:
+                    c.add_to_right(noise)
+                    e.add_to_right(noise)
+
+                # restrict range to [0, 1]
+                c.p, c.q = clip(c.p), clip(c.q)
+                e.p, e.q = clip(e.p), clip(e.q)
+
+        # assert c == e
 
 
 def crossover(parent: Classifier, donor: Classifier):
@@ -65,20 +77,6 @@ def crossover(parent: Classifier, donor: Classifier):
     donor.condition = Condition(_unflatten(d_cond_flat), cfg=donor.cfg)
     parent.effect = Effect(_unflatten(p_effect_flat), cfg=parent.cfg)
     donor.effect = Effect(_unflatten(d_effect_flat), cfg=parent.cfg)
-
-
-def _widen_attribute(interval: Interval, noise_max: float, mu: float):
-
-    # TODO: we should modify both condition and effect parts with the
-    # same noise.
-    # This mutation can also create non suitable classifier!
-    if np.random.random() < mu:
-        noise = np.random.uniform(-noise_max, noise_max)
-        interval.p = clip(interval.p + noise)
-
-    if np.random.random() < mu:
-        noise = np.random.uniform(-noise_max, noise_max)
-        interval.q = clip(interval.q + noise)
 
 
 def _flatten(ps: PerceptionString) -> List:

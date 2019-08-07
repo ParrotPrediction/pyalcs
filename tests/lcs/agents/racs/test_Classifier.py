@@ -158,11 +158,19 @@ class TestClassifier:
 
         # then
         assert cl is not copied_cl
+
         assert cl.condition == copied_cl.condition
         assert cl.condition is not copied_cl.condition
+        assert cl.condition[0] == copied_cl.condition[0]
+        assert cl.condition[0] is not copied_cl.condition[0]
+
         assert cl.action == copied_cl.action
+
         assert cl.effect == copied_cl.effect
         assert cl.effect is not copied_cl.effect
+        assert cl.effect[0] == copied_cl.effect[0]
+        assert cl.effect[0] is not copied_cl.effect[0]
+
         assert copied_cl.is_marked() is False
         assert cl.r == copied_cl.r
         assert cl.q == copied_cl.q
@@ -237,7 +245,6 @@ class TestClassifier:
 
         # then
         assert cl.get_interval_proportions() == _res
-
 
     @staticmethod
     def _random_interval():

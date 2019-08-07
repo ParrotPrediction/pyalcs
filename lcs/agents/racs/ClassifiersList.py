@@ -142,14 +142,13 @@ class ClassifiersList(TypedList):
             child2 = Classifier.copy_from(parent2, time)
 
             # Execute mutation
-            # TODO at this point mutation can only broaden search
             mutate(child1, mu)
             mutate(child2, mu)
 
             # Execute cross-over
-            # TODO that will never happen for real values,
-            #  some tolerance is needed
             if random.random() < chi:
+                # TODO that will never happen for real values,
+                #  some tolerance is needed
                 if child1.effect == child2.effect:
                     crossover(child1, child2)
 

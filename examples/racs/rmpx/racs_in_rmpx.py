@@ -36,12 +36,13 @@ if __name__ == '__main__':
                         do_ga=True,
                         theta_r=0.9,
                         theta_i=0.3,
-                        theta_ga=100,
+                        theta_ga=25,
+                        mutation_noise=0.5,
                         chi=0.5,
-                        mu=0.15)
+                        mu=1)
 
     agent = RACS(cfg)
-    population, metrics = agent.explore(rmpx, 1000)
+    population, metrics = agent.explore(rmpx, 5000)
     logging.info("Done")
 
     # print reliable classifiers
