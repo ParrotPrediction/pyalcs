@@ -1,12 +1,12 @@
 from setuptools import setup, find_packages
 
 setup(name='pyalcs',
-      version='1.4',
+      version='1.5',
       description='Implementation of Anticipatory Learning Classifiers',
       keywords='acs lcs machine-learning reinforcement-learning openai',
       url='https://github.com/ParrotPrediction/pyalcs',
       author='Parrot Prediction Ltd',
-      author_email='norbert@parrotprediction.com',
+      author_email='nkozlowski@protonmail.com',
       license='MIT',
       classifiers=[
           'Development Status :: 4 - Beta',

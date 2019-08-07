@@ -67,7 +67,7 @@ class TestEffect:
         assert effect1.subsumes(effect2) == _result
 
     @pytest.mark.parametrize("_effect, _result", [
-        ([UBR(0, 15), UBR(0, 7)], 'OOOOOOOOOO|OOOOO.....')
+        ([UBR(0, 15), UBR(0, 7)], 'OOOOOOOOOo|OOOOo.....')
     ])
     def test_should_visualize(self, _effect, _result, cfg):
         assert repr(Effect(_effect, cfg=cfg)) == _result
