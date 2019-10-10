@@ -158,7 +158,7 @@ def choose_action_from_knowledge_array(cll, all_actions: int) -> int:
     """
     knowledge_array = {i: 0.0 for i in range(all_actions)}
 
-    cll.sort(key=lambda cl: cl.action)
+    cll.sort(key=lambda cl: cl.action if isinstance(cl.action, int) else -1)
 
     for _action, _clss in groupby(cll, lambda cl: cl.action):
         _classifiers = [cl for cl in _clss]
