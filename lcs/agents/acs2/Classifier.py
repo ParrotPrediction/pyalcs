@@ -150,9 +150,14 @@ class Classifier:
         indices = []
 
         for idx, (cpi, epi) in enumerate(zip(self.condition, self.effect)):
-            if cpi != self.cfg.classifier_wildcard and \
-                    epi == self.cfg.classifier_wildcard:
-                indices.append(idx)
+            if isinstance(epi, ProbabilityEnhancedAttribute):
+                if cpi != self.cfg.classifier_wildcard and \
+                        epi.does_contain(cpi):
+                    indices.append(idx)
+            else:
+                if cpi != self.cfg.classifier_wildcard and \
+                        epi == self.cfg.classifier_wildcard:
+                    indices.append(idx)
 
         return indices
 
