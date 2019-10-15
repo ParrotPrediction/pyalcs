@@ -138,14 +138,14 @@ class Classifier:
     @property
     def specified_unchanging_attributes(self) -> List[int]:
         """
-        Determines the number of specified unchanging attributes in
-        the classifier. An unchanging attribute is one that is anticipated
-        not to change in the effect part.
+        Determines the specified unchanging attributes in the classifier.
+        An unchanging attribute is one that is anticipated not to change
+        in the effect part.
 
         Returns
         -------
         List[int]
-            list specified unchanging attributes indices
+            list of specified unchanging attributes indices
         """
         indices = []
 
