@@ -18,7 +18,7 @@ class PerceptionString(TypedList):
     def empty(cls,
               length: int,
               wildcard: Any ='#',
-              oktypes: Tuple[Any]=(str, dict)):
+              oktypes: Tuple[Any, Any]=(str, dict)):
         """
         Creates a perception string composed from wildcard symbols.
         Note that in case that wildcard is an object is get's copied
