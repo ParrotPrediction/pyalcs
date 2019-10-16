@@ -34,6 +34,7 @@ class Effect(PerceptionString):
         """
         Create a new enhanced effect part.
         """
+        assert perception is not None
         result = cls(observation=effect1, wildcard=wildcard)
         for i, attr2 in enumerate(effect2):
             attr1 = effect1[i]
