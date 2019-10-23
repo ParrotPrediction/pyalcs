@@ -89,6 +89,7 @@ def exploit(cll, all_actions: int) -> int:
                               if cl.does_anticipate_change()]
 
     if len(anticipated_change_cls) > 0:
+        random.shuffle(anticipated_change_cls)
         best_classifier = max(anticipated_change_cls,
                               key=lambda cl: cl.fitness * cl.num)
 

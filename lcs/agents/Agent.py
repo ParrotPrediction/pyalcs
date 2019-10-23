@@ -4,6 +4,8 @@ from typing import Callable, List, Tuple
 
 from lcs.metrics import basic_metrics
 
+import numpy as np
+
 TrialMetrics = namedtuple('TrialMetrics', ['steps', 'reward'])
 
 logger = logging.getLogger(__name__)
@@ -23,7 +25,7 @@ class Agent:
     def get_cfg(self):
         raise NotImplementedError()
 
-    def explore(self, env, trials) -> Tuple:
+    def explore(self, env, trials, decay: bool = False) -> Tuple:
         """
         Explores the environment in given set of trials.
 
@@ -33,13 +35,15 @@ class Agent:
             environment
         trials
             number of trials
+        decay
+            whether the epsilon is decaying along trials
 
         Returns
         -------
         Tuple
             population of classifiers and metrics
         """
-        return self._evaluate(env, trials, self._run_trial_explore)
+        return self._evaluate(env, trials, self._run_trial_explore, decay)
 
     def exploit(self, env, trials) -> Tuple:
         """
@@ -84,7 +88,11 @@ class Agent:
 
         return self._evaluate(env, trials, switch_phases)
 
-    def _evaluate(self, env, max_trials: int, func: Callable) -> Tuple:
+    def _evaluate(self,
+                  env,
+                  n_trials: int,
+                  func: Callable,
+                  decay: bool = False) -> Tuple:
         """
         Runs the classifier in desired strategy (see `func`) and collects
         metrics.
@@ -93,11 +101,13 @@ class Agent:
         ----------
         env:
             OpenAI Gym environment
-        max_trials: int
+        n_trials: int
             maximum number of trials
         func: Callable
             Function accepting three parameters: env, steps already made,
              current trial
+        decay: bool
+            Whether the epsilon is decaying through the whole experiment
 
         Returns
         -------
@@ -108,10 +118,11 @@ class Agent:
         steps = 0
 
         metrics: List = []
-        while current_trial < max_trials:
+        while current_trial < n_trials:
             steps_in_trial, reward = func(env, steps, current_trial)
             steps += steps_in_trial
 
+            # collect user metrics
             if current_trial % self.get_cfg().metrics_trial_frequency == 0:
                 m = basic_metrics(current_trial, steps_in_trial, reward)
 
@@ -122,8 +133,14 @@ class Agent:
                 metrics.append(m)
 
             # Print last metric
-            if current_trial % 500 == 0:
+            if current_trial % np.round(n_trials / 10) == 0:
                 logger.info(metrics[-1])
+
+            if decay:
+                # Gradually decrease the epsilon
+                self.get_cfg().epsilon -= 1 / n_trials
+                if self.get_cfg().epsilon < 0.01:
+                    self.get_cfg().epsilon = 0.01
 
             current_trial += 1
 

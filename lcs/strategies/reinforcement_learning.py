@@ -20,8 +20,8 @@ def update_classifier(cl, step_reward: int, max_fitness: float,
     gamma: float
     """
 
-    _reward = step_reward + gamma * max_fitness
+    _discounted_reward = step_reward + gamma * max_fitness
 
     # Update classifier properties
-    cl.r += beta * (_reward - cl.r)
+    cl.r += beta * (_discounted_reward - cl.r)
     cl.ir += beta * (step_reward - cl.ir)

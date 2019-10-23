@@ -115,19 +115,19 @@ class ACS2(Agent):
                     0,
                     self.cfg.beta,
                     self.cfg.gamma)
-            if self.cfg.do_ga:
-                ClassifiersList.apply_ga(
-                    time + steps,
-                    self.population,
-                    ClassifiersList(),
-                    action_set,
-                    state,
-                    self.cfg.theta_ga,
-                    self.cfg.mu,
-                    self.cfg.chi,
-                    self.cfg.theta_as,
-                    self.cfg.do_subsumption,
-                    self.cfg.theta_exp)
+                if self.cfg.do_ga:
+                    ClassifiersList.apply_ga(
+                        time + steps,
+                        self.population,
+                        ClassifiersList(),
+                        action_set,
+                        state,
+                        self.cfg.theta_ga,
+                        self.cfg.mu,
+                        self.cfg.chi,
+                        self.cfg.theta_as,
+                        self.cfg.do_subsumption,
+                        self.cfg.theta_exp)
 
             steps += 1
 

@@ -1,5 +1,8 @@
 jupyter==1.0.0
+jupyterlab
+jupyter_contrib_nbextensions
 matplotlib>=2.2
+papermill==1.1.0
 gym==0.11
 pandas>=0.21
 git+https://github.com/ParrotPrediction/openai-envs.git#egg=parrotprediction-openai-envs

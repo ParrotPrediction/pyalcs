@@ -11,7 +11,10 @@ test: lint
 	py.test -n 4 --cov=lcs tests/
 
 notebook:
-	jupyter notebook
+	jupyter lab --notebook-dir notebooks/
 
 execute_notebooks:
-	find . -name '*Lake.ipynb' -exec jupyter nbconvert --execute {} --inplace --debug --ExecutePreprocessor.timeout=6000 \;
+#	papermill notebooks/rACS_Corridor.ipynb docs/source/notebooks/rACS_Corridor.ipynb
+	papermill notebooks/FrozenLake.ipynb docs/source/notebooks/FrozenLake.ipynb
+	papermill notebooks/Maze.ipynb docs/source/notebooks/Maze.ipynb
+	papermill notebooks/ACS2.ipynb docs/source/notebooks/ACS2.ipynb

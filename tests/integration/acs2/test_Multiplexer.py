@@ -9,8 +9,8 @@ from .utils import count_macroclassifiers, count_microclassifiers
 
 
 class MultiplexerAdapter(EnvironmentAdapter):
-    @staticmethod
-    def to_genotype(env_state):
+    @classmethod
+    def to_genotype(cls, env_state):
         return [str(x) for x in env_state]
 
 
