@@ -133,6 +133,9 @@ class Classifier:
 
     @property
     def fitness(self):
+        if self.cfg.fitness_fcn:
+            return self.cfg.fitness_fcn(self)
+
         return self.q * self.r
 
     @property
@@ -282,7 +285,9 @@ class Classifier:
             # All checks passed
             return True
 
-        return all(effect_item_is_correct(eitem, previous_situation[idx], situation[idx]) for idx, eitem in enumerate(self.effect))
+        return all(effect_item_is_correct(
+            eitem, previous_situation[idx], situation[idx])
+            for idx, eitem in enumerate(self.effect))
 
     def set_mark(self, perception: Perception) -> None:
         """

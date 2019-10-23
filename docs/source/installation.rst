@@ -34,3 +34,10 @@ Start the Jupyter notebook locally with::
   make notebook
 
 Open the browser at ``localhost:8888`` and examine files inside ``notebooks/`` directory.
+
+You might also want to install some extensions::
+
+  jupyter labextension install @jupyter-widgets/jupyterlab-manager
+  jupyter contrib nbextension install
+
+

@@ -6,21 +6,25 @@ import gym
 import gym_multiplexer
 
 from lcs.agents.acs2 import ACS2, Configuration
+from lcs.agents import EnvironmentAdapter
+
 
 logging.basicConfig(level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 
 
-def _map_perception(perception):
-    return [str(x) for x in perception]
+class MultiplexerAdapter(EnvironmentAdapter):
+    @classmethod
+    def to_genotype(cls, env_state):
+        return [str(x) for x in env_state]
 
 
 def get_actors():
     mp = gym.make('boolean-multiplexer-6bit-v0')
     cfg = Configuration(
         mp.env.observation_space.n, 2,
-        perception_mapper_fcn=_map_perception,
+        environment_adapter=MultiplexerAdapter(),
         do_ga=True)
 
     return ACS2(cfg), mp

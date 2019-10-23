@@ -14,8 +14,8 @@ logger = logging.getLogger(__name__)
 
 
 class CorridorAdapter(EnvironmentAdapter):
-    @staticmethod
-    def to_genotype(phenotype):
+    @classmethod
+    def to_genotype(cls, phenotype):
         return phenotype,
 
 

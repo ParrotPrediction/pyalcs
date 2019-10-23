@@ -10,6 +10,7 @@ class Configuration:
                  classifier_wildcard='#',
                  environment_adapter=EnvironmentAdapter,
                  user_metrics_collector_fcn: Callable = None,
+                 fitness_fcn=None,
                  metrics_trial_frequency: int = 5,
                  do_ga: bool=False,
                  do_subsumption: bool=True,
@@ -35,6 +36,7 @@ class Configuration:
         :param classifier_wildcard: wildcard symbol
         :param environment_adapter: EnvironmentAdapter class ACS2 needs to use
             to interact with the environment
+        :param fitness_fcn: Custom fitness function
         :param do_ga: switch *Genetic Generalization* module
         :param do_subsumption:
         :param do_action_planning: switch Action Planning phase
@@ -57,6 +59,7 @@ class Configuration:
         self.environment_adapter = environment_adapter
         self.metrics_trial_frequency = metrics_trial_frequency
         self.user_metrics_collector_fcn = user_metrics_collector_fcn
+        self.fitness_fcn = fitness_fcn
         self.do_ga = do_ga
         self.do_subsumption = do_subsumption
         self.do_action_planning = do_action_planning
@@ -79,6 +82,7 @@ class Configuration:
                "\n\t- Number of possible actions: [{}]" \
                "\n\t- Classifier wildcard: [{}]" \
                "\n\t- Environment adapter function: [{}]" \
+               "\n\t- Fitness function: [{}]" \
                "\n\t- Do GA: [{}]" \
                "\n\t- Do subsumption: [{}]" \
                "\n\t- Do Action Planning: [{}]" \
@@ -90,6 +94,7 @@ class Configuration:
                     self.number_of_possible_actions,
                     self.classifier_wildcard,
                     self.environment_adapter,
+                    self.fitness_fcn,
                     self.do_ga,
                     self.do_subsumption,
                     self.do_action_planning,

@@ -5,15 +5,15 @@ Jupyter notebooks
    :maxdepth: 1
    :caption: General:
 
-   notebooks/Description of ACS2
+   notebooks/ACS2
 
 .. toctree::
    :maxdepth: 1
    :caption: ACS2:
 
-   notebooks/ACS2 in Maze
+   notebooks/Maze
    notebooks/ACS2 in Multiplexer
-   notebooks/ACS2 in Frozen Lake
+   notebooks/FrozenLake
    notebooks/Action Planning in HandEye environment
 
 .. toctree::

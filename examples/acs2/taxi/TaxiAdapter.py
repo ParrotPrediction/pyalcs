@@ -3,8 +3,8 @@ from lcs.agents import EnvironmentAdapter
 
 class TaxiAdapter(EnvironmentAdapter):
 
-    @staticmethod
-    def to_genotype(phenotype):
+    @classmethod
+    def to_genotype(cls, phenotype):
         """
         Converts environment representation of a state to LCS
         representation.
@@ -12,8 +12,8 @@ class TaxiAdapter(EnvironmentAdapter):
         phenotype = (str(phenotype), )
         return phenotype
 
-    @staticmethod
-    def to_phenotype(genotype):
+    @classmethod
+    def to_phenotype(cls, genotype):
         """
         Converts LCS representation of a state to environment
         representation.

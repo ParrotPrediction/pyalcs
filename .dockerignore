@@ -4,7 +4,7 @@
 .coverage
 .idea
 assets
-docs/source/notebooks
+notebooks
 .editorconfig
 .gitignore
 .travis.yml
