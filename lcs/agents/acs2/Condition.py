@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import random
-from typing import Callable, Union
+from typing import Callable
 
 from lcs import Perception
 from .. import PerceptionString
@@ -48,14 +48,14 @@ class Condition(PerceptionString):
             ridx = func(specific_ids)
             self.generalize(ridx)
 
-    def does_match(self, other: Union[Perception, Condition]) -> bool:
+    def does_match(self, p: Perception) -> bool:
         """
         Check if condition match other list such as perception or another
         condition.
 
         Parameters
         ----------
-        other: Union[Perception, Condition]
+        p: Union[Perception, Condition]
             perception or condition object
 
         Returns
@@ -63,14 +63,18 @@ class Condition(PerceptionString):
         bool
             True if condition match given list, False otherwise
         """
-        for ci, oi in zip(self, other):
+        for ci, oi in zip(self, p):
             if ci != self.wildcard and oi != self.wildcard and ci != oi:
                 return False
 
         return True
 
     def subsumes(self, other: Condition) -> bool:
-        return self.does_match(other)
+        for ci, oi in zip(self, other):
+            if ci != self.wildcard and oi != self.wildcard and ci != oi:
+                return False
+
+        return True
 
     def get_backwards_anticipation(self, perception: Perception) -> Perception:
         """

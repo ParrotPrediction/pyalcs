@@ -305,21 +305,24 @@ class Classifier:
         if self.mark.set_mark_using_condition(self.condition, perception):
             self.ee = False
 
-    def set_alp_timestamp(self, time: int) -> None:
+    def update_application_average(self, time: int) -> None:
         """
         Sets the ALP time stamp and the application average parameter.
+        Uses the Moyenne Adaptive Modifee (MAM) technique.
 
         Parameters
         ----------
         time: int
-            current step
+            current time step
         """
         # TODO p5: write test
-        if 1. / self.exp > self.cfg.beta:
-            self.tav = (self.tav * self.exp + (time - self.talp)) / (
-                self.exp + 1)
+        last_applied = time - self.talp - self.tav
+
+        if self.exp < 1. / self.cfg.beta:
+            # average of values seen so far
+            self.tav += last_applied / self.exp
         else:
-            self.tav += self.cfg.beta * ((time - self.talp) - self.tav)
+            self.tav += self.cfg.beta * last_applied
 
         self.talp = time
 

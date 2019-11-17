@@ -33,7 +33,7 @@ def choose_action(cll, all_actions: int, epsilon: float) -> int:
     return exploit(cll, all_actions)
 
 
-def explore(cll, all_actions: int, pb: float = 0.5) -> int:
+def explore(cll, all_actions: int, pb: float = 0.2) -> int:
     """
     Chooses action according to current exploration policy
 

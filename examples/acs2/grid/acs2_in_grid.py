@@ -40,10 +40,10 @@ if __name__ == '__main__':
     cfg = Configuration(
         classifier_length=2,
         number_of_possible_actions=4,
-        epsilon=1.0,
+        epsilon=0.9,
         beta=0.03,
         gamma=0.97,
-        theta_i=0.05,
+        theta_i=0.1,
         theta_as=10,
         theta_exp=50,
         theta_ga=50,
@@ -54,17 +54,17 @@ if __name__ == '__main__':
 
     # Explore the environment
     agent1 = ACS2(cfg)
-    population, explore_metrics = agent1.explore(grid, 1000, decay=True)
+    population, explore_metrics = agent1.explore(grid, 1000, decay=False)
 
     for cl in sorted(population, key=lambda c: -c.fitness):
         if cl.does_anticipate_change():
             print_cl(cl)
 
     # Exploit
-    # agent2 = ACS2(cfg, population)
-    # pop_exploit, metric_exploit = agent2.exploit(grid, 1000)
-    #
-    # # Print classifiers
-    # for cl in sorted(pop_exploit, key=lambda c: -c.fitness):
-    #     if cl.does_anticipate_change():
-    #         print_cl(cl)
+    agent2 = ACS2(cfg, population)
+    pop_exploit, metric_exploit = agent2.exploit(grid, 100)
+
+    # Print classifiers
+    for cl in sorted(pop_exploit, key=lambda c: -c.fitness):
+        if cl.does_anticipate_change():
+            print_cl(cl)

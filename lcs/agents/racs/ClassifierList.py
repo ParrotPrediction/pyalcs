@@ -76,7 +76,7 @@ class ClassifierList(TypedList):
 
         for cl in action_set:
             cl.increase_experience()
-            cl.set_alp_timestamp(time)
+            cl.update_application_average(time)
 
             if cl.does_anticipate_correctly(p0, p1):
                 new_cl = alp_racs.expected_case(cl, p0, time)
