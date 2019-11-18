@@ -147,6 +147,7 @@ class ACS2(Agent):
         steps = 0
         raw_state = env.reset()
         state = self.cfg.environment_adapter.to_genotype(raw_state)
+        state = Perception(state)
 
         last_reward = 0
         action_set = ClassifiersList()

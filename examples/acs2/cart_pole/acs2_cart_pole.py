@@ -61,9 +61,10 @@ class CartPoleAdapter(EnvironmentAdapter):
 
     @classmethod
     def to_genotype(cls, obs):
-        return np.round(((obs - _low) / _range) * cls.BINS).astype(int).astype(
-            str)
-
+        return np.round(((obs - _low) / _range) * cls.BINS)\
+            .astype(int)\
+            .astype(str)\
+            .tolist()
 
 def avg_fitness(pop):
     return np.mean([cl.fitness for cl in pop if cl.is_reliable()])
