@@ -66,6 +66,7 @@ class CartPoleAdapter(EnvironmentAdapter):
             .astype(str)\
             .tolist()
 
+
 def avg_fitness(pop):
     return np.mean([cl.fitness for cl in pop if cl.is_reliable()])
 
