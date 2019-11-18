@@ -185,8 +185,8 @@ class TestClassifier:
 
     def test_should_specialize(self, cfg):
         # given
-        p0 = Perception(np.random.random(2), oktypes=(float,))
-        p1 = Perception(np.random.random(2), oktypes=(float,))
+        p0 = Perception(np.random.random(2), oktypes=(np.float64,))
+        p1 = Perception(np.random.random(2), oktypes=(np.float64,))
         cl = Classifier(cfg=cfg)
 
         # when

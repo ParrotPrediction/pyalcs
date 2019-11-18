@@ -3,7 +3,6 @@ from __future__ import annotations
 import random
 from itertools import chain
 from typing import Optional, List
-
 import lcs.agents.acs2.components.alp as alp_acs2
 import lcs.strategies.anticipatory_learning_process as alp
 import lcs.strategies.genetic_algorithms as ga
@@ -11,6 +10,7 @@ import lcs.strategies.reinforcement_learning as rl
 from lcs import Perception, TypedList
 from lcs.agents.acs2 import Configuration
 from . import Classifier
+from lcs.agents.acs2.cache import matching
 
 
 class ClassifiersList(TypedList):
@@ -22,8 +22,8 @@ class ClassifiersList(TypedList):
         super().__init__((Classifier, ), *args)
 
     def form_match_set(self, situation: Perception) -> ClassifiersList:
-        matching = [cl for cl in self if cl.condition.does_match(situation)]
-        return ClassifiersList(*matching)
+        matching_ls = [cl for cl in self if matching(cl.condition, situation)]
+        return ClassifiersList(*matching_ls)
 
     def form_match_set_backwards(self,
                                  situation: Perception) -> ClassifiersList:
@@ -136,7 +136,7 @@ class ClassifiersList(TypedList):
 
         if match_set is not None:
             new_matching = [cl for cl in new_list if
-                            cl.condition.does_match(p1)]
+                            matching(cl.condition, p1)]
             match_set.extend(new_matching)
 
     @staticmethod

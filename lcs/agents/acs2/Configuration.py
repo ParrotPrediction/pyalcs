@@ -7,26 +7,27 @@ class Configuration:
     def __init__(self,
                  classifier_length: int,
                  number_of_possible_actions: int,
-                 classifier_wildcard='#',
+                 classifier_wildcard: str = '#',
                  environment_adapter=EnvironmentAdapter,
                  user_metrics_collector_fcn: Callable = None,
                  fitness_fcn=None,
                  metrics_trial_frequency: int = 5,
-                 do_ga: bool=False,
-                 do_subsumption: bool=True,
-                 do_action_planning: bool=False,
-                 action_planning_frequency: int=50,
-                 beta: float=0.05,
-                 gamma: float=0.95,
-                 theta_i: float=0.1,
-                 theta_r: float=0.9,
-                 epsilon: float=0.5,
-                 u_max: int=100000,
-                 theta_exp: int=20,
-                 theta_ga: int=100,
-                 theta_as: int=20,
-                 mu: float=0.3,
-                 chi: float=0.8) -> None:
+                 do_ga: bool = False,
+                 do_subsumption: bool = True,
+                 do_action_planning: bool = False,
+                 action_planning_frequency: int = 50,
+                 beta: float = 0.05,
+                 gamma: float = 0.95,
+                 theta_i: float = 0.1,
+                 theta_r: float = 0.9,
+                 epsilon: float = 0.5,
+                 biased_exploration: float = 0.05,
+                 u_max: int = 100000,
+                 theta_exp: int = 20,
+                 theta_ga: int = 100,
+                 theta_as: int = 20,
+                 mu: float = 0.3,
+                 chi: float = 0.8) -> None:
         """
         Creates the configuration object used during training the ACS2 agent.
 
@@ -44,8 +45,18 @@ class Configuration:
         :param beta:
         :param gamma:
         :param theta_i: inadequacy threshold
-        :param theta_r:
-        :param epsilon:
+        :param theta_r: float
+            Reliability threshold. Quality level when the classifier is
+            treated as "reliable"
+        :param epsilon: float
+            Probability of executing random action. Otherwise the action
+            from best classifier is selected.
+        :param biased_exploration: float
+            Probability of executing biased exploration. During exploration
+            there are chances that action will be selected according to
+            knowledge array or action delay bias. Increasing this parameter
+            might speed-up the process of traversing the classifier search
+            space in the environment.
         :param u_max:
         :param theta_exp:
         :param theta_as:
@@ -70,6 +81,7 @@ class Configuration:
         self.theta_i = theta_i
         self.theta_r = theta_r
         self.epsilon = epsilon
+        self.biased_exploration = biased_exploration
         self.u_max = u_max
         self.theta_ga = theta_ga
         self.theta_as = theta_as
@@ -80,7 +92,6 @@ class Configuration:
         return "ACS2Configuration:" \
                "\n\t- Classifier length: [{}]" \
                "\n\t- Number of possible actions: [{}]" \
-               "\n\t- Classifier wildcard: [{}]" \
                "\n\t- Environment adapter function: [{}]" \
                "\n\t- Fitness function: [{}]" \
                "\n\t- Do GA: [{}]" \
@@ -92,7 +103,6 @@ class Configuration:
                "\n\t- U_max: [{}]" \
             .format(self.classifier_length,
                     self.number_of_possible_actions,
-                    self.classifier_wildcard,
                     self.environment_adapter,
                     self.fitness_fcn,
                     self.do_ga,
