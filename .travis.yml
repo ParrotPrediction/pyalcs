@@ -3,7 +3,7 @@ services:
 - docker
 language: python
 python:
-- 3.7-dev
+- 3.7
 install:
 - docker build -t parrot-prediction/lcs .
 script:
