@@ -7,7 +7,10 @@ import numpy as np
 logger = logging.getLogger(__name__)
 
 
-def choose_action(cll, all_actions: int, epsilon: float) -> int:
+def choose_action(cll,
+                  all_actions: int,
+                  epsilon: float,
+                  biased_exploration_prob: float) -> int:
     """
     Chooses which action to execute given classifier list (match set).
 
@@ -19,6 +22,8 @@ def choose_action(cll, all_actions: int, epsilon: float) -> int:
         int: number of all possible actions available
     epsilon: float
         Probability of executing exploration path
+    biased_exploration_prob: float
+        Probability of executing biased exploration
 
     Returns
     -------
@@ -27,13 +32,13 @@ def choose_action(cll, all_actions: int, epsilon: float) -> int:
     """
     if random.random() < epsilon:
         logger.debug("\t\tExploration path")
-        return explore(cll, all_actions)
+        return explore(cll, all_actions, biased_exploration_prob)
 
     logger.debug("\t\tExploitation path")
     return exploit(cll, all_actions)
 
 
-def explore(cll, all_actions: int, pb: float = 0.2) -> int:
+def explore(cll, all_actions: int, pb: float) -> int:
     """
     Chooses action according to current exploration policy
 

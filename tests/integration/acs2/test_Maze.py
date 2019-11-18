@@ -20,6 +20,7 @@ class TestMaze:
         # given
         cfg = Configuration(8, 8,
                             epsilon=1.0,
+                            biased_exploration=0.5,
                             do_ga=False,
                             metrics_trial_frequency=1,
                             user_metrics_collector_fcn=self._maze_metrics)
@@ -44,6 +45,7 @@ class TestMaze:
         # given
         cfg = Configuration(8, 8,
                             epsilon=0.8,
+                            biased_exploration=0.5,
                             mu=0.3,
                             chi=0.0,
                             do_ga=True,

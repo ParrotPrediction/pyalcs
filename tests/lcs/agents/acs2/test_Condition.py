@@ -1,7 +1,8 @@
 import pytest
 
 from lcs import Perception
-from lcs.agents.acs2 import Condition
+from lcs.agents.acs2.cache import matching
+from lcs.agents.acs2.Condition import Condition
 
 
 class TestCondition:
@@ -65,7 +66,7 @@ class TestCondition:
     def test_should_only_accept_strings(self):
         condition = Condition([])
 
-        with pytest.raises(TypeError):
+        with pytest.raises(AssertionError):
             # Try to store an integer
             condition[0] = 1
 
@@ -120,7 +121,7 @@ class TestCondition:
         p = Perception(_p)
 
         # then
-        assert c.does_match(p) is _result
+        assert matching(c, p) is _result
 
     @pytest.mark.parametrize("_c, _other, _result", [
         ('########', '10011001', True),
@@ -134,7 +135,7 @@ class TestCondition:
         other = Condition(_other)
 
         # then
-        assert c.does_match(other) is _result
+        assert matching(c, other) is _result
 
     def test_get_backwards_anticipation(self):
         # given

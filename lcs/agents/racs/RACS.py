@@ -15,7 +15,7 @@ class RACS(Agent):
 
     def __init__(self,
                  cfg: Configuration,
-                 population: ClassifierList=None) -> None:
+                 population: ClassifierList = None) -> None:
         self.cfg = cfg
         self.population = population or ClassifierList()
 
@@ -91,7 +91,9 @@ class RACS(Agent):
             action = choose_action(
                 match_set,
                 self.cfg.number_of_possible_actions,
-                self.cfg.epsilon)
+                self.cfg.epsilon,
+                self.cfg.biased_exploration
+            )
             logger.debug("\tExecuting action: [%d]", action)
             action_set = match_set.form_action_set(action)
 
@@ -161,7 +163,8 @@ class RACS(Agent):
             action = choose_action(
                 match_set,
                 self.cfg.number_of_possible_actions,
-                epsilon=0.0)
+                epsilon=0.0,
+                biased_exploration_prob=0.0)
             iaction = self.cfg.environment_adapter.to_lcs_action(action)
             action_set = match_set.form_action_set(action)
 

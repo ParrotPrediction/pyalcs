@@ -17,7 +17,7 @@ class TestEffect:
     def test_should_set_effect_with_non_string_char(self):
         effect = Effect.empty(8)
 
-        with pytest.raises(TypeError):
+        with pytest.raises(AssertionError):
             effect[0] = 1
 
     @pytest.mark.parametrize("_e, _result", [

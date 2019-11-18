@@ -55,3 +55,5 @@ if __name__ == '__main__':
 
     for metric in exploit_metric:
         logger.info(metric)
+
+    logger.info("Done")

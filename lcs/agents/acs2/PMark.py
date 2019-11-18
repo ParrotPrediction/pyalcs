@@ -61,9 +61,7 @@ class PMark(TypedList):
         :param: perception
         :return: condition that specifies all the differences.
         """
-        diff = Condition.empty(
-            wildcard=self.cfg.classifier_wildcard,
-            length=self.cfg.classifier_length)
+        diff = Condition.empty(length=self.cfg.classifier_length)
 
         nr1, nr2 = 0, 0
 

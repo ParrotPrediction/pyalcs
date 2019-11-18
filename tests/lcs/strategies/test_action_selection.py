@@ -23,7 +23,8 @@ class TestActionSelection:
         for _ in range(1000):
             act = choose_action(population,
                                 all_actions=all_actions,
-                                epsilon=1.0)
+                                epsilon=1.0,
+                                biased_exploration_prob=0.0)
             actions.add(act)
 
         # then

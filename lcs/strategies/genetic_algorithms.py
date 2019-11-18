@@ -4,6 +4,7 @@ from typing import Callable, Dict
 import numpy as np
 
 from lcs import Perception
+from lcs.agents.acs2.cache import matching
 from lcs.strategies.subsumption import find_subsumers
 
 
@@ -154,7 +155,7 @@ def add_classifier(cl, p: Perception,
     if old_cl is None:
         population.append(cl)
         action_set.append(cl)
-        if match_set is not None and cl.condition.does_match(p):
+        if match_set is not None and matching(cl.condition, p):
             match_set.append(cl)
     else:
         if not old_cl.is_marked():

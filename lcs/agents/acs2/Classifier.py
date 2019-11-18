@@ -5,7 +5,7 @@ import random
 from typing import Optional, Union, Callable, List
 
 from lcs import Perception
-from . import Configuration, Condition, Effect, PMark
+from . import Configuration, Condition, Effect, PMark, matching
 
 
 logger = logging.getLogger(__name__)
@@ -36,12 +36,11 @@ class Classifier:
         self.cfg = cfg
 
         def build_perception_string(cls, initial,
-                                    length=self.cfg.classifier_length,
-                                    wildcard=self.cfg.classifier_wildcard):
+                                    length=self.cfg.classifier_length):
             if initial:
-                return cls(initial, wildcard=wildcard)
+                return cls(initial)
 
-            return cls.empty(wildcard=wildcard, length=length)
+            return cls.empty(length=length)
 
         self.condition = build_perception_string(Condition, condition)
         self.action = action
@@ -116,8 +115,7 @@ class Classifier:
             copied classifier
         """
         new_cls = cls(
-            condition=Condition(old_cls.condition,
-                                old_cls.cfg.classifier_wildcard),
+            condition=Condition(old_cls.condition),
             action=old_cls.action,
             effect=old_cls.effect,
             quality=old_cls.q,
@@ -240,7 +238,7 @@ class Classifier:
         bool
             True if classifier makes successful predictions, False otherwise
         """
-        if self.condition.does_match(p0):
+        if self.does_match(p0):
             if self.action == action:
                 if self.does_anticipate_correctly(p0, p1):
                     return True
@@ -375,7 +373,7 @@ class Classifier:
         :param situation:
         :return:
         """
-        return self.condition.does_match(situation)
+        return matching(self.condition, situation)
 
     def does_match_backwards(self, situation: Perception) -> bool:
         """

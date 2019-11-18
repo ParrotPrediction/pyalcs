@@ -49,7 +49,7 @@ class TestPerception:
         obs = ["f", "o", 0]
 
         # when & then
-        with pytest.raises(TypeError) as _:
+        with pytest.raises(AssertionError) as _:
             Perception(obs)
 
     def test_should_create_empty_perception(self):
@@ -58,3 +58,8 @@ class TestPerception:
 
         # then
         assert p is not None
+
+    def test_should_compare_equal_hashes(self):
+        assert Perception("111") == Perception("111")
+        assert Perception("111") is not Perception("111")
+        assert hash(Perception("111")) == hash(Perception("111"))

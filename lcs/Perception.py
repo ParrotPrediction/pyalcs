@@ -1,7 +1,5 @@
 import collections.abc
 
-from . import check_types
-
 
 class Perception(collections.abc.Sequence):
     """
@@ -12,16 +10,17 @@ class Perception(collections.abc.Sequence):
     __slots__ = ['_items', 'oktypes']
 
     def __init__(self, observation, oktypes=(str,)):
-        self._items = list()
-
         for el in observation:
-            check_types(oktypes, el)
+            assert type(el) in oktypes
 
-        self._items.extend(list(observation))
+        self._items = tuple(observation)
 
     @classmethod
     def empty(cls):
         return cls([], oktypes=(None,))
+
+    def __hash__(self):
+        return hash(self._items)
 
     def __getitem__(self, i):
         return self._items[i]

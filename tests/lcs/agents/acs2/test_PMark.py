@@ -77,9 +77,7 @@ class TestPMark:
     ])
     def test_should_get_differences_1(self, _p0, cfg):
         # given
-        generic_condition = Condition.empty(
-            wildcard=cfg.classifier_wildcard,
-            length=cfg.classifier_length)
+        generic_condition = Condition.empty(length=cfg.classifier_length)
         p0 = Perception(_p0)
         mark = PMark(cfg)
 

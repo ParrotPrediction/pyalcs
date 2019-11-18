@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from lcs import Perception
-from .. import PerceptionString
+from .. import ImmutableSequence
 
 
-class Effect(PerceptionString):
+class Effect(ImmutableSequence):
     """
     Anticipates the effects that the classifier 'believes'
     to be caused by the specified action.
@@ -21,7 +21,7 @@ class Effect(PerceptionString):
         bool
             True if the effect part predicts a change, False otherwise
         """
-        return any(True for e in self if e != self.wildcard)
+        return any(True for e in self if e != self.WILDCARD)
 
     def is_specializable(self, p0: Perception, p1: Perception) -> bool:
         """
@@ -41,7 +41,7 @@ class Effect(PerceptionString):
             True if specializable, false otherwise
         """
         for p0i, p1i, ei in zip(p0, p1, self):
-            if ei != self.wildcard:
+            if ei != self.WILDCARD:
                 if ei != p1i or p0i == p1i:
                     return False
 
@@ -60,7 +60,7 @@ class Effect(PerceptionString):
         # ('getBestChar' function)
         ant = list(perception)
         for idx, item in enumerate(self):
-            if item != self.wildcard:
+            if item != self.WILDCARD:
                 ant[idx] = item
         return Perception(ant)
 
@@ -75,12 +75,12 @@ class Effect(PerceptionString):
         :return:
         """
         for item, back_ant, sit in zip(self, back_anticipation, situation):
-            if item == self.wildcard and back_ant != sit:
+            if item == self.WILDCARD and back_ant != sit:
                 # change anticipated backwards although no change should occur
                 return False
             # TODO: if PEEs are implemented, 'isEnhanced()' should be added
             # to the condition below
-            if item != self.wildcard and item == back_ant:
+            if item != self.WILDCARD and item == back_ant:
                 return False
         return True
 
@@ -98,9 +98,9 @@ class Effect(PerceptionString):
         """
         for (item, percept, percept2) in zip(self, perception,
                                              other_perception):
-            if item == self.wildcard and percept != percept2:
+            if item == self.WILDCARD and percept != percept2:
                 return False
-            elif item != self.wildcard and item != percept:
+            elif item != self.WILDCARD and item != percept:
                 return False
         return True
 
