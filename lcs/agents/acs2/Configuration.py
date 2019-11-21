@@ -12,6 +12,7 @@ class Configuration:
                  user_metrics_collector_fcn: Callable = None,
                  fitness_fcn=None,
                  metrics_trial_frequency: int = 5,
+                 do_pee: bool = False,
                  do_ga: bool = False,
                  do_subsumption: bool = True,
                  do_action_planning: bool = False,
@@ -38,6 +39,12 @@ class Configuration:
         :param environment_adapter: EnvironmentAdapter class ACS2 needs to use
             to interact with the environment
         :param fitness_fcn: Custom fitness function
+        :param do_pee: switch *Probability-Enhanced Effects*.
+            This is the mechanism described and implemented in C++
+            in Martin V. Butz, David E. Goldberg, Wolfgang Stolzmann,
+            "Probability-Enhanced Predictions in the Anticipatory Classifier
+             System", University of Illinois at Urbana-Champaign:
+            Illinois Genetic Algorithms Laboratory, Urbana, 2000.
         :param do_ga: switch *Genetic Generalization* module
         :param do_subsumption:
         :param do_action_planning: switch Action Planning phase
@@ -70,6 +77,7 @@ class Configuration:
         self.environment_adapter = environment_adapter
         self.metrics_trial_frequency = metrics_trial_frequency
         self.user_metrics_collector_fcn = user_metrics_collector_fcn
+        self.do_pee = do_pee
         self.fitness_fcn = fitness_fcn
         self.do_ga = do_ga
         self.do_subsumption = do_subsumption

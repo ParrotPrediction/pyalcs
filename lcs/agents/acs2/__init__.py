@@ -1,4 +1,5 @@
 from .cache import matching
+from .ProbabilityEnhancedAttribute import ProbabilityEnhancedAttribute
 from .Configuration import Configuration
 from .Condition import Condition
 from .Effect import Effect

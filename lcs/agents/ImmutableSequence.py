@@ -4,15 +4,15 @@ from copy import copy
 class ImmutableSequence:
 
     WILDCARD = '#'
-    OK_TYPES = (str, )
+    OK_TYPES = (str, dict)  # PEEs are stored in dict
 
     def __init__(self, observation):
+        obs = tuple(observation)
+
         assert type(self.WILDCARD) in self.OK_TYPES
+        assert all(isinstance(o, self.OK_TYPES) for o in obs)
 
-        for attr in observation:
-            assert type(attr) in self.OK_TYPES
-
-        self._items = tuple(observation)
+        self._items = obs
 
     @classmethod
     def empty(cls, length: int):
@@ -45,7 +45,7 @@ class ImmutableSequence:
         return self._items[index]
 
     def __setitem__(self, index, value):
-        assert type(value) in self.OK_TYPES
+        assert isinstance(value, self.OK_TYPES)
         lst = list(self._items)
         lst[index] = value
 

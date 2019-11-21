@@ -58,10 +58,17 @@ def expected_case(cl: Classifier,
     :param time:
     :return: new classifier or None
     """
+    if cl.cfg.do_pee:
+        cl.effect.update_enhanced_effect_probs(p0, cl.cfg.beta)
+
     diff = cl.mark.get_differences(p0)
 
     if diff.specificity == 0:
+        if cl.cfg.do_pee and cl.is_marked():
+            cl.ee = True
+
         cl.increase_quality()
+
         return None
 
     no_spec = len(cl.specified_unchanging_attributes)
@@ -117,7 +124,13 @@ def unexpected_case(cl: Classifier,
 
     child = cl.copy_from(cl, time)
 
-    child.specialize(p0, p1, leave_specialized=True)
+    if cl.cfg.do_pee:
+        # Probability-Enhanced attributes cannot appear in the effect part
+        # if we leave already specialized attributes unchanged.
+        # Therefore don't leave specialized.
+        child.specialize(p0, p1, leave_specialized=False)
+    else:
+        child.specialize(p0, p1, leave_specialized=True)
 
     if child.q < 0.5:
         child.q = 0.5

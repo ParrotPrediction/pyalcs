@@ -1,7 +1,12 @@
 from __future__ import annotations
 
 from lcs import Perception
+from lcs.agents.acs2 import Configuration
+from lcs.agents.acs2 import ProbabilityEnhancedAttribute
 from .. import ImmutableSequence
+
+
+DETAILED_PEE_PRINTING = True
 
 
 class Effect(ImmutableSequence):
@@ -9,6 +14,18 @@ class Effect(ImmutableSequence):
     Anticipates the effects that the classifier 'believes'
     to be caused by the specified action.
     """
+
+    def __init__(self, observation):
+        # Convert dict to ProbabilityEnhancedAttribute
+        if not all(isinstance(attr, ProbabilityEnhancedAttribute)
+                   for attr in observation):
+
+            observation = (ProbabilityEnhancedAttribute(attr)
+                           if isinstance(attr, dict)
+                           else attr
+                           for attr in observation)
+
+        super().__init__(observation)
 
     @property
     def specify_change(self) -> bool:
@@ -21,7 +38,51 @@ class Effect(ImmutableSequence):
         bool
             True if the effect part predicts a change, False otherwise
         """
-        return any(True for e in self if e != self.WILDCARD)
+        if self.is_enhanced():
+            return True
+        else:
+            return any(True for e in self if e != self.WILDCARD)
+
+    @classmethod
+    def enhanced_effect(cls, effect1, effect2,
+                        q1: float = 0.5, q2: float = 0.5,
+                        perception: ImmutableSequence = None):
+        """
+        Create a new enhanced effect part.
+        """
+        assert perception is not None
+        result = cls(observation=effect1)
+        for i, attr2 in enumerate(effect2):
+            attr1 = effect1[i]
+            if attr1 == Effect.WILDCARD and attr2 == Effect.WILDCARD:
+                continue
+            if attr1 == Effect.WILDCARD:
+                attr1 = perception[i]
+            if attr2 == Effect.WILDCARD:
+                attr2 = perception[i]
+
+            result[i] = ProbabilityEnhancedAttribute.merged_attributes(
+                attr1, attr2, q1, q2)
+
+        return result
+
+    @classmethod
+    def for_perception_change(cls,
+                              p0: ImmutableSequence,
+                              p1: ImmutableSequence,
+                              cfg: Configuration):
+        """
+        Create an Effect that represents the change from perception p0
+        to perception p1.
+        """
+
+        # Start with the resulting perception
+        result = cls(observation=p1)
+
+        # Insert wildcard characters where necessary
+        for idx, eitem in enumerate(result):
+            if p0[idx] == p1[idx]:
+                result[idx] = cfg.classifier_wildcard
 
     def is_specializable(self, p0: Perception, p1: Perception) -> bool:
         """
@@ -40,6 +101,9 @@ class Effect(ImmutableSequence):
         bool
             True if specializable, false otherwise
         """
+        if self.is_enhanced():
+            return True
+
         for p0i, p1i, ei in zip(p0, p1, self):
             if ei != self.WILDCARD:
                 if ei != p1i or p0i == p1i:
@@ -106,3 +170,49 @@ class Effect(ImmutableSequence):
 
     def subsumes(self, other: Effect) -> bool:
         return self == other
+
+    def is_enhanced(self) -> bool:
+        """
+        Checks whether any element of the Effect is Probability-Enhanced.
+        str elements of the Effect are not Enhanced,
+        ProbabilityEnhancedAttribute elements are Enhanced.
+        :return: True if this is a Probability-Enhanced Effect, False otherwise
+        """
+        # Sanity check
+        assert not any(isinstance(elem, dict) and
+                       not isinstance(elem, ProbabilityEnhancedAttribute)
+                       for elem in self)
+
+        return any(isinstance(elem, ProbabilityEnhancedAttribute)
+                   for elem in self)
+
+    def reduced_to_non_enhanced(self):
+        if not self.is_enhanced():
+            return self
+
+        result = Effect(self)
+
+        for i, elem in enumerate(result):
+            if isinstance(elem, ProbabilityEnhancedAttribute):
+                result[i] = self[i].get_best_symbol()
+
+        return result
+
+    def update_enhanced_effect_probs(self, perception: Perception,
+                                     update_rate: float):
+        for i, elem in enumerate(self):
+            if isinstance(elem, ProbabilityEnhancedAttribute):
+                elem.make_compact()
+                effect_symbol = perception[i]
+                elem.increase_probability(effect_symbol, update_rate)
+
+    def __str__(self):
+        if DETAILED_PEE_PRINTING:
+            return ''.join(str(attr) for attr in self)
+        else:
+            if self.is_enhanced():
+                return '(PEE)' + ''.join(attr for attr
+                                         in self.reduced_to_non_enhanced())
+            else:
+                assert all(isinstance(attr, str) for attr in self)
+                return ''.join(attr for attr in self)
