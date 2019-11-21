@@ -6,6 +6,7 @@ from typing import Optional, Union, Callable, List
 
 from lcs import Perception
 from . import Configuration, Condition, Effect, PMark, matching
+from . import ProbabilityEnhancedAttribute
 
 
 logger = logging.getLogger(__name__)
@@ -139,21 +140,26 @@ class Classifier:
     @property
     def specified_unchanging_attributes(self) -> List[int]:
         """
-        Determines the number of specified unchanging attributes in
-        the classifier. An unchanging attribute is one that is anticipated
-        not to change in the effect part.
+        Determines the specified unchanging attributes in the classifier.
+        An unchanging attribute is one that is anticipated not to change
+        in the effect part.
 
         Returns
         -------
         List[int]
-            list specified unchanging attributes indices
+            list of specified unchanging attributes indices
         """
         indices = []
 
         for idx, (cpi, epi) in enumerate(zip(self.condition, self.effect)):
-            if cpi != self.cfg.classifier_wildcard and \
-                    epi == self.cfg.classifier_wildcard:
-                indices.append(idx)
+            if isinstance(epi, ProbabilityEnhancedAttribute):
+                if cpi != self.cfg.classifier_wildcard and \
+                        epi.does_contain(cpi):
+                    indices.append(idx)
+            else:
+                if cpi != self.cfg.classifier_wildcard and \
+                        epi == self.cfg.classifier_wildcard:
+                    indices.append(idx)
 
         return indices
 
@@ -177,6 +183,9 @@ class Classifier:
 
     def is_inadequate(self) -> bool:
         return self.q < self.cfg.theta_i
+
+    def is_enhanceable(self):
+        return self.ee
 
     def increase_experience(self) -> int:
         self.exp += 1
@@ -206,15 +215,61 @@ class Classifier:
             Requires the effect attribute to be a wildcard to specialize it.
             By default false
         """
-        for idx, item in enumerate(situation):
+        for idx in range(len(situation)):
             if leave_specialized:
                 if self.effect[idx] != self.cfg.classifier_wildcard:
                     # If we have a specialized attribute don't change it.
                     continue
 
             if previous_situation[idx] != situation[idx]:
-                self.effect[idx] = situation[idx]
+                if self.effect[idx] == self.cfg.classifier_wildcard:
+                    self.effect[idx] = situation[idx]
+                else:
+                    if not isinstance(self.effect[idx],
+                                      ProbabilityEnhancedAttribute):
+                        self.effect[idx] = ProbabilityEnhancedAttribute(
+                            self.effect[idx])
+                    self.effect[idx].insert_symbol(situation[idx])
+
                 self.condition[idx] = previous_situation[idx]
+
+    def merge_with(self, other_classifier, perception, time):
+        assert self.cfg.do_pee
+
+        result = Classifier(cfg=self.cfg)
+
+        result.condition = Condition(self.condition)
+        result.condition.specialize_with_condition(other_classifier.condition)
+
+        # action is an int, so we can assign directly
+        result.action = self.action
+
+        result.effect = Effect.enhanced_effect(
+            self.effect, other_classifier.effect,
+            self.q, other_classifier.q,
+            perception)
+
+        result.mark = PMark(cfg=self.cfg)
+
+        result.r = (self.r + other_classifier.r) / 2.0
+        result.q = (self.q + other_classifier.q) / 2.0
+
+        # This 0.5 is Q_INI constant in the original C++ code
+        if result.q < 0.5:
+            result.q = 0.5
+
+        result.num = 1
+        result.tga = time
+        result.talp = time
+        result.tav = 0
+        result.exp = 1
+
+        result.ee = False
+
+        return result
+
+    def reverse_increase_quality(self):
+        self.q = (self.q - self.cfg.beta) / (1.0 - self.cfg.beta)
 
     def predicts_successfully(self,
                               p0: Perception,
@@ -270,14 +325,18 @@ class Classifier:
             False otherwise
         """
         def effect_item_is_correct(effect_item, p0_item, p1_item):
-            if effect_item == self.cfg.classifier_wildcard:
-                if p0_item != p1_item:
-                    return False
-            else:
-                if p0_item == p1_item:
-                    return False
+            if not isinstance(effect_item, ProbabilityEnhancedAttribute):
+                if effect_item == self.cfg.classifier_wildcard:
+                    if p0_item != p1_item:
+                        return False
+                else:
+                    if p0_item == p1_item:
+                        return False
 
-                if effect_item != p1_item:
+                    if effect_item != p1_item:
+                        return False
+            else:
+                if not effect_item.does_contain(p1_item):
                     return False
 
             # All checks passed
