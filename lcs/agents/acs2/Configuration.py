@@ -96,26 +96,5 @@ class Configuration:
         self.mu = mu
         self.chi = chi
 
-    def __str__(self):
-        return "ACS2Configuration:" \
-               "\n\t- Classifier length: [{}]" \
-               "\n\t- Number of possible actions: [{}]" \
-               "\n\t- Environment adapter function: [{}]" \
-               "\n\t- Fitness function: [{}]" \
-               "\n\t- Do GA: [{}]" \
-               "\n\t- Do subsumption: [{}]" \
-               "\n\t- Do Action Planning: [{}]" \
-               "\n\t- Beta: [{}]" \
-               "\n\t- ..." \
-               "\n\t- Epsilon: [{}]" \
-               "\n\t- U_max: [{}]" \
-            .format(self.classifier_length,
-                    self.number_of_possible_actions,
-                    self.environment_adapter,
-                    self.fitness_fcn,
-                    self.do_ga,
-                    self.do_subsumption,
-                    self.do_action_planning,
-                    self.beta,
-                    self.epsilon,
-                    self.u_max)
+    def __str__(self) -> str:
+        return str(vars(self))

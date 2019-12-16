@@ -1,4 +1,5 @@
 .PHONY: docs
+experiments_image = acs:2
 
 docs:
 	(cd docs && make html)
@@ -12,6 +13,11 @@ test: lint
 
 notebook:
 	jupyter lab --notebook-dir notebooks/
+
+publish_experiments_docker_image:
+	docker build -f Dockerfile.experiments -t $(experiments_image) .
+	docker tag $(experiments_image) khozzy/$(experiments_image)
+	docker push khozzy/$(experiments_image)
 
 execute_notebooks:
 #	papermill notebooks/rACS_Corridor.ipynb docs/source/notebooks/rACS_Corridor.ipynb
