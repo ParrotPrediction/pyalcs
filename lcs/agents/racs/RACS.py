@@ -1,5 +1,4 @@
 import logging
-from typing import Tuple
 
 from lcs import Perception
 from lcs.agents.Agent import TrialMetrics

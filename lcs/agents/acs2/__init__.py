@@ -1,3 +1,4 @@
+# flake8: noqa
 from .cache import matching
 from .ProbabilityEnhancedAttribute import ProbabilityEnhancedAttribute
 from .Configuration import Configuration

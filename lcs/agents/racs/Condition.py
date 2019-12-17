@@ -76,7 +76,7 @@ class Condition(PerceptionString):
         self[idx] = self.cfg.classifier_wildcard
 
     def generalize_specific_attribute_randomly(
-            self, func: Callable=random.choice) -> None:
+            self, func: Callable = random.choice) -> None:
         """
         Generalizes one randomly selected specified attribute.
 

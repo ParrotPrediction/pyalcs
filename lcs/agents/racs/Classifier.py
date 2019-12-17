@@ -11,7 +11,6 @@ from . import Condition, Effect, Mark, Configuration
 
 
 class Classifier:
-
     __slots__ = ['condition', 'action', 'effect', 'mark', 'q', 'r',
                  'ir', 'num', 'exp', 'talp', 'tga', 'tav', 'ee', 'cfg']
 
@@ -67,7 +66,7 @@ class Classifier:
     def __eq__(self, other):
         # TODO: here we should base on intervals somehow
         if self.condition == other.condition and \
-                self.action == other.action and \
+            self.action == other.action and \
                 self.effect == other.effect:
             return True
 
@@ -334,7 +333,7 @@ class Classifier:
         return counts
 
     def generalize_unchanging_condition_attribute(
-            self, randomfunc: Callable=random.choice) -> bool:
+            self, randomfunc: Callable = random.choice) -> bool:
         """
         Generalizes one randomly unchanging attribute in the condition.
         An unchanging attribute is one that is anticipated not to change

@@ -3,8 +3,9 @@
 .pytest_cache
 .coverage
 .idea
-assets
 notebooks
+examples
+docs
 .editorconfig
 .gitignore
 .travis.yml

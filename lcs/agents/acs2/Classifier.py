@@ -8,27 +8,25 @@ from lcs import Perception
 from . import Configuration, Condition, Effect, PMark, matching
 from . import ProbabilityEnhancedAttribute
 
-
 logger = logging.getLogger(__name__)
 
 
 class Classifier:
-
     __slots__ = ['condition', 'action', 'effect', 'mark', 'q', 'r',
                  'ir', 'num', 'exp', 'talp', 'tga', 'tav', 'ee', 'cfg']
 
     def __init__(self,
-                 condition: Union[Condition, str, None]=None,
-                 action: Optional[int]=None,
-                 effect: Union[Effect, str, None]=None,
-                 quality: float=0.5,
-                 reward: float=0.5,
-                 immediate_reward: float=0.0,
-                 numerosity: int=1,
-                 experience: int=1,
+                 condition: Union[Condition, str, None] = None,
+                 action: Optional[int] = None,
+                 effect: Union[Effect, str, None] = None,
+                 quality: float = 0.5,
+                 reward: float = 0.5,
+                 immediate_reward: float = 0.0,
+                 numerosity: int = 1,
+                 experience: int = 1,
                  talp=None,
-                 tga: int=0,
-                 tav: float=0.0,
+                 tga: int = 0,
+                 tav: float = 0.0,
                  cfg: Optional[Configuration] = None) -> None:
 
         if cfg is None:
@@ -78,7 +76,7 @@ class Classifier:
 
     def __eq__(self, other):
         if self.condition == other.condition and \
-                self.action == other.action and \
+            self.action == other.action and \
                 self.effect == other.effect:
             return True
 
@@ -324,6 +322,7 @@ class Classifier:
             True if classifier's effect pat anticipates correctly,
             False otherwise
         """
+
         def effect_item_is_correct(effect_item, p0_item, p1_item):
             if not isinstance(effect_item, ProbabilityEnhancedAttribute):
                 if effect_item == self.cfg.classifier_wildcard:
@@ -344,7 +343,7 @@ class Classifier:
 
         return all(effect_item_is_correct(
             eitem, previous_situation[idx], situation[idx])
-            for idx, eitem in enumerate(self.effect))
+                   for idx, eitem in enumerate(self.effect))
 
     def set_mark(self, perception: Perception) -> None:
         """
@@ -401,7 +400,7 @@ class Classifier:
         return self.condition.specificity < other.condition.specificity
 
     def generalize_unchanging_condition_attribute(
-            self, randomfunc: Callable=random.choice) -> bool:
+            self, randomfunc: Callable = random.choice) -> bool:
         """
         Generalizes one randomly unchanging attribute in the condition.
         An unchanging attribute is one that is anticipated not to change
@@ -468,11 +467,11 @@ class Classifier:
         :param perception:
         :return:
         """
-        back_anticipation = self.condition.\
+        back_anticipation = self.condition. \
             get_backwards_anticipation(perception)
-        if not self.effect.\
-                does_specify_only_changes_backwards(back_anticipation,
-                                                    perception):
+        if not self.effect. \
+            does_specify_only_changes_backwards(back_anticipation,
+                                                perception):
             # If a specified attribute in the effect part matches
             # the anticipated 'back_anticipation', the backward anticipation
             # fails, because a specified attribute in Effect means a change!

@@ -1,3 +1,4 @@
+# flake8: noqa
 from .Configuration import Configuration
 from .Condition import Condition
 from .Effect import Effect
