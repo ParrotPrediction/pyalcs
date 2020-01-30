@@ -1,7 +1,7 @@
 import pytest
 
 from lcs import Perception
-from lcs.agents.acs2 import Configuration, PMark, Condition
+from lcs.agents.acs import Configuration, Condition, PMark
 
 
 class TestPMark:

@@ -48,6 +48,27 @@ class Condition(ImmutableSequence):
             ridx = func(specific_ids)
             self.generalize(ridx)
 
+    def does_match(self, p: Perception) -> bool:
+        """
+        Check if condition match other list such as perception or another
+        condition.
+
+        Parameters
+        ----------
+        p: Union[Perception, Condition]
+            perception or condition object
+
+        Returns
+        -------
+        bool
+            True if condition match given list, False otherwise
+        """
+        for ci, oi in zip(self, p):
+            if ci != self.WILDCARD and oi != self.WILDCARD and ci != oi:
+                return False
+
+        return True
+
     def subsumes(self, other: Condition) -> bool:
         for ci, oi in zip(self, other):
             if ci != self.WILDCARD and oi != self.WILDCARD and ci != oi:

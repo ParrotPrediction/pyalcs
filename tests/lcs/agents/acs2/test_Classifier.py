@@ -1,8 +1,8 @@
 import pytest
 
 from lcs import Perception
-from lcs.agents.acs2 import Configuration, Classifier, \
-    Condition, Effect
+from lcs.agents.acs import Condition
+from lcs.agents.acs2 import Configuration, Classifier, Effect
 
 
 class TestClassifier:

@@ -1,19 +1,14 @@
 from __future__ import annotations
 
+import lcs.agents.acs as acs
 from lcs import Perception
-from lcs.agents.acs2 import Configuration
 from lcs.agents.acs2 import ProbabilityEnhancedAttribute
 from .. import ImmutableSequence
-
 
 DETAILED_PEE_PRINTING = True
 
 
-class Effect(ImmutableSequence):
-    """
-    Anticipates the effects that the classifier 'believes'
-    to be caused by the specified action.
-    """
+class Effect(acs.Effect):
 
     def __init__(self, observation):
         # Convert dict to ProbabilityEnhancedAttribute
@@ -41,7 +36,7 @@ class Effect(ImmutableSequence):
         if self.is_enhanced():
             return True
         else:
-            return any(True for e in self if e != self.WILDCARD)
+            return super().specify_change
 
     @classmethod
     def enhanced_effect(cls, effect1, effect2,
@@ -67,49 +62,47 @@ class Effect(ImmutableSequence):
         return result
 
     @classmethod
-    def for_perception_change(cls,
-                              p0: ImmutableSequence,
-                              p1: ImmutableSequence,
-                              cfg: Configuration):
-        """
-        Create an Effect that represents the change from perception p0
-        to perception p1.
-        """
+    def item_anticipate_change(cls, item, p0_item, p1_item) -> bool:
+        if not isinstance(item, ProbabilityEnhancedAttribute):
+            if item == cls.WILDCARD:
+                if p0_item != p1_item:
+                    return False
+            else:
+                if p0_item == p1_item:
+                    return False
 
-        # Start with the resulting perception
-        result = cls(observation=p1)
+                if item != p1_item:
+                    return False
+        else:
+            if not item.does_contain(p1_item):
+                return False
 
-        # Insert wildcard characters where necessary
-        for idx, eitem in enumerate(result):
-            if p0[idx] == p1[idx]:
-                result[idx] = cfg.classifier_wildcard
+        # All checks passed
+        return True
 
     def is_specializable(self, p0: Perception, p1: Perception) -> bool:
-        """
-        Determines if the effect part can be modified to anticipate
-        changes from `p0` to `p1` correctly by only specializing attributes.
-
-        Parameters
-        ----------
-        p0: Perception
-            previous perception
-        p1: Perception
-            current perception
-
-        Returns
-        -------
-        bool
-            True if specializable, false otherwise
-        """
         if self.is_enhanced():
             return True
 
-        for p0i, p1i, ei in zip(p0, p1, self):
-            if ei != self.WILDCARD:
-                if ei != p1i or p0i == p1i:
-                    return False
+        return super().is_specializable(p0, p1)
 
-        return True
+    # @classmethod
+    # def for_perception_change(cls,
+    #                           p0: ImmutableSequence,
+    #                           p1: ImmutableSequence,
+    #                           cfg: ACS2Configuration):
+    #     """
+    #     Create an Effect that represents the change from perception p0
+    #     to perception p1.
+    #     """
+    #
+    #     # Start with the resulting perception
+    #     result = cls(observation=p1)
+    #
+    #     # Insert wildcard characters where necessary
+    #     for idx, eitem in enumerate(result):
+    #         if p0[idx] == p1[idx]:
+    #             result[idx] = cfg.classifier_wildcard
 
     def get_best_anticipation(self, perception: Perception) -> Perception:
         """
@@ -148,29 +141,6 @@ class Effect(ImmutableSequence):
                 return False
         return True
 
-    def does_match(self,
-                   perception: Perception,
-                   other_perception: Perception) -> bool:
-        """
-        Returns if the effect matches the perception.
-        Hereby, the specified attributes are compared with perception.
-        Where the effect part has got #-symbols perception and other_perception
-        are compared. If they are not equal the effect part does not match.
-        :param perception: Perception
-        :param other_perception: Perception
-        :return:
-        """
-        for (item, percept, percept2) in zip(self, perception,
-                                             other_perception):
-            if item == self.WILDCARD and percept != percept2:
-                return False
-            elif item != self.WILDCARD and item != percept:
-                return False
-        return True
-
-    def subsumes(self, other: Effect) -> bool:
-        return self == other
-
     def is_enhanced(self) -> bool:
         """
         Checks whether any element of the Effect is Probability-Enhanced.
@@ -198,7 +168,8 @@ class Effect(ImmutableSequence):
 
         return result
 
-    def update_enhanced_effect_probs(self, perception: Perception,
+    def update_enhanced_effect_probs(self,
+                                     perception: Perception,
                                      update_rate: float):
         for i, elem in enumerate(self):
             if isinstance(elem, ProbabilityEnhancedAttribute):
@@ -214,5 +185,4 @@ class Effect(ImmutableSequence):
                 return '(PEE)' + ''.join(attr for attr
                                          in self.reduced_to_non_enhanced())
             else:
-                assert all(isinstance(attr, str) for attr in self)
-                return ''.join(attr for attr in self)
+                return super().__str__()

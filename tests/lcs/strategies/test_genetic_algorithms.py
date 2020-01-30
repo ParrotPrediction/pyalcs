@@ -4,6 +4,7 @@ from dataclasses import dataclass
 import numpy as np
 import pytest
 
+import lcs.agents.acs as acs
 import lcs.agents.acs2 as acs2
 import lcs.strategies.genetic_algorithms as ga
 from lcs import Perception
@@ -64,7 +65,7 @@ class TestGeneticAlgorithms:
         ga.generalizing_mutation(cl, mu=_mu)
 
         # then
-        assert cl.condition == acs2.Condition(_cond2)
+        assert cl.condition == acs.Condition(_cond2)
 
     @pytest.mark.parametrize("_seed, _c1, _c2, _rc1, _rc2", [
         (111, '1111', '2222', '1211', '2122'),  # left=1, right=2
@@ -83,8 +84,8 @@ class TestGeneticAlgorithms:
         ga.two_point_crossover(cl1, cl2)
 
         # then
-        assert cl1.condition == acs2.Condition(_rc1)
-        assert cl2.condition == acs2.Condition(_rc2)
+        assert cl1.condition == acs.Condition(_rc1)
+        assert cl2.condition == acs.Condition(_rc2)
 
     @pytest.mark.parametrize(
         "_cl_del_q, _cl_del_marked, _cl_del_tav," +

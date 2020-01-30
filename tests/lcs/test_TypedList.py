@@ -6,7 +6,7 @@ from lcs import TypedList
 class TestTypedList:
 
     def test_should_initialize_empty_int_list(self):
-        assert len(TypedList(int)) is 0
+        assert len(TypedList(oktypes=int)) is 0
 
     def test_should_prepopulate_list(self):
         # given
@@ -14,7 +14,7 @@ class TestTypedList:
         elems = [1, 2, 3]
 
         # when
-        lst = TypedList(oktypes, *elems)
+        lst = TypedList(*elems, oktypes=oktypes)
 
         # then
         assert len(lst) == 3
@@ -36,7 +36,7 @@ class TestTypedList:
         elems = [1, 2, 3]
 
         # when
-        lst = TypedList(oktypes, *elems)
+        lst = TypedList(*elems, oktypes=oktypes)
 
         # then
         assert lst[0] == 1
@@ -46,7 +46,7 @@ class TestTypedList:
     def test_should_insert_items(self):
         # given
         oktypes = (int,)
-        lst = TypedList(oktypes)
+        lst = TypedList(oktypes=oktypes)
 
         # when
         lst.insert(0, 1)
@@ -58,7 +58,7 @@ class TestTypedList:
     def test_should_fail_when_inserting_items(self):
         # given
         oktypes = (int,)
-        lst = TypedList(oktypes)
+        lst = TypedList(oktypes=oktypes)
 
         # then
         with pytest.raises(TypeError) as _:
@@ -66,7 +66,7 @@ class TestTypedList:
 
     def test_should_append_items(self):
         # given
-        lst = TypedList((int,), *[1, 2, 3])
+        lst = TypedList(*[1, 2, 3], oktypes=(int,))
 
         # when
         lst.append(4)
@@ -77,7 +77,7 @@ class TestTypedList:
 
     def test_should_fail_when_appending(self):
         # given
-        lst = TypedList((int,), *[1, 2, 3])
+        lst = TypedList(*[1, 2, 3], oktypes=(int,))
 
         # then
         with pytest.raises(TypeError) as _:
@@ -85,7 +85,7 @@ class TestTypedList:
 
     def test_should_delete_item(self):
         # given
-        lst = TypedList((int,), *[1, 2, 3])
+        lst = TypedList(*[1, 2, 3], oktypes=(int,))
 
         # when
         del lst[0]
@@ -96,14 +96,14 @@ class TestTypedList:
 
     def test_should_extend_list(self):
         # given
-        lst1 = TypedList((int,), *[1, 2, 3])
-        lst2 = TypedList((int,), *[4, 5])
+        lst1 = TypedList(*[1, 2, 3], oktypes=(int,))
+        lst2 = TypedList(*[4, 5], oktypes=(int,))
 
         # when
         lst1.extend(lst2)
 
         # then
-        extended = TypedList((int,), *[1, 2, 3, 4, 5])
+        extended = TypedList(*[1, 2, 3, 4, 5], oktypes=(int,))
         assert lst1 == extended
 
     @pytest.mark.parametrize("_type, _init, _del, _result", [
@@ -113,22 +113,22 @@ class TestTypedList:
     ])
     def test_should_safe_remove_items(self, _type, _init, _del, _result):
         # given
-        lst = TypedList((_type,), *_init)
+        lst = TypedList(*_init, oktypes=(_type,))
 
         # when
         lst.safe_remove(_del)
 
         # then
-        result = TypedList((_type,), *_result)
+        result = TypedList(*_result, oktypes=(_type,))
         assert lst == result
 
     def test_should_sort_list(self):
         # given
-        lst = TypedList((int,), *[3, 5, 1, 8])
+        lst = TypedList(*[3, 5, 1, 8], oktypes=(int,))
 
         # when
         lst.sort(key=lambda el: el)
 
         # then
-        sorted_lst = TypedList((int,), *[1, 3, 5, 8])
+        sorted_lst = TypedList(*[1, 3, 5, 8], oktypes=(int,))
         assert lst == sorted_lst

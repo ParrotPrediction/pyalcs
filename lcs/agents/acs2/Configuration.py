@@ -1,9 +1,10 @@
 from typing import Callable
 
+import lcs.agents.acs as acs
 from lcs.agents import EnvironmentAdapter
 
 
-class Configuration:
+class Configuration(acs.Configuration):
     def __init__(self,
                  classifier_length: int,
                  number_of_possible_actions: int,
@@ -28,73 +29,35 @@ class Configuration:
                  theta_ga: int = 100,
                  theta_as: int = 20,
                  mu: float = 0.3,
-                 chi: float = 0.8) -> None:
-        """
-        Creates the configuration object used during training the ACS2 agent.
+                 chi: float = 0.8):
 
-        :param classifier_length: length of the condition and effect strings
-        :param number_of_possible_actions: number of possible actions to
-            be executed
-        :param classifier_wildcard: wildcard symbol
-        :param environment_adapter: EnvironmentAdapter class ACS2 needs to use
-            to interact with the environment
-        :param fitness_fcn: Custom fitness function
-        :param do_pee: switch *Probability-Enhanced Effects*.
-            This is the mechanism described and implemented in C++
-            in Martin V. Butz, David E. Goldberg, Wolfgang Stolzmann,
-            "Probability-Enhanced Predictions in the Anticipatory Classifier
-             System", University of Illinois at Urbana-Champaign:
-            Illinois Genetic Algorithms Laboratory, Urbana, 2000.
-        :param do_ga: switch *Genetic Generalization* module
-        :param do_subsumption:
-        :param do_action_planning: switch Action Planning phase
-        :param action_planning_frequency:
-        :param beta:
-        :param gamma:
-        :param theta_i: inadequacy threshold
-        :param theta_r: float
-            Reliability threshold. Quality level when the classifier is
-            treated as "reliable"
-        :param epsilon: float
-            Probability of executing random action. Otherwise the action
-            from best classifier is selected.
-        :param biased_exploration: float
-            Probability of executing biased exploration. During exploration
-            there are chances that action will be selected according to
-            knowledge array or action delay bias. Increasing this parameter
-            might speed-up the process of traversing the classifier search
-            space in the environment.
-        :param u_max:
-        :param theta_exp:
-        :param theta_as:
-        :param theta_as:
-        :param mu:
-        :param chi: GA crossover probability
-        """
-        self.classifier_length = classifier_length
-        self.number_of_possible_actions = number_of_possible_actions
-        self.classifier_wildcard = classifier_wildcard
-        self.environment_adapter = environment_adapter
-        self.metrics_trial_frequency = metrics_trial_frequency
-        self.user_metrics_collector_fcn = user_metrics_collector_fcn
+        super(Configuration, self).__init__(
+            classifier_length,
+            number_of_possible_actions,
+            classifier_wildcard,
+            environment_adapter,
+            user_metrics_collector_fcn,
+            fitness_fcn,
+            metrics_trial_frequency,
+            do_subsumption,
+            beta,
+            theta_i,
+            theta_r,
+            epsilon,
+            u_max,
+            theta_exp,
+            theta_as)
+
+        self.gamma = gamma
         self.do_pee = do_pee
-        self.fitness_fcn = fitness_fcn
         self.do_ga = do_ga
-        self.do_subsumption = do_subsumption
         self.do_action_planning = do_action_planning
         self.action_planning_frequency = action_planning_frequency
-        self.theta_exp = theta_exp
-        self.beta = beta
-        self.gamma = gamma
-        self.theta_i = theta_i
-        self.theta_r = theta_r
-        self.epsilon = epsilon
         self.biased_exploration = biased_exploration
-        self.u_max = u_max
         self.theta_ga = theta_ga
-        self.theta_as = theta_as
         self.mu = mu
         self.chi = chi
 
     def __str__(self) -> str:
         return str(vars(self))
+

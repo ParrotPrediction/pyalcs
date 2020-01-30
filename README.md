@@ -3,6 +3,27 @@ Repository containing code implementation for various *Anticipatory Learning Cla
 
 [![Build Status](https://travis-ci.org/ParrotPrediction/pyalcs.svg?branch=master)](https://travis-ci.org/ParrotPrediction/pyalcs) [![Documentation Status](https://readthedocs.org/projects/pyalcs/badge/?version=latest)](https://pyalcs.readthedocs.io/en/latest/?badge=latest)
 
+## Agents
+
+### ACS
+Introduced by _Stolzmann_ in 1997 originally intended to simulate and evaluate Hoffmann's learning theory of anticipations.
+- LCS framework with explicit representation of anticipations
+- directed anticipatory learning process
+
+### ACS2
+Added modifications:
+- start with initially empty population of classifiers that are created by covering mechanism,
+- genetic generalization mechanism
+- population includes C-A-E triples that anticipate no change in the environment (ACS by default assumes no changes),
+- after executing an action modification are applied to all action set [A],
+- classifier has an extra property of "immediate reward".
+
+### YACS
+todo
+
+### MACS
+todo
+
 ## Documentation
 Documentation is available [here](https://pyalcs.readthedocs.io).
 

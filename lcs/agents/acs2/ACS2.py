@@ -5,7 +5,7 @@ from lcs import Perception
 from lcs.agents.Agent import TrialMetrics
 from lcs.strategies.action_planning.action_planning import \
     search_goal_sequence, suitable_cl_exists
-from . import ClassifiersList, Configuration, matching
+from . import ClassifiersList, Configuration
 from ...agents import Agent
 from ...strategies.action_selection import choose_action
 
@@ -17,7 +17,6 @@ class ACS2(Agent):
     def __init__(self,
                  cfg: Configuration,
                  population: ClassifiersList = None) -> None:
-        matching.cache_clear()
         self.cfg = cfg
         self.population = population or ClassifiersList()
 

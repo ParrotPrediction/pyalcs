@@ -1,39 +1,37 @@
 from __future__ import annotations
 
-import random
 import logging
+import random
 from itertools import chain
 from typing import Optional, List
-import lcs.agents.acs2.components.alp as alp_acs2
+
+import lcs.agents.acs as acs
+import lcs.agents.acs2.alp as alp_acs2
 import lcs.strategies.anticipatory_learning_process as alp
 import lcs.strategies.genetic_algorithms as ga
 import lcs.strategies.reinforcement_learning as rl
-from lcs import Perception, TypedList
+from lcs import Perception
 from lcs.agents.acs2 import Configuration
 from . import Classifier
-from lcs.agents.acs2.cache import matching
 
 
-class ClassifiersList(TypedList):
-    """
-    Represents overall population, match/action sets
-    """
+class ClassifiersList(acs.ClassifiersList):
 
-    def __init__(self, *args) -> None:
-        super().__init__((Classifier, ), *args)
+    def __init__(self, *args, oktypes=(Classifier,)) -> None:
+        super().__init__(*args, oktypes=oktypes)
 
     def form_match_set(self, situation: Perception) -> ClassifiersList:
-        matching_ls = [cl for cl in self if matching(cl.condition, situation)]
+        matching_ls = [cl for cl in self if cl.does_match(situation)]
         return ClassifiersList(*matching_ls)
+
+    def form_action_set(self, action: int) -> ClassifiersList:
+        matching = [cl for cl in self if cl.action == action]
+        return ClassifiersList(*matching)
 
     def form_match_set_backwards(self,
                                  situation: Perception) -> ClassifiersList:
 
         matching = [cl for cl in self if cl.does_match_backwards(situation)]
-        return ClassifiersList(*matching)
-
-    def form_action_set(self, action: int) -> ClassifiersList:
-        matching = [cl for cl in self if cl.action == action]
         return ClassifiersList(*matching)
 
     def expand(self) -> List[Classifier]:
@@ -47,25 +45,6 @@ class ClassifiersList(TypedList):
         """
         list2d = [[cl] * cl.num for cl in self]
         return list(chain.from_iterable(list2d))
-
-    def get_maximum_fitness(self) -> float:
-        """
-        Returns the maximum fitness value amongst those classifiers
-        that anticipated a change in environment.
-
-        Returns
-        -------
-        float
-            fitness value
-        """
-        anticipated_change_cls = [cl for cl in self
-                                  if cl.does_anticipate_change()]
-
-        if len(anticipated_change_cls) > 0:
-            best_cl = max(anticipated_change_cls, key=lambda cl: cl.fitness)
-            return best_cl.fitness
-
-        return 0.0
 
     @staticmethod
     def apply_enhanced_effect_part_check(action_set: ClassifiersList,
@@ -179,17 +158,8 @@ class ClassifiersList(TypedList):
 
         if match_set is not None:
             new_matching = [cl for cl in new_list if
-                            matching(cl.condition, p1)]
+                            cl.condition.does_match(p1)]
             match_set.extend(new_matching)
-
-    @staticmethod
-    def apply_reinforcement_learning(action_set: ClassifiersList,
-                                     reward: int,
-                                     p: float,
-                                     beta: float,
-                                     gamma: float) -> None:
-        for cl in action_set:
-            rl.update_classifier(cl, reward, p, beta, gamma)
 
     @staticmethod
     def apply_ga(time: int,
@@ -244,7 +214,11 @@ class ClassifiersList(TypedList):
                                   population, match_set, action_set,
                                   do_subsumption, theta_exp)
 
-    def __str__(self):
-        return "\n".join(str(classifier)
-                         for classifier
-                         in sorted(self, key=lambda cl: -cl.fitness))
+    @staticmethod
+    def apply_reinforcement_learning(action_set: ClassifiersList,
+                                     reward: int,
+                                     p: float,
+                                     beta: float,
+                                     gamma: float) -> None:
+        for cl in action_set:
+            rl.update_classifier(cl, reward, p, beta, gamma)

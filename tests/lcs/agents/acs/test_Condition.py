@@ -1,8 +1,7 @@
 import pytest
 
 from lcs import Perception
-from lcs.agents.acs2.cache import matching
-from lcs.agents.acs2.Condition import Condition
+from lcs.agents.acs.Condition import Condition
 
 
 class TestCondition:
@@ -121,7 +120,7 @@ class TestCondition:
         p = Perception(_p)
 
         # then
-        assert matching(c, p) is _result
+        assert c.does_match(p) is _result
 
     @pytest.mark.parametrize("_c, _other, _result", [
         ('########', '10011001', True),
@@ -135,7 +134,7 @@ class TestCondition:
         other = Condition(_other)
 
         # then
-        assert matching(c, other) is _result
+        assert c.does_match(other) is _result
 
     def test_get_backwards_anticipation(self):
         # given

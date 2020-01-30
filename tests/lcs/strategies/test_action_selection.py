@@ -2,7 +2,8 @@ from random import randint
 
 import pytest
 
-from lcs.agents.acs2 import Configuration, Classifier, ClassifiersList
+from lcs.agents.acs import Configuration
+from lcs.agents.acs2 import Classifier, ClassifiersList
 from lcs.strategies.action_selection import exploit, choose_random_action, \
     choose_latest_action, choose_action_from_knowledge_array, choose_action
 

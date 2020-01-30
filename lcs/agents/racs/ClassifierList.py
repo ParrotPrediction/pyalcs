@@ -17,7 +17,7 @@ from . import Classifier
 class ClassifierList(TypedList):
 
     def __init__(self, *args) -> None:
-        super().__init__((Classifier,), *args)
+        super().__init__(*args, oktypes=(Classifier,))
 
     def form_match_set(self, situation: Perception) -> ClassifierList:
         matching = [cl for cl in self if cl.condition.does_match(situation)]

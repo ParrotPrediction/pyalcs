@@ -11,7 +11,7 @@ class Mark(TypedList):
     def __init__(self, cfg: Configuration) -> None:
         self.cfg = cfg
         initial: List = [set() for _ in range(self.cfg.classifier_length)]
-        super().__init__((set,), *initial)
+        super().__init__(*initial, oktypes=(set,))
 
     def is_marked(self) -> bool:
         """

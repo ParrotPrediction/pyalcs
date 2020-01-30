@@ -13,6 +13,37 @@ class Classifier:
 
 class TestReinforcementLearning:
 
+    @pytest.mark.parametrize("_r0, reward, _r1", [
+        (0.5, 0, 0.5),
+        (0.5, 1, 0.55),
+        (0.5, 10, 1.45),
+    ])
+    def test_should_perform_bucket_brigade_update(self, _r0, reward, _r1):
+        # given
+        prev_cl = Classifier(_r0, None)
+        cl = Classifier(0.5, None)
+
+        # when
+        rl.bucket_brigade_update(cl, prev_cl, reward)
+
+        # then
+        assert cl.r == 0.5
+        assert prev_cl.r == _r1
+        assert cl.ir is None
+        assert prev_cl.ir is None
+
+    def test_should_perform_bucket_brigade_update_when_first_step(self):
+        # given
+        prev_cl = None
+        cl = Classifier(0.5, None)
+
+        # when
+        rl.bucket_brigade_update(cl, prev_cl, 100)
+
+        # then
+        assert cl.r == 0.5
+        assert prev_cl is None
+
     @pytest.mark.parametrize("_r0, _r1, _ir0, _ir1", [
         (0.5, 97.975, 0.0, 50.0)
     ])

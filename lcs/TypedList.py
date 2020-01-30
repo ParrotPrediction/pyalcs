@@ -7,7 +7,7 @@ class TypedList(collections.abc.MutableSequence):
 
     __slots__ = ['_items', 'oktypes']
 
-    def __init__(self, oktypes, *args):
+    def __init__(self, *args, oktypes):
         self._items = list()
         self.oktypes = oktypes
 

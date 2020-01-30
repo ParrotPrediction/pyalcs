@@ -9,7 +9,7 @@ from lcs import TypedList
 class PerceptionString(TypedList):
 
     def __init__(self, observation, wildcard='#', oktypes=(str,)):
-        super().__init__(oktypes, *observation)
+        super().__init__(*observation, oktypes=oktypes)
         assert type(wildcard) in self.oktypes
         self.wildcard = wildcard
 
