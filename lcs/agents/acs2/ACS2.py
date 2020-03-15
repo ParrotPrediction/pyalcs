@@ -5,9 +5,9 @@ from lcs import Perception
 from lcs.agents.Agent import TrialMetrics
 from lcs.strategies.action_planning.action_planning import \
     search_goal_sequence, suitable_cl_exists
+from lcs.strategies.action_selection import BestAction
 from . import ClassifiersList, Configuration
 from ...agents import Agent
-from ...strategies.action_selection import choose_action
 
 logger = logging.getLogger(__name__)
 
@@ -87,12 +87,7 @@ class ACS2(Agent):
                         self.cfg.do_subsumption,
                         self.cfg.theta_exp)
 
-            action = choose_action(
-                match_set,
-                self.cfg.number_of_possible_actions,
-                self.cfg.epsilon,
-                self.cfg.biased_exploration
-            )
+            action = self.cfg.action_selector(match_set)
             iaction = self.cfg.environment_adapter.to_lcs_action(action)
             logger.debug("\tExecuting action: [%d]", action)
             action_set = match_set.form_action_set(action)
@@ -164,12 +159,8 @@ class ACS2(Agent):
                     self.cfg.gamma)
 
             # Here when exploiting always choose best action
-            action = choose_action(
-                match_set,
-                self.cfg.number_of_possible_actions,
-                epsilon=0.0,
-                biased_exploration_prob=0.0
-            )
+            action = BestAction(
+                all_actions=self.cfg.number_of_possible_actions)(match_set)
             iaction = self.cfg.environment_adapter.to_env_action(action)
             action_set = match_set.form_action_set(action)
 

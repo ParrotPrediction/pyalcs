@@ -88,7 +88,6 @@ class TestAnticipatoryLearningProcess:
         child = acs2.Classifier(
             condition='#1O##O##',
             action=0,
-            quality=0.5,
             reward=18.206,
             immediate_reward=0,
             experience=1,

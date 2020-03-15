@@ -20,7 +20,7 @@ class Classifier(acs.Classifier):
                  condition: Union[acs.Condition, str, None] = None,
                  action: Optional[int] = None,
                  effect: Union[Effect, str, None] = None,
-                 quality: float = 0.5,
+                 quality: float = None,
                  reward: float = 0.5,
                  immediate_reward: float = 0.0,
                  numerosity: int = 1,
@@ -47,7 +47,11 @@ class Classifier(acs.Classifier):
         self.effect = build_perception_string(Effect, effect)
 
         self.mark = acs.PMark(cfg=self.cfg)
-        self.q = quality
+        if quality is None:
+            self.q = self.cfg.initial_q
+        else:
+            self.q = quality
+
         self.r = reward
         self.ir = immediate_reward  # Immediate reward
         self.num = numerosity  # Numerosity

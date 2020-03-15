@@ -2,7 +2,7 @@ import logging
 
 from lcs import Perception
 from lcs.agents.Agent import TrialMetrics
-from lcs.strategies.action_selection import choose_action
+from lcs.agents.racs.action_selection import choose_action
 from ...agents import Agent
 from ...agents.racs import Configuration, ClassifierList
 
