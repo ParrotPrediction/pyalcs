@@ -85,7 +85,7 @@ class TestClassifier:
 
     def test_should_be_considered_as_inadequate_1(self, cfg):
         # given
-        cls = Classifier(quality=0.50, cfg=cfg)
+        cls = Classifier(cfg=cfg)
 
         # then
         assert cls.is_reliable() is False
@@ -119,7 +119,8 @@ class TestClassifier:
 
     def test_should_decrease_quality(self, cfg):
         # given
-        cls = Classifier(quality=0.47, cfg=cfg)
+        cls = Classifier(cfg=cfg)
+        cls.q = 0.47
 
         # when
         cls.decrease_quality()
@@ -381,7 +382,6 @@ class TestClassifier:
             numerosity=1.1,
             experience=0.9,
             immediate_reward=1.2,
-            quality=0.5,
             reward=0.6,
             talp=None,
             tav=1,
@@ -396,7 +396,6 @@ class TestClassifier:
             numerosity=1.2,
             experience=0.9,
             immediate_reward=1.2,
-            quality=0.5,
             reward=0.6,
             talp=None,
             tav=1,
@@ -456,7 +455,6 @@ class TestClassifier:
             numerosity=1.1,
             experience=0.9,
             immediate_reward=1.2,
-            quality=0.5,
             reward=0.5,
             talp=None,
             tav=1,
@@ -471,7 +469,6 @@ class TestClassifier:
             numerosity=1.1,
             experience=0.9,
             immediate_reward=1.2,
-            quality=0.5,
             reward=0.6,
             talp=1,
             tav=1,
@@ -486,7 +483,6 @@ class TestClassifier:
             numerosity=1.1,
             experience=0.9,
             immediate_reward=1.2,
-            quality=0.5,
             reward=0.6,
             talp=None,
             tav=2,
@@ -501,7 +497,6 @@ class TestClassifier:
             numerosity=1.1,
             experience=0.9,
             immediate_reward=1.2,
-            quality=0.5,
             reward=0.6,
             talp=None,
             tav=1,

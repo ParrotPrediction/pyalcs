@@ -251,17 +251,11 @@ class TestGeneticAlgorithms:
             quality=0.95,
             cfg=cfg)
 
-        similar = acs2.Classifier(
-            condition='10######',
-            action=1,
-            cfg=cfg)
+        similar = acs2.Classifier(condition='10######', action=1, cfg=cfg)
 
         population = acs2.ClassifiersList(*[similar, subsumer])
 
-        cl = acs2.Classifier(
-            condition='10######',
-            action=1,
-            cfg=cfg)
+        cl = acs2.Classifier(condition='10######', action=1, cfg=cfg)
 
         # when
         old_cls = ga._find_old_classifier(population, cl, True, cfg.theta_exp)

@@ -2,6 +2,7 @@ from typing import Callable
 
 import lcs.agents.acs as acs
 from lcs.agents import EnvironmentAdapter
+from lcs.strategies.action_selection import EpsilonGreedy
 
 
 class Configuration(acs.Configuration):
@@ -22,8 +23,10 @@ class Configuration(acs.Configuration):
                  gamma: float = 0.95,
                  theta_i: float = 0.1,
                  theta_r: float = 0.9,
+                 initial_q: float = 0.5,
+                 action_selector=EpsilonGreedy,
                  epsilon: float = 0.5,
-                 biased_exploration: float = 0.05,
+                 biased_exploration_prob: float = 0.05,
                  u_max: int = 100000,
                  theta_exp: int = 20,
                  theta_ga: int = 100,
@@ -52,8 +55,14 @@ class Configuration(acs.Configuration):
         self.do_pee = do_pee
         self.do_ga = do_ga
         self.do_action_planning = do_action_planning
+        self.initial_q = initial_q
         self.action_planning_frequency = action_planning_frequency
-        self.biased_exploration = biased_exploration
+        self.action_selector = action_selector(
+            all_actions=number_of_possible_actions,
+            epsilon=epsilon,
+            biased_exploration_prob=biased_exploration_prob
+        )
+        self.biased_exploration_prob = biased_exploration_prob
         self.theta_ga = theta_ga
         self.mu = mu
         self.chi = chi
