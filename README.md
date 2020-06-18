@@ -44,3 +44,7 @@ If you want to use the library in your project please cite the following:
 Prior to PR please execute to check if standards are holding:
 
     make test
+
+## See also
+- [Dedicated OpenAI Gym environments](https://github.com/ParrotPrediction/openai-envs)
+- [Examples of integration and interactive notebooks](https://github.com/ParrotPrediction/pyalcs-experiments)
