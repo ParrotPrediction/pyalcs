@@ -169,7 +169,7 @@ class AACS2(Agent):
         if is_exploit:
             self.rho += self.cfg.zeta * (reward - self.rho)
 
-        R = reward - self.rho + self.cfg.gamma * p  # validate (remove gamma)
+        R = reward - self.rho + p
 
         for cl in action_set:
             cl.r += self.cfg.beta * (R - cl.r)

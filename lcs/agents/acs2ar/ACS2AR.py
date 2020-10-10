@@ -1,9 +1,11 @@
 import logging
 
+import numpy as np
+
 from lcs import Perception
 from lcs.agents.Agent import TrialMetrics
 from lcs.agents.acs2 import ClassifiersList
-from lcs.strategies.action_selection import BestAction
+from lcs.strategies.action_selection import BestAction, RandomAction
 from . import Configuration
 from ...agents import Agent
 
@@ -41,6 +43,7 @@ class ACS2AR(Agent):
         done = False
 
         prev_M_best_fitness = 0
+        was_best = False
 
         while not done:
             state = Perception(state)
@@ -62,7 +65,8 @@ class ACS2AR(Agent):
                     action_set,
                     last_reward,
                     prev_M_best_fitness,
-                    match_set.get_maximum_fitness())
+                    match_set.get_maximum_fitness(),
+                    was_best)
                 if self.cfg.do_ga:
                     ClassifiersList.apply_ga(
                         time + steps,
@@ -77,7 +81,7 @@ class ACS2AR(Agent):
                         self.cfg.do_subsumption,
                         self.cfg.theta_exp)
 
-            action = self.cfg.action_selector(match_set)
+            action, was_best = self._epsilon_greedy(match_set)
             iaction = self.cfg.environment_adapter.to_lcs_action(action)
             logger.debug("\tExecuting action: [%d]", action)
             action_set = match_set.form_action_set(action)
@@ -105,7 +109,8 @@ class ACS2AR(Agent):
                     action_set,
                     last_reward,
                     prev_M_best_fitness,
-                    0)
+                    0,
+                    was_best)
                 if self.cfg.do_ga:
                     ClassifiersList.apply_ga(
                         time + steps,
@@ -174,16 +179,25 @@ class ACS2AR(Agent):
     def apply_reinforcement_learning(self,
                                      action_set: ClassifiersList,
                                      reward: int,
-                                     p0: float,  # [M]t-1 best fitness
+                                     p0: float,  # [M]t-1 best fitness (previous)
                                      p1: float,  # [M] best fitness
                                      is_exploit: bool = False) -> None:
 
         if is_exploit:
-            self.rho += self.cfg.zeta * (reward + p1 - p0 - self.rho)
+            self.rho += self.cfg.zeta * (reward + p0 - p1 - self.rho)
 
-        # it should be ok for now
         R = reward - self.rho + p1
 
         for cl in action_set:
             cl.r += self.cfg.beta * (R - cl.r)
             cl.ir += self.cfg.beta * (reward - cl.ir)
+
+    def _epsilon_greedy(self, match_set: ClassifiersList):
+        # Epsilon greedy action selection returning tuple - action and
+        # information whether it was best possible move
+        all_actions = self.cfg.number_of_possible_actions
+
+        if np.random.rand() < self.cfg.epsilon:
+            return RandomAction(all_actions=all_actions)(match_set), False
+        else:
+            return BestAction(all_actions=all_actions)(match_set), True
