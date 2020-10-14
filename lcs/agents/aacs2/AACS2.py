@@ -1,9 +1,11 @@
 import logging
 
+import numpy as np
+
 from lcs import Perception
 from lcs.agents.Agent import TrialMetrics
 from lcs.agents.acs2 import ClassifiersList
-from lcs.strategies.action_selection import BestAction
+from lcs.strategies.action_selection import BestAction, RandomAction
 from . import Configuration
 from ...agents import Agent
 
@@ -40,6 +42,9 @@ class AACS2(Agent):
         action_set = ClassifiersList()
         done = False
 
+        prev_M_best_fitness = 0
+        was_best = False
+
         while not done:
             state = Perception(state)
             match_set = self.population.form_match_set(state)
@@ -59,7 +64,9 @@ class AACS2(Agent):
                 self.apply_reinforcement_learning(
                     action_set,
                     last_reward,
-                    match_set.get_maximum_fitness())
+                    prev_M_best_fitness,
+                    match_set.get_maximum_fitness(),
+                    was_best)
                 if self.cfg.do_ga:
                     ClassifiersList.apply_ga(
                         time + steps,
@@ -74,12 +81,14 @@ class AACS2(Agent):
                         self.cfg.do_subsumption,
                         self.cfg.theta_exp)
 
-            action = self.cfg.action_selector(match_set)
+            action, was_best = self._epsilon_greedy(match_set)
             iaction = self.cfg.environment_adapter.to_lcs_action(action)
             logger.debug("\tExecuting action: [%d]", action)
             action_set = match_set.form_action_set(action)
 
             prev_state = Perception(state)
+            prev_M_best_fitness = match_set.get_maximum_fitness()
+
             raw_state, last_reward, done, _ = env.step(iaction)
 
             state = self.cfg.environment_adapter.to_genotype(raw_state)
@@ -99,7 +108,9 @@ class AACS2(Agent):
                 self.apply_reinforcement_learning(
                     action_set,
                     last_reward,
-                    0)
+                    prev_M_best_fitness,
+                    0,
+                    was_best)
                 if self.cfg.do_ga:
                     ClassifiersList.apply_ga(
                         time + steps,
@@ -132,6 +143,8 @@ class AACS2(Agent):
         action_set = ClassifiersList()
         done = False
 
+        prev_M_best_fitness = 0
+
         while not done:
             match_set = self.population.form_match_set(state)
 
@@ -139,6 +152,7 @@ class AACS2(Agent):
                 self.apply_reinforcement_learning(
                     action_set,
                     last_reward,
+                    prev_M_best_fitness,
                     match_set.get_maximum_fitness(),
                     True)
 
@@ -148,13 +162,15 @@ class AACS2(Agent):
             iaction = self.cfg.environment_adapter.to_env_action(action)
             action_set = match_set.form_action_set(action)
 
+            prev_M_best_fitness = match_set.get_maximum_fitness()
+
             raw_state, last_reward, done, _ = env.step(iaction)
             state = self.cfg.environment_adapter.to_genotype(raw_state)
             state = Perception(state)
 
             if done:
                 self.apply_reinforcement_learning(
-                    action_set, last_reward, 0, True)
+                    action_set, last_reward, prev_M_best_fitness, 0, True)
 
             steps += 1
 
@@ -163,14 +179,30 @@ class AACS2(Agent):
     def apply_reinforcement_learning(self,
                                      action_set: ClassifiersList,
                                      reward: int,
-                                     p: float,
+                                     p0: float,  # [M]t-1 best fitness
+                                     p1: float,  # [M] best fitness
                                      is_exploit: bool = False) -> None:
 
         if is_exploit:
-            self.rho += self.cfg.zeta * (reward - self.rho)
+            if self.cfg.rho_update_version == '1':
+                self.rho += self.cfg.zeta * (reward - self.rho)
+            elif self.cfg.rho_update_version == '2':
+                self.rho += self.cfg.zeta * (reward + p0 - p1 - self.rho)
+            else:
+                raise ValueError('Invalid rho update version')
 
-        R = reward - self.rho + p
+        R = reward - self.rho + p1
 
         for cl in action_set:
             cl.r += self.cfg.beta * (R - cl.r)
             cl.ir += self.cfg.beta * (reward - cl.ir)
+
+    def _epsilon_greedy(self, match_set: ClassifiersList):
+        # Epsilon greedy action selection returning tuple - action and
+        # information whether it was best possible move
+        all_actions = self.cfg.number_of_possible_actions
+
+        if np.random.rand() < self.cfg.epsilon:
+            return RandomAction(all_actions=all_actions)(match_set), False
+        else:
+            return BestAction(all_actions=all_actions)(match_set), True

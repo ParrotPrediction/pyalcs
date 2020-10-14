@@ -22,6 +22,7 @@ class Configuration(acs2.Configuration):
                  beta: float = 0.05,
                  gamma: float = 0.95,
                  zeta: float = 0.001,
+                 rho_update_version: str = '1',
                  theta_i: float = 0.1,
                  theta_r: float = 0.9,
                  initial_q: float = 0.5,
@@ -64,6 +65,7 @@ class Configuration(acs2.Configuration):
             chi)
 
         self.zeta = zeta
+        self.rho_update_version = rho_update_version
 
     def __str__(self) -> str:
         return str(vars(self))
