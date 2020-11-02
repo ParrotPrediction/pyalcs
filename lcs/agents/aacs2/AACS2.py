@@ -43,7 +43,7 @@ class AACS2(Agent):
         done = False
 
         prev_M_best_fitness = 0
-        was_best = False
+        was_greedy = False
 
         while not done:
             state = Perception(state)
@@ -66,7 +66,7 @@ class AACS2(Agent):
                     last_reward,
                     prev_M_best_fitness,
                     match_set.get_maximum_fitness(),
-                    was_best)
+                    was_greedy)
                 if self.cfg.do_ga:
                     ClassifiersList.apply_ga(
                         time + steps,
@@ -81,7 +81,7 @@ class AACS2(Agent):
                         self.cfg.do_subsumption,
                         self.cfg.theta_exp)
 
-            action, was_best = self._epsilon_greedy(match_set)
+            action, was_greedy = self._epsilon_greedy(match_set)
             iaction = self.cfg.environment_adapter.to_lcs_action(action)
             logger.debug("\tExecuting action: [%d]", action)
             action_set = match_set.form_action_set(action)
@@ -110,7 +110,7 @@ class AACS2(Agent):
                     last_reward,
                     prev_M_best_fitness,
                     0,
-                    was_best)
+                    was_greedy)
                 if self.cfg.do_ga:
                     ClassifiersList.apply_ga(
                         time + steps,
@@ -154,7 +154,7 @@ class AACS2(Agent):
                     last_reward,
                     prev_M_best_fitness,
                     match_set.get_maximum_fitness(),
-                    True)
+                    False)
 
             # Here when exploiting always choose best action
             action = BestAction(
@@ -170,7 +170,7 @@ class AACS2(Agent):
 
             if done:
                 self.apply_reinforcement_learning(
-                    action_set, last_reward, prev_M_best_fitness, 0, True)
+                    action_set, last_reward, prev_M_best_fitness, 0, False)
 
             steps += 1
 
@@ -181,9 +181,9 @@ class AACS2(Agent):
                                      reward: int,
                                      p0: float,  # [M]t-1 best fitness
                                      p1: float,  # [M] best fitness
-                                     is_exploit: bool = False) -> None:
+                                     was_greedy: bool = False) -> None:
 
-        if is_exploit:
+        if was_greedy:
             if self.cfg.rho_update_version == '1':
                 self.rho += self.cfg.zeta * (reward - self.rho)
             elif self.cfg.rho_update_version == '2':
