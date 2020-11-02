@@ -128,7 +128,7 @@ class Agent:
 
                 user_metrics = self.get_cfg().user_metrics_collector_fcn
                 if user_metrics is not None:
-                    m.update(user_metrics(self.get_population(), env))
+                    m.update(user_metrics(self, env))
 
                 metrics.append(m)
 
