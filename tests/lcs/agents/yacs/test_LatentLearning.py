@@ -96,3 +96,35 @@ class TestLatentLearning:
         assert len(population) == 2
         assert cl1 in population
         assert cl2 in population
+
+    def test_mutspec(self, cfg, ll):
+        # given
+        cl = Classifier(condition='####', action=0, effect='####', cfg=cfg)
+        feature_idx = 0
+
+        # when
+        new_cls = list(ll.mutspec(cl, feature_idx))
+
+        # then
+        assert len(new_cls) == 2
+        assert all(True for cl in new_cls if cl.action == 0)
+        assert all(True for cl in new_cls if cl.effect == Effect('####'))
+        assert new_cls[0].condition == Condition('0###')
+        assert new_cls[1].condition == Condition('1###')
+
+    def test_mutspec_with_effect_change(self, cfg, ll):
+        # given
+        cl = Classifier(condition='####', action=0, effect='1###', cfg=cfg)
+        feature_idx = 0
+
+        # when
+        new_cls = list(ll.mutspec(cl, feature_idx))
+
+        # then
+        assert len(new_cls) == 2
+        assert all(True for cl in new_cls if cl.action == 0)
+        assert new_cls[0].condition == Condition('0###')
+        assert new_cls[0].effect == Effect('1###')
+        assert new_cls[1].condition == Condition('1###')
+        assert new_cls[1].effect == Effect('####')
+

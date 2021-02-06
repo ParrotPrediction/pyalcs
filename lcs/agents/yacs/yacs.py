@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import random
 from collections import deque
-from typing import Union, Optional
+from typing import Union, Optional, List, Generator
 
 from enum import Enum
 from lcs import TypedList, Perception
@@ -23,11 +23,13 @@ class Configuration:
                  classifier_length: int,
                  number_of_possible_actions: int,
                  feature_possible_values: list,
+                 classifier_wildcard: str = '#',
                  trace_length: int = 5):
         assert classifier_length == len(feature_possible_values)
         self.classifier_length = classifier_length
         self.number_of_possible_actions = number_of_possible_actions
         self.feature_possible_values = feature_possible_values
+        self.classifier_wildcard = classifier_wildcard
         self.trace_length = trace_length
 
 
@@ -149,6 +151,31 @@ class LatentLearning:
             if len(cl.trace) == self.cfg.trace_length:
                 if not all(t == ClassifierTrace.GOOD for t in cl.trace):
                     population.remove(cl)
+
+    def specialize_conditions(self, population: ClassifiersList):
+        # token selection
+        # mutespec + discard old classifier
+        raise NotImplementedError
+
+    def mutspec(self, cl: Classifier, feature_idx: int) -> Generator[Classifier]:
+        assert cl.condition[feature_idx] == self.cfg.classifier_wildcard
+
+        for feature in range(self.cfg.feature_possible_values[feature_idx]):
+            # Build condition
+            new_c = Condition(cl.condition)
+            new_c[feature_idx] = str(feature)
+
+            # Build effect
+            new_e = Effect(cl.effect)
+            if new_c[feature_idx] == new_e[feature_idx]:
+                new_e[feature_idx] = self.cfg.classifier_wildcard
+
+            yield Classifier(
+                condition=new_c,
+                action=cl.action,
+                effect=new_e,
+                cfg=cl.cfg
+            )
 
 
 class YACS(Agent):
