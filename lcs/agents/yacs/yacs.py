@@ -3,14 +3,21 @@ from __future__ import annotations
 import logging
 import random
 from collections import deque
-from typing import Union, Optional, List, Generator
-
+from dataclasses import dataclass
 from enum import Enum
+from typing import Union, Optional, Generator
+
 from lcs import TypedList, Perception
 from lcs.agents import ImmutableSequence, Agent
 from lcs.agents.Agent import TrialMetrics
 
 logging.basicConfig(level=logging.DEBUG)
+
+
+@dataclass
+class DontCare:
+    symbol: str = '#'
+    eis: float = 0.0  # expected improvement by specialization
 
 
 class ClassifierTrace(Enum):
@@ -23,20 +30,25 @@ class Configuration:
                  classifier_length: int,
                  number_of_possible_actions: int,
                  feature_possible_values: list,
-                 classifier_wildcard: str = '#',
                  trace_length: int = 5):
         assert classifier_length == len(feature_possible_values)
         self.classifier_length = classifier_length
         self.number_of_possible_actions = number_of_possible_actions
         self.feature_possible_values = feature_possible_values
-        self.classifier_wildcard = classifier_wildcard
         self.trace_length = trace_length
 
 
 class Condition(ImmutableSequence):
+    WILDCARD = DontCare()
+    OK_TYPES = (str, DontCare)
+
+    def __init__(self, observation):
+        obs = [DontCare() if o == DontCare.symbol else o for o in observation]
+        super().__init__(obs)
+
     def does_match(self, p: Perception) -> bool:
         for ci, oi in zip(self, p):
-            if ci != self.WILDCARD and oi != self.WILDCARD and ci != oi:
+            if ci != self.WILDCARD and ci != oi:
                 return False
 
         return True
@@ -158,7 +170,7 @@ class LatentLearning:
         raise NotImplementedError
 
     def mutspec(self, cl: Classifier, feature_idx: int) -> Generator[Classifier]:
-        assert cl.condition[feature_idx] == self.cfg.classifier_wildcard
+        assert type(cl.condition[feature_idx]) == DontCare
 
         for feature in range(self.cfg.feature_possible_values[feature_idx]):
             # Build condition
@@ -168,7 +180,7 @@ class LatentLearning:
             # Build effect
             new_e = Effect(cl.effect)
             if new_c[feature_idx] == new_e[feature_idx]:
-                new_e[feature_idx] = self.cfg.classifier_wildcard
+                new_e[feature_idx] = DontCare.symbol
 
             yield Classifier(
                 condition=new_c,
@@ -195,6 +207,8 @@ class YACS(Agent):
     def _run_trial_explore(self, env, trials, current_trial) -> TrialMetrics:
         logging.info("Running trial explore")
 
+        # TODO: make sure that perception features are matching possible
+        #  values from configuration
         prev_state = Perception.empty()
         prev_action = None
 
