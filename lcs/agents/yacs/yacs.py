@@ -5,7 +5,8 @@ import random
 from collections import deque
 from dataclasses import dataclass
 from enum import Enum
-from typing import Union, Optional, Generator
+from typing import Union, Optional, Generator, List
+from itertools import groupby
 
 from lcs import TypedList, Perception
 from lcs.agents import ImmutableSequence, Agent
@@ -18,6 +19,9 @@ logging.basicConfig(level=logging.DEBUG)
 class DontCare:
     symbol: str = '#'
     eis: float = 0.0  # expected improvement by specialization
+
+    def __repr__(self):
+        return self.symbol
 
 
 class ClassifierTrace(Enum):
@@ -43,8 +47,12 @@ class Condition(ImmutableSequence):
     OK_TYPES = (str, DontCare)
 
     def __init__(self, observation):
-        obs = [DontCare() if o == DontCare.symbol else o for o in observation]
+        obs = [DontCare() if str(o) == DontCare.symbol else o for o in observation]
         super().__init__(obs)
+
+    @property
+    def expected_improvements(self) -> List[float]:
+        return [f.eis if type(f) is DontCare else 0.0 for f in self]
 
     def does_match(self, p: Perception) -> bool:
         for ci, oi in zip(self, p):
@@ -52,6 +60,18 @@ class Condition(ImmutableSequence):
                 return False
 
         return True
+
+    # TODO probably don't needed...
+    def token_idx_to_specialize(self) -> Optional[int]:
+        """
+        Find wildcard token with maximum expected improvement by
+        specialization value
+        """
+        if all(type(t) != DontCare for t in self):
+            return None
+
+        t = max([t for t in self if type(t) == DontCare], key=lambda t: t.eis)
+        return self._items.index(t)
 
     def subsumes(self, other) -> bool:
         raise NotImplementedError('YACS has no subsume operator')
@@ -92,12 +112,38 @@ class Classifier:
         self.action = action
         self.effect = build_perception_string(Effect, effect)
         self.trace = deque(maxlen=self.cfg.trace_length)
+        self.last_bad_state = None  # situation preceding wrong anticipation
+        self.last_good_state = None  # situation preceding good anticipation
+
+    def __repr__(self):
+        return f"{self.condition}-{self.action}-{self.effect} @ {hex(id(self))}"
+
+    @property
+    def trace_full(self) -> bool:
+        return len(self.trace) == self.cfg.trace_length
+
+    @property
+    def oscillating(self) -> bool:
+        return all(t in self.trace for t in [ClassifierTrace.GOOD, ClassifierTrace.BAD])
 
     def does_match(self, situation: Perception) -> bool:
         return self.condition.does_match(situation)
 
     def add_to_trace(self, mark: ClassifierTrace):
         self.trace.append(mark)
+
+    def is_specializable(self) -> bool:
+        return self.trace_full and self.oscillating
+
+    def memorize_state(self, p: Perception):
+        # check the last trace
+        last_anticipation_result = self.trace[-1]
+        assert last_anticipation_result is not None
+
+        if last_anticipation_result == ClassifierTrace.GOOD:
+            self.last_good_state = p
+        else:
+            self.last_bad_state = p
 
 
 class ClassifiersList(TypedList):
@@ -158,22 +204,44 @@ class LatentLearning:
 
             population.append(new_cl)
 
-    def select_accurate_classifiers(self, population: ClassifiersList):
-        for cl in population:
-            if len(cl.trace) == self.cfg.trace_length:
-                if not all(t == ClassifierTrace.GOOD for t in cl.trace):
-                    population.remove(cl)
+    def specialize(self, pop: ClassifiersList):
+        def keyfunc(cl):
+            return repr(cl.condition), repr(cl.action)
 
-    def specialize_conditions(self, population: ClassifiersList):
-        # token selection
-        # mutespec + discard old classifier
-        raise NotImplementedError
+        for key, grouped in groupby(sorted(pop, key=keyfunc), key=keyfunc):
+            cl_group = list(grouped)
+            if all(cl.is_specializable() for cl in cl_group):
+                # Generate new classifiers with mutspec operator
+                # by specializing condition parts
+                new_cls = self.specialize_condition(cl_group)
+
+                # Add newly created classifiers to initial population
+                pop.extend(new_cls)
+
+                # Remove all classifiers from the population
+                for cl in cl_group:
+                    pop.remove(cl)
+
+    @staticmethod
+    def select_accurate_classifiers(population: ClassifiersList):
+        for cl in population:
+            if cl.trace_full and cl.oscillating:
+                population.remove(cl)
+
+    def specialize_condition(self, pop: Union[list, ClassifiersList]) -> Generator[Classifier]:
+        assert len(pop) > 0
+        eis = [cl.condition.expected_improvements for cl in pop]
+        summed_eis = [sum(x) for x in zip(*eis)]
+
+        feature_idx = summed_eis.index(max(summed_eis))
+
+        yield from self.mutspec(pop[0], feature_idx)
 
     def mutspec(self, cl: Classifier, feature_idx: int) -> Generator[Classifier]:
         assert type(cl.condition[feature_idx]) == DontCare
 
         for feature in range(self.cfg.feature_possible_values[feature_idx]):
-            # Build condition
+            # Build condition (TODO: eis are reseted here...)
             new_c = Condition(cl.condition)
             new_c[feature_idx] = str(feature)
 
@@ -217,5 +285,5 @@ class YACS(Agent):
 
 
 if __name__ == '__main__':
-    cfg = Configuration(4, 2)
+    cfg = Configuration(4, 2, feature_possible_values=[2, 2, 2, 2])
     agent = YACS(cfg)

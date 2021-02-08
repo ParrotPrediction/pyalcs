@@ -23,3 +23,29 @@ class TestClassifier:
         cls.add_to_trace(ClassifierTrace.BAD)
         assert len(cls.trace) == cfg.trace_length
         assert all([True for t in cls.trace if t == ClassifierTrace.BAD])
+
+    def test_should_determine_specializable_classifier(self, cfg):
+        # Correct case - trace full and oscillating
+        cl1 = Classifier(cfg=cfg)
+        cl1.add_to_trace(ClassifierTrace.BAD)
+        cl1.add_to_trace(ClassifierTrace.BAD)
+        cl1.add_to_trace(ClassifierTrace.BAD)
+        cl1.add_to_trace(ClassifierTrace.GOOD)
+        cl1.add_to_trace(ClassifierTrace.BAD)
+        assert cl1.is_specializable() is True
+
+        # Wrong case - trace not full and oscillating
+        cl2 = Classifier(cfg=cfg)
+        cl2.add_to_trace(ClassifierTrace.BAD)
+        cl2.add_to_trace(ClassifierTrace.GOOD)
+        cl2.add_to_trace(ClassifierTrace.BAD)
+        assert cl2.is_specializable() is False
+
+        # Wrong case - trace full not oscillating
+        cl3 = Classifier(cfg=cfg)
+        cl3.add_to_trace(ClassifierTrace.BAD)
+        cl3.add_to_trace(ClassifierTrace.BAD)
+        cl3.add_to_trace(ClassifierTrace.BAD)
+        cl3.add_to_trace(ClassifierTrace.BAD)
+        cl3.add_to_trace(ClassifierTrace.BAD)
+        assert cl3.is_specializable() is False

@@ -26,3 +26,26 @@ class TestCondition:
     ])
     def test_should_match_perception(self, _c, _p, _res):
         assert Condition(_c).does_match(Perception(_p)) is _res
+
+    @pytest.mark.parametrize('_c, _res', [
+        ("####", [0.0, 0.0, 0.0, 0.0]),
+        ("##1#", [0.0, 0.0, 0.0, 0.0]),
+    ])
+    def test_should_get_expected_improvements_property(self, _c, _res):
+        assert Condition(_c).expected_improvements == _res
+
+    @pytest.mark.parametrize('_c, _eis, _res', [
+        ("####", [.4, .1, .2, 0], 0),
+        ("1###", [None, .1, .2, .05], 2),
+        ("112#", [None, None, None, .05], 3),
+        ("1122", [None, None, None, None], None),
+    ])
+    def test_should_return_token_idx_to_specialize(self, _c, _eis, _res):
+        # given
+        c = Condition(_c)
+        for idx, ei in enumerate(_eis):
+            if ei is not None:
+                c[idx].eis = ei
+
+        # then
+        assert c.token_idx_to_specialize() == _res
