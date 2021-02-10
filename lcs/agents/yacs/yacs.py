@@ -281,8 +281,8 @@ class PolicyLearning:
 
     def update_desirability_values(self,
                                    pop: ClassifiersList,
-                                   fired_cl: Classifier,
                                    desirability_values: Dict[Perception, float],
+                                   fired_cl: Classifier,
                                    obs: Perception):
 
         assert obs in desirability_values
@@ -317,6 +317,8 @@ class YACS(Agent):
         self.cfg = cfg
         self.desirability_values = desirability_values or dict()
         self.population = population or ClassifiersList()
+        self.ll = LatentLearning(cfg)
+        self.pl = PolicyLearning(cfg)
 
     def get_population(self):
         return self.population
@@ -334,26 +336,18 @@ class YACS(Agent):
             self.desirability_values[p] = 0.0
 
     def _run_trial_explore(self, env, trials, current_trial) -> TrialMetrics:
-        """
-        The algorithm:
-        1. Get a reward and perception
-        2. Learn the env dynamics (latent learning) and optimiality of actions
-        3. Select an action
-        4. Act in environment
-
-
-        """
         logging.info("Running trial explore")
 
         # Initial conditions
         steps = 0
+        last_reward = 0
         raw_state = env.reset()
 
         state = Perception(raw_state)
         prev_state = Perception.empty()
 
-        action = env.action_space.sample()
-        prev_action = None
+        selected_cl = None
+        prev_selected_cl = None
 
         done = False
 
@@ -362,11 +356,48 @@ class YACS(Agent):
             match_set = self.population.form_match_set(state)
 
             if len(match_set) == 0:
-                # TODO: cover new classifier
+                # TODO: cover new classifier, add to match-set and population
                 pass
+
+            if steps > 0:
+                # Latent learning
+                self.ll.effect_covering(
+                    self.population,
+                    prev_state,
+                    state,
+                    prev_selected_cl.action)
+                self.ll.select_accurate_classifiers(self.population)
+                self.ll.specialize(self.population)
+
+                # Policy learning
+                self.pl.update_immediate_rewards(
+                    self.population,
+                    prev_state,
+                    prev_selected_cl.action,
+                    last_reward)
+                self.pl.update_desirability_values(
+                    self.population,
+                    self.desirability_values,
+                    prev_selected_cl,
+                    prev_state)
+
+            # Select an action
+            prev_selected_cl = selected_cl
+            selected_cl = random.choice(match_set)
+            action = selected_cl.action
+
+            # Act in environment
+            raw_state, last_reward, done, _ = env.step(action)
+            prev_state = state
+            state = Perception(raw_state)
+
+            steps += 1
+
+        return TrialMetrics(steps, last_reward)
 
     def _run_trial_exploit(self, env, trials, current_trial) -> TrialMetrics:
         logging.info("Running trial exploit")
+        return None
 
 
 if __name__ == '__main__':
