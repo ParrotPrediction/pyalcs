@@ -20,3 +20,11 @@ class TestEffect:
     ])
     def test_should_calculate_desired_effect(self, _p0, _p1, _res):
         assert Effect.diff(Perception(_p0), Perception(_p1)) == Effect(_res)
+
+    @pytest.mark.parametrize('_e, _p0, _p1', [
+        ('####', '0000', '0000'),
+        ('1111', '0000', '1111'),
+        ('1#1#', '0000', '1010'),
+    ])
+    def test_should_anticipate_next_state(self, _e, _p0, _p1):
+        assert Effect(_e).passthrough(Perception(_p0)) == Perception(_p1)

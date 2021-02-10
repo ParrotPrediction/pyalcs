@@ -49,3 +49,25 @@ class TestClassifier:
         cl3.add_to_trace(ClassifierTrace.BAD)
         cl3.add_to_trace(ClassifierTrace.BAD)
         assert cl3.is_specializable() is False
+
+    def test_should_update_reward(self, cfg):
+        # given
+        cl = Classifier(cfg=cfg)
+        env_reward = 100
+
+        assert cl.r == 0
+
+        # test two steps
+        cl.update_reward(env_reward)
+        assert cl.r == 10
+
+        cl.update_reward(env_reward)
+        assert cl.r == 19.00
+
+        # test convergence
+        for _ in range(0, 100):
+            cl.update_reward(env_reward)
+
+        assert abs(cl.r - env_reward) < 0.1
+
+

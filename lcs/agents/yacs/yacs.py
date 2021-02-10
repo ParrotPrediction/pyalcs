@@ -5,8 +5,8 @@ import random
 from collections import deque
 from dataclasses import dataclass
 from enum import Enum
-from typing import Union, Optional, Generator, List
 from itertools import groupby
+from typing import Union, Optional, Generator, List, Dict
 
 from lcs import TypedList, Perception
 from lcs.agents import ImmutableSequence, Agent
@@ -34,12 +34,16 @@ class Configuration:
                  classifier_length: int,
                  number_of_possible_actions: int,
                  feature_possible_values: list,
-                 trace_length: int = 5):
+                 trace_length: int = 5,
+                 learning_rate: float = 0.1,
+                 discount_factor: float = 0.9):
         assert classifier_length == len(feature_possible_values)
         self.classifier_length = classifier_length
         self.number_of_possible_actions = number_of_possible_actions
         self.feature_possible_values = feature_possible_values
         self.trace_length = trace_length
+        self.beta = learning_rate
+        self.gamma = discount_factor
 
 
 class Condition(ImmutableSequence):
@@ -47,7 +51,8 @@ class Condition(ImmutableSequence):
     OK_TYPES = (str, DontCare)
 
     def __init__(self, observation):
-        obs = [DontCare() if str(o) == DontCare.symbol else o for o in observation]
+        obs = [DontCare() if str(o) == DontCare.symbol else o for o in
+               observation]
         super().__init__(obs)
 
     @property
@@ -61,18 +66,6 @@ class Condition(ImmutableSequence):
 
         return True
 
-    # TODO probably don't needed...
-    def token_idx_to_specialize(self) -> Optional[int]:
-        """
-        Find wildcard token with maximum expected improvement by
-        specialization value
-        """
-        if all(type(t) != DontCare for t in self):
-            return None
-
-        t = max([t for t in self if type(t) == DontCare], key=lambda t: t.eis)
-        return self._items.index(t)
-
     def subsumes(self, other) -> bool:
         raise NotImplementedError('YACS has no subsume operator')
 
@@ -85,6 +78,12 @@ class Effect(ImmutableSequence):
             [p1i if p1i != p0i else ImmutableSequence.WILDCARD for p0i, p1i in
              zip(p0, p1)])
 
+    def passthrough(self, obs: Perception) -> Perception:
+        # Predicts next state (reverse of diff)
+        return Perception(
+            [ei if ei != ImmutableSequence.WILDCARD else pi for ei, pi in
+             zip(self, obs)])
+
     def subsumes(self, other) -> bool:
         raise NotImplementedError('YACS has no subsume operator')
 
@@ -94,6 +93,7 @@ class Classifier:
                  condition: Union[Condition, str, None] = None,
                  action: Optional[int] = None,
                  effect: Union[Effect, str, None] = None,
+                 reward: float = 0,  # immediate reward
                  cfg: Optional[Configuration] = None):
 
         if cfg is None:
@@ -111,6 +111,7 @@ class Classifier:
         self.condition = build_perception_string(Condition, condition)
         self.action = action
         self.effect = build_perception_string(Effect, effect)
+        self.r = reward
         self.trace = deque(maxlen=self.cfg.trace_length)
         self.last_bad_state = None  # situation preceding wrong anticipation
         self.last_good_state = None  # situation preceding good anticipation
@@ -124,7 +125,8 @@ class Classifier:
 
     @property
     def oscillating(self) -> bool:
-        return all(t in self.trace for t in [ClassifierTrace.GOOD, ClassifierTrace.BAD])
+        return all(t in self.trace for t in
+                   [ClassifierTrace.GOOD, ClassifierTrace.BAD])
 
     def does_match(self, situation: Perception) -> bool:
         return self.condition.does_match(situation)
@@ -144,6 +146,9 @@ class Classifier:
             self.last_good_state = p
         else:
             self.last_bad_state = p
+
+    def update_reward(self, env_reward):
+        self.r = (1 - self.cfg.beta) * self.r + self.cfg.beta * env_reward
 
 
 class ClassifiersList(TypedList):
@@ -258,12 +263,59 @@ class LatentLearning:
             )
 
 
+class PolicyLearning:
+
+    def __init__(self, cfg: Configuration):
+        self.cfg = cfg
+
+    @staticmethod
+    def update_immediate_rewards(pop: ClassifiersList,
+                                 obs: Perception,
+                                 action: int,
+                                 env_reward: int):
+
+        match_set = pop.form_match_set(obs)
+        action_set = match_set.form_action_set(action)
+        for cl in action_set:
+            cl.update_reward(env_reward)
+
+    def update_desirability_values(self,
+                                   pop: ClassifiersList,
+                                   fired_cl: Classifier,
+                                   desirability_values: Dict[Perception, float],
+                                   obs: Perception):
+
+        assert obs in desirability_values
+        match_set = pop.form_match_set(obs)
+
+        if fired_cl in match_set:
+            max_r = max(cl.r for cl in match_set)
+            anticipated_obs = fired_cl.effect.passthrough(obs)
+            desirability_values[obs] = max_r + self.cfg.gamma * desirability_values.get(anticipated_obs, 0.0)
+
+    def select_action(self,
+                      pop: ClassifiersList,
+                      desirability_values: Dict[Perception, float],
+                      obs: Perception) -> int:
+
+        match_set = pop.form_match_set(obs)
+
+        def quality(cl: Classifier):
+            anticipated_obs = cl.effect.passthrough(obs)
+            return cl.r + self.cfg.gamma * desirability_values.get(anticipated_obs, 0.0)
+
+        selected_cl = max(match_set, key=quality)
+        return selected_cl.action
+
+
 class YACS(Agent):
 
     def __init__(self,
                  cfg: Configuration,
-                 population: ClassifiersList = None):
+                 population: ClassifiersList = None,
+                 desirability_values: Dict[Perception, float] = None):
         self.cfg = cfg
+        self.desirability_values = desirability_values or dict()
         self.population = population or ClassifiersList()
 
     def get_population(self):
@@ -272,13 +324,46 @@ class YACS(Agent):
     def get_cfg(self):
         return self.cfg
 
+    def remember_situation(self, p: Perception):
+        assert len(p) == self.cfg.classifier_length
+
+        for f_max, p in zip(self.cfg.feature_possible_values, p):
+            assert int(p) in range(0, f_max)
+
+        if p not in self.desirability_values:
+            self.desirability_values[p] = 0.0
+
     def _run_trial_explore(self, env, trials, current_trial) -> TrialMetrics:
+        """
+        The algorithm:
+        1. Get a reward and perception
+        2. Learn the env dynamics (latent learning) and optimiality of actions
+        3. Select an action
+        4. Act in environment
+
+
+        """
         logging.info("Running trial explore")
 
-        # TODO: make sure that perception features are matching possible
-        #  values from configuration
+        # Initial conditions
+        steps = 0
+        raw_state = env.reset()
+
+        state = Perception(raw_state)
         prev_state = Perception.empty()
+
+        action = env.action_space.sample()
         prev_action = None
+
+        done = False
+
+        while not done:
+            agent.remember_situation(state)
+            match_set = self.population.form_match_set(state)
+
+            if len(match_set) == 0:
+                # TODO: cover new classifier
+                pass
 
     def _run_trial_exploit(self, env, trials, current_trial) -> TrialMetrics:
         logging.info("Running trial exploit")
