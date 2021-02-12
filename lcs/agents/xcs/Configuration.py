@@ -7,7 +7,8 @@ class Configuration(object):
                  theta_mna,
                  classifier_wildcard: str = '#',
                  environment_adapter=EnvironmentAdapter,
-                 n: int = 300,  # it is not from a paper figure it out
+
+                 n: int = 200,
                  beta: float = 0.1,
                  alpha: float = 0.1,
                  epsilon_0: float = 10,
@@ -43,9 +44,9 @@ class Configuration(object):
         :param delta: fraction of the mean fitness in P
         :param theta_sub: subsumption threshold, exp greater than theta_sub to be able to subsume
         :param population_wildcard: probability of using wildcard in one attribute in C
-        :param p_i: used as initial value for new classifiers
-        :param epsilon_i: used as initial value for new classifiers
-        :param f_i: used as initial value for new classifiers
+        :param p_i: used as initial value for new classifiers - prediction
+        :param epsilon_i: used as initial value for new classifiers - error
+        :param f_i: used as initial value for new classifiers - fitness
         :param p_exp: probability of choosing action uniform randomly
         :param theta_mna: minimal number of actions in match_set
         :param do_ga_subsumption: specifies if offspring are to be tested for logical subsumption
@@ -77,5 +78,6 @@ class Configuration(object):
     def __str__(self) -> str:
         return str(vars(self))
 
-
+    def initial_classifier_values(self):
+        return self.p_I, self.epsilon_I, self.f_I
 
