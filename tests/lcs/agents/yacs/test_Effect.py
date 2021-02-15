@@ -21,6 +21,9 @@ class TestEffect:
     def test_should_calculate_desired_effect(self, _p0, _p1, _res):
         assert Effect.diff(Perception(_p0), Perception(_p1)) == Effect(_res)
 
+    def test_should_calculate_desired_effect_with_empty_perception(self):
+        assert Effect.diff(None, Perception('1100')) == Effect('1100')
+
     @pytest.mark.parametrize('_e, _p0, _p1', [
         ('####', '0000', '0000'),
         ('1111', '0000', '1111'),

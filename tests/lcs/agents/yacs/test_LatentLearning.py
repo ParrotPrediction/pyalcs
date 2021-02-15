@@ -8,6 +8,8 @@ from lcs.agents.yacs.yacs import Configuration, Condition, Effect, Classifier, C
 
 class TestLatentLearning:
 
+    SEED = 31337
+
     @pytest.fixture
     def cfg(self):
         return Configuration(4, 2,
@@ -49,7 +51,7 @@ class TestLatentLearning:
         p0 = Perception('1000')
         p1 = Perception('1010')
         prev_action = 0
-        random.seed(31337)  # selects c1 as an old classifier
+        random.seed(self.SEED)  # selects c1 as an old classifier
 
         # when
         ll.effect_covering(population, p0, p1, prev_action)
@@ -207,3 +209,63 @@ class TestLatentLearning:
         assert cl5 not in population
         assert cl6 not in population
 
+    def test_should_cover_new_classifier_in_first_step(self, cfg, ll):
+        # given
+        p0 = None
+        p1 = Perception('1010')
+        population = ClassifiersList()
+        random.seed(self.SEED)
+
+        # when
+        cl = ll.cover_classifier(population, p0, p1)
+
+        # then
+        assert cl is not None
+        assert cl.condition == Condition('#0#0')  # randomly
+        assert cl.action == 0
+        assert cl.effect == Effect('1010')
+        assert len(cl.trace) == 0
+        assert cl.condition.does_match(p1)
+
+    def test_should_cover_new_classifier_with_empty_action_set(self, cfg, ll):
+        # given
+        p0 = Perception('1000')
+        p1 = Perception('1010')
+        population = ClassifiersList()
+        random.seed(self.SEED)
+
+        # when
+        cl = ll.cover_classifier(population, p0, p1)
+
+        # then
+        assert cl is not None
+        assert cl.condition == Condition('#0#0')
+        assert cl.action == 0
+        assert cl.effect == Effect('##1#')
+        assert cl.condition.does_match(p1)
+
+    def test_should_cover_classifier_with_action_set(self, cfg, ll):
+        # given
+        p0 = Perception('1000')
+        p1 = Perception('1010')
+
+        cl1 = Classifier(condition="#1#0", action=0, effect="1#22", cfg=cfg)
+        cl2 = Classifier(condition="11#0", action=0, effect="1#22", cfg=cfg)
+        cl3 = Classifier(condition="#100", action=1, effect="1#22", cfg=cfg)
+
+        pop = ClassifiersList(*[cl1, cl2, cl3])
+        random.seed(self.SEED)
+
+        assert len(pop.form_match_set(p1)) == 0  # no cl should match
+
+        # when
+        cl = ll.cover_classifier(pop, p0, p1)
+
+        # then
+        assert cl is not None
+        assert cl.condition == Condition('#0#0')
+        assert cl.action == 0
+        assert cl.effect == Effect('##1#')
+        assert cl.condition.does_match(p1)
+        assert any(True for cl in pop if cl.condition.is_more_general(cl.condition)) is False
+        assert any(True for cl in pop if cl.condition.is_more_specialized(cl.condition)) is False

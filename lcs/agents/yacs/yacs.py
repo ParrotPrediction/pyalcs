@@ -6,7 +6,7 @@ from collections import deque
 from dataclasses import dataclass
 from enum import Enum
 from itertools import groupby
-from typing import Union, Optional, Generator, List, Dict
+from typing import Union, Optional, Generator, List, Dict, Callable
 
 from lcs import TypedList, Perception
 from lcs.agents import ImmutableSequence, Agent
@@ -36,7 +36,9 @@ class Configuration:
                  feature_possible_values: list,
                  trace_length: int = 5,
                  learning_rate: float = 0.1,
-                 discount_factor: float = 0.9):
+                 discount_factor: float = 0.9,
+                 metrics_trial_frequency: int = 5,
+                 user_metrics_collector_fcn: Callable = None):
         assert classifier_length == len(feature_possible_values)
         self.classifier_length = classifier_length
         self.number_of_possible_actions = number_of_possible_actions
@@ -44,6 +46,8 @@ class Configuration:
         self.trace_length = trace_length
         self.beta = learning_rate
         self.gamma = discount_factor
+        self.metrics_trial_frequency = metrics_trial_frequency
+        self.user_metrics_collector_fcn = user_metrics_collector_fcn
 
 
 class Condition(ImmutableSequence):
@@ -55,9 +59,47 @@ class Condition(ImmutableSequence):
                observation]
         super().__init__(obs)
 
+    @staticmethod
+    def random_matching(p0: Perception) -> Generator[Condition]:
+        max_val = len(p0) - 1
+        while True:
+            c = Condition(p0)
+            num_dont_cares = random.randint(0, max_val)
+            for i in random.sample(range(0, max_val), num_dont_cares):
+                c[i] = DontCare()
+            yield c
+
     @property
     def expected_improvements(self) -> List[float]:
         return [f.eis if type(f) is DontCare else 0.0 for f in self]
+
+    @property
+    def generality(self) -> int:
+        return sum(1 for f in self if type(f) is DontCare)
+
+    def is_more_specialized(self, other: Condition) -> bool:
+        """Checks if other condition is more specialized"""
+        def is_less_general(s, o):
+            return (type(s) is DontCare and type(o) is not DontCare) or s == o
+
+        less_general = all(is_less_general(s, o) for s, o in zip(self, other))
+        different_tokens = sum(1 for s, o in zip(self, other) if s != o)
+
+        return less_general and different_tokens > 0
+
+    def is_more_general(self, other: Condition) -> bool:
+        """Checks if other condition is more general"""
+        def is_more_general(s, o):
+            return type(o) is DontCare or s == o
+
+        more_general = all(is_more_general(s, o) for s, o in zip(self, other))
+        different_tokens = sum(1 for s, o in zip(self, other) if s != o)
+
+        return more_general and different_tokens > 0
+
+    @property
+    def specificity(self) -> int:
+        return len(self) - self.generality
 
     def does_match(self, p: Perception) -> bool:
         for ci, oi in zip(self, p):
@@ -72,8 +114,11 @@ class Condition(ImmutableSequence):
 
 class Effect(ImmutableSequence):
     @staticmethod
-    def diff(p0: Perception, p1: Perception):
+    def diff(p0: Optional[Perception], p1: Perception):
         # Computes the desired effect
+        if p0 is None:
+            return Effect(p1)
+
         return Effect(
             [p1i if p1i != p0i else ImmutableSequence.WILDCARD for p0i, p1i in
              zip(p0, p1)])
@@ -173,6 +218,34 @@ class LatentLearning:
     def __init__(self, cfg: Configuration):
         self.cfg = cfg
 
+    def cover_classifier(self,
+                         population: ClassifiersList,
+                         p0: Optional[Perception],
+                         p1: Perception) -> Classifier:
+
+        def _neither_more_general_nor_more_specialized(
+                cond: Condition, pop: ClassifiersList) -> bool:
+
+            is_more_general = any(True for c in pop if c.condition.is_more_general(cond))
+            is_more_specialized = any(True for c in pop if c.condition.is_more_specialized(cond))
+
+            return is_more_general is False and is_more_specialized is False
+
+        action = random.choice(range(0, self.cfg.number_of_possible_actions))
+        action_set = population.form_action_set(action)
+
+        # generate condition until desired conditions are met
+        c = None
+        for c in Condition.random_matching(p1):
+            if len(action_set) == 0 or _neither_more_general_nor_more_specialized(c, action_set):
+                break
+
+        return Classifier(
+            condition=Condition(c),
+            action=action,
+            effect=Effect.diff(p0, p1),
+            cfg=self.cfg)
+
     def effect_covering(self,
                         population: ClassifiersList,
                         p0: Perception,
@@ -193,11 +266,11 @@ class LatentLearning:
 
         # Add trace to classifiers that anticipated wrong
         wrong_classifiers = [cl for cl in action_set if cl.effect != de]
-        for cl in [cl for cl in action_set if cl.effect != de]:
+        for cl in wrong_classifiers:
             cl.add_to_trace(ClassifierTrace.BAD)
 
         # If no classifier has correct anticipation - create it
-        if len(good_classifiers) == 0:
+        if len(good_classifiers) == 0 and len(wrong_classifiers) > 0:
             old_cl = random.choice(wrong_classifiers)
             new_cl = Classifier(
                 condition=Condition(old_cl.condition),
@@ -230,7 +303,7 @@ class LatentLearning:
     @staticmethod
     def select_accurate_classifiers(population: ClassifiersList):
         for cl in population:
-            if cl.trace_full and cl.oscillating:
+            if cl.trace_full and not all(t == ClassifierTrace.GOOD for t in cl.trace):
                 population.remove(cl)
 
     def specialize_condition(self, pop: Union[list, ClassifiersList]) -> Generator[Classifier]:
@@ -329,8 +402,8 @@ class YACS(Agent):
     def remember_situation(self, p: Perception):
         assert len(p) == self.cfg.classifier_length
 
-        for f_max, p in zip(self.cfg.feature_possible_values, p):
-            assert int(p) in range(0, f_max)
+        for f_max, _p in zip(self.cfg.feature_possible_values, p):
+            assert int(_p) in range(0, f_max)
 
         if p not in self.desirability_values:
             self.desirability_values[p] = 0.0
@@ -344,20 +417,22 @@ class YACS(Agent):
         raw_state = env.reset()
 
         state = Perception(raw_state)
-        prev_state = Perception.empty()
+        prev_state = None
 
+        action = None
         selected_cl = None
-        prev_selected_cl = None
 
         done = False
 
         while not done:
-            agent.remember_situation(state)
+            logging.debug(f"Step {steps}, perception: {state}")
+            self.remember_situation(state)
             match_set = self.population.form_match_set(state)
 
             if len(match_set) == 0:
-                # TODO: cover new classifier, add to match-set and population
-                pass
+                cl = self.ll.cover_classifier(self.population, prev_state, state)
+                match_set.append(cl)
+                self.population.append(cl)
 
             if steps > 0:
                 # Latent learning
@@ -365,7 +440,7 @@ class YACS(Agent):
                     self.population,
                     prev_state,
                     state,
-                    prev_selected_cl.action)
+                    action)
                 self.ll.select_accurate_classifiers(self.population)
                 self.ll.specialize(self.population)
 
@@ -373,18 +448,20 @@ class YACS(Agent):
                 self.pl.update_immediate_rewards(
                     self.population,
                     prev_state,
-                    prev_selected_cl.action,
+                    action,
                     last_reward)
                 self.pl.update_desirability_values(
                     self.population,
                     self.desirability_values,
-                    prev_selected_cl,
+                    selected_cl,
                     prev_state)
 
             # Select an action
-            prev_selected_cl = selected_cl
-            selected_cl = random.choice(match_set)
-            action = selected_cl.action
+            action = random.randint(0, self.cfg.number_of_possible_actions-1)
+            # selected_cl = random.choice(match_set)
+            # action = selected_cl.action
+
+            logging.debug(f"Executing action {action}")
 
             # Act in environment
             raw_state, last_reward, done, _ = env.step(action)
