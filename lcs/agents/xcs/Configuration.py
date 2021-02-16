@@ -26,7 +26,8 @@ class Configuration(object):
                  f_i: float = float(np.finfo(np.float32).tiny),
                  p_exp: float = 0.5,
                  do_ga_subsumption: bool = False,
-                 do_action_set_subsumption:bool = False
+                 do_action_set_subsumption: bool = False,
+                 number_of_actions: int = 0
                  ) -> None:
         """
         :param classifier_wildcard: Wildcard symbol
@@ -74,6 +75,7 @@ class Configuration(object):
         self.theta_mna = theta_mna
         self.do_GA_subsumption = do_ga_subsumption
         self.do_action_set_subsumption = do_action_set_subsumption
+        self.number_of_actions = number_of_actions
 
     def __str__(self) -> str:
         return str(vars(self))

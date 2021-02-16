@@ -45,3 +45,5 @@ class Classifier:
 
     def fitness(self):
         return self.fitness
+
+
