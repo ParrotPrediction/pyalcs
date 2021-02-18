@@ -131,6 +131,7 @@ class TestLatentLearning:
         assert new_cls[1].effect == Effect('####')
 
     def test_should_specialize_conditions(self, cfg, ll):
+        random.seed(self.SEED)
         # given oscillating classifiers with full traces
         cl1 = Classifier(condition="#1#1", action=0, effect="1122", cfg=cfg)
         cl2 = Classifier(condition="#1#1", action=0, effect="2211", cfg=cfg)
@@ -154,15 +155,19 @@ class TestLatentLearning:
         new_cls = list(ll.specialize_condition(population))
 
         # then
-        assert len(new_cls) == 2
+        assert len(new_cls) == 4
 
         assert new_cls[0].condition == Condition("01#1")
         assert new_cls[1].condition == Condition("11#1")
+        assert new_cls[2].condition == Condition("01#1")
+        assert new_cls[3].condition == Condition("11#1")
 
         assert all(cl.action == 0 for cl in new_cls)
 
-        assert new_cls[0].effect == Effect("1122")
-        assert new_cls[1].effect == Effect("#122")
+        assert new_cls[0].effect == Effect("1#22")
+        assert new_cls[1].effect == Effect("##22")
+        assert new_cls[2].effect == Effect("221#")
+        assert new_cls[3].effect == Effect("221#")
 
         assert all(len(cl.trace) == 0 for cl in new_cls)
 
@@ -201,7 +206,7 @@ class TestLatentLearning:
         ll.specialize(population)
 
         # then
-        assert len(population) == 6
+        assert len(population) == 10
         assert cl1 in population
         assert cl2 in population
         assert cl3 not in population
@@ -211,36 +216,38 @@ class TestLatentLearning:
 
     def test_should_cover_new_classifier_in_first_step(self, cfg, ll):
         # given
+        action = 0
         p0 = None
         p1 = Perception('1010')
         population = ClassifiersList()
         random.seed(self.SEED)
 
         # when
-        cl = ll.cover_classifier(population, p0, p1)
+        cl = ll.cover_classifier(population, action, p0, p1)
 
         # then
         assert cl is not None
-        assert cl.condition == Condition('#0#0')  # randomly
-        assert cl.action == 0
+        assert cl.condition == Condition('####')  # most general
+        assert cl.action == action
         assert cl.effect == Effect('1010')
         assert len(cl.trace) == 0
         assert cl.condition.does_match(p1)
 
     def test_should_cover_new_classifier_with_empty_action_set(self, cfg, ll):
         # given
+        action = 0
         p0 = Perception('1000')
         p1 = Perception('1010')
         population = ClassifiersList()
         random.seed(self.SEED)
 
         # when
-        cl = ll.cover_classifier(population, p0, p1)
+        cl = ll.cover_classifier(population, action, p0, p1)
 
         # then
         assert cl is not None
-        assert cl.condition == Condition('#0#0')
-        assert cl.action == 0
+        assert cl.condition == Condition('####')
+        assert cl.action == action
         assert cl.effect == Effect('##1#')
         assert cl.condition.does_match(p1)
 
@@ -248,9 +255,10 @@ class TestLatentLearning:
         # given
         p0 = Perception('1000')
         p1 = Perception('1010')
+        action = 0
 
-        cl1 = Classifier(condition="#1#0", action=0, effect="1#22", cfg=cfg)
-        cl2 = Classifier(condition="11#0", action=0, effect="1#22", cfg=cfg)
+        cl1 = Classifier(condition="#1#0", action=action, effect="1#22", cfg=cfg)
+        cl2 = Classifier(condition="11#0", action=action, effect="1#22", cfg=cfg)
         cl3 = Classifier(condition="#100", action=1, effect="1#22", cfg=cfg)
 
         pop = ClassifiersList(*[cl1, cl2, cl3])
@@ -259,13 +267,13 @@ class TestLatentLearning:
         assert len(pop.form_match_set(p1)) == 0  # no cl should match
 
         # when
-        cl = ll.cover_classifier(pop, p0, p1)
+        cl = ll.cover_classifier(pop, action, p0, p1)
 
         # then
         assert cl is not None
-        assert cl.condition == Condition('#0#0')
-        assert cl.action == 0
-        assert cl.effect == Effect('##1#')
+        assert cl.condition == Condition('1#10')
+        assert cl.action == action
+        assert cl.effect == Effect('####')
         assert cl.condition.does_match(p1)
         assert any(True for cl in pop if cl.condition.is_more_general(cl.condition)) is False
         assert any(True for cl in pop if cl.condition.is_more_specialized(cl.condition)) is False

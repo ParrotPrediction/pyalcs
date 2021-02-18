@@ -12,8 +12,6 @@ from lcs import TypedList, Perception
 from lcs.agents import ImmutableSequence, Agent
 from lcs.agents.Agent import TrialMetrics
 
-logging.basicConfig(level=logging.DEBUG)
-
 
 @dataclass
 class DontCare:
@@ -71,7 +69,7 @@ class Condition(ImmutableSequence):
 
     @property
     def expected_improvements(self) -> List[float]:
-        return [f.eis if type(f) is DontCare else 0.0 for f in self]
+        return [f.eis if type(f) is DontCare else None for f in self]
 
     @property
     def generality(self) -> int:
@@ -79,6 +77,7 @@ class Condition(ImmutableSequence):
 
     def is_more_specialized(self, other: Condition) -> bool:
         """Checks if other condition is more specialized"""
+
         def is_less_general(s, o):
             return (type(s) is DontCare and type(o) is not DontCare) or s == o
 
@@ -89,6 +88,7 @@ class Condition(ImmutableSequence):
 
     def is_more_general(self, other: Condition) -> bool:
         """Checks if other condition is more general"""
+
         def is_more_general(s, o):
             return type(o) is DontCare or s == o
 
@@ -114,7 +114,7 @@ class Condition(ImmutableSequence):
 
 class Effect(ImmutableSequence):
     @staticmethod
-    def diff(p0: Optional[Perception], p1: Perception):
+    def diff(p0: Optional[Perception], p1: Perception) -> Effect:
         # Computes the desired effect
         if p0 is None:
             return Effect(p1)
@@ -139,6 +139,7 @@ class Classifier:
                  action: Optional[int] = None,
                  effect: Union[Effect, str, None] = None,
                  reward: float = 0,  # immediate reward
+                 debug: dict = dict(),
                  cfg: Optional[Configuration] = None):
 
         if cfg is None:
@@ -160,9 +161,10 @@ class Classifier:
         self.trace = deque(maxlen=self.cfg.trace_length)
         self.last_bad_state = None  # situation preceding wrong anticipation
         self.last_good_state = None  # situation preceding good anticipation
+        self.debug = debug
 
     def __repr__(self):
-        return f"{self.condition}-{self.action}-{self.effect} @ {hex(id(self))}"
+        return f"{self.condition}-{self.action}-{self.effect} r: {self.r:.2f} @ {hex(id(self))}"
 
     @property
     def trace_full(self) -> bool:
@@ -220,30 +222,42 @@ class LatentLearning:
 
     def cover_classifier(self,
                          population: ClassifiersList,
+                         action: int,
                          p0: Optional[Perception],
                          p1: Perception) -> Classifier:
 
         def _neither_more_general_nor_more_specialized(
-                cond: Condition, pop: ClassifiersList) -> bool:
+            cond: Condition, pop: ClassifiersList) -> bool:
 
-            is_more_general = any(True for c in pop if c.condition.is_more_general(cond))
-            is_more_specialized = any(True for c in pop if c.condition.is_more_specialized(cond))
+            is_more_general = any(
+                True for c in pop if c.condition.is_more_general(cond))
+            is_more_specialized = any(
+                True for c in pop if c.condition.is_more_specialized(cond))
 
             return is_more_general is False and is_more_specialized is False
 
-        action = random.choice(range(0, self.cfg.number_of_possible_actions))
         action_set = population.form_action_set(action)
 
         # generate condition until desired conditions are met
         c = None
-        for c in Condition.random_matching(p1):
-            if len(action_set) == 0 or _neither_more_general_nor_more_specialized(c, action_set):
-                break
+        if len(action_set) == 0:
+            c = [DontCare()] * self.cfg.classifier_length
+        else:
+            for c in Condition.random_matching(p1):
+                if _neither_more_general_nor_more_specialized(c, action_set):
+                    break
+
+        # Create effect part
+        e = Effect.diff(p0, p1)
+        for idx, (ci, ei) in enumerate(zip(c, e)):
+            if ci == ei:
+                e[idx] = ImmutableSequence.WILDCARD
 
         return Classifier(
             condition=Condition(c),
             action=action,
-            effect=Effect.diff(p0, p1),
+            effect=e,
+            debug={'origin': 'covering'},
             cfg=self.cfg)
 
     def effect_covering(self,
@@ -276,6 +290,7 @@ class LatentLearning:
                 condition=Condition(old_cl.condition),
                 action=old_cl.action,
                 effect=de,
+                debug={'origin': 'effect_covering'},
                 cfg=self.cfg
             )
             new_cl.add_to_trace(ClassifierTrace.GOOD)
@@ -303,19 +318,32 @@ class LatentLearning:
     @staticmethod
     def select_accurate_classifiers(population: ClassifiersList):
         for cl in population:
-            if cl.trace_full and not all(t == ClassifierTrace.GOOD for t in cl.trace):
+            if cl.trace_full and not all(
+                t == ClassifierTrace.GOOD for t in cl.trace):
                 population.remove(cl)
 
-    def specialize_condition(self, pop: Union[list, ClassifiersList]) -> Generator[Classifier]:
+    def specialize_condition(self, pop: Union[list, ClassifiersList]) -> \
+    Generator[Classifier]:
         assert len(pop) > 0
         eis = [cl.condition.expected_improvements for cl in pop]
-        summed_eis = [sum(x) for x in zip(*eis)]
 
-        feature_idx = summed_eis.index(max(summed_eis))
+        summed_eis = [None] * self.cfg.classifier_length
+        for idx, sei in enumerate(summed_eis):
+            if all(x[idx] is not None for x in eis):
+                summed_eis[idx] = sum(x[idx] for x in eis)
 
-        yield from self.mutspec(pop[0], feature_idx)
+        # TODO: temporary solution to pick up random specializable feature
+        feature_idx = random.choice(
+            [idx for idx, val in enumerate(summed_eis) if val is not None])
 
-    def mutspec(self, cl: Classifier, feature_idx: int) -> Generator[Classifier]:
+        # select index if maximum feature skipping None values
+        # feature_idx = max(((idx, val) for idx, val in enumerate(summed_eis) if val is not None), key=lambda x: x[1])[0]
+
+        for cl in pop:
+            yield from self.mutspec(cl, feature_idx)
+
+    def mutspec(self, cl: Classifier, feature_idx: int) -> Generator[
+        Classifier]:
         assert type(cl.condition[feature_idx]) == DontCare
 
         for feature in range(self.cfg.feature_possible_values[feature_idx]):
@@ -325,57 +353,54 @@ class LatentLearning:
 
             # Build effect
             new_e = Effect(cl.effect)
-            if new_c[feature_idx] == new_e[feature_idx]:
-                new_e[feature_idx] = DontCare.symbol
+            for idx, (ci, ei) in enumerate(zip(new_c, new_e)):
+                if ci == ei:
+                    new_e[idx] = ImmutableSequence.WILDCARD
 
             yield Classifier(
                 condition=new_c,
                 action=cl.action,
                 effect=new_e,
+                debug={'origin': 'mutespec'},
                 cfg=cl.cfg
             )
 
 
 class PolicyLearning:
-
     def __init__(self, cfg: Configuration):
         self.cfg = cfg
 
-    @staticmethod
-    def update_immediate_rewards(pop: ClassifiersList,
-                                 obs: Perception,
-                                 action: int,
-                                 env_reward: int):
-
-        match_set = pop.form_match_set(obs)
-        action_set = match_set.form_action_set(action)
-        for cl in action_set:
-            cl.update_reward(env_reward)
-
-    def update_desirability_values(self,
-                                   pop: ClassifiersList,
-                                   desirability_values: Dict[Perception, float],
-                                   fired_cl: Classifier,
-                                   obs: Perception):
+    def update_optimal_policy(self,
+                              pop: ClassifiersList,
+                              desirability_values: Dict[Perception, float],
+                              obs: Perception,
+                              action: int,
+                              env_reward: int):
 
         assert obs in desirability_values
         match_set = pop.form_match_set(obs)
+        action_set = match_set.form_action_set(action)
 
-        if fired_cl in match_set:
-            max_r = max(cl.r for cl in match_set)
-            anticipated_obs = fired_cl.effect.passthrough(obs)
-            desirability_values[obs] = max_r + self.cfg.gamma * desirability_values.get(anticipated_obs, 0.0)
+        # Assign immediate rewards
+        for cl in action_set:
+            cl.update_reward(env_reward)
+
+        # Update desirability value
+        anticipated_obs = [cl.effect.passthrough(obs) for cl in action_set]
+        exp_cum_reward = max((v for p, v in desirability_values.items() if p in anticipated_obs), default=0)
+
+        desirability_values[obs] = env_reward + self.cfg.gamma * exp_cum_reward
 
     def select_action(self,
                       pop: ClassifiersList,
                       desirability_values: Dict[Perception, float],
                       obs: Perception) -> int:
-
         match_set = pop.form_match_set(obs)
 
         def quality(cl: Classifier):
             anticipated_obs = cl.effect.passthrough(obs)
-            return cl.r + self.cfg.gamma * desirability_values.get(anticipated_obs, 0.0)
+            return cl.r + self.cfg.gamma * desirability_values.get(
+                anticipated_obs, 0.0)
 
         selected_cl = max(match_set, key=quality)
         return selected_cl.action
@@ -409,7 +434,7 @@ class YACS(Agent):
             self.desirability_values[p] = 0.0
 
     def _run_trial_explore(self, env, trials, current_trial) -> TrialMetrics:
-        logging.info("Running trial explore")
+        logging.debug("Running trial explore")
 
         # Initial conditions
         steps = 0
@@ -427,53 +452,39 @@ class YACS(Agent):
         while not done:
             logging.debug(f"Step {steps}, perception: {state}")
             self.remember_situation(state)
-            match_set = self.population.form_match_set(state)
-
-            if len(match_set) == 0:
-                cl = self.ll.cover_classifier(self.population, prev_state, state)
-                match_set.append(cl)
-                self.population.append(cl)
-
-            if steps > 0:
-                # Latent learning
-                self.ll.effect_covering(
-                    self.population,
-                    prev_state,
-                    state,
-                    action)
-                self.ll.select_accurate_classifiers(self.population)
-                self.ll.specialize(self.population)
-
-                # Policy learning
-                self.pl.update_immediate_rewards(
-                    self.population,
-                    prev_state,
-                    action,
-                    last_reward)
-                self.pl.update_desirability_values(
-                    self.population,
-                    self.desirability_values,
-                    selected_cl,
-                    prev_state)
 
             # Select an action
-            action = random.randint(0, self.cfg.number_of_possible_actions-1)
-            # selected_cl = random.choice(match_set)
-            # action = selected_cl.action
-
-            logging.debug(f"Executing action {action}")
+            action = random.randint(0, self.cfg.number_of_possible_actions - 1)
 
             # Act in environment
+            logging.debug(f"Executing action {action}")
             raw_state, last_reward, done, _ = env.step(action)
+
+            if last_reward > 0:
+                logging.debug("FOUND REWARD")
+
             prev_state = state
             state = Perception(raw_state)
+
+            match_set = self.population.form_match_set(prev_state)
+            action_set = match_set.form_action_set(action)
+            if len(action_set) == 0:
+                cl = self.ll.cover_classifier(self.population, action,
+                                              prev_state, state)
+                self.population.append(cl)
+
+            self.ll.effect_covering(self.population, prev_state, state, action)
+            self.ll.specialize(self.population)
+            self.ll.select_accurate_classifiers(self.population)
+
+            self.pl.update_optimal_policy(self.population, self.desirability_values, prev_state, action, last_reward)
 
             steps += 1
 
         return TrialMetrics(steps, last_reward)
 
     def _run_trial_exploit(self, env, trials, current_trial) -> TrialMetrics:
-        logging.info("Running trial exploit")
+        logging.debug("Running trial exploit")
         return None
 
 

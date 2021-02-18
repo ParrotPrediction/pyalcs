@@ -62,7 +62,7 @@ class TestCondition:
 
     @pytest.mark.parametrize('_c, _res', [
         ("####", [0.0, 0.0, 0.0, 0.0]),
-        ("##1#", [0.0, 0.0, 0.0, 0.0]),
+        ("##1#", [0.0, 0.0, None, 0.0]),
     ])
     def test_should_get_expected_improvements_property(self, _c, _res):
         assert Condition(_c).expected_improvements == _res
