@@ -35,6 +35,7 @@ class Configuration:
                  trace_length: int = 5,
                  learning_rate: float = 0.1,
                  discount_factor: float = 0.9,
+                 estimate_expected_improvements: bool = True,
                  metrics_trial_frequency: int = 5,
                  user_metrics_collector_fcn: Callable = None):
         assert classifier_length == len(feature_possible_values)
@@ -44,6 +45,7 @@ class Configuration:
         self.trace_length = trace_length
         self.beta = learning_rate
         self.gamma = discount_factor
+        self.estimate_expected_improvements = estimate_expected_improvements
         self.metrics_trial_frequency = metrics_trial_frequency
         self.user_metrics_collector_fcn = user_metrics_collector_fcn
 
@@ -79,23 +81,45 @@ class Condition(ImmutableSequence):
         """Checks if other condition is more specialized"""
 
         def is_less_general(s, o):
-            return (type(s) is DontCare and type(o) is not DontCare) or s == o
+            if type(s) is DontCare:
+                return True
 
-        less_general = all(is_less_general(s, o) for s, o in zip(self, other))
-        different_tokens = sum(1 for s, o in zip(self, other) if s != o)
+            return s == o
 
-        return less_general and different_tokens > 0
+        def is_different(s, o):
+            if type(s) is DontCare and type(o) is DontCare:
+                return False
+            else:
+                return s != o
+
+        other_less_general = all(
+            is_less_general(s, o) for s, o in zip(self, other))
+        different_tokens = sum(
+            1 for s, o in zip(self, other) if is_different(s, o))
+
+        return other_less_general and different_tokens > 0
 
     def is_more_general(self, other: Condition) -> bool:
         """Checks if other condition is more general"""
 
         def is_more_general(s, o):
-            return type(o) is DontCare or s == o
+            if type(o) is DontCare:
+                return True
 
-        more_general = all(is_more_general(s, o) for s, o in zip(self, other))
-        different_tokens = sum(1 for s, o in zip(self, other) if s != o)
+            return s == o
 
-        return more_general and different_tokens > 0
+        def is_different(s, o):
+            if type(s) is DontCare and type(o) is DontCare:
+                return False
+            else:
+                return s != o
+
+        other_more_general = all(
+            is_more_general(s, o) for s, o in zip(self, other))
+        different_tokens = sum(
+            1 for s, o in zip(self, other) if is_different(s, o))
+
+        return other_more_general and different_tokens > 0
 
     @property
     def specificity(self) -> int:
@@ -103,10 +127,20 @@ class Condition(ImmutableSequence):
 
     def does_match(self, p: Perception) -> bool:
         for ci, oi in zip(self, p):
-            if ci != self.WILDCARD and ci != oi:
+            if type(ci) is not DontCare and ci != oi:
                 return False
 
         return True
+
+    def increase_eis(self, idx, beta):
+        t = self[idx]
+        if type(t) is DontCare:
+            t.eis = (1 - beta) * t.eis + beta
+
+    def decrease_eis(self, idx, beta):
+        t = self[idx]
+        if type(t) is DontCare:
+            t.eis = (1 - beta) * t.eis
 
     def subsumes(self, other) -> bool:
         raise NotImplementedError('YACS has no subsume operator')
@@ -159,12 +193,14 @@ class Classifier:
         self.effect = build_perception_string(Effect, effect)
         self.r = reward
         self.trace = deque(maxlen=self.cfg.trace_length)
-        self.last_bad_state = None  # situation preceding wrong anticipation
-        self.last_good_state = None  # situation preceding good anticipation
+        self.last_bad_perception: Optional[
+            Perception] = None  # situation preceding wrong anticipation
+        self.last_good_perception: Optional[
+            Perception] = None  # situation preceding good anticipation
         self.debug = debug
 
     def __repr__(self):
-        return f"{self.condition}-{self.action}-{self.effect} r: {self.r:.2f} @ {hex(id(self))}"
+        return f"{self.condition}-{self.action}-{self.effect} @ {hex(id(self))}"
 
     @property
     def trace_full(self) -> bool:
@@ -175,6 +211,9 @@ class Classifier:
         return all(t in self.trace for t in
                    [ClassifierTrace.GOOD, ClassifierTrace.BAD])
 
+    def anticipation(self, obs: Perception) -> Perception:
+        return self.effect.passthrough(obs)
+
     def does_match(self, situation: Perception) -> bool:
         return self.condition.does_match(situation)
 
@@ -183,16 +222,6 @@ class Classifier:
 
     def is_specializable(self) -> bool:
         return self.trace_full and self.oscillating
-
-    def memorize_state(self, p: Perception):
-        # check the last trace
-        last_anticipation_result = self.trace[-1]
-        assert last_anticipation_result is not None
-
-        if last_anticipation_result == ClassifierTrace.GOOD:
-            self.last_good_state = p
-        else:
-            self.last_bad_state = p
 
     def update_reward(self, env_reward):
         self.r = (1 - self.cfg.beta) * self.r + self.cfg.beta * env_reward
@@ -224,17 +253,17 @@ class LatentLearning:
                          population: ClassifiersList,
                          action: int,
                          p0: Optional[Perception],
-                         p1: Perception) -> Classifier:
+                         p1: Perception) -> Optional[Classifier]:
 
         def _neither_more_general_nor_more_specialized(
             cond: Condition, pop: ClassifiersList) -> bool:
 
-            is_more_general = any(
-                True for c in pop if c.condition.is_more_general(cond))
-            is_more_specialized = any(
-                True for c in pop if c.condition.is_more_specialized(cond))
+            more_general_exists = any(
+                True for cl in pop if cond.is_more_general(cl.condition))
+            more_specialized_exists = any(
+                True for cl in pop if cond.is_more_specialized(cl.condition))
 
-            return is_more_general is False and is_more_specialized is False
+            return more_general_exists is False and more_specialized_exists is False
 
         action_set = population.form_action_set(action)
 
@@ -243,9 +272,16 @@ class LatentLearning:
         if len(action_set) == 0:
             c = [DontCare()] * self.cfg.classifier_length
         else:
-            for c in Condition.random_matching(p1):
+            tries = 1000
+            while tries > 0:
+                c = next(Condition.random_matching(p1))
                 if _neither_more_general_nor_more_specialized(c, action_set):
                     break
+
+                tries -= 1
+                if tries == 0:
+                    logging.warning(f'Unable to cover classifier for perception: {p1}')
+                    return None
 
         # Create effect part
         e = Effect.diff(p0, p1)
@@ -277,11 +313,31 @@ class LatentLearning:
         good_classifiers = [cl for cl in action_set if cl.effect == de]
         for cl in good_classifiers:
             cl.add_to_trace(ClassifierTrace.GOOD)
+            cl.last_good_perception = p0
 
         # Add trace to classifiers that anticipated wrong
         wrong_classifiers = [cl for cl in action_set if cl.effect != de]
         for cl in wrong_classifiers:
             cl.add_to_trace(ClassifierTrace.BAD)
+            cl.last_bad_perception = p0
+
+        if self.cfg.estimate_expected_improvements:
+            # Adjust expected improvement by specialization values
+            for cl in [cl for cl in good_classifiers if
+                       cl.last_bad_perception is not None]:
+                for i, (p0i, bpi) in enumerate(zip(p0, cl.last_bad_perception)):
+                    if p0i == bpi:
+                        cl.condition.decrease_eis(i, self.cfg.beta)
+                    else:
+                        cl.condition.increase_eis(i, self.cfg.beta)
+
+            for cl in [cl for cl in wrong_classifiers if
+                       cl.last_good_perception is not None]:
+                for i, (p0i, gpi) in enumerate(zip(p0, cl.last_good_perception)):
+                    if p0i == gpi:
+                        cl.condition.decrease_eis(i, self.cfg.beta)
+                    else:
+                        cl.condition.increase_eis(i, self.cfg.beta)
 
         # If no classifier has correct anticipation - create it
         if len(good_classifiers) == 0 and len(wrong_classifiers) > 0:
@@ -323,7 +379,7 @@ class LatentLearning:
                 population.remove(cl)
 
     def specialize_condition(self, pop: Union[list, ClassifiersList]) -> \
-    Generator[Classifier]:
+        Generator[Classifier]:
         assert len(pop) > 0
         eis = [cl.condition.expected_improvements for cl in pop]
 
@@ -332,22 +388,19 @@ class LatentLearning:
             if all(x[idx] is not None for x in eis):
                 summed_eis[idx] = sum(x[idx] for x in eis)
 
-        # TODO: temporary solution to pick up random specializable feature
-        feature_idx = random.choice(
-            [idx for idx, val in enumerate(summed_eis) if val is not None])
-
-        # select index if maximum feature skipping None values
-        # feature_idx = max(((idx, val) for idx, val in enumerate(summed_eis) if val is not None), key=lambda x: x[1])[0]
+        if self.cfg.estimate_expected_improvements:
+            feature_idx = max(((idx, val) for idx, val in enumerate(summed_eis) if val is not None), key=lambda x: x[1])[0]
+        else:
+            feature_idx = random.choice([idx for idx, val in enumerate(summed_eis) if val is not None])
 
         for cl in pop:
             yield from self.mutspec(cl, feature_idx)
 
-    def mutspec(self, cl: Classifier, feature_idx: int) -> Generator[
-        Classifier]:
+    def mutspec(self, cl: Classifier, feature_idx: int) -> Generator[Classifier]:
         assert type(cl.condition[feature_idx]) == DontCare
 
         for feature in range(self.cfg.feature_possible_values[feature_idx]):
-            # Build condition (TODO: eis are reseted here...)
+            # Build condition
             new_c = Condition(cl.condition)
             new_c[feature_idx] = str(feature)
 
@@ -376,7 +429,6 @@ class PolicyLearning:
                               obs: Perception,
                               action: int,
                               env_reward: int):
-
         assert obs in desirability_values
         match_set = pop.form_match_set(obs)
         action_set = match_set.form_action_set(action)
@@ -386,23 +438,23 @@ class PolicyLearning:
             cl.update_reward(env_reward)
 
         # Update desirability value
-        anticipated_obs = [cl.effect.passthrough(obs) for cl in action_set]
-        exp_cum_reward = max((v for p, v in desirability_values.items() if p in anticipated_obs), default=0)
+        anticipated_obs = [cl.anticipation(obs) for cl in action_set]
+        exp_cum_reward = max((v for p, v in desirability_values.items() if
+                              p in anticipated_obs), default=0)
 
         desirability_values[obs] = env_reward + self.cfg.gamma * exp_cum_reward
 
     def select_action(self,
-                      pop: ClassifiersList,
+                      match_set: ClassifiersList,
                       desirability_values: Dict[Perception, float],
                       obs: Perception) -> int:
-        match_set = pop.form_match_set(obs)
-
         def quality(cl: Classifier):
-            anticipated_obs = cl.effect.passthrough(obs)
+            anticipated_obs = cl.anticipation(obs)
             return cl.r + self.cfg.gamma * desirability_values.get(
                 anticipated_obs, 0.0)
 
         selected_cl = max(match_set, key=quality)
+        # print(f"\t{selected_cl}")
         return selected_cl.action
 
 
@@ -468,16 +520,22 @@ class YACS(Agent):
 
             match_set = self.population.form_match_set(prev_state)
             action_set = match_set.form_action_set(action)
+
+            logging.debug(f"Action set size {len(action_set)}")
+
             if len(action_set) == 0:
                 cl = self.ll.cover_classifier(self.population, action,
                                               prev_state, state)
-                self.population.append(cl)
+                if cl is not None:
+                    self.population.append(cl)
 
             self.ll.effect_covering(self.population, prev_state, state, action)
             self.ll.specialize(self.population)
             self.ll.select_accurate_classifiers(self.population)
 
-            self.pl.update_optimal_policy(self.population, self.desirability_values, prev_state, action, last_reward)
+            self.pl.update_optimal_policy(self.population,
+                                          self.desirability_values, prev_state,
+                                          action, last_reward)
 
             steps += 1
 
@@ -485,7 +543,37 @@ class YACS(Agent):
 
     def _run_trial_exploit(self, env, trials, current_trial) -> TrialMetrics:
         logging.debug("Running trial exploit")
-        return None
+
+        # Initial conditions
+        steps = 0
+        last_reward = 0
+        raw_state = env.reset()
+        state = Perception(raw_state)
+        done = False
+
+        while not done:
+            logging.info(f"\tStep {steps}, perception: {state}")
+
+            # Select an action
+            match_set = self.population.form_match_set(state)
+            if len(match_set) == 0:
+                logging.error(
+                    f"Unknown state [{state}] encountered. Please retrain the agent")
+
+            action = self.pl.select_action(match_set, self.desirability_values,
+                                           state)
+
+            # Act in environment
+            logging.info(f"\tExecuting action {action}")
+            raw_state, last_reward, done, _ = env.step(action)
+
+            if last_reward > 0:
+                logging.debug("FOUND REWARD")
+
+            state = Perception(raw_state)
+            steps += 1
+
+        return TrialMetrics(steps, last_reward)
 
 
 if __name__ == '__main__':
