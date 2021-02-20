@@ -1,16 +1,12 @@
-from dataclasses import dataclass
-from typing import Union, Optional, Generator, List, Dict
-from typing import Callable, List, Tuple
 import numpy as np
 
 from lcs.agents import Agent
 from lcs.agents.xcs import Configuration, Classifier, ClassifiersList
 from lcs.agents.Agent import TrialMetrics
-from lcs.agents.ImmutableSequence import ImmutableSequence
-
 
 # The condition C is included inside the ImmutableSequence
 # Find proper object description for reinforcement program
+
 class XCS(Agent):
     def __init__(self,
                  cfg: Configuration,
@@ -21,7 +17,7 @@ class XCS(Agent):
         :param population: all classifiers at current time
         """
         self.cfg = cfg
-        self.population = population or self._initial_population()
+        self.population = ClassifiersList(cfg=cfg)
         self.time_stamp = 0
 
     def get_population(self):
@@ -41,7 +37,7 @@ class XCS(Agent):
 
         while not eop:
             situation = env.to_genotype()
-            match_set = self.population.form_match_set(situation, self.cfg, self.time_stamp)
+            match_set = self.population.form_match_set(situation, self.time_stamp)
             prediction_array = self._generate_prediction_array(match_set)
             action = self.select_action(prediction_array, match_set)
             action_set = match_set.form_action_set(action)
@@ -73,7 +69,7 @@ class XCS(Agent):
         fitness_sum_array = []
         for cl in match_set:
             prediction_array.append(cl.prediction())
-            fitness_sum_array.append(cl.fitness())
+            fitness_sum_array.append(cl.get_fitness())
         for i in range(0, len(prediction_array)):
             if fitness_sum_array[i] != 0:
                 prediction_array[i] /= fitness_sum_array[i]
@@ -84,15 +80,6 @@ class XCS(Agent):
         if np.random.rand() > self.cfg.p_exp:
             return match_set[prediction_array.index(max(prediction_array))].action
         return np.random.randint(match_set).action
-
-    def _initial_population(self):
-        cls = []
-        for action in range(0, self.cfg.number_of_actions):
-            cls.append(Classifier(condition=None,
-                                  action=action,
-                                  time_stamp=self.time_stamp,
-                                  cfg=self.cfg))
-        return ClassifiersList(*cls)
 
     # TODO: Update Set
     def _update_set(self, p):

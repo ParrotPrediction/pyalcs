@@ -1,13 +1,12 @@
 import numpy as np
-from lcs.agents import EnvironmentAdapter
 
 
+# TODO: Find if env should be here only in XCS
 class Configuration(object):
     def __init__(self,
-                 theta_mna,
+                 number_of_actions: int,
+                 theta_mna: int,
                  classifier_wildcard: str = '#',
-                 environment_adapter=EnvironmentAdapter,
-
                  n: int = 200,
                  beta: float = 0.1,
                  alpha: float = 0.1,
@@ -26,12 +25,10 @@ class Configuration(object):
                  f_i: float = float(np.finfo(np.float32).tiny),
                  p_exp: float = 0.5,
                  do_ga_subsumption: bool = False,
-                 do_action_set_subsumption: bool = False,
-                 number_of_actions: int = 0
+                 do_action_set_subsumption: bool = False
                  ) -> None:
         """
         :param classifier_wildcard: Wildcard symbol
-        :param environment_adapter: Adapter of the env, does not store env
         :param n: maximum size of the population
         :param beta: learning rate for p, epsilon, f
         :param alpha: used in calculating fitness
@@ -54,7 +51,6 @@ class Configuration(object):
         :param do_action_set_subsumption: specifies if action sets are to be tested for subsuming classifiers
         """
         self.classifier_wildcard = classifier_wildcard
-        self.environment_adapter = environment_adapter
         self.n = n
         self.beta = beta
         self.alpha = alpha
@@ -68,9 +64,9 @@ class Configuration(object):
         self.delta = delta
         self.theta_sub = theta_sub
         self.population_wildcard = population_wildcard
-        self.p_I = p_i
-        self.epsilon_I = epsilon_i
-        self.f_I = f_i
+        self.p_i = p_i
+        self.epsilon_i = epsilon_i
+        self.f_i = f_i
         self.p_exp = p_exp
         self.theta_mna = theta_mna
         self.do_GA_subsumption = do_ga_subsumption
@@ -81,5 +77,5 @@ class Configuration(object):
         return str(vars(self))
 
     def initial_classifier_values(self):
-        return self.p_I, self.epsilon_I, self.f_I
+        return self.p_i, self.epsilon_i, self.f_i
 

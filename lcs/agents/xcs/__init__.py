@@ -1,5 +1,6 @@
+from .Condition import Condition
 from .Configuration import Configuration
-from .XCS import XCS
 # TODO: New file for Condition
-from .Classifier import Classifier, Condition
+from .Classifier import Classifier
 from .ClassifiersList import ClassifiersList
+from .XCS import XCS
