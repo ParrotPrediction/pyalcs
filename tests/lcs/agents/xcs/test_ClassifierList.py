@@ -46,3 +46,22 @@ class TestClassifiersList:
         assert sum(cl.numerosity for cl in classifiers_list) >= cfg.n
         classifiers_list.delete_from_population()
         assert sum(cl.numerosity for cl in classifiers_list) <= cfg.n
+
+    def test_match_set(self, cfg):
+        classifiers_list = ClassifiersList(cfg)
+        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 0, 0))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 1, 0))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 2, 0))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 3, 0))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition("1111"), 0, 0))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition("1111"), 1, 0))
+        assert len(classifiers_list.form_match_set(Perception("1100"), 1)) == 4
+        assert len(classifiers_list.form_match_set(Perception("1110"), 1)) == 4
+
+    def test_action_set(self, cfg):
+        classifiers_list = ClassifiersList(cfg)
+        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 0, 0))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 1, 0))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 2, 0))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 3, 0))
+        assert len(classifiers_list.form_action_set(0)) == 1

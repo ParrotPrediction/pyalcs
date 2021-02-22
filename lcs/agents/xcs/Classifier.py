@@ -35,8 +35,8 @@ class Classifier:
         return self.prediction * self.fitness
 
     def does_match(self, situation):
-        if type(situation) != str:
-            situation = str(situation)
+        if len(situation) != len(self):
+            return False
         return self.condition.subsumes(situation)
 
     def generalize(self, position=None):
@@ -49,6 +49,5 @@ class Classifier:
             return True
         return False
 
-    def __str__(self):
-        return str(self.condition) + " " + str(self.action)
-
+    def __len__(self):
+        return len(self.condition)
