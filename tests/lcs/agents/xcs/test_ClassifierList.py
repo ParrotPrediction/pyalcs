@@ -36,7 +36,8 @@ class TestClassifiersList:
         assert Classifier(cfg, Condition("1111"), 0, 0) ==\
             classifiers_list.generate_covering_classifier("1111", 0, 0)
 
-    # TODO: Finish this test
+    # TODO: You can test if correct element was deleted
+    # TODO: Include random state to manipulate the rnd and see the above TODO
     def test_deletion(self, cfg: Configuration):
         classifiers_list = ClassifiersList(cfg)
         for i in range(cfg.n + 1):

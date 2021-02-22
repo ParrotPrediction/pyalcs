@@ -38,7 +38,7 @@ class XCS(Agent):
         while not eop:
             situation = env.to_genotype()
             match_set = self.population.form_match_set(situation, self.time_stamp)
-            prediction_array = self._generate_prediction_array(match_set)
+            prediction_array = self.generate_prediction_array(match_set)
             action = self.select_action(prediction_array, match_set)
             action_set = match_set.form_action_set(action)
             # TODO: See if this is correct way to do it.
@@ -64,18 +64,18 @@ class XCS(Agent):
         raise NotImplementedError
 
     @classmethod
-    def _generate_prediction_array(cls, match_set: ClassifiersList):
+    def generate_prediction_array(cls, match_set: ClassifiersList):
         prediction_array = []
         fitness_sum_array = []
         for cl in match_set:
-            prediction_array.append(cl.prediction())
+            prediction_array.append(cl.get_prediction() * cl.get_fitness())
             fitness_sum_array.append(cl.get_fitness())
         for i in range(0, len(prediction_array)):
             if fitness_sum_array[i] != 0:
                 prediction_array[i] /= fitness_sum_array[i]
         return prediction_array
 
-    # TODO: YOu can use EpsilonGreedy
+    # TODO: Modify to include multiple selections from strategies/action_selection
     def select_action(self, prediction_array, match_set: ClassifiersList) -> int:
         if np.random.rand() > self.cfg.p_exp:
             return match_set[prediction_array.index(max(prediction_array))].action

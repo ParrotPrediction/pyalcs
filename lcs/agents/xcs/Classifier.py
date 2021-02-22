@@ -31,8 +31,8 @@ class Classifier:
     def get_situation(self):
         return self.condition
 
-    def prediction(self):
-        return self.prediction * self.fitness
+    def get_prediction(self):
+        return self.prediction
 
     def does_match(self, situation):
         if len(situation) != len(self):
