@@ -65,4 +65,8 @@ class TestClassifiersList:
         classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 1, 0))
         classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 2, 0))
         classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 3, 0))
-        assert len(classifiers_list.form_action_set(0)) == 1
+        action_set = classifiers_list.form_action_set(0)
+        assert len(action_set) == 1
+        action_set[0].action = 1
+        assert classifiers_list[0].action == 1
+

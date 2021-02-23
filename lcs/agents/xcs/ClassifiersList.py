@@ -82,10 +82,10 @@ class ClassifiersList(TypedList):
             self.insert_in_population(cl)
             self.delete_from_population()
             matching_ls.append(cl)
-        return matching_ls
+        return ClassifiersList(self.cfg, *matching_ls)
 
     def form_action_set(self, action):
         action_ls = [cl for cl in self if cl.action == action]
-        return action_ls
+        return ClassifiersList(self.cfg, *action_ls)
 
 

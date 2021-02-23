@@ -2,6 +2,7 @@ import random
 
 import lcs.agents.acs as acs
 import lcs.agents.acs2 as acs2
+import lcs.agents.xcs as xcs
 from . import RandomAction
 
 
@@ -15,6 +16,8 @@ class BestAction:
             return self._handle_best_action_for_acs(population)
         elif type(population) is acs2.ClassifiersList:
             return self._handle_best_action_for_acs2(population)
+        elif type(population) is xcs.ClassifiersList:
+            return self._handle_best_action_for_xcs(population)
         else:
             raise TypeError()
 
@@ -36,3 +39,7 @@ class BestAction:
 
         # If there is no classifier - return random action
         return RandomAction(all_actions=self.all_actions)(population)
+
+    def _handle_best_action_for_xcs(self, population) -> int:
+        best_classifier = max(population, key=lambda cl: cl.fitness)
+        return best_classifier.action

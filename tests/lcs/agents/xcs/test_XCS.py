@@ -21,7 +21,7 @@ class TestXCS:
         classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 1, 0))
         classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 2, 0))
         classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 3, 0))
-        xcs = XCS()
+        xcs = XCS(cfg)
         prediction_array = xcs.generate_prediction_array(classifiers_list)
         assert len(classifiers_list) == len(prediction_array)
 
@@ -36,6 +36,12 @@ class TestXCS:
         prediction_array = xcs.generate_prediction_array(classifiers_list)
         action = xcs.select_action(prediction_array=prediction_array,
                                    match_set=classifiers_list)
+        xcs.cfg.p_exp = 0.999999 # I know that is lazy
+        assert type(action) == int
+        assert action < number_of_actions
 
+        xcs.cfg.p_exp = 0
+        action = xcs.select_action(prediction_array=prediction_array,
+                                   match_set=classifiers_list)
         assert type(action) == int
         assert action < number_of_actions

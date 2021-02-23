@@ -3,6 +3,7 @@ import numpy as np
 from lcs.agents import Agent
 from lcs.agents.xcs import Configuration, Classifier, ClassifiersList
 from lcs.agents.Agent import TrialMetrics
+from lcs.strategies.action_selection import EpsilonGreedy
 
 # The condition C is included inside the ImmutableSequence
 # Find proper object description for reinforcement program
@@ -42,8 +43,11 @@ class XCS(Agent):
             action = self.select_action(prediction_array, match_set)
             action_set = match_set.form_action_set(action)
             # TODO: See if this is correct way to do it.
-            # I expect reinforcement program to be on the other side of adapted
+            # I expect reinforcement program to be on the other side of adapter
             reward = env.to_phenotype(action)
+
+
+
             # TODO: insert GA here
             if len(prev_action_set) > 0:
                 p = prev_reward + self.cfg.gamma
@@ -53,7 +57,7 @@ class XCS(Agent):
 
 
             # TODO: eop flag is not changed
-            if self.cfg.eop:
+            if eop:
                 pass
             else:
                 prev_action_set = action_set
@@ -75,7 +79,12 @@ class XCS(Agent):
                 prediction_array[i] /= fitness_sum_array[i]
         return prediction_array
 
-    # TODO: Modify to include multiple selections from strategies/action_selection
+    # TODO: EspilonGreedy
+    # Run into a lot of issues where in EpsilonGreedy where BestAction was not callable
+    # Changing EpsilonGreed to:
+    # best = BestAction(all_actions=self.all_actions)
+    # return best(population)
+    # Fixed the issue but I want to solve it without changes to EpsilonGreedy.py
     def select_action(self, prediction_array, match_set: ClassifiersList) -> int:
         if np.random.rand() > self.cfg.p_exp:
             return match_set[prediction_array.index(max(prediction_array))].action
@@ -85,6 +94,3 @@ class XCS(Agent):
     def _update_set(self, p):
         raise NotImplementedError()
 
-    # TODO: Run GA
-    def _run_genetic_algorithm(self):
-        raise NotImplementedError()

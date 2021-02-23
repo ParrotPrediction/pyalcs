@@ -1,4 +1,5 @@
 import numpy as np
+from lcs.strategies.action_selection import EpsilonGreedy
 
 
 # TODO: Find if env should be here only in XCS
@@ -78,4 +79,5 @@ class Configuration(object):
 
     def initial_classifier_values(self):
         return self.p_i, self.epsilon_i, self.f_i
+
 
