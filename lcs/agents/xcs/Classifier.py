@@ -25,15 +25,6 @@ class Classifier:
         self.prediction, self.error, self.fitness \
             = cfg.initial_classifier_values()
 
-    def get_fitness(self):
-        return self.fitness
-
-    def get_situation(self):
-        return self.condition
-
-    def get_prediction(self):
-        return self.prediction
-
     def does_match(self, situation):
         if len(situation) != len(self):
             return False

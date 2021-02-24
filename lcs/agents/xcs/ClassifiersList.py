@@ -44,7 +44,7 @@ class ClassifiersList(TypedList):
         if total_numerosity <= self.cfg.n:
             return None
 
-        total_fitness = sum(cl.get_fitness() for cl in self)
+        total_fitness = sum(cl.fitness for cl in self)
         average_fitness = total_fitness / total_numerosity
 
         total_votes = 0
@@ -56,7 +56,7 @@ class ClassifiersList(TypedList):
                 self[cl].experience > self.cfg.theta_del
             )
             low_fitness = (
-                self[cl].get_fitness() / self[cl].numerosity <
+                self[cl].fitness / self[cl].numerosity <
                 self.cfg.delta * average_fitness
             )
             if sufficient_experience and low_fitness:
