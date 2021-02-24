@@ -32,3 +32,18 @@ class TestCondition:
         assert Condition("11##").subsumes(Perception("11##"))
         assert Condition("11").subsumes(Perception("1111"))
         assert not Condition("1111").subsumes(Perception("10##"))
+
+    def test_number_of_wildcards(self):
+        assert Condition("1011").wildcard_number() == 0
+        assert Condition("101#").wildcard_number() == 1
+        assert Condition("10##").wildcard_number() == 2
+        assert Condition("1###").wildcard_number() == 3
+        assert Condition("1##0").wildcard_number() == 2
+        assert Condition("1#10").wildcard_number() == 1
+
+    def test_is_more_general(self):
+        assert Condition("1111").is_more_general(Condition("1111"))
+        assert Condition("11##").is_more_general(Condition("1111"))
+        assert Condition("####").is_more_general(Condition("##11"))
+        assert not Condition("1100").is_more_general(Condition("1111"))
+        assert not Condition("1100").is_more_general(Condition("11##"))

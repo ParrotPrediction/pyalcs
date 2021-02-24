@@ -49,7 +49,32 @@ class TestClassifier:
         assert not Classifier(cfg, Condition("1111"), 0, 0) == Classifier(cfg, Condition("1111"), 1, 0)
         assert not Classifier(cfg, Condition("1111"), 0, 0) == Classifier(cfg, Condition("1100"), 0, 0)
 
+    def test_could_subsume(self, cfg):
+        cl = Classifier(cfg, Condition("1111"), 0, 0)
+        assert not cl.could_subsume()
+        cl.experience = cfg.theta_sub * 2
+        cl.error = cfg.epsilon_i / 2
+        assert cl.could_subsume()
 
+    def test_is_more_general(self, cfg):
+        assert Classifier(cfg, Condition("####"), 0, 0).is_more_general(
+            Classifier(cfg, Condition("1111"), 0, 0)
+        )
+        assert not Classifier(cfg, Condition("1111"), 0, 0).is_more_general(
+            Classifier(cfg, Condition("1111"), 0, 0)
+        )
+        assert not Classifier(cfg, Condition("1111"), 0, 0).is_more_general(
+            Classifier(cfg, Condition("11##"), 0, 0)
+        )
+        assert not Classifier(cfg, Condition("###0"), 0, 0).is_more_general(
+            Classifier(cfg, Condition("1111"), 0, 0)
+        )
 
-
-
+    def test_does_subsume(self, cfg):
+        cl = Classifier(cfg, Condition("11##"), 0, 0)
+        assert not cl.does_subsume(Classifier(cfg, Condition("1111"), 0, 0))
+        cl.experience = cfg.theta_sub * 2
+        cl.error = cfg.epsilon_i / 2
+        assert cl.does_subsume(Classifier(cfg, Condition("1111"), 0, 0))
+        assert not cl.does_subsume(Classifier(cfg, Condition("1111"), 1, 0))
+        assert not cl.does_subsume(Classifier(cfg, Condition("0011"), 1, 0))

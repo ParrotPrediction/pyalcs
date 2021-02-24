@@ -30,8 +30,25 @@ class Classifier:
             return False
         return self.condition.subsumes(situation)
 
-    def generalize(self, position=None):
-        self.condition.generalize(position)
+    def does_subsume(self, other):
+        if self.action == other.action and \
+           self.could_subsume() and \
+           self.is_more_general(other):
+                    return True
+        return False
+
+    def could_subsume(self):
+        if self.experience > self.cfg.theta_sub and self.error < self.cfg.epsilon_i:
+                return True
+        return False
+
+    def is_more_general(self, other):
+        if self.wildcard_number() <= other.wildcard_number():
+            return False
+        return self.condition.is_more_general(other.condition)
+
+    def wildcard_number(self):
+        return self.condition.wildcard_number()
 
     def __eq__(self, other):
         if type(other) != Classifier:
