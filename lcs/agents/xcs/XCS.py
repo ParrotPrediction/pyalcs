@@ -1,4 +1,6 @@
+import logging
 import numpy as np
+import copy
 from typing import Optional
 
 from lcs.agents import Agent
@@ -9,6 +11,7 @@ from lcs.strategies.action_selection import EpsilonGreedy
 # TODO: Find proper object description for reinforcement program
 # TODO: Logger
 
+logger = logging.getLogger(__name__)
 
 class XCS(Agent):
     def __init__(self,
@@ -24,7 +27,6 @@ class XCS(Agent):
             self.population = population
         else:
             self.population = ClassifiersList(cfg=cfg)
-        self.time_stamp = 0
 
     def get_population(self):
         return self.cfg
@@ -34,19 +36,21 @@ class XCS(Agent):
 
     def _run_trial_exploit(self, env, trials, current_trial) -> TrialMetrics:
         self.cfg.p_exp = 0
-        self._run_trial_explore(env, trials, current_trial)
+        return self._run_trial_explore(env, trials, current_trial)
 
     # run experiment
     # TODO: return Trial Metrics
+    # TODO: Realize what trials, current_trial do
     # TODO: make it compatible with Open AI environments
     def _run_trial_explore(self, env, trials, current_trial) -> TrialMetrics:
         eop = False
         prev_action_set = None
-        prev_reward = 0
+        prev_reward = None
         prev_situation = None
+        time_stamp = 0
         while not eop:
             situation = env.to_genotype()
-            match_set = self.population.form_match_set(situation, self.time_stamp)
+            match_set = self.population.form_match_set(situation, time_stamp)
             prediction_array = self.generate_prediction_array(match_set)
             action = self.select_action(prediction_array, match_set)
             action_set = match_set.form_action_set(action)
@@ -56,22 +60,18 @@ class XCS(Agent):
             if len(prev_action_set) > 0:
                 p = prev_reward + self.cfg.gamma * max(prediction_array)
                 self._update_set(prev_action_set, p)
-                self.run_ga(prev_situation)
+                self.run_ga(prev_action_set, prev_situation)
             if eop:
                 p = reward
                 self._update_set(prev_action_set, p)
-                self.run_ga(prev_situation)
+                self.run_ga(action_set, situation)
             else:
                 prev_action_set = action_set
                 prev_reward = reward
                 prev_situation = situation
+            time_stamp += 1
 
-            self.time_stamp += 1
-        raise NotImplementedError
-
-    # TODO: change it to ClassifierList method
-    @classmethod
-    def generate_prediction_array(cls, match_set: ClassifiersList):
+    def generate_prediction_array(self, match_set: ClassifiersList):
         prediction_array = []
         fitness_sum_array = []
         for cl in match_set:
@@ -95,17 +95,17 @@ class XCS(Agent):
 
     def _update_set(self, action_set: ClassifiersList, p):
         for cl in action_set:
-            cl.expirience += 1
+            cl.experience += 1
             action_set_numerosity = sum(cl.numerosity for cl in action_set)
             # update prediction, prediction error, action set size estimate
-            if cl.expirience < 1/self.cfg.beta:
-                cl.prediction += (p - cl.prediction) / cl.expirience
-                cl.error += (abs(p - cl.prediction) - p.error) / cl.expirience
+            if cl.experience < 1/self.cfg.beta:
+                cl.prediction += (p - cl.prediction) / cl.experience
+                cl.error += (abs(p - cl.prediction) - cl.error) / cl.experience
                 cl.action_set_size +=\
-                    (action_set_numerosity - cl.action_set_size) / cl.expirience
+                    (action_set_numerosity - cl.action_set_size) / cl.experience
             else:
                 cl.prediction += self.cfg.beta * (p - cl.prediction)
-                cl.error += self.cfg.beta * (abs(p - cl.prediction) - p.error)
+                cl.error += self.cfg.beta * (abs(p - cl.prediction) - cl.error)
                 cl.action_set_size += \
                     self.cfg.beta * (action_set_numerosity - cl.action_set_size)
         self.update_fitness(action_set)
@@ -139,6 +139,75 @@ class XCS(Agent):
                     action_set.safe_remove(c)
                     self.population.safe_remove(c)
 
-    # TODO: Implement run GA
-    def run_ga(self, situation):
-        raise NotImplementedError()
+    def run_ga(self, action_set, situation, time_stamp):
+        if time_stamp - sum(cl.time_stamp * cl.numerosity for cl in action_set) / \
+                sum(cl.numerosity for cl in action_set) > self.cfg.theta_GA:
+            for i in enumerate(action_set):
+                action_set[i].time_stamp = time_stamp
+            parent1 = self.select_offspring(action_set)
+            parent2 = self.select_offspring(action_set)
+            child1 = copy.copy(parent1)
+            child2 = copy.copy(parent2)
+            child1.numerosity = child2.numerosity + 1
+            child1.experience = child2.experience + 1
+            if np.random.rand() < self.cfg.chi:
+                self.apply_crossover(child1, child2)
+                child1.prediction = (parent1.prediction + parent2.prediction) / 2
+                child1.error = 0.25 * (parent1.error + parent2.error) / 2
+                child1.fitness = (parent1.fitness + parent2.fitness) / 2
+                child2.prediction = child1.prediction
+                child2.error = child1.error
+                child2.fitness = child2.fitness
+            self.apply_mutation(child1, situation)
+            self.apply_mutation(child2, situation)
+            if self.cfg.do_GA_subsumption:
+                if parent1.does_subsume(child1):
+                    parent1.numerosity += 1
+                elif parent2.does_subsume(child1):
+                    parent2.numerosity += 1
+                else:
+                    self.population.insert_in_population(child1)
+                self.population.delete_from_population()
+
+                if parent1.does_subsume(child2):
+                    parent1.numerosity += 1
+                elif parent2.does_subsume(child2):
+                    parent2.numerosity += 1
+                else:
+                    self.population.insert_in_population(child2)
+                self.population.delete_from_population()
+
+    def select_offspring(self, action_set: ClassifiersList) -> Classifier:
+        fitness_sum = 0
+        for cl in action_set:
+            fitness_sum += cl.fitness
+        choice_point = np.random.rand() * fitness_sum
+        fitness_sum = 0
+        for cl in action_set:
+            fitness_sum += cl.fitness
+            if fitness_sum > choice_point:
+                return cl
+
+    def apply_crossover(self, child1, child2):
+        x = np.random.rand() * len(child1.condition)
+        y = np.random.rand() * len(child1.condition)
+        if x > y:
+            x, y = y, x
+        i = 0
+        while i < y:
+            if x <= i < y:
+                child1.condition[i], child2.condition[i] =\
+                    child1.condition[i], child2.condition[i]
+            i += 1
+
+    def apply_mutation(self, child, situation):
+        i = 0
+        while i < len(child.condition):
+            if np.random.rand() < self.cfg.mu:
+                if child.condition[i] == child.condition.WILDCARD:
+                    child.condition[i] = situation[i]
+                else:
+                    child.condition[i] = child.condition.WILDCARD
+            i += 1
+        if np.random.rand() < self.cfg.mu:
+            child.action = np.random.randint(self.cfg.number_of_actions)

@@ -1,9 +1,9 @@
-
+import logging
 from typing import Union, Optional
-from lcs import Perception
 
 from lcs.agents.xcs import Configuration, Condition
 
+logger = logging.getLogger(__name__)
 
 class Classifier:
     def __init__(self,
@@ -15,15 +15,16 @@ class Classifier:
             raise TypeError("Configuration should be passed to Classifier")
         if type(condition) != Condition:
             condition = str(condition)
-        self.cfg = cfg
-        self.condition = condition
-        self.action = action
-        self.time_stamp = time_stamp
-        self.experience = 0
-        self.action_set_size = 1
-        self.numerosity = 1
+        self.cfg = cfg                  # cfg
+        self.condition = condition      # current situation
+        self.action = action            # A - int action
+        self.time_stamp = time_stamp    # time - int
+        self.experience = 0             # exp
+        self.action_set_size = 1        # as
+        self.numerosity = 1             # num
         self.prediction, self.error, self.fitness \
             = cfg.initial_classifier_values()
+        # p, Epsilon, f
 
     def does_match(self, situation):
         if len(situation) != len(self):

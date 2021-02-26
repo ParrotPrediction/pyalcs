@@ -1,13 +1,13 @@
 import numpy as np
 import random
-import copy
+import logging
 
 from lcs import TypedList, Perception
 from lcs.agents.xcs import Classifier, Condition, Configuration
 
+logger = logging.getLogger(__name__)
 
 class ClassifiersList(TypedList):
-    # TODO include cfg in the ClassifierList
     def __init__(self,
                  cfg: Configuration,
                  *args,
@@ -87,5 +87,3 @@ class ClassifiersList(TypedList):
     def form_action_set(self, action):
         action_ls = [cl for cl in self if cl.action == action]
         return ClassifiersList(self.cfg, *action_ls)
-
-

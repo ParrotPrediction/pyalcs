@@ -1,8 +1,7 @@
 import numpy as np
-from lcs.strategies.action_selection import EpsilonGreedy
+import logging
 
 
-# TODO: Find if env should be here only in XCS
 class Configuration(object):
     def __init__(self,
                  number_of_actions: int,
