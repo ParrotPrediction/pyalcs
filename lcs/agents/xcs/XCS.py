@@ -70,6 +70,7 @@ class XCS(Agent):
                 prev_reward = reward
                 prev_situation = situation
             time_stamp += 1
+        return TrialMetrics(time_stamp, prev_reward)
 
     def generate_prediction_array(self, match_set: ClassifiersList):
         prediction_array = []
