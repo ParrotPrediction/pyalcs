@@ -22,6 +22,9 @@ class TestCondition:
         assert Condition('1101####') != Condition('1111####')
         assert Condition('00001###') == Condition('00001###')
 
+        assert Condition("11##") == Perception("11##")
+        # str doesn't have items. I assume it is purposeful.
+
     def test_should_hash(self):
         assert hash(Condition('111')) == hash(Condition('111'))
         assert hash(Condition('111')) != hash(Condition('112'))
@@ -32,6 +35,10 @@ class TestCondition:
         assert Condition("11##").subsumes(Perception("11##"))
         assert Condition("11").subsumes(Perception("1111"))
         assert not Condition("1111").subsumes(Perception("10##"))
+
+        assert Condition("11##").subsumes(Condition("11##"))
+        assert Condition("11##").subsumes(Perception("11##"))
+        assert Condition("11##").subsumes("11##")
 
     def test_number_of_wildcards(self):
         assert Condition("1011").wildcard_number() == 0

@@ -39,7 +39,6 @@ class XCS(Agent):
         return self._run_trial_explore(env, trials, current_trial)
 
     # run experiment
-    # TODO: return Trial Metrics
     # TODO: Realize what trials, current_trial do
     # TODO: make it compatible with Open AI environments
     def _run_trial_explore(self, env, trials, current_trial) -> TrialMetrics:
@@ -47,16 +46,22 @@ class XCS(Agent):
         prev_action_set = None
         prev_reward = None
         prev_situation = None
-        time_stamp = 0
-        while not eop:
-            situation = env.to_genotype()
+        time_stamp = 0  # steps
+        done = False  # eop
+
+        raw_state = env.reset()
+        # situation is called state in ACS
+        situation = self.cfg.environment_adapter.to_genotype(raw_state)
+
+        while not done:
             match_set = self.population.form_match_set(situation, time_stamp)
             prediction_array = self.generate_prediction_array(match_set)
             action = self.select_action(prediction_array, match_set)
             action_set = match_set.form_action_set(action)
             # TODO: I am using to_phenotype to determine eop and reward
             # I ma not sure if it is right.
-            reward, eop = env.to_phenotype(action)
+            raw_state, reward, done, _ = env.step(action)
+            situation = self.cfg.environment_adapter.to_genotype(raw_state)
             if len(prev_action_set) > 0:
                 p = prev_reward + self.cfg.gamma * max(prediction_array)
                 self._update_set(prev_action_set, p)

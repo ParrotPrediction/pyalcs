@@ -1,12 +1,15 @@
 import numpy as np
 import logging
 
+from lcs.agents import EnvironmentAdapter
+
 
 class Configuration(object):
     def __init__(self,
                  number_of_actions: int,
                  theta_mna: int,
                  classifier_wildcard: str = '#',
+                 environment_adapter=EnvironmentAdapter,
                  n: int = 200,
                  beta: float = 0.1,
                  alpha: float = 0.1,
@@ -51,6 +54,7 @@ class Configuration(object):
         :param do_action_set_subsumption: specifies if action sets are to be tested for subsuming classifiers
         """
         self.classifier_wildcard = classifier_wildcard
+        self.environment_adapter = environment_adapter
         self.n = n
         self.beta = beta
         self.alpha = alpha
