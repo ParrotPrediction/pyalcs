@@ -3,6 +3,8 @@ Repository containing code implementation for various *Anticipatory Learning Cla
 
 [![Build Status](https://travis-ci.org/ParrotPrediction/pyalcs.svg?branch=master)](https://travis-ci.org/ParrotPrediction/pyalcs) [![Documentation Status](https://readthedocs.org/projects/pyalcs/badge/?version=latest)](https://pyalcs.readthedocs.io/en/latest/?badge=latest)
 
+The main advantage of *Learning Classifier Systems* with respect to other RL techniques it to afford generalization capabilities. This makes it possible to aggregate several situations within a common description so that the representation of the problem gets smaller.
+
 ## Agents
 
 ### ACS
@@ -19,7 +21,7 @@ Added modifications:
 - classifier has an extra property of "immediate reward".
 
 ### YACS
-todo
+- Different heuristics
 
 ### MACS
 todo
