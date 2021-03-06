@@ -42,6 +42,20 @@ class TestCondition:
 
         assert cond.does_match(p0)
 
+    @pytest.mark.parametrize('_c, _eis, _res', [
+        ('####', [0.2, 0.3, 0.5, 0.4], 2),
+        ('##1#', [0.2, 0.3, 0.5, 0.4], 3),
+        ('1###', [0.5, 0.5, 0.5, 0.5], 1),
+        ('1111', [0.2, 0.3, 0.5, 0.4], None),
+    ])
+    def test_should_return_index_to_specialize(self, _c, _eis, _res):
+        cond = Condition(_c)
+        for c, eis in zip(cond, _eis):
+            if hasattr(c, 'eis'):
+                c.eis = eis
+
+        assert cond.feature_to_specialize() == _res
+
     @pytest.mark.parametrize('_init_eis, _res', [
         (0.0, 0.1),
         (0.1, 0.19),

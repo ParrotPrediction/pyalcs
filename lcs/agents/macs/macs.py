@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import random
 from dataclasses import dataclass
-from typing import Union, Optional, List
+from typing import Union, Optional, List, Dict, Generator, Set
 
 from lcs import TypedList, Perception
 from lcs.agents import Agent, ImmutableSequence
@@ -49,6 +49,14 @@ class Condition(ImmutableSequence):
         if type(t) is DontCare:
             t.eis = (1 - beta) * t.eis
 
+    def feature_to_specialize(self) -> Optional[int]:
+        """Returns index of the feature suggested for specialization"""
+        if all(type(c) is not DontCare for c in self):
+            return None
+
+        eis = {idx: c.eis for idx, c in enumerate(self) if type(c) is DontCare}
+        return max(eis, key=eis.get)
+
     def subsumes(self, other) -> bool:
         raise NotImplementedError('MACS has no subsume operator')
 
@@ -67,15 +75,20 @@ class Configuration:
     def __init__(self,
                  classifier_length: int,
                  number_of_possible_actions: int,
+                 feature_possible_values: list,
                  learning_rate: float = 0.1,
                  inaccuracy_threshold: int = 5,
                  accuracy_threshold: int = 5,
+                 oscillation_threshold: int = 5,
                  specified_symbols: int = 1):
+        assert classifier_length == len(feature_possible_values)
         self.classifier_length = classifier_length
         self.number_of_possible_actions = number_of_possible_actions
+        self.feature_possible_values = feature_possible_values
         self.beta = learning_rate
         self.er = inaccuracy_threshold
         self.ea = accuracy_threshold
+        self.eo = oscillation_threshold
         self.specified_symbols = specified_symbols
 
 
@@ -118,6 +131,10 @@ class Classifier:
     def is_inaccurate(self) -> bool:
         return self.g == 0 and self.b == self.cfg.er
 
+    @property
+    def is_oscillating(self) -> bool:
+        return self.g + self.b > self.cfg.eo and self.g * self.b > 0
+
     def does_match(self, situation: Perception) -> bool:
         return self.condition.does_match(situation)
 
@@ -125,7 +142,7 @@ class Classifier:
         return self.effect.does_match(situation)
 
 
-class ClassifiersList(TypedList):
+class ClassifiersList(TypedList[Classifier]):
     def __init__(self, *args, oktypes=(Classifier,)) -> None:
         super().__init__(*args, oktypes=oktypes)
 
@@ -169,23 +186,58 @@ class LatentLearning:
                         else:
                             cl.condition.increase_eis(i, self.cfg.beta)
 
+    def select_accurate(self, pop: ClassifiersList) -> None:
+        for cl in pop:
             if cl.is_inaccurate:
-                population.safe_remove(cl)
+                pop.safe_remove(cl)
+
+    def specialize_conditions(self,
+                              pop: ClassifiersList,
+                              perceptions: Set[Perception]) -> None:
+
+        for cl in [cl for cl in pop if cl.is_oscillating]:
+            feature_idx = cl.condition.feature_to_specialize()
+            for new_cl in self.mutspec(cl, feature_idx):
+                if any(new_cl.does_match(p) for p in perceptions):
+                    pop.append(new_cl)
+
+    def mutspec(self, cl: Classifier, feature_idx: int) -> Generator[Classifier]:
+        assert type(cl.condition[feature_idx]) == DontCare
+        for feature in range(self.cfg.feature_possible_values[feature_idx]):
+            new_c = Condition(cl.condition)
+            new_c[feature_idx] = str(feature)
+
+            yield Classifier(
+                condition=new_c,
+                action=cl.action,
+                effect=Effect(cl.effect),
+                cfg=cl.cfg
+            )
 
 
 class MACS(Agent):
-
     def __init__(self,
                  cfg: Configuration,
-                 population: ClassifiersList = None):
+                 population: ClassifiersList = None,
+                 desirability_values: Dict[Perception, float] = None):
         self.cfg = cfg
         self.population = population or ClassifiersList()
+        self.desirability_values = desirability_values or dict()
 
     def get_population(self):
         return self.population
 
     def get_cfg(self):
         return self.cfg
+
+    def remember_situation(self, p: Perception):
+        assert len(p) == self.cfg.classifier_length
+
+        for f_max, _p in zip(self.cfg.feature_possible_values, p):
+            assert int(_p) in range(0, f_max)
+
+        if p not in self.desirability_values:
+            self.desirability_values[p] = 0.0
 
     def _run_trial_explore(self, env, trials, current_trial) -> TrialMetrics:
         logging.debug("Running trial explore")
@@ -221,3 +273,7 @@ class MACS(Agent):
             steps += 1
 
         return TrialMetrics(steps, last_reward)
+
+if __name__ == '__main__':
+    cfg = Configuration(4, 2, feature_possible_values=[2, 2, 2, 2])
+    agent = MACS(cfg)

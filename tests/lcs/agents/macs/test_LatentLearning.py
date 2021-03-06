@@ -2,7 +2,7 @@ import pytest
 
 from lcs import Perception
 from lcs.agents.macs.macs import Configuration, LatentLearning, \
-    ClassifiersList, Classifier
+    ClassifiersList, Classifier, Effect, Condition
 
 
 class TestLatentLearning:
@@ -14,7 +14,7 @@ class TestLatentLearning:
 
     @pytest.fixture
     def cfg(self):
-        return Configuration(4, 2)
+        return Configuration(4, 2, [2, 2, 2, 2])
 
     @pytest.fixture
     def ll(self, cfg):
@@ -54,21 +54,47 @@ class TestLatentLearning:
         self._assert_gb_metrics(cl3, 1, 0)
         self._assert_gb_metrics(cl4, 0, 0)
 
-    def test_should_suppress_classifier_when_evaluating(
+    def test_should_suppress_inaccurate_classifier(
         self, population, ll, cfg):
         # given
         [cl1, cl2, cl3, cl4] = population
-        cl1.b = 4
+        cl1.b = 5
 
         # when
-        ll.evaluate_classifiers(population, self.P0, self.ACTION, self.P1)
+        ll.select_accurate(population)
 
         # then
         assert len(population) == 3
         assert cl1 not in population
-        self._assert_gb_metrics(cl2, 0, 0)
-        self._assert_gb_metrics(cl3, 1, 0)
-        self._assert_gb_metrics(cl4, 0, 0)
+
+    def test_should_generate_using_mutspec(self, ll, cfg):
+        # given
+        cl = Classifier(condition='####', action=0, effect='???1', cfg=cfg)
+        feature_idx = 0
+
+        # when
+        new_cls = list(ll.mutspec(cl, feature_idx))
+
+        # then
+        assert len(new_cls) == 2
+        assert all(cl.action == 0 for cl in new_cls)
+        assert all(cl.effect == Effect('???1') for cl in new_cls)
+        assert new_cls[0].condition == Condition('0###')
+        assert new_cls[1].condition == Condition('1###')
+
+    def test_should_specialize_conditions(self, population, ll, cfg):
+        # given
+        [cl1, cl2, cl3, cl4] = population
+        cl3.g = 3
+        cl3.b = 3
+        perceptions = {self.P0}
+
+        # when
+        ll.specialize_conditions(population, perceptions)
+
+        # then
+        assert len(population) == 5
+        assert any(cl.condition == Condition('10##') for cl in population)
 
     @staticmethod
     def _assert_gb_metrics(cl: Classifier, ga, ba):

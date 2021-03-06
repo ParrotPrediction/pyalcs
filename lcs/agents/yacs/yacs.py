@@ -227,7 +227,7 @@ class Classifier:
         self.r = (1 - self.cfg.beta) * self.r + self.cfg.beta * env_reward
 
 
-class ClassifiersList(TypedList):
+class ClassifiersList(TypedList[Classifier]):
     def __init__(self, *args, oktypes=(Classifier,)) -> None:
         super().__init__(*args, oktypes=oktypes)
 
@@ -465,8 +465,8 @@ class YACS(Agent):
                  population: ClassifiersList = None,
                  desirability_values: Dict[Perception, float] = None):
         self.cfg = cfg
-        self.desirability_values = desirability_values or dict()
         self.population = population or ClassifiersList()
+        self.desirability_values = desirability_values or dict()
         self.ll = LatentLearning(cfg)
         self.pl = PolicyLearning(cfg)
 
@@ -494,10 +494,6 @@ class YACS(Agent):
         raw_state = env.reset()
 
         state = Perception(raw_state)
-        prev_state = None
-
-        action = None
-        selected_cl = None
 
         done = False
 
