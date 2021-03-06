@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import random
 from dataclasses import dataclass
-from typing import Union, Optional
+from typing import Union, Optional, List
 
 from lcs import TypedList, Perception
 from lcs.agents import Agent, ImmutableSequence
@@ -28,12 +28,26 @@ class Condition(ImmutableSequence):
                observation]
         super().__init__(obs)
 
+    @property
+    def expected_improvements(self) -> List[float]:
+        return [f.eis if type(f) is DontCare else 0.5 for f in self]
+
     def does_match(self, p: Perception) -> bool:
         for ci, oi in zip(self, p):
             if type(ci) is not DontCare and ci != oi:
                 return False
 
         return True
+
+    def increase_eis(self, idx, beta):
+        t = self[idx]
+        if type(t) is DontCare:
+            t.eis = (1 - beta) * t.eis + beta
+
+    def decrease_eis(self, idx, beta):
+        t = self[idx]
+        if type(t) is DontCare:
+            t.eis = (1 - beta) * t.eis
 
     def subsumes(self, other) -> bool:
         raise NotImplementedError('MACS has no subsume operator')
@@ -53,11 +67,13 @@ class Configuration:
     def __init__(self,
                  classifier_length: int,
                  number_of_possible_actions: int,
+                 learning_rate: float = 0.1,
                  inaccuracy_threshold: int = 5,
                  accuracy_threshold: int = 5,
                  specified_symbols: int = 1):
         self.classifier_length = classifier_length
         self.number_of_possible_actions = number_of_possible_actions
+        self.beta = learning_rate
         self.er = inaccuracy_threshold
         self.ea = accuracy_threshold
         self.specified_symbols = specified_symbols
@@ -85,8 +101,18 @@ class Classifier:
         self.condition = build_perception_string(Condition, condition)
         self.action = action
         self.effect = build_perception_string(Effect, effect)
-        self.g = 0  # Number of good anticipations
-        self.b = 0  # Number of bad anticipations
+
+        # Number of good anticipations
+        self.g = 0
+
+        # Situation preceding last anticipation success
+        self.sg: Optional[Perception] = None
+
+        # Number of bad anticipations
+        self.b = 0
+
+        # Situation preceding last anticipation mistake
+        self.sb: Optional[Perception] = None
 
     @property
     def is_inaccurate(self) -> bool:
@@ -113,11 +139,11 @@ class ClassifiersList(TypedList):
 
 
 class LatentLearning:
-    def __init__(self, cfg):
+    def __init__(self, cfg: Configuration):
         self.cfg = cfg
 
-    @staticmethod
-    def evaluate_classifiers(population: ClassifiersList,
+    def evaluate_classifiers(self,
+                             population: ClassifiersList,
                              p0: Perception,
                              action: int,
                              p1: Perception):
@@ -128,8 +154,20 @@ class LatentLearning:
         for cl in action_set:
             if cl.anticipates(p1):
                 cl.g += 1
+                if cl.sb is not None:
+                    for i, (p0i, bpi) in enumerate(zip(p0, cl.sb)):
+                        if p0i == bpi:
+                            cl.condition.decrease_eis(i, self.cfg.beta)
+                        else:
+                            cl.condition.increase_eis(i, self.cfg.beta)
             else:
                 cl.b += 1
+                if cl.sg is not None:
+                    for i, (p0i, gpi) in enumerate(zip(p0, cl.sg)):
+                        if p0i == gpi:
+                            cl.condition.decrease_eis(i, self.cfg.beta)
+                        else:
+                            cl.condition.increase_eis(i, self.cfg.beta)
 
             if cl.is_inaccurate:
                 population.safe_remove(cl)
