@@ -96,6 +96,21 @@ class TestLatentLearning:
         assert len(population) == 5
         assert any(cl.condition == Condition('10##') for cl in population)
 
+    def test_should_update_ig_estimates(self, population, ll, cfg):
+        # given
+        assert all(cl.condition.ig == [0.5, 0.5, 0.5, 0.5] for cl in population)
+
+        # when
+        # cl4 is eligible for generalization
+        ll.evaluate_generalization_estimates(
+            population, self.P0, self.ACTION, self.P1)
+
+        # then
+        [cl1, cl2, cl3, cl4] = population
+        assert all(
+            cl.condition.ig == [0.5, 0.5, 0.5, 0.5] for cl in [cl1, cl2, cl3])
+        assert cl4.condition.ig == [0.55, 0.5, 0.5, 0.5]
+
     @staticmethod
     def _assert_gb_metrics(cl: Classifier, ga, ba):
         assert cl.g == ga

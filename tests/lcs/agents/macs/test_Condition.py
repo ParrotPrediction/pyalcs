@@ -53,35 +53,70 @@ class TestCondition:
 
         assert cond.feature_to_specialize() == _res
 
-    @pytest.mark.parametrize('_init_eis, _res', [
-        (0.0, 0.1),
-        (0.1, 0.19),
-        (0.5, 0.55),
-        (1.0, 1.0),
-    ])
-    def test_should_increase_eis(self, _init_eis, _res, idx=0, beta=0.1):
+    def test_should_generate_generalized_conditions(self):
         # given
-        cond = Condition('####')
-        cond.eis[idx] = _init_eis
+        cond = Condition('##12')
 
         # when
-        cond.increase_eis(idx, beta)
+        new_conds = [c for c, idx in cond.exhaustive_generalization()]
 
         # then
-        assert cond.eis[idx] == _res
+        assert len(new_conds) == 2
+        assert all(c != cond for c in new_conds)
+        assert all(c is not cond for c in new_conds)
+        assert cond == Condition('##12')
+        assert new_conds[0] == Condition('###2')
+        assert new_conds[1] == Condition('##1#')
 
-    @pytest.mark.parametrize('_init_eis, _res', [
-        (0.7, 0.63),
-        (0.3, 0.27),
-        (0, 0),
+    @pytest.mark.parametrize("_cond, _res", [
+        ('####', 0),
+        ('###1', 1),
+        ('2121', 4),
     ])
-    def test_should_decrease_eis(self, _init_eis, _res, idx=0, beta=0.1):
+    def test_should_generate_proper_number_of_new_conditions(self, _cond, _res):
+        cond = Condition(_cond)
+        assert len([c for c in cond.exhaustive_generalization()]) == _res
+
+    @pytest.mark.parametrize('_init, _idx, _param, _res', [
+        (0.0, 0, 'eis', 0.1), (0.0, 1, 'ig', 0.1),
+        (0.1, 0, 'eis', 0.19), (0.1, 1, 'ig', 0.19),
+        (0.5, 0, 'eis', 0.55), (0.5, 1, 'ig', 0.55),
+        (1.0, 0, 'eis', 1.0), (1.0, 1, 'ig', 1.0),
+    ])
+    def test_should_increase_by_widrow_hoff(self, _init, _res, _idx,
+                                            _param, beta=0.1):
         # given
-        cond = Condition('####')
-        cond.eis[idx] = _init_eis
+        cond = Condition('#2#')
 
-        # when
-        cond.decrease_eis(idx, beta)
+        assert _param in ['eis', 'ig']
 
-        # then
-        assert cond.eis[idx] == _res
+        # when & then
+        if _param == 'eis':
+            cond.eis[_idx] = _init
+            cond.increase_eis(_idx, beta)
+            assert cond.eis[_idx] == _res
+        elif _param == 'ig':
+            cond.ig[_idx] = _init
+            cond.increase_ig(_idx, beta)
+            assert cond.ig[_idx] == _res
+
+    @pytest.mark.parametrize('_init, _idx, _param, _res', [
+        (0.7, 0, 'eis', 0.63), (0.7, 1, 'ig', 0.63),
+        (0.3, 0, 'eis', 0.27), (0.3, 1, 'ig', 0.27),
+        (0, 0, 'eis', 0), (0, 1, 'ig', 0)
+    ])
+    def test_should_decrease_by_widrow_hoff(self, _init, _res, _idx,
+                                            _param, beta=0.1):
+        # given
+        cond = Condition('#2##')
+
+        assert _param in ['eis', 'ig']
+
+        if _param == 'eis':
+            cond.eis[_idx] = _init
+            cond.decrease_eis(_idx, beta)
+            assert cond.eis[_idx] == _res
+        elif _param == 'ig':
+            cond.ig[_idx] = _init
+            cond.decrease_ig(_idx, beta)
+            assert cond.ig[_idx] == _res

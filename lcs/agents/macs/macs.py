@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import random
-from typing import Union, Optional, Dict, Generator, Set
+from typing import Union, Optional, Dict, Generator, Set, Tuple
 
 from lcs import TypedList, Perception
 from lcs.agents import Agent, ImmutableSequence
@@ -38,6 +38,18 @@ class Condition(ImmutableSequence):
         else:
             raise ValueError('Trying to modify eis for non wildcard')
 
+    def increase_ig(self, idx, beta):
+        if self[idx] != self.WILDCARD:
+            self.ig[idx] = (1 - beta) * self.ig[idx] + beta
+        else:
+            raise ValueError('Trying to modify ig for a wildcard')
+
+    def decrease_ig(self, idx, beta):
+        if self[idx] != self.WILDCARD:
+            self.ig[idx] = (1 - beta) * self.ig[idx]
+        else:
+            raise ValueError('Trying to modify if for a wildcard')
+
     def feature_to_specialize(self) -> Optional[int]:
         """Returns index of the feature suggested for specialization"""
         if all(c != self.WILDCARD for c in self):
@@ -45,6 +57,16 @@ class Condition(ImmutableSequence):
 
         eis = {idx: self.eis[idx] for idx, c in enumerate(self) if c == self.WILDCARD}
         return max(eis, key=eis.get)
+
+    def exhaustive_generalization(self) -> Generator[Tuple[Condition, int]]:
+        """
+        Generates new condition where each specialized attribute is generalized
+        """
+        spec_idx = [idx for idx, c in enumerate(self) if c != self.WILDCARD]
+        for spec_id in spec_idx:
+            new_obs = list(self._items[:])
+            new_obs[spec_id] = self.WILDCARD
+            yield Condition(new_obs), spec_id
 
     def subsumes(self, other) -> bool:
         raise NotImplementedError('MACS has no subsume operator')
@@ -190,7 +212,8 @@ class LatentLearning:
                 if any(new_cl.does_match(p) for p in perceptions):
                     pop.append(new_cl)
 
-    def mutspec(self, cl: Classifier, feature_idx: int) -> Generator[Classifier]:
+    def mutspec(self, cl: Classifier, feature_idx: int) -> Generator[
+        Classifier]:
         assert cl.condition[feature_idx] == Condition.WILDCARD
         for feature in range(self.cfg.feature_possible_values[feature_idx]):
             new_c = Condition(cl.condition)
@@ -202,6 +225,23 @@ class LatentLearning:
                 effect=Effect(cl.effect),
                 cfg=cl.cfg
             )
+
+    def evaluate_generalization_estimates(self,
+                                          population: ClassifiersList,
+                                          p0: Perception,
+                                          action: int,
+                                          p1: Perception) -> None:
+
+        non_matching = [cl for cl in population if
+                        not cl.does_match(p0) and cl.action == action]
+
+        for cl in non_matching:
+            for new_cond, idx in cl.condition.exhaustive_generalization():
+                if new_cond.does_match(p0):
+                    if cl.effect.does_match(p1):
+                        cl.condition.increase_ig(idx, self.cfg.beta)
+                    else:
+                        cl.condition.decrease_ig(idx, self.cfg.beta)
 
 
 class MACS(Agent):
