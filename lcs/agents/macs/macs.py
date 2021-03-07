@@ -2,59 +2,48 @@ from __future__ import annotations
 
 import logging
 import random
-from dataclasses import dataclass
-from typing import Union, Optional, List, Dict, Generator, Set
+from typing import Union, Optional, Dict, Generator, Set
 
 from lcs import TypedList, Perception
 from lcs.agents import Agent, ImmutableSequence
 from lcs.agents.Agent import TrialMetrics
 
 
-@dataclass
-class DontCare:
-    symbol: str = '#'
-    eis: float = 0.5  # expected improvement by specialization
-
-    def __repr__(self):
-        return self.symbol
-
-
 class Condition(ImmutableSequence):
-    WILDCARD = DontCare()
-    OK_TYPES = (str, DontCare)
-
     def __init__(self, observation):
-        obs = [DontCare() if str(o) == DontCare.symbol else o for o in
-               observation]
-        super().__init__(obs)
+        super().__init__(observation)
 
-    @property
-    def expected_improvements(self) -> List[float]:
-        return [f.eis if type(f) is DontCare else 0.5 for f in self]
+        # expected improvement by specialization
+        self.eis = [0.5] * len(observation)
+
+        # improvements by generalization
+        self.ig = [0.5] * len(observation)
 
     def does_match(self, p: Perception) -> bool:
         for ci, oi in zip(self, p):
-            if type(ci) is not DontCare and ci != oi:
+            if ci != self.WILDCARD and ci != oi:
                 return False
 
         return True
 
     def increase_eis(self, idx, beta):
-        t = self[idx]
-        if type(t) is DontCare:
-            t.eis = (1 - beta) * t.eis + beta
+        if self[idx] == self.WILDCARD:
+            self.eis[idx] = (1 - beta) * self.eis[idx] + beta
+        else:
+            raise ValueError('Trying to modify eis for non wildcard')
 
     def decrease_eis(self, idx, beta):
-        t = self[idx]
-        if type(t) is DontCare:
-            t.eis = (1 - beta) * t.eis
+        if self[idx] == self.WILDCARD:
+            self.eis[idx] = (1 - beta) * self.eis[idx]
+        else:
+            raise ValueError('Trying to modify eis for non wildcard')
 
     def feature_to_specialize(self) -> Optional[int]:
         """Returns index of the feature suggested for specialization"""
-        if all(type(c) is not DontCare for c in self):
+        if all(c != self.WILDCARD for c in self):
             return None
 
-        eis = {idx: c.eis for idx, c in enumerate(self) if type(c) is DontCare}
+        eis = {idx: self.eis[idx] for idx, c in enumerate(self) if c == self.WILDCARD}
         return max(eis, key=eis.get)
 
     def subsumes(self, other) -> bool:
@@ -202,7 +191,7 @@ class LatentLearning:
                     pop.append(new_cl)
 
     def mutspec(self, cl: Classifier, feature_idx: int) -> Generator[Classifier]:
-        assert type(cl.condition[feature_idx]) == DontCare
+        assert cl.condition[feature_idx] == Condition.WILDCARD
         for feature in range(self.cfg.feature_possible_values[feature_idx]):
             new_c = Condition(cl.condition)
             new_c[feature_idx] = str(feature)
@@ -273,6 +262,7 @@ class MACS(Agent):
             steps += 1
 
         return TrialMetrics(steps, last_reward)
+
 
 if __name__ == '__main__':
     cfg = Configuration(4, 2, feature_possible_values=[2, 2, 2, 2])
