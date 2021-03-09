@@ -72,7 +72,7 @@ class Configuration(object):
         self.p_i = p_i
         self.epsilon_i = epsilon_i
         self.f_i = f_i
-        self.p_exp = p_exp
+        self.epsilon = p_exp
         self.theta_mna = theta_mna
         self.do_GA_subsumption = do_ga_subsumption
         self.do_action_set_subsumption = do_action_set_subsumption

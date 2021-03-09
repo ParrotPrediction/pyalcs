@@ -35,10 +35,10 @@ class XCS(Agent):
 
     # TODO: return p_exp to original value
     def _run_trial_exploit(self, env, trials, current_trial) -> TrialMetrics:
-        temp = self.cfg.p_exp
-        self.cfg.p_exp = 0
+        temp = self.cfg.epsilon
+        self.cfg.epsilon = 0
         metrics = self._run_trial_explore(env, trials, current_trial)
-        self.cfg.p_exp = temp
+        self.cfg.epsilon = temp
         return metrics
 
 
@@ -94,7 +94,7 @@ class XCS(Agent):
     # return best(population)
     # Fixed the issue but I want to solve it without changes to EpsilonGreedy.py
     def select_action(self, prediction_array, match_set: ClassifiersList) -> int:
-        if np.random.rand() > self.cfg.p_exp:
+        if np.random.rand() > self.cfg.epsilon:
             return match_set[prediction_array.index(max(prediction_array))].action
         return match_set[np.random.randint(len(match_set))].action
 
