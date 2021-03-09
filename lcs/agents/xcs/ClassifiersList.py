@@ -39,6 +39,7 @@ class ClassifiersList(TypedList):
         return cl
 
     # Roulette-Wheel Deletion
+    # TODO: use/move to strategies
     def delete_from_population(self):
         total_numerosity = sum(cl.numerosity for cl in self)
         if total_numerosity <= self.cfg.n:
@@ -60,7 +61,7 @@ class ClassifiersList(TypedList):
                 self.cfg.delta * average_fitness
             )
             if sufficient_experience and low_fitness:
-                vote *= average_fitness / (self[cl].get_fitness /
+                vote *= average_fitness / (self[cl].get_fitness() /
                                            self[cl].numerosity)
             deletion_votes.append(vote)
             total_votes += vote

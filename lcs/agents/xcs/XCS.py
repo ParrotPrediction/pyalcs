@@ -3,13 +3,12 @@ import numpy as np
 import copy
 from typing import Optional
 
+
 from lcs.agents import Agent
 from lcs.agents.xcs import Configuration, Classifier, ClassifiersList
 from lcs.agents.Agent import TrialMetrics
 from lcs.strategies.action_selection import EpsilonGreedy
 
-# TODO: Find proper object description for reinforcement program
-# TODO: Logger
 
 logger = logging.getLogger(__name__)
 
@@ -29,53 +28,53 @@ class XCS(Agent):
             self.population = ClassifiersList(cfg=cfg)
 
     def get_population(self):
-        return self.cfg
-
-    def get_cfg(self):
         return self.population
 
-    def _run_trial_exploit(self, env, trials, current_trial) -> TrialMetrics:
-        self.cfg.p_exp = 0
-        return self._run_trial_explore(env, trials, current_trial)
+    def get_cfg(self):
+        return self.cfg
 
-    # run experiment
-    # TODO: Realize what trials, current_trial do
-    # TODO: make it compatible with Open AI environments
+    # TODO: return p_exp to original value
+    def _run_trial_exploit(self, env, trials, current_trial) -> TrialMetrics:
+        temp = self.cfg.p_exp
+        self.cfg.p_exp = 0
+        metrics = self._run_trial_explore(env, trials, current_trial)
+        self.cfg.p_exp = temp
+        return metrics
+
+
     def _run_trial_explore(self, env, trials, current_trial) -> TrialMetrics:
-        eop = False
         prev_action_set = None
         prev_reward = None
         prev_situation = None
         time_stamp = 0  # steps
         done = False  # eop
+        reward = None
 
         raw_state = env.reset()
         # situation is called state in ACS
-        situation = self.cfg.environment_adapter.to_genotype(raw_state)
+        state = self.cfg.environment_adapter.to_genotype(raw_state)
 
         while not done:
-            match_set = self.population.form_match_set(situation, time_stamp)
+            match_set = self.population.form_match_set(state, time_stamp)
             prediction_array = self.generate_prediction_array(match_set)
             action = self.select_action(prediction_array, match_set)
             action_set = match_set.form_action_set(action)
-            # TODO: I am using to_phenotype to determine eop and reward
-            # I ma not sure if it is right.
             raw_state, reward, done, _ = env.step(action)
-            situation = self.cfg.environment_adapter.to_genotype(raw_state)
-            if len(prev_action_set) > 0:
+            state = self.cfg.environment_adapter.to_genotype(raw_state)
+            if prev_action_set is not None and len(prev_action_set) > 0:
                 p = prev_reward + self.cfg.gamma * max(prediction_array)
                 self._update_set(prev_action_set, p)
-                self.run_ga(prev_action_set, prev_situation)
-            if eop:
+                self.run_ga(prev_action_set, prev_situation, time_stamp)
+            if done:
                 p = reward
                 self._update_set(prev_action_set, p)
-                self.run_ga(action_set, situation)
+                self.run_ga(action_set, state, time_stamp)
             else:
                 prev_action_set = action_set
                 prev_reward = reward
-                prev_situation = situation
+                prev_situation = state
             time_stamp += 1
-        return TrialMetrics(time_stamp, prev_reward)
+        return TrialMetrics(time_stamp, reward)
 
     def generate_prediction_array(self, match_set: ClassifiersList):
         prediction_array = []
@@ -100,23 +99,24 @@ class XCS(Agent):
         return match_set[np.random.randint(len(match_set))].action
 
     def _update_set(self, action_set: ClassifiersList, p):
-        for cl in action_set:
-            cl.experience += 1
-            action_set_numerosity = sum(cl.numerosity for cl in action_set)
-            # update prediction, prediction error, action set size estimate
-            if cl.experience < 1/self.cfg.beta:
-                cl.prediction += (p - cl.prediction) / cl.experience
-                cl.error += (abs(p - cl.prediction) - cl.error) / cl.experience
-                cl.action_set_size +=\
-                    (action_set_numerosity - cl.action_set_size) / cl.experience
-            else:
-                cl.prediction += self.cfg.beta * (p - cl.prediction)
-                cl.error += self.cfg.beta * (abs(p - cl.prediction) - cl.error)
-                cl.action_set_size += \
-                    self.cfg.beta * (action_set_numerosity - cl.action_set_size)
-        self.update_fitness(action_set)
-        if self.cfg.do_action_set_subsumption:
-            self.do_action_set_subsumption(action_set)
+        if action_set is not None and len(action_set) > 0:
+            for cl in action_set:
+                cl.experience += 1
+                action_set_numerosity = sum(cl.numerosity for cl in action_set)
+                # update prediction, prediction error, action set size estimate
+                if cl.experience < 1/self.cfg.beta:
+                    cl.prediction += (p - cl.prediction) / cl.experience
+                    cl.error += (abs(p - cl.prediction) - cl.error) / cl.experience
+                    cl.action_set_size +=\
+                        (action_set_numerosity - cl.action_set_size) / cl.experience
+                else:
+                    cl.prediction += self.cfg.beta * (p - cl.prediction)
+                    cl.error += self.cfg.beta * (abs(p - cl.prediction) - cl.error)
+                    cl.action_set_size += \
+                        self.cfg.beta * (action_set_numerosity - cl.action_set_size)
+            self.update_fitness(action_set)
+            if self.cfg.do_action_set_subsumption:
+                self.do_action_set_subsumption(action_set)
 
     def update_fitness(self, action_set: ClassifiersList):
         accuracy_sum = 0
@@ -216,4 +216,4 @@ class XCS(Agent):
                     child.condition[i] = child.condition.WILDCARD
             i += 1
         if np.random.rand() < self.cfg.mu:
-            child.action = np.random.randint(self.cfg.number_of_actions)
+            child.action = np.random.randint(self.cfg.theta_mna)

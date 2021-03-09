@@ -1,12 +1,11 @@
 import numpy as np
-import logging
+from typing import Callable
 
 from lcs.agents import EnvironmentAdapter
 
 
 class Configuration(object):
     def __init__(self,
-                 number_of_actions: int,
                  theta_mna: int,
                  classifier_wildcard: str = '#',
                  environment_adapter=EnvironmentAdapter,
@@ -28,7 +27,9 @@ class Configuration(object):
                  f_i: float = float(np.finfo(np.float32).tiny),
                  p_exp: float = 0.5,
                  do_ga_subsumption: bool = False,
-                 do_action_set_subsumption: bool = False
+                 do_action_set_subsumption: bool = False,
+                 metrics_trial_frequency: int = 5,
+                 user_metrics_collector_fcn: Callable = None
                  ) -> None:
         """
         :param classifier_wildcard: Wildcard symbol
@@ -75,7 +76,9 @@ class Configuration(object):
         self.theta_mna = theta_mna
         self.do_GA_subsumption = do_ga_subsumption
         self.do_action_set_subsumption = do_action_set_subsumption
-        self.number_of_actions = number_of_actions
+
+        self.metrics_trial_frequency = metrics_trial_frequency
+        self.user_metrics_collector_fcn = user_metrics_collector_fcn
 
     def __str__(self) -> str:
         return str(vars(self))

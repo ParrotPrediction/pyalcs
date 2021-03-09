@@ -26,6 +26,9 @@ class Classifier:
             = cfg.initial_classifier_values()
         # p, Epsilon, f
 
+    def get_fitness(self):
+        return self.fitness
+
     def does_match(self, situation):
         if len(situation) != len(self):
             return False
@@ -60,3 +63,7 @@ class Classifier:
 
     def __len__(self):
         return len(self.condition)
+
+    def __str__(self):
+        return f"{self.condition} - {self.action} - {self.numerosity} " + \
+            f"[fit: {self.fitness:.3f}, exp: {self.experience:.2f}"
