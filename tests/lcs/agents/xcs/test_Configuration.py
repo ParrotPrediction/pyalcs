@@ -10,7 +10,7 @@ class TestConfiguration:
 
     @pytest.fixture
     def cfg(self):
-        return Configuration(4, 4)
+        return Configuration(theta_mna=4)
 
     def test_minimum(self, cfg):
         assert float(np.finfo(np.float32).tiny) == cfg.p_i

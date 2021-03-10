@@ -66,5 +66,5 @@ class Classifier:
         return len(self.condition)
 
     def __str__(self):
-        return f"{self.condition} - {self.action} - {self.numerosity} " + \
-            f"[fit: {self.fitness:.3f}, exp: {self.experience:.2f}]"
+        return f"Cond:{self.condition} - Act:{self.action} - Num:{self.numerosity} " + \
+            f"[fit: {self.fitness:.3f}, exp: {self.experience:.2f}, pred: {self.prediction:3f}]"

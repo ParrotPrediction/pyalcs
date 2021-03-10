@@ -1,6 +1,6 @@
 import logging
 import numpy as np
-import copy
+from copy import copy
 from typing import Optional
 
 
@@ -33,14 +33,12 @@ class XCS(Agent):
     def get_cfg(self):
         return self.cfg
 
-    # TODO: return p_exp to original value
     def _run_trial_exploit(self, env, trials, current_trial) -> TrialMetrics:
         temp = self.cfg.epsilon
         self.cfg.epsilon = 0
         metrics = self._run_trial_explore(env, trials, current_trial)
         self.cfg.epsilon = temp
         return metrics
-
 
     def _run_trial_explore(self, env, trials, current_trial) -> TrialMetrics:
         logger.debug("** Running trial explore ** ")
@@ -52,7 +50,6 @@ class XCS(Agent):
         reward = None
 
         raw_state = env.reset()
-        # situation is called state in ACS
         state = self.cfg.environment_adapter.to_genotype(raw_state)
 
         while not done:
@@ -64,16 +61,16 @@ class XCS(Agent):
             state = self.cfg.environment_adapter.to_genotype(raw_state)
             if prev_action_set is not None and len(prev_action_set) > 0:
                 p = prev_reward + self.cfg.gamma * max(prediction_array)
-                self._update_set(prev_action_set, p)
+                self.update_set(prev_action_set, p)
                 self.run_ga(prev_action_set, prev_situation, time_stamp)
             if done:
                 p = reward
-                self._update_set(prev_action_set, p)
+                self.update_set(prev_action_set, p)
                 self.run_ga(action_set, state, time_stamp)
             else:
-                prev_action_set = action_set
-                prev_reward = reward
-                prev_situation = state
+                prev_action_set = copy(action_set)
+                prev_reward = copy(reward)
+                prev_situation = copy(state)
             time_stamp += 1
         return TrialMetrics(time_stamp, reward)
 
@@ -97,9 +94,11 @@ class XCS(Agent):
     def select_action(self, prediction_array, match_set: ClassifiersList) -> int:
         if np.random.rand() > self.cfg.epsilon:
             return match_set[prediction_array.index(max(prediction_array))].action
-        return match_set[np.random.randint(len(match_set))].action
+        # return match_set[np.random.randint(len(match_set))].action
+        # The previous method is not random enough, fails to explore
+        return np.random.randint(self.cfg.theta_mna)
 
-    def _update_set(self, action_set: ClassifiersList, p):
+    def update_set(self, action_set: ClassifiersList, p):
         if action_set is not None and len(action_set) > 0:
             for cl in action_set:
                 cl.experience += 1
@@ -157,8 +156,8 @@ class XCS(Agent):
             # select children
             parent1 = self.select_offspring(action_set)
             parent2 = self.select_offspring(action_set)
-            child1 = copy.copy(parent1)
-            child2 = copy.copy(parent2)
+            child1 = copy(parent1)
+            child2 = copy(parent2)
             child1.numerosity = 1
             child2.numerosity = 1
             child1.experience = 0

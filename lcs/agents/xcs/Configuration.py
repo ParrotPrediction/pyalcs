@@ -6,7 +6,7 @@ from lcs.agents import EnvironmentAdapter
 
 class Configuration(object):
     def __init__(self,
-                 theta_mna: int,
+                 theta_mna: int,  # it is actually smart to make it equal to number of actions
                  classifier_wildcard: str = '#',
                  environment_adapter=EnvironmentAdapter,
                  n: int = 200,

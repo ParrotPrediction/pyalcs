@@ -7,6 +7,7 @@ from lcs.agents.xcs import Classifier, Condition, Configuration
 
 logger = logging.getLogger(__name__)
 
+
 class ClassifiersList(TypedList):
     def __init__(self,
                  cfg: Configuration,
@@ -39,7 +40,7 @@ class ClassifiersList(TypedList):
         return cl
 
     # Roulette-Wheel Deletion
-    # TODO: use/move to strategies
+    # TODO: use strategies
     def delete_from_population(self):
         total_numerosity = self.numerosity()
         if total_numerosity <= self.cfg.n:
@@ -79,7 +80,11 @@ class ClassifiersList(TypedList):
     def form_match_set(self, situation: Perception,  time_stamp):
         matching_ls = [cl for cl in self if cl.does_match(situation)]
         while len(matching_ls) < self.cfg.theta_mna:
-            cl = self.generate_covering_classifier(situation, 1, time_stamp)
+            action = 0
+            for a in range(0, self.cfg.theta_mna):
+                if all(cl.action != a for cl in matching_ls):
+                    action = a
+            cl = self.generate_covering_classifier(situation, action, time_stamp)
             self.insert_in_population(cl)
             self.delete_from_population()
             matching_ls.append(cl)

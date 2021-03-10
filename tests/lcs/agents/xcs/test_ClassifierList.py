@@ -9,7 +9,7 @@ class TestClassifiersList:
 
     @pytest.fixture
     def cfg(self):
-        return Configuration(4, 4)
+        return Configuration(theta_mna=4)
 
     def test_init(self, cfg):
         assert len(ClassifiersList(cfg)) == 0
@@ -57,7 +57,8 @@ class TestClassifiersList:
         classifiers_list.insert_in_population(Classifier(cfg, Condition("1111"), 0, 0))
         classifiers_list.insert_in_population(Classifier(cfg, Condition("1111"), 1, 0))
         assert len(classifiers_list.form_match_set(Perception("1100"), 1)) == 4
-        assert len(classifiers_list.form_match_set(Perception("1110"), 1)) == 4
+        match_set = classifiers_list.form_match_set(Perception("1111"), 1)
+        assert len(match_set) == 4
 
     def test_action_set(self, cfg):
         classifiers_list = ClassifiersList(cfg)

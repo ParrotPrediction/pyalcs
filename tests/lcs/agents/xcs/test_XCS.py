@@ -13,7 +13,7 @@ class TestXCS:
 
     @pytest.fixture
     def cfg(self, number_of_actions):
-        return Configuration(number_of_actions, 4, do_action_set_subsumption=False)
+        return Configuration(theta_mna=number_of_actions, do_action_set_subsumption=False)
 
     @pytest.fixture
     def xcs(self, cfg):
@@ -134,12 +134,12 @@ class TestXCS:
         action_set = xcs.population.form_action_set(0)
         cl = copy.copy(action_set[0])
         cfg.beta = 1
-        xcs._update_set(action_set, 0.2)
+        xcs.update_set(action_set, 0.2)
         assert classifiers_list[0].experience > 0
         assert classifiers_list[0].prediction != cl.prediction
         assert classifiers_list[0].error != cl.error
         cfg.beta = 0.000000001
         cl = copy.copy(action_set[0])
-        xcs._update_set(action_set, 0.2)
+        xcs.update_set(action_set, 0.2)
         assert classifiers_list[0].experience > 1
 

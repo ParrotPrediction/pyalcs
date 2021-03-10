@@ -9,7 +9,7 @@ class TestClassifier:
 
     @pytest.fixture
     def cfg(self):
-        return Configuration(4, 4)
+        return Configuration(theta_mna=4)
 
     def test_classifier_default(self, cfg):
         cl = Classifier(cfg,
