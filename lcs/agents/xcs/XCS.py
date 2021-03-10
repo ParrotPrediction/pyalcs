@@ -43,6 +43,7 @@ class XCS(Agent):
 
 
     def _run_trial_explore(self, env, trials, current_trial) -> TrialMetrics:
+        logger.debug("** Running trial explore ** ")
         prev_action_set = None
         prev_reward = None
         prev_situation = None
@@ -146,16 +147,23 @@ class XCS(Agent):
                     self.population.safe_remove(c)
 
     def run_ga(self, action_set, situation, time_stamp):
+        if action_set is None or len(action_set) < 0:
+            return None
+
         if time_stamp - sum(cl.time_stamp * cl.numerosity for cl in action_set) / \
                 sum(cl.numerosity for cl in action_set) > self.cfg.theta_GA:
-            for i in enumerate(action_set):
-                action_set[i].time_stamp = time_stamp
+            for cl in action_set:
+                cl.time_stamp = time_stamp
+            # select children
             parent1 = self.select_offspring(action_set)
             parent2 = self.select_offspring(action_set)
             child1 = copy.copy(parent1)
             child2 = copy.copy(parent2)
-            child1.numerosity = child2.numerosity + 1
-            child1.experience = child2.experience + 1
+            child1.numerosity = 1
+            child2.numerosity = 1
+            child1.experience = 0
+            child2.experience = 0
+            # apply crossover
             if np.random.rand() < self.cfg.chi:
                 self.apply_crossover(child1, child2)
                 child1.prediction = (parent1.prediction + parent2.prediction) / 2
@@ -163,9 +171,11 @@ class XCS(Agent):
                 child1.fitness = (parent1.fitness + parent2.fitness) / 2
                 child2.prediction = child1.prediction
                 child2.error = child1.error
-                child2.fitness = child2.fitness
+                child2.fitness = child1.fitness
+            # apply mutation on both children
             self.apply_mutation(child1, situation)
             self.apply_mutation(child2, situation)
+            # apply subsumption or just insert into population
             if self.cfg.do_GA_subsumption:
                 if parent1.does_subsume(child1):
                     parent1.numerosity += 1
@@ -182,6 +192,10 @@ class XCS(Agent):
                 else:
                     self.population.insert_in_population(child2)
                 self.population.delete_from_population()
+            else:
+                self.population.insert_in_population(child1)
+                self.population.insert_in_population(child2)
+            self.population.delete_from_population()
 
     def select_offspring(self, action_set: ClassifiersList) -> Classifier:
         fitness_sum = 0

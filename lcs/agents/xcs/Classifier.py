@@ -5,6 +5,7 @@ from lcs.agents.xcs import Configuration, Condition
 
 logger = logging.getLogger(__name__)
 
+
 class Classifier:
     def __init__(self,
                  cfg: Optional[Configuration] = None,
@@ -66,4 +67,4 @@ class Classifier:
 
     def __str__(self):
         return f"{self.condition} - {self.action} - {self.numerosity} " + \
-            f"[fit: {self.fitness:.3f}, exp: {self.experience:.2f}"
+            f"[fit: {self.fitness:.3f}, exp: {self.experience:.2f}]"

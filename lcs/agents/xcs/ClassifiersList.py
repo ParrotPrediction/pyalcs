@@ -41,7 +41,7 @@ class ClassifiersList(TypedList):
     # Roulette-Wheel Deletion
     # TODO: use/move to strategies
     def delete_from_population(self):
-        total_numerosity = sum(cl.numerosity for cl in self)
+        total_numerosity = self.numerosity()
         if total_numerosity <= self.cfg.n:
             return None
 
@@ -88,3 +88,6 @@ class ClassifiersList(TypedList):
     def form_action_set(self, action):
         action_ls = [cl for cl in self if cl.action == action]
         return ClassifiersList(self.cfg, *action_ls)
+
+    def numerosity(self):
+        return sum(cl.numerosity for cl in self)

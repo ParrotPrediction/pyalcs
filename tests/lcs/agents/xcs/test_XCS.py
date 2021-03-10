@@ -70,13 +70,14 @@ class TestXCS:
 
     def test_mutation(self, cfg):
         cfg.mu = 0
-        cl = Classifier(cfg, Condition("1111"), 0, 0)
+        cl = Classifier(cfg, Condition("####"), 0, 0)
         xcs = XCS(cfg)
-        xcs.apply_mutation(cl, Perception("0000"))
+        xcs.apply_mutation(cl, Perception("1111"))
         assert cl == Classifier(cfg, Condition("1111"), 0, 0)
-        cfg.mu = 2
-        xcs.apply_mutation(cl, Perception("0000"))
-        assert cl != Classifier(cfg, Condition("1111"), 0, 0)
+        cfg.mu = 1
+        cl = Classifier(cfg, Condition("1111"), 0, 0)
+        xcs.apply_mutation(cl, Perception("1111"))
+        assert cl.is_more_general(Classifier(cfg, Condition("1111"), 0, 0))
 
     # only tests for errors and types
     def test_crossover(self, cfg):
@@ -89,13 +90,33 @@ class TestXCS:
     def test_run_GA(self, cfg):
         cfg.do_GA_subsumption = True
         classifiers_list = ClassifiersList(cfg)
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 0, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 1, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 2, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 3, 0))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition("1111"), 0, 0))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition("1111"), 1, 0))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition("1111"), 2, 0))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition("1111"), 3, 0))
         xcs = XCS(cfg, classifiers_list)
         action_set = xcs.population.form_action_set(0)
-        xcs.run_ga(action_set, Perception("0000"), 1)
+
+        cfg.chi = 0  # do perform crossover
+        cfg.do_GA_subsumption = False  # do not perform subsumption
+        xcs.run_ga(action_set, Perception("0000"), 100000)
+        assert xcs.population[0].time_stamp != 0
+        assert xcs.population.numerosity() > 4
+
+        classifiers_list = ClassifiersList(cfg)
+        classifiers_list.insert_in_population(Classifier(cfg, Condition("1111"), 0, 0))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition("1111"), 1, 0))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition("1111"), 2, 0))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition("1111"), 3, 0))
+        xcs = XCS(cfg, classifiers_list)
+        action_set = xcs.population.form_action_set(0)
+
+        cfg.chi = 0  # do perform crossover
+        cfg.do_GA_subsumption = True  # do not perform subsumption
+        xcs.run_ga(action_set, Perception("0000"), 100000)
+        assert xcs.population[0].time_stamp != 0
+        assert xcs.population.numerosity() > 4
+
 
     # only tests for errors and types
     def test_do_action_set_subsumption(self, xcs):

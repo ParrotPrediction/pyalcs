@@ -25,7 +25,7 @@ class Configuration(object):
                  p_i: float = float(np.finfo(np.float32).tiny),
                  epsilon_i: float = float(np.finfo(np.float32).tiny),
                  f_i: float = float(np.finfo(np.float32).tiny),
-                 p_exp: float = 0.5,
+                 epsilon: float = 0.5,
                  do_ga_subsumption: bool = False,
                  do_action_set_subsumption: bool = False,
                  metrics_trial_frequency: int = 5,
@@ -49,7 +49,7 @@ class Configuration(object):
         :param p_i: used as initial value for new classifiers - prediction
         :param epsilon_i: used as initial value for new classifiers - error
         :param f_i: used as initial value for new classifiers - fitness
-        :param p_exp: probability of choosing action uniform randomly
+        :param epsilon: probability of choosing action uniform randomly
         :param theta_mna: minimal number of actions in match_set
         :param do_ga_subsumption: specifies if offspring are to be tested for logical subsumption
         :param do_action_set_subsumption: specifies if action sets are to be tested for subsuming classifiers
@@ -72,7 +72,7 @@ class Configuration(object):
         self.p_i = p_i
         self.epsilon_i = epsilon_i
         self.f_i = f_i
-        self.epsilon = p_exp
+        self.epsilon = epsilon  # p_exp
         self.theta_mna = theta_mna
         self.do_GA_subsumption = do_ga_subsumption
         self.do_action_set_subsumption = do_action_set_subsumption
