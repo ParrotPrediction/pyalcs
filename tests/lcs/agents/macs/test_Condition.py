@@ -53,6 +53,18 @@ class TestCondition:
 
         assert cond.feature_to_specialize() == _res
 
+    @pytest.mark.parametrize('_c, _ig, _res', [
+        ('####', [0.2, 0.3, 0.5, 0.4], None),
+        ('##1#', [0.2, 0.3, 0.5, 0.4], 2),
+        ('1#1#', [0.5, 0.5, 0.6, 0.5], 2),
+        ('1111', [0.2, 0.3, 0.5, 0.4], 2),
+    ])
+    def test_should_return_index_to_generalized(self, _c, _ig, _res):
+        cond = Condition(_c)
+        cond.ig = _ig
+
+        assert cond.feature_to_generalize() == _res
+
     def test_should_generate_generalized_conditions(self):
         # given
         cond = Condition('##12')

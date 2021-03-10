@@ -102,7 +102,7 @@ class TestLatentLearning:
 
         # when
         # cl4 is eligible for generalization
-        ll.evaluate_generalization_estimates(
+        ll.generalize_conditions(
             population, self.P0, self.ACTION, self.P1)
 
         # then

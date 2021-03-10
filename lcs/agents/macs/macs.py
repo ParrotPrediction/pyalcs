@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+import itertools
 import logging
 import random
-from typing import Union, Optional, Dict, Generator, Set, Tuple
+from itertools import groupby
+from operator import attrgetter
+from typing import Union, Optional, Dict, Generator, Set, Tuple, List, \
+    NamedTuple
 
 from lcs import TypedList, Perception
 from lcs.agents import Agent, ImmutableSequence
@@ -58,6 +62,14 @@ class Condition(ImmutableSequence):
         eis = {idx: self.eis[idx] for idx, c in enumerate(self) if c == self.WILDCARD}
         return max(eis, key=eis.get)
 
+    def feature_to_generalize(self) -> Optional[int]:
+        """Returns index of the feature suggested for generalization"""
+        if all(c == self.WILDCARD for c in self):
+            return None
+
+        igs = {idx: self.ig[idx] for idx, c in enumerate(self) if c != self.WILDCARD}
+        return max(igs, key=igs.get)
+
     def exhaustive_generalization(self) -> Generator[Tuple[Condition, int]]:
         """
         Generates new condition where each specialized attribute is generalized
@@ -74,6 +86,17 @@ class Condition(ImmutableSequence):
 
 class Effect(ImmutableSequence):
     WILDCARD = '?'  # don't know symbol - matches any value
+
+    def __lt__(self, other: Effect):
+        return self._items < other._items
+
+    def conflicts(self, other: Effect) -> bool:
+        """Other classifier has different value for the same attribute"""
+        for si, oi in zip(self, other):
+            if si != self.WILDCARD and oi != self.WILDCARD and si != oi:
+                return True
+
+        return False
 
     def does_match(self, p: Perception) -> bool:
         return all(ei == pi for ei, pi in zip(self, p) if ei != self.WILDCARD)
@@ -139,8 +162,12 @@ class Classifier:
         self.sb: Optional[Perception] = None
 
     @property
+    def is_accurate(self) -> bool:
+        return self.b == 0 and self.g >= self.cfg.ea
+
+    @property
     def is_inaccurate(self) -> bool:
-        return self.g == 0 and self.b == self.cfg.er
+        return self.g == 0 and self.b >= self.cfg.er
 
     @property
     def is_oscillating(self) -> bool:
@@ -226,22 +253,64 @@ class LatentLearning:
                 cfg=cl.cfg
             )
 
-    def evaluate_generalization_estimates(self,
-                                          population: ClassifiersList,
-                                          p0: Perception,
-                                          action: int,
-                                          p1: Perception) -> None:
+    def generalize_conditions(self,
+                              population: ClassifiersList,
+                              obs_situations: List[Perception],
+                              p0: Perception,
+                              action: int,
+                              p1: Perception) -> None:
 
         non_matching = [cl for cl in population if
                         not cl.does_match(p0) and cl.action == action]
+
+        set_a = []  # potentially matching
 
         for cl in non_matching:
             for new_cond, idx in cl.condition.exhaustive_generalization():
                 if new_cond.does_match(p0):
                     if cl.effect.does_match(p1):
                         cl.condition.increase_ig(idx, self.cfg.beta)
+                        set_a.append(cl)
                     else:
                         cl.condition.decrease_ig(idx, self.cfg.beta)
+
+        set_c: List[ChildClassifier] = []  # general set of classifiers
+        ChildClassifier = NamedTuple('ChildClassifier',
+                                     [('classifier', Classifier),
+                                      ('parent', Optional[Classifier])])
+
+        # Sort classifiers by effect for grouping
+        set_a.sort(key=attrgetter("effect"))
+        for _, set_b in groupby(set_a, key=attrgetter("effect")):
+            if all(cl.is_accurate for cl in set_b):
+                # Build [C] only when all classifiers from [B] are accurate
+                for cl in set_b:
+                    if all(c.ig < 0.5 for c in cl.condition):
+                        set_c.append(ChildClassifier(cl, None))
+                    else:
+                        spec_cond_idx = cl.condition.feature_to_generalize()
+                        assert spec_cond_idx is not None
+
+                        new_cond = Condition(cl.condition)
+                        new_cond[spec_cond_idx] = Condition.WILDCARD
+                        new_cl = Classifier(condition=new_cond, action=cl.action, effect=cl.effect, cfg=cl.cfg)
+
+                        set_c.append(ChildClassifier(new_cl, cl))
+
+        # Check conflicts in [C]
+        set_d: List[Classifier] = []  # conflicts
+        for p in obs_situations:
+            for existing_cl in [cl for cl in population if cl.does_match(p) and cl.action == action]:
+                for new_cl in [cl for cl in set_c if cl.classifier.does_match(p) and cl.classifier.action == action]:
+                    if existing_cl.effect.conflicts(new_cl.classifier.effect):
+                        if new_cl.parent is not None:
+                            set_d.append(new_cl.parent)
+                        else:
+                            set_d.append(new_cl.classifier)
+
+        # Analyze every possible pair of [D] for duplicates
+        for (c1, c2) in itertools.combinations(set_d, 2):
+            pass
 
 
 class MACS(Agent):
