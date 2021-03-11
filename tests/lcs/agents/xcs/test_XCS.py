@@ -65,8 +65,8 @@ class TestXCS:
         xcs = XCS(cfg, classifiers_list)
         action_set = xcs.population.form_action_set(0)
         xcs.update_fitness(action_set)
-        assert xcs.population[0].fitness != cfg.f_i
-        assert classifiers_list[0].fitness != cfg.f_i
+        assert xcs.population[0].fitness != cfg.initial_fitness
+        assert classifiers_list[0].fitness != cfg.initial_fitness
 
     def test_mutation(self, cfg):
         cfg.mu = 0
