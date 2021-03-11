@@ -44,7 +44,7 @@ class ClassifiersList(TypedList):
     # TODO: use strategies
     def delete_from_population(self):
         total_numerosity = self.numerosity()
-        if total_numerosity <= self.cfg.n:
+        if total_numerosity <= self.cfg.max_population:
             return None
 
         total_fitness = sum(cl.fitness for cl in self)
@@ -56,7 +56,7 @@ class ClassifiersList(TypedList):
         for cl in range(len(self)):
             vote = self[cl].action_set_size * self[cl].numerosity
             sufficient_experience = (
-                self[cl].experience > self.cfg.theta_del
+                self[cl].experience > self.cfg.deletion_threshold
             )
             low_fitness = (
                 self[cl].fitness / self[cl].numerosity <
@@ -80,9 +80,9 @@ class ClassifiersList(TypedList):
 
     def form_match_set(self, situation: Perception,  time_stamp):
         matching_ls = [cl for cl in self if cl.does_match(situation)]
-        while len(matching_ls) < self.cfg.theta_mna:
+        while len(matching_ls) < self.cfg.number_of_actions:
             action = 0
-            for a in range(0, self.cfg.theta_mna):
+            for a in range(0, self.cfg.number_of_actions):
                 if all(cl.action != a for cl in matching_ls):
                     action = a
             cl = self.generate_covering_classifier(situation, action, time_stamp)
@@ -98,5 +98,7 @@ class ClassifiersList(TypedList):
     def numerosity(self):
         return sum(cl.numerosity for cl in self)
 
+    # it is my creation, it very likely is wrong
+    # reasoning: fitness is used as prediction weight in prediction array
     def best_prediction(self):
         return max(cl.prediction * cl.fitness for cl in self)

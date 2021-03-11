@@ -13,7 +13,7 @@ class TestXCS:
 
     @pytest.fixture
     def cfg(self, number_of_actions):
-        return Configuration(theta_mna=number_of_actions, do_action_set_subsumption=False)
+        return Configuration(number_of_actions=number_of_actions, do_action_set_subsumption=False)
 
     @pytest.fixture
     def xcs(self, cfg):

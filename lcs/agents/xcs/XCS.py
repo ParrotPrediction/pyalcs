@@ -26,7 +26,7 @@ class XCS(Agent):
             self.population = population
         else:
             self.population = ClassifiersList(cfg=cfg)
-        self.act_reward = [0 for _ in range(cfg.theta_mna)]
+        self.act_reward = [0 for _ in range(cfg.number_of_actions)]
 
     def get_population(self):
         return self.population
@@ -42,7 +42,6 @@ class XCS(Agent):
         return metrics
 
     def _run_trial_explore(self, env, trials, current_trial) -> TrialMetrics:
-        logger.debug("** Running trial explore ** ")
         prev_action_set = None
         prev_reward = None
         prev_situation = None
@@ -64,7 +63,7 @@ class XCS(Agent):
             state = self.cfg.environment_adapter.to_genotype(raw_state)
             reward = simple_q_learning(self.act_reward[action],
                                        step_reward,
-                                       self.cfg.beta,
+                                       self.cfg.learning_rate,
                                        self.cfg.gamma,
                                        match_set.best_prediction())
 
@@ -106,7 +105,7 @@ class XCS(Agent):
     def select_action(self, prediction_array, match_set: ClassifiersList) -> int:
         if np.random.rand() > self.cfg.epsilon:
             return match_set[prediction_array.index(max(prediction_array))].action
-        return np.random.randint(self.cfg.theta_mna)
+        return np.random.randint(self.cfg.number_of_actions)
 
     def update_set(self, action_set: ClassifiersList, p):
         if action_set is not None and len(action_set) > 0:
@@ -114,33 +113,32 @@ class XCS(Agent):
                 cl.experience += 1
                 action_set_numerosity = sum(cl.numerosity for cl in action_set)
                 # update prediction, prediction error, action set size estimate
-                if cl.experience < 1/self.cfg.beta:
+                if cl.experience < 1/self.cfg.learning_rate:
                     cl.prediction += (p - cl.prediction) / cl.experience
                     cl.error += (abs(p - cl.prediction) - cl.error) / cl.experience
                     cl.action_set_size +=\
                         (action_set_numerosity - cl.action_set_size) / cl.experience
                 else:
-                    cl.prediction += self.cfg.beta * (p - cl.prediction)
-                    cl.error += self.cfg.beta * (abs(p - cl.prediction) - cl.error)
+                    cl.prediction += self.cfg.learning_rate * (p - cl.prediction)
+                    cl.error += self.cfg.learning_rate * (abs(p - cl.prediction) - cl.error)
                     cl.action_set_size += \
-                        self.cfg.beta * (action_set_numerosity - cl.action_set_size)
+                        self.cfg.learning_rate * (action_set_numerosity - cl.action_set_size)
             self.update_fitness(action_set)
             if self.cfg.do_action_set_subsumption:
                 self.do_action_set_subsumption(action_set)
 
     def update_fitness(self, action_set: ClassifiersList):
         accuracy_sum = 0
-        # It literally is called that in paper
         accuracy_vector_k = []
         for cl in action_set:
-            if cl.error < self.cfg.epsilon_i:
+            if cl.error < self.cfg.initial_error:
                 tmp_acc = 1
             else:
-                tmp_acc = self.cfg.alpha * pow(cl.error * self.cfg.epsilon_i, self.cfg.v)
+                tmp_acc = self.cfg.alpha * pow(cl.error * self.cfg.initial_error, self.cfg.v)
             accuracy_vector_k.append(tmp_acc)
             accuracy_sum += tmp_acc + cl.numerosity
         for cl, k in zip(action_set, accuracy_vector_k):
-            cl.fitness += self.cfg.beta * (k * cl.numerosity / accuracy_sum - cl.fitness)
+            cl.fitness += self.cfg.learning_rate * (k * cl.numerosity / accuracy_sum - cl.fitness)
 
     def do_action_set_subsumption(self, action_set: ClassifiersList) -> None:
         cl = None
@@ -243,4 +241,4 @@ class XCS(Agent):
                     child.condition[i] = child.condition.WILDCARD
             i += 1
         if np.random.rand() < self.cfg.mu:
-            child.action = np.random.randint(self.cfg.theta_mna)
+            child.action = np.random.randint(self.cfg.number_of_actions)

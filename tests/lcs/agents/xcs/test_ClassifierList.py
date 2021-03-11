@@ -9,7 +9,7 @@ class TestClassifiersList:
 
     @pytest.fixture
     def cfg(self):
-        return Configuration(theta_mna=4)
+        return Configuration(number_of_actions=4)
 
     def test_init(self, cfg):
         assert len(ClassifiersList(cfg)) == 0
@@ -40,13 +40,13 @@ class TestClassifiersList:
     # TODO: Include random state to manipulate the rnd and see the above TODO
     def test_deletion(self, cfg: Configuration):
         classifiers_list = ClassifiersList(cfg)
-        for i in range(cfg.n + 1):
+        for i in range(cfg.max_population + 1):
             classifiers_list.insert_in_population(
                 Classifier(cfg, Condition("1111"), 0, 0)
             )
-        assert sum(cl.numerosity for cl in classifiers_list) >= cfg.n
+        assert sum(cl.numerosity for cl in classifiers_list) >= cfg.max_population
         classifiers_list.delete_from_population()
-        assert sum(cl.numerosity for cl in classifiers_list) <= cfg.n
+        assert sum(cl.numerosity for cl in classifiers_list) <= cfg.max_population
 
     def test_match_set(self, cfg):
         classifiers_list = ClassifiersList(cfg)

@@ -23,9 +23,9 @@ class Classifier:
         self.experience = 0             # exp
         self.action_set_size = 1        # as
         self.numerosity = 1             # num
-        self.prediction = cfg.p_i
-        self.error = cfg.epsilon_i
-        self.fitness = cfg.f_i
+        self.prediction = cfg.initial_prediction
+        self.error = cfg.initial_error
+        self.fitness = cfg.initial_fitness
         # p, Epsilon, f
 
     def get_fitness(self):
@@ -44,7 +44,7 @@ class Classifier:
         return False
 
     def could_subsume(self):
-        if self.experience > self.cfg.theta_sub and self.error < self.cfg.epsilon_i:
+        if self.experience > self.cfg.subsumption_threshold and self.error < self.cfg.initial_error:
                 return True
         return False
 
@@ -55,10 +55,6 @@ class Classifier:
 
     def wildcard_number(self):
         return self.condition.wildcard_number()
-
-    def is_general(self):
-        cl_length = len(self)
-        return self.condition == Condition.empty(cl_length)
 
     def __eq__(self, other):
         if type(other) != Classifier:
@@ -72,4 +68,4 @@ class Classifier:
 
     def __str__(self):
         return f"Cond:{self.condition} - Act:{self.action} - Num:{self.numerosity} " + \
-            f"[fit: {self.fitness:.3f}, exp: {self.experience:.2f}, pred: {self.prediction:3f}]"
+            f"[fit: {self.fitness:.3f}, exp: {self.experience:3.2f}, pred: {self.prediction:2.3f}]"
