@@ -15,6 +15,7 @@ class ClassifiersList(TypedList):
                  oktypes=(Classifier,),
                  ) -> None:
         self.cfg = cfg
+        self._best_prediction = None
         super().__init__(*args, oktypes=oktypes)
 
     def insert_in_population(self, cl: Classifier):
@@ -96,3 +97,6 @@ class ClassifiersList(TypedList):
 
     def numerosity(self):
         return sum(cl.numerosity for cl in self)
+
+    def best_prediction(self):
+        return max(cl.prediction * cl.fitness for cl in self)

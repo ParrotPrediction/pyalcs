@@ -17,8 +17,7 @@ class TestClassifier:
                         2,
                         8)
         assert cl.condition == Condition('####')
-        assert (cl.prediction, cl.error, cl.fitness) \
-            == cfg.initial_classifier_values()
+        assert cl.prediction == cfg.p_i
 
     def test_subsumes(self, cfg):
         assert Classifier(cfg, Condition("1100"), 0, 0).condition.subsumes("1100")

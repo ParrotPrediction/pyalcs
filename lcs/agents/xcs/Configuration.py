@@ -3,7 +3,6 @@ from typing import Callable
 
 from lcs.agents import EnvironmentAdapter
 
-
 class Configuration(object):
     def __init__(self,
                  theta_mna: int,  # it is actually smart to make it equal to number of actions
@@ -82,8 +81,5 @@ class Configuration(object):
 
     def __str__(self) -> str:
         return str(vars(self))
-
-    def initial_classifier_values(self):
-        return self.p_i, self.epsilon_i, self.f_i
 
 

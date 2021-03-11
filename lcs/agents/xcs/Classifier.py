@@ -23,8 +23,9 @@ class Classifier:
         self.experience = 0             # exp
         self.action_set_size = 1        # as
         self.numerosity = 1             # num
-        self.prediction, self.error, self.fitness \
-            = cfg.initial_classifier_values()
+        self.prediction = cfg.p_i
+        self.error = cfg.epsilon_i
+        self.fitness = cfg.f_i
         # p, Epsilon, f
 
     def get_fitness(self):
@@ -54,6 +55,10 @@ class Classifier:
 
     def wildcard_number(self):
         return self.condition.wildcard_number()
+
+    def is_general(self):
+        cl_length = len(self)
+        return self.condition == Condition.empty(cl_length)
 
     def __eq__(self, other):
         if type(other) != Classifier:

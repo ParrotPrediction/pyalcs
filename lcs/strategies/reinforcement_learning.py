@@ -52,3 +52,10 @@ def update_classifier(cl,
     # Update classifier properties
     cl.r += beta * (_discounted_reward - cl.r)
     cl.ir += beta * (step_reward - cl.ir)
+
+
+def simple_q_learning(prev_reward, reward, beta, gamma, best_prediction):
+    next_reward = prev_reward + beta * (reward + gamma * best_prediction - prev_reward)
+    if next_reward >= 0:
+        return next_reward
+    return 0

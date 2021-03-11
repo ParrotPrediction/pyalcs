@@ -3,10 +3,10 @@ import numpy as np
 from copy import copy
 from typing import Optional
 
-
 from lcs.agents import Agent
 from lcs.agents.xcs import Configuration, Classifier, ClassifiersList
 from lcs.agents.Agent import TrialMetrics
+from lcs.strategies.reinforcement_learning import simple_q_learning
 from lcs.strategies.action_selection import EpsilonGreedy
 
 
@@ -26,6 +26,7 @@ class XCS(Agent):
             self.population = population
         else:
             self.population = ClassifiersList(cfg=cfg)
+        self.act_reward = [0 for _ in range(cfg.theta_mna)]
 
     def get_population(self):
         return self.population
@@ -53,21 +54,32 @@ class XCS(Agent):
         state = self.cfg.environment_adapter.to_genotype(raw_state)
 
         while not done:
+            # We are in t+1 here
             match_set = self.population.form_match_set(state, time_stamp)
             prediction_array = self.generate_prediction_array(match_set)
             action = self.select_action(prediction_array, match_set)
             action_set = match_set.form_action_set(action)
-            raw_state, reward, done, _ = env.step(action)
+            # apply action to environment
+            raw_state, step_reward, done, _ = env.step(action)
             state = self.cfg.environment_adapter.to_genotype(raw_state)
+            reward = simple_q_learning(self.act_reward[action],
+                                       step_reward,
+                                       self.cfg.beta,
+                                       self.cfg.gamma,
+                                       match_set.best_prediction())
+
             if prev_action_set is not None and len(prev_action_set) > 0:
+                # here we perform action based on values in t
                 p = prev_reward + self.cfg.gamma * max(prediction_array)
                 self.update_set(prev_action_set, p)
                 self.run_ga(prev_action_set, prev_situation, time_stamp)
             if done:
+                # we won't be able to do t next loop round so we do it now
                 p = reward
                 self.update_set(prev_action_set, p)
                 self.run_ga(action_set, state, time_stamp)
             else:
+                # moving values from t+1 to t
                 prev_action_set = copy(action_set)
                 prev_reward = copy(reward)
                 prev_situation = copy(state)
@@ -94,8 +106,6 @@ class XCS(Agent):
     def select_action(self, prediction_array, match_set: ClassifiersList) -> int:
         if np.random.rand() > self.cfg.epsilon:
             return match_set[prediction_array.index(max(prediction_array))].action
-        # return match_set[np.random.randint(len(match_set))].action
-        # The previous method is not random enough, fails to explore
         return np.random.randint(self.cfg.theta_mna)
 
     def update_set(self, action_set: ClassifiersList, p):
@@ -146,11 +156,15 @@ class XCS(Agent):
                     self.population.safe_remove(c)
 
     def run_ga(self, action_set, situation, time_stamp):
-        if action_set is None or len(action_set) < 0:
+        if action_set is None:
             return None
 
-        if time_stamp - sum(cl.time_stamp * cl.numerosity for cl in action_set) / \
-                sum(cl.numerosity for cl in action_set) > self.cfg.theta_GA:
+        temp_numerosity = sum(cl.numerosity for cl in action_set)
+        if temp_numerosity == 0:
+            return None
+
+        if time_stamp - sum(cl.time_stamp * cl.numerosity for cl in action_set) / temp_numerosity \
+            > self.cfg.theta_GA:
             for cl in action_set:
                 cl.time_stamp = time_stamp
             # select children
