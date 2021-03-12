@@ -1,3 +1,5 @@
+import random
+
 import pytest
 
 from lcs import Perception
@@ -88,6 +90,32 @@ class TestCondition:
     def test_should_generate_proper_number_of_new_conditions(self, _cond, _res):
         cond = Condition(_cond)
         assert len([c for c in cond.exhaustive_generalization()]) == _res
+
+    @pytest.mark.parametrize('_self, _other, _res', [
+        ('####', '####', True),
+        ('####', '###1', False),
+        ('###1', '###1', True),
+        ('##11', '###1', True),
+        ('##11', '####', True),
+        ('1#11', '###2', False),
+        ('1#11', '###1', True),
+    ])
+    def test_should_determine_more_general(self, _self, _other, _res):
+        # given
+        cond = Condition(_self)
+        other = Condition(_other)
+
+        # randomly insert some eis values
+        for idx, t in enumerate(cond):
+            if t == Condition.WILDCARD and random.random() < 0.5:
+                cond.eis[idx] = random.random()
+
+        for idx, t in enumerate(other):
+            if t == Condition.WILDCARD and random.random() < 0.5:
+                other.eis[idx] = random.random()
+
+        # then
+        assert cond.is_more_general(other) == _res
 
     @pytest.mark.parametrize('_init, _idx, _param, _res', [
         (0.0, 0, 'eis', 0.1), (0.0, 1, 'ig', 0.1),

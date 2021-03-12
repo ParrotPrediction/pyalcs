@@ -1,4 +1,5 @@
 import pytest
+from pytest_mock import MockFixture
 
 from lcs import Perception
 from lcs.agents.macs.macs import Configuration, LatentLearning, \
@@ -102,14 +103,52 @@ class TestLatentLearning:
 
         # when
         # cl4 is eligible for generalization
-        ll.generalize_conditions(
-            population, self.P0, self.ACTION, self.P1)
+        set_a = ll._update_igs(population, self.P0, self.ACTION, self.P1)
 
         # then
         [cl1, cl2, cl3, cl4] = population
         assert all(
             cl.condition.ig == [0.5, 0.5, 0.5, 0.5] for cl in [cl1, cl2, cl3])
         assert cl4.condition.ig == [0.55, 0.5, 0.5, 0.5]
+
+    def test_should_generalize_conditions(self, ll, cfg, mocker: MockFixture):
+        # according to Figure 4 in "Combining latent learning with dynamic
+        # programming in the modular anticipatory classifiers system" by
+        # Pierre Gerard
+        p0 = Perception('0010')
+        a0 = 0
+        p1 = Perception('1001')
+        obs_situations = [p0, p1, Perception('0100')]
+
+        cl1 = Classifier(condition='#100', action=a0, effect='1???', cfg=cfg)
+        cl2 = Classifier(condition='#001', action=a0, effect='1???', cfg=cfg)
+        cl3 = Classifier(condition='#000', action=a0, effect='1???', cfg=cfg)
+        cl4 = Classifier(condition='1#0#', action=a0, effect='?0??', cfg=cfg)
+        cl5 = Classifier(condition='10#1', action=a0, effect='??0?', cfg=cfg)
+        cl6 = Classifier(condition='1###', action=a0, effect='???1', cfg=cfg)
+
+        population = ClassifiersList(*[cl1, cl2, cl3, cl4, cl5, cl6])
+
+        set_a = {cl1, cl2, cl3}
+        # Make all classifiers in the set accurate
+        for cl in set_a:
+            cl.b = 0
+            cl.g = cfg.ea + 1
+
+        # Increase desired generality estimate
+        cl2.condition.ig[3] = 0.6
+        cl3.condition.ig[3] = 0.6
+
+        # when
+        mocker.patch('lcs.agents.macs.macs.LatentLearning._update_igs',
+                     return_value=set_a)
+        ll.generalize_conditions(population, obs_situations, p0, a0, p1)
+
+        # then
+        assert len(population) == 5
+        assert all(cl in population for cl in [cl1, cl4, cl5, cl6])
+        assert all(cl not in population for cl in [cl2, cl3])
+        assert len([cl for cl in population if cl.condition == Condition('#00#')]) == 1
 
     @staticmethod
     def _assert_gb_metrics(cl: Classifier, ga, ba):

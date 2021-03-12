@@ -3,9 +3,9 @@ from setuptools import setup, find_packages
 testing_requires = [
     'twine>=2.0.0',
     'pytest>=5.2',
-    'pytest-cov==2.8.1',
-    'pytest-mock==1.11.2',
-    'pytest-xdist==1.30.0'
+    'pytest-cov==2.11.1',
+    'pytest-mock==3.5.1',
+    'pytest-xdist==2.2.1'
 ]
 
 docs_requires = [

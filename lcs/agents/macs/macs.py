@@ -54,6 +54,31 @@ class Condition(ImmutableSequence):
         else:
             raise ValueError('Trying to modify if for a wildcard')
 
+    def is_more_general(self, other: Condition) -> bool:
+        """Checks if other condition is more general"""
+        if self == other:
+            return True
+
+        # TODO validate if method below are useful
+        def is_more_general(s, o):
+            if o == self.WILDCARD:
+                return True
+
+            return s == o
+
+        def is_different(s, o):
+            if s == self.WILDCARD and o == self.WILDCARD:
+                return False
+            else:
+                return s != o
+
+        other_more_general = all(
+            is_more_general(s, o) for s, o in zip(self, other))
+        different_tokens = sum(
+            1 for s, o in zip(self, other) if is_different(s, o))
+
+        return other_more_general and different_tokens > 0
+
     def feature_to_specialize(self) -> Optional[int]:
         """Returns index of the feature suggested for specialization"""
         if all(c != self.WILDCARD for c in self):
@@ -161,6 +186,9 @@ class Classifier:
         # Situation preceding last anticipation mistake
         self.sb: Optional[Perception] = None
 
+    def __repr__(self):
+        return f"{self.condition}-{self.action}-{self.effect} @ {hex(id(self))}"
+
     @property
     def is_accurate(self) -> bool:
         return self.b == 0 and self.g >= self.cfg.ea
@@ -257,36 +285,25 @@ class LatentLearning:
                               population: ClassifiersList,
                               obs_situations: List[Perception],
                               p0: Perception,
-                              action: int,
+                              a0: int,
                               p1: Perception) -> None:
 
-        non_matching = [cl for cl in population if
-                        not cl.does_match(p0) and cl.action == action]
+        set_a = self._update_igs(population, p0, a0, p1)
 
-        set_a = []  # potentially matching
-
-        for cl in non_matching:
-            for new_cond, idx in cl.condition.exhaustive_generalization():
-                if new_cond.does_match(p0):
-                    if cl.effect.does_match(p1):
-                        cl.condition.increase_ig(idx, self.cfg.beta)
-                        set_a.append(cl)
-                    else:
-                        cl.condition.decrease_ig(idx, self.cfg.beta)
-
-        set_c: List[ChildClassifier] = []  # general set of classifiers
+        set_c: Set[ChildClassifier] = set()  # general set of classifiers
         ChildClassifier = NamedTuple('ChildClassifier',
                                      [('classifier', Classifier),
                                       ('parent', Optional[Classifier])])
 
         # Sort classifiers by effect for grouping
-        set_a.sort(key=attrgetter("effect"))
+        set_a = sorted(set_a, key=attrgetter("effect"))
         for _, set_b in groupby(set_a, key=attrgetter("effect")):
+            set_b = set(set_b)
             if all(cl.is_accurate for cl in set_b):
                 # Build [C] only when all classifiers from [B] are accurate
                 for cl in set_b:
-                    if all(c.ig < 0.5 for c in cl.condition):
-                        set_c.append(ChildClassifier(cl, None))
+                    if all(ig <= 0.5 for ig in cl.condition.ig):
+                        set_c.add(ChildClassifier(cl, None))
                     else:
                         spec_cond_idx = cl.condition.feature_to_generalize()
                         assert spec_cond_idx is not None
@@ -295,22 +312,54 @@ class LatentLearning:
                         new_cond[spec_cond_idx] = Condition.WILDCARD
                         new_cl = Classifier(condition=new_cond, action=cl.action, effect=cl.effect, cfg=cl.cfg)
 
-                        set_c.append(ChildClassifier(new_cl, cl))
+                        set_c.add(ChildClassifier(new_cl, cl))
 
-        # Check conflicts in [C]
-        set_d: List[Classifier] = []  # conflicts
+        # Check for conflicts in [C]
+        set_d: Set[Classifier] = set()  # conflicts
         for p in obs_situations:
-            for existing_cl in [cl for cl in population if cl.does_match(p) and cl.action == action]:
-                for new_cl in [cl for cl in set_c if cl.classifier.does_match(p) and cl.classifier.action == action]:
+            for existing_cl in [cl for cl in population if cl.does_match(p) and cl.action == a0]:
+                for new_cl in [cl for cl in set_c if cl.classifier.does_match(p) and cl.classifier.action == a0]:
                     if existing_cl.effect.conflicts(new_cl.classifier.effect):
-                        if new_cl.parent is not None:
-                            set_d.append(new_cl.parent)
-                        else:
-                            set_d.append(new_cl.classifier)
+                        assert new_cl.parent is not None
+                        set_d.add(new_cl.parent)
+                    else:
+                        set_d.add(new_cl.classifier)
 
-        # Analyze every possible pair of [D] for duplicates
+        # Analyze every possible pair of [D] for duplicates (keep most general)
         for (c1, c2) in itertools.combinations(set_d, 2):
-            pass
+            if c1.condition.is_more_general(c2.condition):
+                set_d.remove(c2)
+
+        # In the original population replace classifiers from [A]
+        # by those generated from [D]
+        for cl in set_a:
+            population.remove(cl)
+
+        for cl in set_d:
+            population.append(cl)
+
+    def _update_igs(self,
+                    population: ClassifiersList,
+                    p0: Perception,
+                    a0: int,
+                    p1: Perception) -> Set[Classifier]:
+        """
+        Compute estimates ig for each classifier.
+        Returns classifiers whose A part patches a0 and whose E part matches p1
+        """
+        set_a: Set[Classifier] = set()
+        non_matching = [cl for cl in population if not cl.does_match(p0) and cl.action == a0]
+
+        for cl in non_matching:
+            for new_cond, idx in cl.condition.exhaustive_generalization():
+                if new_cond.does_match(p0):
+                    if cl.effect.does_match(p1):
+                        cl.condition.increase_ig(idx, self.cfg.beta)
+                        set_a.add(cl)
+                    else:
+                        cl.condition.decrease_ig(idx, self.cfg.beta)
+
+        return set_a
 
 
 class MACS(Agent):
