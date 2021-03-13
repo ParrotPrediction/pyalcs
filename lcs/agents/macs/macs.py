@@ -112,6 +112,20 @@ class Condition(ImmutableSequence):
 class Effect(ImmutableSequence):
     WILDCARD = '?'  # don't know symbol - matches any value
 
+    @staticmethod
+    def generate(p: Perception, specific_count: int = 1) -> Generator[Effect]:
+        str_len = len(p)
+        combinations = itertools.combinations(
+            range(0, str_len), str_len - specific_count)
+
+        for combination in combinations:
+            items = list(p)
+
+            for wildcard_id in combination:
+                items[wildcard_id] = Effect.WILDCARD
+
+            yield Effect(items)
+
     def __lt__(self, other: Effect):
         return self._items < other._items
 

@@ -35,6 +35,23 @@ class TestEffect:
         assert Effect(_e1).conflicts(Effect(_e2)) == _res
         assert Effect(_e2).conflicts(Effect(_e1)) == _res
 
+    @pytest.mark.parametrize('_p1, _c, _res', [
+        ('1010', 1, ['1???', '?0??', '??1?', '???0']),
+        ('1010', 2, ['10??', '1?1?', '1??0', '?01?', '??10', '?0?0']),
+        ('1010', 3, ['101?', '10?0', '1?10', '?010']),
+        ('1010', 4, ['1010']),
+    ])
+    def test_should_generate(self, _p1, _c, _res):
+        # given
+        p = Perception(_p1)
+
+        # when
+        effects = Effect.generate(p, int(_c))
+        effects = list(map(str, effects))
+
+        assert len(effects) == len(_res)
+        assert sorted(effects) == sorted(_res)
+
     def test_should_sort(self):
         # given
         e1 = Effect('???1')
