@@ -21,6 +21,12 @@ class TestCondition:
         assert condition.ig == [0.5, 0.5, 0.5, 0.5]
 
     @pytest.mark.parametrize('_c, _res', [
+        ('####', 4), ('##1#', 3), ('1513', 0),
+    ])
+    def test_should_calculate_generality(self, _c, _res):
+        assert Condition(_c).generality == _res
+
+    @pytest.mark.parametrize('_c, _res', [
         ("####", [0.5, 0.5, 0.5, 0.5]),
         ("##1#", [0.5, 0.5, 0.5, 0.5]),
     ])
@@ -42,6 +48,24 @@ class TestCondition:
         p0 = Perception('0000')
 
         assert cond.does_match(p0)
+
+    @pytest.mark.parametrize('_p, _res', [
+        ('1', ['#', '1']),
+        ('11', ['##', '#1', '1#', '11']),
+        ('10', ['##', '#0', '1#', '10']),
+        ('101', ['###', '##1', '#0#', '1##', '#01', '1#1', '10#', '101']),
+    ])
+    def test_should_generate_all_matching_conditions(self, _p, _res):
+        # given
+        p = Perception(_p)
+
+        # when
+        conditions = list(Condition.generate_matching(p))
+
+        # then
+        conditions = sorted(conditions)
+        assert len(conditions) == len(_res)
+        assert conditions == list(map(Condition, _res))
 
     @pytest.mark.parametrize('_c, _eis, _res', [
         ('####', [0.2, 0.3, 0.5, 0.4], 2),

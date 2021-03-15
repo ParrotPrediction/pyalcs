@@ -23,12 +23,35 @@ class Condition(ImmutableSequence):
         # improvements by generalization
         self.ig = [0.5] * len(observation)
 
+    def __lt__(self, other: Condition):
+        return other.generality < self.generality
+
+    @property
+    def generality(self) -> int:
+        return sum(1 for c in self if c == self.WILDCARD)
+
     def does_match(self, p: Perception) -> bool:
         for ci, oi in zip(self, p):
             if ci != self.WILDCARD and ci != oi:
                 return False
 
         return True
+
+    @staticmethod
+    def generate_matching(p: Perception) -> Generator[Condition]:
+        wildcards = len(p)
+        yield Condition(p)
+
+        while wildcards > 0:
+            combinations = itertools.combinations(range(0, len(p)), wildcards)
+
+            for combination in combinations:
+                c = Condition(p)
+                for c_id in combination:
+                    c[c_id] = Condition.WILDCARD
+                yield c
+
+            wildcards -= 1
 
     def increase_eis(self, idx, beta):
         if self[idx] == self.WILDCARD:
@@ -84,7 +107,8 @@ class Condition(ImmutableSequence):
         if all(c != self.WILDCARD for c in self):
             return None
 
-        eis = {idx: self.eis[idx] for idx, c in enumerate(self) if c == self.WILDCARD}
+        eis = {idx: self.eis[idx] for idx, c in enumerate(self) if
+               c == self.WILDCARD}
         return max(eis, key=eis.get)
 
     def feature_to_generalize(self) -> Optional[int]:
@@ -92,7 +116,8 @@ class Condition(ImmutableSequence):
         if all(c == self.WILDCARD for c in self):
             return None
 
-        igs = {idx: self.ig[idx] for idx, c in enumerate(self) if c != self.WILDCARD}
+        igs = {idx: self.ig[idx] for idx, c in enumerate(self) if
+               c != self.WILDCARD}
         return max(igs, key=igs.get)
 
     def exhaustive_generalization(self) -> Generator[Tuple[Condition, int]]:
@@ -149,6 +174,7 @@ class Configuration:
                  classifier_length: int,
                  number_of_possible_actions: int,
                  feature_possible_values: list,
+                 specified_effect_attributes: int = 1,
                  learning_rate: float = 0.1,
                  inaccuracy_threshold: int = 5,
                  accuracy_threshold: int = 5,
@@ -158,6 +184,7 @@ class Configuration:
         self.classifier_length = classifier_length
         self.number_of_possible_actions = number_of_possible_actions
         self.feature_possible_values = feature_possible_values
+        self.specified_effect_attributes = specified_effect_attributes
         self.beta = learning_rate
         self.er = inaccuracy_threshold
         self.ea = accuracy_threshold
@@ -324,15 +351,19 @@ class LatentLearning:
 
                         new_cond = Condition(cl.condition)
                         new_cond[spec_cond_idx] = Condition.WILDCARD
-                        new_cl = Classifier(condition=new_cond, action=cl.action, effect=cl.effect, cfg=cl.cfg)
+                        new_cl = Classifier(condition=new_cond,
+                                            action=cl.action, effect=cl.effect,
+                                            cfg=cl.cfg)
 
                         set_c.add(ChildClassifier(new_cl, cl))
 
         # Check for conflicts in [C]
         set_d: Set[Classifier] = set()  # conflicts
         for p in obs_situations:
-            for existing_cl in [cl for cl in population if cl.does_match(p) and cl.action == a0]:
-                for new_cl in [cl for cl in set_c if cl.classifier.does_match(p) and cl.classifier.action == a0]:
+            for existing_cl in [cl for cl in population if
+                                cl.does_match(p) and cl.action == a0]:
+                for new_cl in [cl for cl in set_c if cl.classifier.does_match(
+                    p) and cl.classifier.action == a0]:
                     if existing_cl.effect.conflicts(new_cl.classifier.effect):
                         assert new_cl.parent is not None
                         set_d.add(new_cl.parent)
@@ -352,6 +383,29 @@ class LatentLearning:
         for cl in set_d:
             population.append(cl)
 
+    def cover_transitions(self,
+                          population: ClassifiersList,
+                          p0: Perception,
+                          a0: int,
+                          p1: Perception) -> None:
+        to_add = set()
+
+        for ef in Effect.generate(p1, self.cfg.specified_effect_attributes):
+            if not [cl for cl in population if cl.does_match(p0) and cl.action == a0 and cl.effect == ef]:
+                conditions = [cl.condition for cl in population if cl.action == a0 and cl.effect == ef]
+                possible_conditions = sorted([c for c in Condition.generate_matching(p0) if c not in conditions])
+
+                if possible_conditions:
+                    new_cl = Classifier(
+                        condition=possible_conditions[0],  # take most general
+                        action=a0,
+                        effect=ef,
+                        cfg=self.cfg)
+                    to_add.add(new_cl)
+
+        for cl in to_add:
+            population.append(cl)
+
     def _update_igs(self,
                     population: ClassifiersList,
                     p0: Perception,
@@ -362,7 +416,8 @@ class LatentLearning:
         Returns classifiers whose A part patches a0 and whose E part matches p1
         """
         set_a: Set[Classifier] = set()
-        non_matching = [cl for cl in population if not cl.does_match(p0) and cl.action == a0]
+        non_matching = [cl for cl in population if
+                        not cl.does_match(p0) and cl.action == a0]
 
         for cl in non_matching:
             for new_cond, idx in cl.condition.exhaustive_generalization():
