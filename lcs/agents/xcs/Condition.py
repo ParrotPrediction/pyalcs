@@ -12,11 +12,7 @@ class Condition(ImmutableSequence):
         return True
 
     def wildcard_number(self) -> int:
-        number_of_wildcard = 0
-        for ci in self:
-            if ci == self.WILDCARD:
-                number_of_wildcard += 1
-        return number_of_wildcard
+        return sum(1 for c in self if c == self.WILDCARD)
 
     def is_more_general(self, other: Condition) -> bool:
         for ci, oi in zip(self, other):

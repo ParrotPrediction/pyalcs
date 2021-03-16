@@ -1,1 +1,1 @@
-# py.test -max_population 4 --cov=xcs tests/lcs/agents/xcs
+# py.test --cov=xcs tests/lcs/agents/xcs
