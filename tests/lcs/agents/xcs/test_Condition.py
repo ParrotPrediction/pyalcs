@@ -41,12 +41,12 @@ class TestCondition:
         assert Condition("11##").subsumes("11##")
 
     def test_number_of_wildcards(self):
-        assert Condition("1011").wildcard_number() == 0
-        assert Condition("101#").wildcard_number() == 1
-        assert Condition("10##").wildcard_number() == 2
-        assert Condition("1###").wildcard_number() == 3
-        assert Condition("1##0").wildcard_number() == 2
-        assert Condition("1#10").wildcard_number() == 1
+        assert Condition("1011").wildcard_number == 0
+        assert Condition("101#").wildcard_number == 1
+        assert Condition("10##").wildcard_number == 2
+        assert Condition("1###").wildcard_number == 3
+        assert Condition("1##0").wildcard_number == 2
+        assert Condition("1#10").wildcard_number == 1
 
     def test_is_more_general(self):
         assert Condition("1111").is_more_general(Condition("1111"))

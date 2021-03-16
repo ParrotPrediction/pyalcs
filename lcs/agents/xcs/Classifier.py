@@ -38,23 +38,25 @@ class Classifier:
 
     def does_subsume(self, other):
         if self.action == other.action and \
-           self.could_subsume() and \
+           self.could_subsume and \
            self.is_more_general(other):
                     return True
         return False
 
+    @property
     def could_subsume(self):
         if self.experience > self.cfg.subsumption_threshold and self.error < self.cfg.initial_error:
                 return True
         return False
 
     def is_more_general(self, other):
-        if self.wildcard_number() <= other.wildcard_number():
+        if self.wildcard_number <= other.wildcard_number:
             return False
         return self.condition.is_more_general(other.condition)
 
+    @property
     def wildcard_number(self):
-        return self.condition.wildcard_number()
+        return self.condition.wildcard_number
 
     def __len__(self):
         return len(self.condition)

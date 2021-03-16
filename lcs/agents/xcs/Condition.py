@@ -11,6 +11,7 @@ class Condition(ImmutableSequence):
                 return False
         return True
 
+    @property
     def wildcard_number(self) -> int:
         return sum(1 for c in self if c == self.WILDCARD)
 

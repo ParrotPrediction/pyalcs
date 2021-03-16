@@ -43,10 +43,10 @@ class TestClassifier:
 
     def test_could_subsume(self, cfg: Configuration):
         cl = Classifier(cfg, Condition("1111"), 0, 0)
-        assert not cl.could_subsume()
+        assert not cl.could_subsume
         cl.experience = cfg.subsumption_threshold * 2
         cl.error = cfg.initial_error / 2
-        assert cl.could_subsume()
+        assert cl.could_subsume
 
     def test_is_more_general(self, cfg: Configuration):
         assert Classifier(cfg, Condition("####"), 0, 0).is_more_general(
