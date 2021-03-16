@@ -69,13 +69,13 @@ class TestXCS:
         assert classifiers_list[0].fitness != cfg.initial_fitness
 
     def test_mutation(self, cfg):
-        cfg.mu = 0
+        cfg.mutation_chance = 0
         cl = Classifier(cfg, Condition("####"), 0, 0)
         xcs = XCS(cfg)
         xcs.apply_mutation(cl, Perception("1111"))
         assert cl.action == Classifier(cfg, Condition("1111"), 0, 0).action
         assert cl.does_match(Condition("1111"))
-        cfg.mu = 1
+        cfg.mutation_chance = 1
         cl = Classifier(cfg, Condition("1111"), 0, 0)
         xcs.apply_mutation(cl, Perception("1111"))
         assert cl.is_more_general(Classifier(cfg, Condition("1111"), 0, 0))

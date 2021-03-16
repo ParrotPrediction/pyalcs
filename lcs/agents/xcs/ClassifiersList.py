@@ -15,7 +15,6 @@ class ClassifiersList(TypedList):
                  oktypes=(Classifier,),
                  ) -> None:
         self.cfg = cfg
-        self._best_prediction = None
         super().__init__(*args, oktypes=oktypes)
 
     def insert_in_population(self, cl: Classifier):
@@ -30,7 +29,7 @@ class ClassifiersList(TypedList):
         # this way allows situation to be either str or Perception
         generalized = []
         for i in range(len(situation)):
-            if np.random.rand() > self.cfg.population_wildcard:
+            if np.random.rand() > self.cfg.covering_wildcard_chance:
                 generalized.append(self.cfg.classifier_wildcard)
             else:
                 generalized.append(situation[i])

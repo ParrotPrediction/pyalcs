@@ -14,13 +14,13 @@ class Configuration(object):
                  epsilon_0: float = 10,
                  v: int = 5,
                  gamma: float = 0.71,
-                 theta_ga: int = 25,
+                 ga_threshold: int = 25,
                  chi: float = 0.5,
-                 mu: float = 0.01,
+                 mutation_chance: float = 0.01,
                  deletion_threshold: int = 20,  # theta_del
                  delta: float = 0.1,
                  subsumption_threshold: int = 20,  # theta_sub
-                 population_wildcard: float = 0.33,
+                 covering_wildcard_chance: float = 0.33,  # population wildcard
                  initial_prediction: float = float(np.finfo(np.float32).tiny),  # p_i
                  initial_error: float = float(np.finfo(np.float32).tiny),  # epsilon_i
                  initial_fitness: float = float(np.finfo(np.float32).tiny),  # f_i
@@ -38,13 +38,13 @@ class Configuration(object):
         :param epsilon_0: used in calculating fitness
         :param v: power parameter, used in calculating fitness
         :param gamma: discount factor
-        :param theta_ga: GA threshold, GA is applied when time since last GA is greater than  theta_GA
+        :param ga_threshold: GA threshold, GA is applied when time since last GA is greater than  ga_threshold
         :param chi: probability of applying crossover in the GA
-        :param mu: probability of mutating an allele in the offspring
+        :param mutation_chance: probability of mutating an allele in the offspring
         :param deletion_threshold: deletion threshold, after exp reaches deletion_threshold fitness is probability for deletion
         :param delta: fraction of the mean fitness in P
         :param subsumption_threshold: subsumption threshold, exp greater than subsumption_threshold to be able to subsume
-        :param population_wildcard: probability of using wildcard in one attribute in C
+        :param covering_wildcard_chance: probability of using wildcard in one attribute in C
         :param initial_prediction: used as initial value for new classifiers - prediction
         :param initial_error: used as initial value for new classifiers - error
         :param initial_fitness: used as initial value for new classifiers - fitness
@@ -61,13 +61,13 @@ class Configuration(object):
         self.epsilon_0 = epsilon_0
         self.v = v
         self.gamma = gamma
-        self.theta_GA = theta_ga
+        self.ga_threshold = ga_threshold
         self.chi = chi
-        self.mu = mu
+        self.mutation_chance = mutation_chance
         self.deletion_threshold = deletion_threshold
         self.delta = delta
         self.subsumption_threshold = subsumption_threshold
-        self.population_wildcard = population_wildcard
+        self.covering_wildcard_chance = covering_wildcard_chance
         self.initial_prediction = initial_prediction
         self.initial_error = initial_error
         self.initial_fitness = initial_fitness

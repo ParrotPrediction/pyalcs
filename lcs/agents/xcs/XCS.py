@@ -131,10 +131,10 @@ class XCS(Agent):
         accuracy_sum = 0
         accuracy_vector_k = []
         for cl in action_set:
-            if cl.error < self.cfg.initial_error:
+            if cl.error < self.cfg.epsilon_0:
                 tmp_acc = 1
             else:
-                tmp_acc = self.cfg.alpha * pow(cl.error * self.cfg.initial_error, self.cfg.v)
+                tmp_acc = self.cfg.alpha * pow(1/(cl.error * self.cfg.epsilon_0), self.cfg.v)
             accuracy_vector_k.append(tmp_acc)
             accuracy_sum += tmp_acc + cl.numerosity
         for cl, k in zip(action_set, accuracy_vector_k):
@@ -162,7 +162,7 @@ class XCS(Agent):
             return None
 
         if time_stamp - sum(cl.time_stamp * cl.numerosity for cl in action_set) / temp_numerosity \
-            > self.cfg.theta_GA:
+            > self.cfg.ga_threshold:
             for cl in action_set:
                 cl.time_stamp = time_stamp
             # select children
@@ -234,11 +234,11 @@ class XCS(Agent):
     def apply_mutation(self, child, situation):
         i = 0
         while i < len(child.condition):
-            if np.random.rand() < self.cfg.mu:
+            if np.random.rand() < self.cfg.mutation_chance:
                 if child.condition[i] == child.condition.WILDCARD:
                     child.condition[i] = situation[i]
                 else:
                     child.condition[i] = child.condition.WILDCARD
             i += 1
-        if np.random.rand() < self.cfg.mu:
+        if np.random.rand() < self.cfg.mutation_chance:
             child.action = np.random.randint(self.cfg.number_of_actions)
