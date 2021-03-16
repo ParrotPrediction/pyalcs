@@ -42,40 +42,33 @@ class ClassifiersList(TypedList):
     # Roulette-Wheel Deletion
     # TODO: use strategies
     def delete_from_population(self):
-        total_numerosity = self.numerosity
-        if total_numerosity <= self.cfg.max_population:
-            return None
+        while self.numerosity > self.cfg.max_population:
+            average_fitness = sum(cl.fitness for cl in self) / self.numerosity
+            deletion_votes = []
+            for cl in self:
+                deletion_votes.append(self._deletion_vote(cl, average_fitness))
+            selector = random.uniform(0, sum(deletion_votes))
+            self._remove_based_on_votes(deletion_votes, selector)
 
-        total_fitness = sum(cl.fitness for cl in self)
-        average_fitness = total_fitness / total_numerosity
+    def _deletion_vote(self, cl, average_fitness):
+        vote = cl.action_set_size * cl.numerosity
+        if cl.experience > self.cfg.deletion_threshold and \
+                cl.fitness / cl.numerosity < \
+                self.cfg.delta * average_fitness:
+            vote *= average_fitness / (cl.get_fitness() / cl.numerosity)
+        return vote
 
-        total_votes = 0
-        deletion_votes = []
-
-        for cl in range(len(self)):
-            vote = self[cl].action_set_size * self[cl].numerosity
-            sufficient_experience = (
-                self[cl].experience > self.cfg.deletion_threshold
-            )
-            low_fitness = (
-                self[cl].fitness / self[cl].numerosity <
-                self.cfg.delta * average_fitness
-            )
-            if sufficient_experience and low_fitness:
-                vote *= average_fitness / (self[cl].get_fitness() /
-                                           self[cl].numerosity)
-            deletion_votes.append(vote)
-            total_votes += vote
-
-        selector = random.uniform(0, total_votes)
+    def _remove_based_on_votes(self, deletion_votes, selector):
         for cl, vote in zip(self, deletion_votes):
             selector -= vote
             if selector <= 0:
                 assert cl in self
-                if self.safe_remove(cl):
-                    return [cl]
+                if cl.numerosity > 1:
+                    cl.numerosity -= 1
+                    return None
                 else:
-                    return []
+                    self.safe_remove(cl)
+                    return None
 
     def form_match_set(self, situation: Perception,  time_stamp):
         matching_ls = [cl for cl in self if cl.does_match(situation)]
