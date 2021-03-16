@@ -31,10 +31,9 @@ class TestClassifiersList:
 
     def test_covering(self, cfg):
         classifiers_list = ClassifiersList(cfg)
-        assert Classifier(cfg, Condition("1111"), 0, 0) ==\
-            classifiers_list.generate_covering_classifier(Perception("1111"), 0, 0)
-        assert Classifier(cfg, Condition("1111"), 0, 0) ==\
-            classifiers_list.generate_covering_classifier("1111", 0, 0)
+        covering_cl = classifiers_list.generate_covering_classifier(Perception("1111"), 0, 0)
+        assert covering_cl.does_match(Perception("1111"))
+        assert classifiers_list.generate_covering_classifier("1111", 0, 0).action == 0
 
     # TODO: You can test if correct element was deleted
     # TODO: Include random state to manipulate the rnd and see the above TODO

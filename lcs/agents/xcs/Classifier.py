@@ -56,13 +56,6 @@ class Classifier:
     def wildcard_number(self):
         return self.condition.wildcard_number()
 
-    def __eq__(self, other):
-        if type(other) != Classifier:
-            raise TypeError("Classifier can only = other classifiers")
-        if self.does_match(other.condition) and self.action == other.action:
-            return True
-        return False
-
     def __len__(self):
         return len(self.condition)
 

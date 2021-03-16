@@ -73,7 +73,8 @@ class TestXCS:
         cl = Classifier(cfg, Condition("####"), 0, 0)
         xcs = XCS(cfg)
         xcs.apply_mutation(cl, Perception("1111"))
-        assert cl == Classifier(cfg, Condition("1111"), 0, 0)
+        assert cl.action == Classifier(cfg, Condition("1111"), 0, 0).action
+        assert cl.does_match(Condition("1111"))
         cfg.mu = 1
         cl = Classifier(cfg, Condition("1111"), 0, 0)
         xcs.apply_mutation(cl, Perception("1111"))

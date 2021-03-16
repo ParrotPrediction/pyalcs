@@ -41,13 +41,6 @@ class TestClassifier:
         assert not Classifier(cfg, Condition("11##"), 0, 0).does_match("10##")
         assert not Classifier(cfg, Condition("11##"), 0, 0).does_match("1000")
 
-    def test_equals(self, cfg: Configuration):
-        assert Classifier(cfg, Condition("1111"), 0, 0) == Classifier(cfg, Condition("1111"), 0, 0)
-        assert Classifier(cfg, Condition("1111"), 0, 0) == Classifier(cfg, Condition("11##"), 0, 0)
-        assert Classifier(cfg, Condition("1111"), 0, 0) == Classifier(cfg, Condition("1111"), 0, 8)
-        assert not Classifier(cfg, Condition("1111"), 0, 0) == Classifier(cfg, Condition("1111"), 1, 0)
-        assert not Classifier(cfg, Condition("1111"), 0, 0) == Classifier(cfg, Condition("1100"), 0, 0)
-
     def test_could_subsume(self, cfg: Configuration):
         cl = Classifier(cfg, Condition("1111"), 0, 0)
         assert not cl.could_subsume()

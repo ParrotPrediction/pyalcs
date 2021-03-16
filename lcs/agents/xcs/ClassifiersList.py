@@ -20,7 +20,7 @@ class ClassifiersList(TypedList):
 
     def insert_in_population(self, cl: Classifier):
         for c in self:
-            if c == cl:
+            if c.condition == cl.condition and c.action == cl.action:
                 c.numerosity += 1
                 return None
         self.append(cl)
