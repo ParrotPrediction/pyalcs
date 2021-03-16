@@ -88,7 +88,7 @@ class TestXCS:
         xcs.apply_crossover(cl1, cl2)
 
     # only tests for errors and types
-    def test_run_GA(self, cfg):
+    def test_run_ga(self, cfg):
         cfg.do_GA_subsumption = True
         classifiers_list = ClassifiersList(cfg)
         classifiers_list.insert_in_population(Classifier(cfg, Condition("1111"), 0, 0))
@@ -102,7 +102,7 @@ class TestXCS:
         cfg.do_GA_subsumption = False  # do not perform subsumption
         xcs.run_ga(action_set, Perception("0000"), 100000)
         assert xcs.population[0].time_stamp != 0
-        assert xcs.population.numerosity() > 4
+        assert xcs.population.numerosity > 4
 
         classifiers_list = ClassifiersList(cfg)
         classifiers_list.insert_in_population(Classifier(cfg, Condition("1111"), 0, 0))
@@ -116,7 +116,7 @@ class TestXCS:
         cfg.do_GA_subsumption = True  # do not perform subsumption
         xcs.run_ga(action_set, Perception("0000"), 100000)
         assert xcs.population[0].time_stamp != 0
-        assert xcs.population.numerosity() > 4
+        assert xcs.population.numerosity > 4
 
 
     # only tests for errors and types
