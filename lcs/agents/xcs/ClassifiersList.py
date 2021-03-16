@@ -53,22 +53,19 @@ class ClassifiersList(TypedList):
     def _deletion_vote(self, cl, average_fitness):
         vote = cl.action_set_size * cl.numerosity
         if cl.experience > self.cfg.deletion_threshold and \
-                cl.fitness / cl.numerosity < \
+                cl.fitness / cl.numerosity > \
                 self.cfg.delta * average_fitness:
             vote *= average_fitness / (cl.get_fitness() / cl.numerosity)
         return vote
 
+    # I toyed with numerosity -= 1
+    # and had better results with same solution as hosford42
     def _remove_based_on_votes(self, deletion_votes, selector):
         for cl, vote in zip(self, deletion_votes):
             selector -= vote
             if selector <= 0:
                 assert cl in self
-                if cl.numerosity > 1:
-                    cl.numerosity -= 1
-                    return None
-                else:
-                    self.safe_remove(cl)
-                    return None
+                self.safe_remove(cl)
 
     def form_match_set(self, situation: Perception,  time_stamp):
         matching_ls = [cl for cl in self if cl.does_match(situation)]

@@ -53,6 +53,7 @@ class XCS(Agent):
         state = self.cfg.environment_adapter.to_genotype(raw_state)
 
         while not done:
+            self.population.delete_from_population()
             # We are in t+1 here
             match_set = self.population.form_match_set(state, time_stamp)
             prediction_array = self.generate_prediction_array(match_set)
@@ -194,7 +195,6 @@ class XCS(Agent):
                     parent2.numerosity += 1
                 else:
                     self.population.insert_in_population(child1)
-                self.population.delete_from_population()
 
                 if parent1.does_subsume(child2):
                     parent1.numerosity += 1
@@ -202,7 +202,7 @@ class XCS(Agent):
                     parent2.numerosity += 1
                 else:
                     self.population.insert_in_population(child2)
-                self.population.delete_from_population()
+
             else:
                 self.population.insert_in_population(child1)
                 self.population.insert_in_population(child2)
