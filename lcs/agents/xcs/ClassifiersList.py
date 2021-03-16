@@ -66,6 +66,7 @@ class ClassifiersList(TypedList):
             if selector <= 0:
                 assert cl in self
                 self.safe_remove(cl)
+                return None
 
     def form_match_set(self, situation: Perception,  time_stamp):
         matching_ls = [cl for cl in self if cl.does_match(situation)]

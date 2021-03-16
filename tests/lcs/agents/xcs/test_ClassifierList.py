@@ -43,7 +43,7 @@ class TestClassifiersList:
             )
         assert sum(cl.numerosity for cl in classifiers_list) > cfg.max_population
         classifiers_list.delete_from_population()
-        assert sum(cl.numerosity for cl in classifiers_list) == cfg.max_population
+        assert sum(cl.numerosity for cl in classifiers_list) < cfg.max_population
 
     def test_removes_correct_one(self, cfg):
         classifiers_list = ClassifiersList(cfg)
