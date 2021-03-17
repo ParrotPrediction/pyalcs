@@ -88,10 +88,9 @@ class TestXCS:
         cl2 = Classifier(cfg, Condition("0000000"), 1, 0)
         GeneticAlgorithm._apply_crossover(cl1, cl2)
 
-
     @pytest.mark.parametrize("chi", [
-        (1),
-        (0)
+        1,
+        0
     ])
     # only tests for errors and types
     def test_run_ga(self, cfg, classifiers_list_diff_actions, chi):

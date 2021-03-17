@@ -72,7 +72,10 @@ class ClassifiersList(TypedList):
             selector -= vote
             if selector <= 0:
                 assert cl in self
-                self.safe_remove(cl)
+                if cl.numerosity > 1:
+                    cl.numerosity -= 1
+                else:
+                    self.safe_remove(cl)
                 return None
 
     def form_match_set(self, situation: Perception,  time_stamp):
@@ -98,6 +101,7 @@ class ClassifiersList(TypedList):
 
     # it is my creation, it very likely is wrong
     # reasoning: fitness is used as prediction weight in prediction array
+    @property
     def best_prediction(self):
         return max(cl.prediction * cl.fitness for cl in self)
 
