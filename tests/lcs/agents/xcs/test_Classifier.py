@@ -48,19 +48,16 @@ class TestClassifier:
         cl.error = cfg.initial_error / 2
         assert cl.could_subsume
 
-    def test_is_more_general(self, cfg: Configuration):
-        assert Classifier(cfg, Condition("####"), 0, 0).is_more_general(
-            Classifier(cfg, Condition("1111"), 0, 0)
-        )
-        assert not Classifier(cfg, Condition("1111"), 0, 0).is_more_general(
-            Classifier(cfg, Condition("1111"), 0, 0)
-        )
-        assert not Classifier(cfg, Condition("1111"), 0, 0).is_more_general(
-            Classifier(cfg, Condition("11##"), 0, 0)
-        )
-        assert not Classifier(cfg, Condition("###0"), 0, 0).is_more_general(
-            Classifier(cfg, Condition("1111"), 0, 0)
-        )
+    @pytest.mark.parametrize("cond1, cond2, result", [
+        ("####", "1111", True),
+        ("##11", "1111", True),
+        ("1111", "1111", False),
+        ("1111", "11##", False),
+        ("###0", "1111", False)
+    ])
+    def test_is_more_general(self, cfg: Configuration, cond1, cond2, result):
+        assert Classifier(cfg, Condition(cond1), 0, 0).is_more_general(
+            Classifier(cfg, Condition(cond2), 0, 0)) == result
 
     def test_does_subsume(self, cfg: Configuration):
         cl = Classifier(cfg, Condition("11##"), 0, 0)

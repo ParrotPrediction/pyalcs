@@ -13,44 +13,51 @@ class TestCondition:
         # then
         assert len(condition) == 8
 
-    def test_equal(self):
-        assert Condition('########') == Condition('########')
-        assert Condition('1#######') != Condition('########')
-        assert Condition('########') != Condition('#######1')
-        assert Condition('1111####') == Condition('1111####')
-        assert Condition('1111####') != Condition('1011####')
-        assert Condition('1101####') != Condition('1111####')
-        assert Condition('00001###') == Condition('00001###')
-
-        assert Condition("11##") == Perception("11##")
-        # str doesn't have items. I assume it is purposeful.
+    @pytest.mark.parametrize("cond1, cond2, result", [
+        ("########", "########", True),
+        ("1#######", "########", False),
+        ("########", "#######1", False),
+        ("1111####", "####1111", False),
+        ("1111####", "########", False)
+    ])
+    def test_equal(self, cond1, cond2, result):
+        tmp = Condition(cond1) == Condition(cond2)
+        assert tmp == result
+        tmp = Condition(cond1) == Perception(cond2)
+        assert tmp == result
 
     def test_should_hash(self):
         assert hash(Condition('111')) == hash(Condition('111'))
         assert hash(Condition('111')) != hash(Condition('112'))
 
-    def test_subsumes(self):
-        assert Condition("1111").subsumes(Perception("1111"))
-        assert Condition("11##").subsumes(Perception("1111"))
-        assert Condition("11##").subsumes(Perception("11##"))
-        assert Condition("11").subsumes(Perception("1111"))
-        assert not Condition("1111").subsumes(Perception("10##"))
+    @pytest.mark.parametrize("cond1, cond2, result", [
+        ("1111", "1111", True),
+        ("11##", "1111", True),
+        ("11##", "11##", True),
+        ("11", "1111", True),
+        ("1111", "10##", False),
+    ])
+    def test_subsumes(self, cond1, cond2, result):
+        assert result == Condition(cond1).subsumes(Perception(cond2))
+        assert result == Condition(cond1).subsumes(Condition(cond2))
+        assert result == Condition(cond1).subsumes(Perception(cond2))
+        assert result == Condition(cond1).subsumes(cond2)
 
-        assert Condition("11##").subsumes(Condition("11##"))
-        assert Condition("11##").subsumes(Perception("11##"))
-        assert Condition("11##").subsumes("11##")
+    @pytest.mark.parametrize("cond, num", [
+        ("1011", 0),
+        ("101#", 1),
+        ("1##1", 2),
+        ("##1#", 3),
+    ])
+    def test_number_of_wildcards(self, cond, num):
+        assert Condition(cond).wildcard_number == num
 
-    def test_number_of_wildcards(self):
-        assert Condition("1011").wildcard_number == 0
-        assert Condition("101#").wildcard_number == 1
-        assert Condition("10##").wildcard_number == 2
-        assert Condition("1###").wildcard_number == 3
-        assert Condition("1##0").wildcard_number == 2
-        assert Condition("1#10").wildcard_number == 1
-
-    def test_is_more_general(self):
-        assert Condition("1111").is_more_general(Condition("1111"))
-        assert Condition("11##").is_more_general(Condition("1111"))
-        assert Condition("####").is_more_general(Condition("##11"))
-        assert not Condition("1100").is_more_general(Condition("1111"))
-        assert not Condition("1100").is_more_general(Condition("11##"))
+    @pytest.mark.parametrize("cond1, cond2, result", [
+        ("1111", "1111", True),
+        ("11##", "1111", True),
+        ("####", "11##", True),
+        ("1100", "####", False),
+        ("1111", "10##", False),
+    ])
+    def test_is_more_general(self, cond1, cond2, result):
+        assert Condition(cond1).is_more_general(Condition(cond2)) == result

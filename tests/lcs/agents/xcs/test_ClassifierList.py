@@ -79,16 +79,12 @@ class TestClassifiersList:
         assert len(match_set) == 4
         assert len(classifiers_list_diff_actions) == 8
 
-    def test_action_set(self, cfg):
-        classifiers_list = ClassifiersList(cfg)
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 0, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 1, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 2, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 3, 0))
-        action_set = classifiers_list.form_action_set(0)
+    def test_action_set(self, cfg, classifiers_list_diff_actions):
+        action_set = classifiers_list_diff_actions.form_action_set(0)
         assert len(action_set) == 1
+        assert action_set[0].action == 0
         action_set[0].action = 1
-        assert classifiers_list[0].action == 1
+        assert classifiers_list_diff_actions[0].action == 1
 
     def test_find_not_present_action(self, cfg):
         classifiers_list = ClassifiersList(cfg)
@@ -103,20 +99,17 @@ class TestClassifiersList:
         assert len(classifiers_list_diff_actions) == cfg.number_of_actions
         assert prediction_array[0] > prediction_array[1]
 
-    def test_update_fitness(self, cfg):
-        classifiers_list = ClassifiersList(cfg)
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 0, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 1, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 2, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 3, 0))
-        classifiers_list._update_fitness()
-        assert classifiers_list[0].fitness != cfg.initial_fitness
+    def test_update_fitness(self, cfg, classifiers_list_diff_actions):
+        classifiers_list_diff_actions._update_fitness()
+        for cl in classifiers_list_diff_actions:
+            assert cl.fitness != cfg.initial_fitness
 
     def test_update_set(self, cfg: Configuration, classifiers_list_diff_actions):
         cfg.do_GA_subsumption = True
         cl = copy(classifiers_list_diff_actions[0])
         cfg.learning_rate = 1
         classifiers_list_diff_actions.update_set(0.2)
-        assert classifiers_list_diff_actions[0].experience > 0
-        assert classifiers_list_diff_actions[0].prediction != cl.prediction
-        assert classifiers_list_diff_actions[0].error != cl.error
+        for c in classifiers_list_diff_actions:
+            assert c.experience > 0
+            assert c.prediction != cl.prediction
+            assert c.error != cl.error

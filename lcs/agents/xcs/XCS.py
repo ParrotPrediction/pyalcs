@@ -5,7 +5,7 @@ from copy import copy
 from typing import Optional
 
 from lcs.agents import Agent
-from lcs.agents.xcs import Configuration, Classifier, ClassifiersList
+from lcs.agents.xcs import Configuration, ClassifiersList, GeneticAlgorithm
 from lcs.agents.Agent import TrialMetrics
 from lcs.strategies.reinforcement_learning import simple_q_learning
 from lcs.strategies.action_selection import EpsilonGreedy
@@ -28,7 +28,6 @@ class XCS(Agent):
             self.population = population
         else:
             self.population = ClassifiersList(cfg=cfg)
-        self.act_reward = [0 for _ in range(cfg.number_of_actions)]
         self.time_stamp = 0
 
     def get_population(self):
@@ -38,6 +37,7 @@ class XCS(Agent):
         return self.cfg
 
     def _run_trial_exploit(self, env, trials, current_trial) -> TrialMetrics:
+        # Doubling _run_trials_explore would cause too many issues.
         temp = self.cfg.epsilon
         self.cfg.epsilon = 0
         metrics = self._run_trial_explore(env, trials, current_trial)
@@ -47,10 +47,10 @@ class XCS(Agent):
     def _run_trial_explore(self, env, trials, current_trial) -> TrialMetrics:
         prev_action_set = None
         prev_reward = 0
+        reward = 0
         prev_state = None  # state is known as situation
         self.time_stamp = 0  # steps
         done = False  # eop
-        reward = None
 
         raw_state = env.reset()
         state = self.cfg.environment_adapter.to_genotype(raw_state)
@@ -65,7 +65,7 @@ class XCS(Agent):
             # apply action to environment
             raw_state, step_reward, done, _ = env.step(action)
             state = self.cfg.environment_adapter.to_genotype(raw_state)
-            reward = simple_q_learning(self.act_reward[action],
+            reward = simple_q_learning(reward,
                                        step_reward,
                                        self.cfg.learning_rate,
                                        self.cfg.gamma,
@@ -82,7 +82,7 @@ class XCS(Agent):
                 prev_action_set = copy(action_set)
                 prev_reward = copy(reward)
                 prev_state = copy(state)
-                self.time_stamp += 1
+            self.time_stamp += 1
         return TrialMetrics(self.time_stamp, reward)
 
     def _distribute_and_update(self, action_set, situation, p):
@@ -90,7 +90,11 @@ class XCS(Agent):
             action_set.update_set(p)
             if self.cfg.do_action_set_subsumption:
                 self.do_action_set_subsumption(action_set)
-            self.run_ga(action_set, situation, self.time_stamp)
+            GeneticAlgorithm.run_ga(self.population,
+                                    action_set,
+                                    situation,
+                                    self.time_stamp,
+                                    self.cfg)
 
     # TODO: EspilonGreedy
     # Run into a lot of issues where in EpsilonGreedy where BestAction was not callable
@@ -116,91 +120,4 @@ class XCS(Agent):
                     action_set.safe_remove(c)
                     self.population.safe_remove(c)
 
-    def run_ga(self, action_set, situation, time_stamp):
-        if action_set is None:
-            return None
 
-        temp_numerosity = sum(cl.numerosity for cl in action_set)
-        if temp_numerosity == 0:
-            return None
-
-        if time_stamp - sum(cl.time_stamp * cl.numerosity for cl in action_set) / temp_numerosity \
-            > self.cfg.ga_threshold:
-            for cl in action_set:
-                cl.time_stamp = time_stamp
-            # select children
-            parent1 = self.select_offspring(action_set)
-            parent2 = self.select_offspring(action_set)
-            child1 = copy(parent1)
-            child2 = copy(parent2)
-            child1.numerosity = 1
-            child2.numerosity = 1
-            child1.experience = 0
-            child2.experience = 0
-            # apply crossover
-            if np.random.rand() < self.cfg.chi:
-                self.apply_crossover(child1, child2)
-                child1.prediction = (parent1.prediction + parent2.prediction) / 2
-                child1.error = 0.25 * (parent1.error + parent2.error) / 2
-                child1.fitness = (parent1.fitness + parent2.fitness) / 2
-                child2.prediction = child1.prediction
-                child2.error = child1.error
-                child2.fitness = child1.fitness
-            # apply mutation on both children
-            self.apply_mutation(child1, situation)
-            self.apply_mutation(child2, situation)
-            # apply subsumption or just insert into population
-            if self.cfg.do_GA_subsumption:
-                if parent1.does_subsume(child1):
-                    parent1.numerosity += 1
-                elif parent2.does_subsume(child1):
-                    parent2.numerosity += 1
-                else:
-                    self.population.insert_in_population(child1)
-
-                if parent1.does_subsume(child2):
-                    parent1.numerosity += 1
-                elif parent2.does_subsume(child2):
-                    parent2.numerosity += 1
-                else:
-                    self.population.insert_in_population(child2)
-
-            else:
-                self.population.insert_in_population(child1)
-                self.population.insert_in_population(child2)
-            self.population.delete_from_population()
-
-    def select_offspring(self, action_set: ClassifiersList) -> Classifier:
-        fitness_sum = 0
-        for cl in action_set:
-            fitness_sum += cl.fitness
-        choice_point = np.random.rand() * fitness_sum
-        fitness_sum = 0
-        for cl in action_set:
-            fitness_sum += cl.fitness
-            if fitness_sum > choice_point:
-                return cl
-
-    def apply_crossover(self, child1, child2):
-        x = np.random.rand() * len(child1.condition)
-        y = np.random.rand() * len(child1.condition)
-        if x > y:
-            x, y = y, x
-        i = 0
-        while i < y:
-            if x <= i < y:
-                child1.condition[i], child2.condition[i] =\
-                    child1.condition[i], child2.condition[i]
-            i += 1
-
-    def apply_mutation(self, child, situation):
-        i = 0
-        while i < len(child.condition):
-            if np.random.rand() < self.cfg.mutation_chance:
-                if child.condition[i] == child.condition.WILDCARD:
-                    child.condition[i] = situation[i]
-                else:
-                    child.condition[i] = child.condition.WILDCARD
-            i += 1
-        if np.random.rand() < self.cfg.mutation_chance:
-            child.action = np.random.randint(self.cfg.number_of_actions)
