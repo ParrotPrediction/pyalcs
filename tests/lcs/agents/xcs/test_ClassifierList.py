@@ -1,6 +1,6 @@
 import pytest
-import random
 
+from copy import copy
 from lcs import Perception
 from lcs.agents.xcs import Configuration, Condition, Classifier, ClassifiersList
 
@@ -109,3 +109,20 @@ class TestClassifiersList:
         assert len(classifiers_list_diff_actions) == cfg.number_of_actions
         assert prediction_array[0] > prediction_array[1]
 
+    def test_update_fitness(self, cfg):
+        classifiers_list = ClassifiersList(cfg)
+        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 0, 0))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 1, 0))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 2, 0))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 3, 0))
+        classifiers_list._update_fitness()
+        assert classifiers_list[0].fitness != cfg.initial_fitness
+
+    def test_update_set(self, cfg: Configuration, classifiers_list_diff_actions):
+        cfg.do_GA_subsumption = True
+        cl = copy(classifiers_list_diff_actions[0])
+        cfg.learning_rate = 1
+        classifiers_list_diff_actions.update_set(0.2)
+        assert classifiers_list_diff_actions[0].experience > 0
+        assert classifiers_list_diff_actions[0].prediction != cl.prediction
+        assert classifiers_list_diff_actions[0].error != cl.error

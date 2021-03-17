@@ -13,6 +13,7 @@ from lcs.strategies.action_selection import EpsilonGreedy
 
 logger = logging.getLogger(__name__)
 
+
 class XCS(Agent):
     def __init__(self,
                  cfg: Configuration,
@@ -75,7 +76,9 @@ class XCS(Agent):
             if self.done:
                 # we won't be able to do t next loop round so we do it now
                 p = reward
-                self.update_set(prev_action_set, p)
+                prev_action_set.update_set(p)
+                if self.cfg.do_action_set_subsumption:
+                    self.do_action_set_subsumption()
                 self.run_ga(action_set, state, self.time_stamp)
             # moving values from t+1 to t
             prev_action_set = copy(action_set)
@@ -88,7 +91,9 @@ class XCS(Agent):
     def _distribute_and_update(self, action_set, situation, reward, prediction_array):
         if action_set is not None and len(action_set) > 0:
             p = reward + self.cfg.gamma * max(prediction_array)
-            self.update_set(action_set, p)
+            action_set.update_set(p)
+            if self.cfg.do_action_set_subsumption:
+                self.do_action_set_subsumption(action_set)
             self.run_ga(action_set, situation, self.time_stamp)
 
     # TODO: EspilonGreedy
@@ -101,39 +106,6 @@ class XCS(Agent):
         if np.random.rand() > self.cfg.epsilon:
             return max((v, i) for i, v in enumerate(prediction_array))[1]
         return match_set[random.randrange(len(match_set))].action
-
-    def update_set(self, action_set: ClassifiersList, p):
-        if action_set is not None and len(action_set) > 0:
-            for cl in action_set:
-                cl.experience += 1
-                action_set_numerosity = sum(cl.numerosity for cl in action_set)
-                # update prediction, prediction error, action set size estimate
-                if cl.experience < 1/self.cfg.learning_rate:
-                    cl.prediction += (p - cl.prediction) / cl.experience
-                    cl.error += (abs(p - cl.prediction) - cl.error) / cl.experience
-                    cl.action_set_size +=\
-                        (action_set_numerosity - cl.action_set_size) / cl.experience
-                else:
-                    cl.prediction += self.cfg.learning_rate * (p - cl.prediction)
-                    cl.error += self.cfg.learning_rate * (abs(p - cl.prediction) - cl.error)
-                    cl.action_set_size += \
-                        self.cfg.learning_rate * (action_set_numerosity - cl.action_set_size)
-            self.update_fitness(action_set)
-            if self.cfg.do_action_set_subsumption:
-                self.do_action_set_subsumption(action_set)
-
-    def update_fitness(self, action_set: ClassifiersList):
-        accuracy_sum = 0
-        accuracy_vector_k = []
-        for cl in action_set:
-            if cl.error < self.cfg.epsilon_0:
-                tmp_acc = 1
-            else:
-                tmp_acc = self.cfg.alpha * pow(1/(cl.error * self.cfg.epsilon_0), self.cfg.v)
-            accuracy_vector_k.append(tmp_acc)
-            accuracy_sum += tmp_acc + cl.numerosity
-        for cl, k in zip(action_set, accuracy_vector_k):
-            cl.fitness += self.cfg.learning_rate * (k * cl.numerosity / accuracy_sum - cl.fitness)
 
     def do_action_set_subsumption(self, action_set: ClassifiersList) -> None:
         cl = None

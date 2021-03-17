@@ -48,19 +48,6 @@ class TestXCS:
         assert type(action) == int
         assert action < xcs.cfg.number_of_actions
 
-
-    def test_update_fitness(self, cfg):
-        classifiers_list = ClassifiersList(cfg)
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 0, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 1, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 2, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 3, 0))
-        xcs = XCS(cfg, classifiers_list)
-        action_set = xcs.population.form_action_set(0)
-        xcs.update_fitness(action_set)
-        assert xcs.population[0].fitness != cfg.initial_fitness
-        assert classifiers_list[0].fitness != cfg.initial_fitness
-
     def test_mutation(self, cfg):
         cfg.mutation_chance = 0
         cl = Classifier(cfg, Condition("####"), 0, 0)
@@ -116,22 +103,6 @@ class TestXCS:
     def test_do_action_set_subsumption(self, xcs):
         action_set = xcs.population.form_action_set(0)
         xcs.do_action_set_subsumption(action_set)
-
-    # TODO: test for all classifiers
-    def test_update_set(self, cfg, classifiers_list_diff_actions):
-        cfg.do_GA_subsumption = True
-        xcs = XCS(cfg, classifiers_list_diff_actions)
-        action_set = xcs.population.form_action_set(0)
-        cl = copy(action_set[0])
-        cfg.beta = 1
-        xcs.update_set(action_set, 0.2)
-        assert classifiers_list_diff_actions[0].experience > 0
-        assert classifiers_list_diff_actions[0].prediction != cl.prediction
-        assert classifiers_list_diff_actions[0].error != cl.error
-        cfg.beta = 0.000000001
-        cl = copy(action_set[0])
-        xcs.update_set(action_set, 0.2)
-        assert classifiers_list_diff_actions[0].experience > 1
 
     def test_distribute_and_update(self, cfg, situation, classifiers_list_diff_actions):
         xcs = XCS(cfg=cfg, population=classifiers_list_diff_actions)
