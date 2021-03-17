@@ -1,5 +1,5 @@
 import pytest
-import copy
+from copy import copy
 
 from lcs import Perception
 from lcs.agents.xcs import Configuration, Condition, Classifier, ClassifiersList, XCS
@@ -14,6 +14,19 @@ class TestXCS:
     @pytest.fixture
     def cfg(self, number_of_actions):
         return Configuration(number_of_actions=number_of_actions, do_action_set_subsumption=False)
+
+    @pytest.fixture
+    def situation(self):
+        return "1100"
+
+    @pytest.fixture
+    def classifiers_list_diff_actions(self, cfg, situation):
+        classifiers_list = ClassifiersList(cfg)
+        classifiers_list.insert_in_population(Classifier(cfg, Condition(situation), 0, 0))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition(situation), 1, 0))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition(situation), 2, 0))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition(situation), 3, 0))
+        return classifiers_list
 
     @pytest.fixture
     def xcs(self, cfg):
@@ -120,27 +133,40 @@ class TestXCS:
 
 
     # only tests for errors and types
+    # TODO: Do more tests here
     def test_do_action_set_subsumption(self, xcs):
         action_set = xcs.population.form_action_set(0)
         xcs.do_action_set_subsumption(action_set)
 
-    def test_update_set(self, cfg):
+    # TODO: test for all classifiers
+    def test_update_set(self, cfg, classifiers_list_diff_actions):
         cfg.do_GA_subsumption = True
-        classifiers_list = ClassifiersList(cfg)
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 0, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 1, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 2, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 3, 0))
-        xcs = XCS(cfg, classifiers_list)
+        xcs = XCS(cfg, classifiers_list_diff_actions)
         action_set = xcs.population.form_action_set(0)
-        cl = copy.copy(action_set[0])
+        cl = copy(action_set[0])
         cfg.beta = 1
         xcs.update_set(action_set, 0.2)
-        assert classifiers_list[0].experience > 0
-        assert classifiers_list[0].prediction != cl.prediction
-        assert classifiers_list[0].error != cl.error
+        assert classifiers_list_diff_actions[0].experience > 0
+        assert classifiers_list_diff_actions[0].prediction != cl.prediction
+        assert classifiers_list_diff_actions[0].error != cl.error
         cfg.beta = 0.000000001
-        cl = copy.copy(action_set[0])
+        cl = copy(action_set[0])
         xcs.update_set(action_set, 0.2)
-        assert classifiers_list[0].experience > 1
+        assert classifiers_list_diff_actions[0].experience > 1
 
+    def test_distribute_and_update(self, cfg, situation, classifiers_list_diff_actions):
+        xcs = XCS(cfg=cfg, population=classifiers_list_diff_actions)
+        prediction_array = [1, 1, 1, 1]
+        reward = 1
+
+        xcs._distribute_and_update(None, situation, reward, prediction_array)
+        for cl in xcs.get_population():
+            assert cl.prediction == cfg.initial_prediction
+            assert cl.fitness == cfg.initial_fitness
+            assert cl.error == cfg.initial_error
+
+        xcs._distribute_and_update(xcs.population, situation, reward, prediction_array)
+        for cl in xcs.get_population():
+            assert not cl.prediction == cfg.initial_prediction
+            assert not cl.fitness == cfg.initial_fitness
+            assert not cl.error == cfg.initial_error
