@@ -109,13 +109,13 @@ class TestXCS:
         prediction_array = [1, 1, 1, 1]
         reward = 1
 
-        xcs._distribute_and_update(None, situation, reward, prediction_array)
+        xcs._distribute_and_update(None, situation, reward)
         for cl in xcs.get_population():
             assert cl.prediction == cfg.initial_prediction
             assert cl.fitness == cfg.initial_fitness
             assert cl.error == cfg.initial_error
 
-        xcs._distribute_and_update(xcs.population, situation, reward, prediction_array)
+        xcs._distribute_and_update(xcs.population, situation, reward)
         for cl in xcs.get_population():
             assert not cl.prediction == cfg.initial_prediction
             assert not cl.fitness == cfg.initial_fitness

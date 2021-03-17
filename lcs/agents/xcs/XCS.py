@@ -30,7 +30,6 @@ class XCS(Agent):
             self.population = ClassifiersList(cfg=cfg)
         self.act_reward = [0 for _ in range(cfg.number_of_actions)]
         self.time_stamp = 0
-        self.done = False
 
     def get_population(self):
         return self.population
@@ -47,16 +46,16 @@ class XCS(Agent):
 
     def _run_trial_explore(self, env, trials, current_trial) -> TrialMetrics:
         prev_action_set = None
-        prev_reward = None
+        prev_reward = 0
         prev_state = None  # state is known as situation
         self.time_stamp = 0  # steps
-        self.done = False  # eop
+        done = False  # eop
         reward = None
 
         raw_state = env.reset()
         state = self.cfg.environment_adapter.to_genotype(raw_state)
 
-        while not self.done:
+        while not done:
             self.population.delete_from_population()
             # We are in t+1 here
             match_set = self.population.form_match_set(state, self.time_stamp)
@@ -72,25 +71,22 @@ class XCS(Agent):
                                        self.cfg.gamma,
                                        match_set.best_prediction())
 
-            self._distribute_and_update(prev_action_set, prev_state, prev_reward, prediction_array)
-            if self.done:
-                # we won't be able to do t next loop round so we do it now
-                p = reward
-                prev_action_set.update_set(p)
-                if self.cfg.do_action_set_subsumption:
-                    self.do_action_set_subsumption()
-                self.run_ga(action_set, state, self.time_stamp)
-            # moving values from t+1 to t
-            prev_action_set = copy(action_set)
-            prev_reward = copy(reward)
-            prev_state = copy(state)
-            self.time_stamp += 1
+            self._distribute_and_update(prev_action_set,
+                                        prev_state,
+                                        prev_reward + self.cfg.gamma * max(prediction_array))
+            if done:
+                self._distribute_and_update(action_set,
+                                            state,
+                                            reward)
+            else:
+                prev_action_set = copy(action_set)
+                prev_reward = copy(reward)
+                prev_state = copy(state)
+                self.time_stamp += 1
         return TrialMetrics(self.time_stamp, reward)
 
-    # TODO: Test it
-    def _distribute_and_update(self, action_set, situation, reward, prediction_array):
+    def _distribute_and_update(self, action_set, situation, p):
         if action_set is not None and len(action_set) > 0:
-            p = reward + self.cfg.gamma * max(prediction_array)
             action_set.update_set(p)
             if self.cfg.do_action_set_subsumption:
                 self.do_action_set_subsumption(action_set)

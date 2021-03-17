@@ -73,17 +73,11 @@ class TestClassifiersList:
         assert not any(cl.does_match("0000") for cl in classifiers_list)
         assert len(classifiers_list) == 4
 
-    def test_match_set(self, cfg):
-        classifiers_list = ClassifiersList(cfg)
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 0, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 1, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 2, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 3, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1111"), 0, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1111"), 1, 0))
-        assert len(classifiers_list.form_match_set(Perception("1100"), 1)) == 4
-        match_set = classifiers_list.form_match_set(Perception("1111"), 1)
+    def test_match_set(self, classifiers_list_diff_actions):
+        assert len(classifiers_list_diff_actions.form_match_set(Perception("1100"), 1)) == 4
+        match_set = classifiers_list_diff_actions.form_match_set(Perception("1111"), 1)
         assert len(match_set) == 4
+        assert len(classifiers_list_diff_actions) == 8
 
     def test_action_set(self, cfg):
         classifiers_list = ClassifiersList(cfg)

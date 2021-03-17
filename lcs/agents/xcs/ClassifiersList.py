@@ -114,22 +114,21 @@ class ClassifiersList(TypedList):
         return prediction_array
 
     def update_set(self, p):
-        if len(self) > 0:
-            action_set_numerosity = sum(cl.numerosity for cl in self)
-            for cl in self:
-                cl.experience += 1
-                # update prediction, prediction error, action set size estimate
-                if cl.experience < 1/self.cfg.learning_rate:
-                    cl.prediction += (p - cl.prediction) / cl.experience
-                    cl.error += (abs(p - cl.prediction) - cl.error) / cl.experience
-                    cl.action_set_size +=\
-                        (action_set_numerosity - cl.action_set_size) / cl.experience
-                else:
-                    cl.prediction += self.cfg.learning_rate * (p - cl.prediction)
-                    cl.error += self.cfg.learning_rate * (abs(p - cl.prediction) - cl.error)
-                    cl.action_set_size += \
-                        self.cfg.learning_rate * (action_set_numerosity - cl.action_set_size)
-            self._update_fitness()
+        action_set_numerosity = sum(cl.numerosity for cl in self)
+        for cl in self:
+            cl.experience += 1
+            # update prediction, prediction error, action set size estimate
+            if cl.experience < 1/self.cfg.learning_rate:
+                cl.prediction += (p - cl.prediction) / cl.experience
+                cl.error += (abs(p - cl.prediction) - cl.error) / cl.experience
+                cl.action_set_size +=\
+                    (action_set_numerosity - cl.action_set_size) / cl.experience
+            else:
+                cl.prediction += self.cfg.learning_rate * (p - cl.prediction)
+                cl.error += self.cfg.learning_rate * (abs(p - cl.prediction) - cl.error)
+                cl.action_set_size += \
+                    self.cfg.learning_rate * (action_set_numerosity - cl.action_set_size)
+        self._update_fitness()
 
     def _update_fitness(self):
         accuracy_sum = 0
