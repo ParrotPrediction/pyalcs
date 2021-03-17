@@ -58,7 +58,7 @@ class XCS(Agent):
             self.population.delete_from_population()
             # We are in t+1 here
             match_set = self.population.form_match_set(state, self.time_stamp)
-            prediction_array = self.generate_prediction_array(match_set)
+            prediction_array = match_set.prediction_array
             action = self.select_action(prediction_array, match_set)
             action_set = match_set.form_action_set(action)
             # apply action to environment
@@ -89,17 +89,6 @@ class XCS(Agent):
             p = reward + self.cfg.gamma * max(prediction_array)
             self.update_set(action_set, p)
             self.run_ga(action_set, situation, self.time_stamp)
-
-    def generate_prediction_array(self, match_set: ClassifiersList):
-        prediction_array = []
-        fitness_sum_array = []
-        for cl in match_set:
-            prediction_array.append(cl.prediction * cl.fitness)
-            fitness_sum_array.append(cl.fitness)
-        for i in range(0, len(prediction_array)):
-            if fitness_sum_array[i] != 0:
-                prediction_array[i] /= fitness_sum_array[i]
-        return prediction_array
 
     # TODO: EspilonGreedy
     # Run into a lot of issues where in EpsilonGreedy where BestAction was not callable
@@ -148,7 +137,7 @@ class XCS(Agent):
     def do_action_set_subsumption(self, action_set: ClassifiersList) -> None:
         cl = None
         for c in action_set:
-            if c.could_subsume():
+            if c.could_subsume:
                 if cl is None or c.more_general(cl):
                     cl = c
         if cl is not None:

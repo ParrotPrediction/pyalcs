@@ -29,13 +29,8 @@ class TestXCS:
         return classifiers_list
 
     @pytest.fixture
-    def xcs(self, cfg):
-        classifiers_list = ClassifiersList(cfg)
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 0, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 1, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 2, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 3, 0))
-        xcs = XCS(cfg)
+    def xcs(self, cfg, classifiers_list_diff_actions):
+        xcs = XCS(cfg=cfg, population=classifiers_list_diff_actions)
         return xcs
 
     def test_prediction_array(self, cfg):
@@ -45,7 +40,7 @@ class TestXCS:
         classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 2, 0))
         classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 3, 0))
         xcs = XCS(cfg)
-        prediction_array = xcs.generate_prediction_array(classifiers_list)
+        prediction_array = classifiers_list.prediction_array
         assert len(classifiers_list) == len(prediction_array)
 
     # it mostly tests if function will manage to run
@@ -56,7 +51,7 @@ class TestXCS:
         classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 2, 0))
         classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 3, 0))
         xcs = XCS(cfg)
-        prediction_array = xcs.generate_prediction_array(classifiers_list)
+        prediction_array = classifiers_list.prediction_array
         action = xcs.select_action(prediction_array=prediction_array,
                                    match_set=classifiers_list)
         xcs.cfg.p_exp = 0.999999 # I know that is lazy
@@ -130,7 +125,6 @@ class TestXCS:
         xcs.run_ga(action_set, Perception("0000"), 100000)
         assert xcs.population[0].time_stamp != 0
         assert xcs.population.numerosity > 4
-
 
     # only tests for errors and types
     # TODO: Do more tests here

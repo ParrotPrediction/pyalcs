@@ -100,3 +100,15 @@ class ClassifiersList(TypedList):
     # reasoning: fitness is used as prediction weight in prediction array
     def best_prediction(self):
         return max(cl.prediction * cl.fitness for cl in self)
+
+    @property
+    def prediction_array(self):
+        prediction_array = []
+        fitness_sum_array = []
+        for cl in self:
+            prediction_array.append(cl.prediction * cl.fitness)
+            fitness_sum_array.append(cl.fitness)
+        for i in range(0, len(prediction_array)):
+            if fitness_sum_array[i] != 0:
+                prediction_array[i] /= fitness_sum_array[i]
+        return prediction_array
