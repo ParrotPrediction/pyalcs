@@ -39,10 +39,16 @@ class ClassifiersList(TypedList):
                         time_stamp=time_stamp)
         return cl
 
+    def _generate_covering_and_insert(self, situation, action, time_stamp):
+        cl = self.generate_covering_classifier(situation, action, time_stamp)
+        self.insert_in_population(cl)
+        self.delete_from_population()
+        return cl
+
     # Roulette-Wheel Deletion
     # TODO: use strategies
     def delete_from_population(self):
-        while self.numerosity > self.cfg.max_population:
+        if self.numerosity > self.cfg.max_population:
             average_fitness = sum(cl.fitness for cl in self) / self.numerosity
             deletion_votes = []
             for cl in self:
@@ -60,6 +66,7 @@ class ClassifiersList(TypedList):
 
     # I toyed with numerosity -= 1
     # and had better results with same solution as hosford42
+    # which is deleting the classifier
     def _remove_based_on_votes(self, deletion_votes, selector):
         for cl, vote in zip(self, deletion_votes):
             selector -= vote
@@ -71,15 +78,15 @@ class ClassifiersList(TypedList):
     def form_match_set(self, situation: Perception,  time_stamp):
         matching_ls = [cl for cl in self if cl.does_match(situation)]
         while len(matching_ls) < self.cfg.number_of_actions:
-            action = 0
-            for a in range(0, self.cfg.number_of_actions):
-                if all(cl.action != a for cl in matching_ls):
-                    action = a
-            cl = self.generate_covering_classifier(situation, action, time_stamp)
-            self.insert_in_population(cl)
-            self.delete_from_population()
+            action = self._find_not_present_action(matching_ls)
+            cl = self._generate_covering_and_insert(situation, action, time_stamp)
             matching_ls.append(cl)
         return ClassifiersList(self.cfg, *matching_ls)
+
+    def _find_not_present_action(self, matching_set):
+        for action in range(0, self.cfg.number_of_actions):
+            if all(cl.action != action for cl in matching_set):
+                return action
 
     def form_action_set(self, action):
         action_ls = [cl for cl in self if cl.action == action]

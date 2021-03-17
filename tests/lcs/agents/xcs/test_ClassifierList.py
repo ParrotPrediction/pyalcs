@@ -83,3 +83,9 @@ class TestClassifiersList:
         action_set[0].action = 1
         assert classifiers_list[0].action == 1
 
+    def test_find_not_present_action(self, cfg):
+        classifiers_list = ClassifiersList(cfg)
+        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 1, 0))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 2, 0))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 3, 0))
+        assert 0 == classifiers_list._find_not_present_action(classifiers_list)
