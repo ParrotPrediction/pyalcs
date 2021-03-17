@@ -33,36 +33,21 @@ class TestXCS:
         xcs = XCS(cfg=cfg, population=classifiers_list_diff_actions)
         return xcs
 
-    def test_prediction_array(self, cfg):
-        classifiers_list = ClassifiersList(cfg)
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 0, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 1, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 2, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 3, 0))
-        xcs = XCS(cfg)
-        prediction_array = classifiers_list.prediction_array
-        assert len(classifiers_list) == len(prediction_array)
-
     # it mostly tests if function will manage to run
-    def test_select_action(self, cfg, number_of_actions):
-        classifiers_list = ClassifiersList(cfg)
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 0, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 1, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 2, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 3, 0))
-        xcs = XCS(cfg)
-        prediction_array = classifiers_list.prediction_array
+    def test_select_action(self, xcs, classifiers_list_diff_actions):
+        prediction_array = [0, 0, 1, 0]
+        xcs.cfg.epsilon = -1
         action = xcs.select_action(prediction_array=prediction_array,
-                                   match_set=classifiers_list)
-        xcs.cfg.p_exp = 0.999999 # I know that is lazy
+                                   match_set=classifiers_list_diff_actions)
         assert type(action) == int
-        assert action < number_of_actions
+        assert action == 2
 
-        xcs.cfg.p_exp = 0
+        xcs.cfg.epsilon = 2
         action = xcs.select_action(prediction_array=prediction_array,
-                                   match_set=classifiers_list)
+                                   match_set=classifiers_list_diff_actions)
         assert type(action) == int
-        assert action < number_of_actions
+        assert action < xcs.cfg.number_of_actions
+
 
     def test_update_fitness(self, cfg):
         classifiers_list = ClassifiersList(cfg)

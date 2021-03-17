@@ -11,6 +11,19 @@ class TestClassifiersList:
     def cfg(self):
         return Configuration(number_of_actions=4)
 
+    @pytest.fixture
+    def situation(self):
+        return "1100"
+
+    @pytest.fixture
+    def classifiers_list_diff_actions(self, cfg, situation):
+        classifiers_list = ClassifiersList(cfg)
+        classifiers_list.insert_in_population(Classifier(cfg, Condition(situation), 0, 0))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition(situation), 1, 0))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition(situation), 2, 0))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition(situation), 3, 0))
+        return classifiers_list
+
     def test_init(self, cfg):
         assert len(ClassifiersList(cfg)) == 0
 
@@ -89,3 +102,10 @@ class TestClassifiersList:
         classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 2, 0))
         classifiers_list.insert_in_population(Classifier(cfg, Condition("1100"), 3, 0))
         assert 0 == classifiers_list._find_not_present_action(classifiers_list)
+
+    def test_prediction_array(self, cfg, classifiers_list_diff_actions):
+        classifiers_list_diff_actions[0].prediction = 10
+        prediction_array = classifiers_list_diff_actions.prediction_array
+        assert len(classifiers_list_diff_actions) == cfg.number_of_actions
+        assert prediction_array[0] > prediction_array[1]
+

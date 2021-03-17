@@ -1,4 +1,5 @@
 import logging
+import random
 import numpy as np
 from copy import copy
 from typing import Optional
@@ -98,8 +99,8 @@ class XCS(Agent):
     # Fixed the issue but I want to solve it without changes to EpsilonGreedy.py
     def select_action(self, prediction_array, match_set: ClassifiersList) -> int:
         if np.random.rand() > self.cfg.epsilon:
-            return match_set[prediction_array.index(max(prediction_array))].action
-        return np.random.randint(self.cfg.number_of_actions)
+            return max((v, i) for i, v in enumerate(prediction_array))[1]
+        return match_set[random.randrange(len(match_set))].action
 
     def update_set(self, action_set: ClassifiersList, p):
         if action_set is not None and len(action_set) > 0:

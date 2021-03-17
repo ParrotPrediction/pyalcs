@@ -103,12 +103,12 @@ class ClassifiersList(TypedList):
 
     @property
     def prediction_array(self):
-        prediction_array = []
-        fitness_sum_array = []
+        prediction_array = [0 for _ in range(self.cfg.number_of_actions)]
+        fitness_sum_array = [0 for _ in range(self.cfg.number_of_actions)]
         for cl in self:
-            prediction_array.append(cl.prediction * cl.fitness)
-            fitness_sum_array.append(cl.fitness)
-        for i in range(0, len(prediction_array)):
+            prediction_array[cl.action] += cl.prediction * cl.fitness
+            fitness_sum_array[cl.action] += cl.fitness
+        for i in range(self.cfg.number_of_actions):
             if fitness_sum_array[i] != 0:
                 prediction_array[i] /= fitness_sum_array[i]
         return prediction_array
