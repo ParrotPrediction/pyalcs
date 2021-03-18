@@ -50,13 +50,13 @@ class TestClassifiersList:
 
     def test_deletion(self, cfg: Configuration):
         classifiers_list = ClassifiersList(cfg)
-        for i in range(cfg.max_population + 10):
+        for i in range(cfg.max_population + 1):
             classifiers_list.insert_in_population(
                 Classifier(cfg, Condition("1111"), 0, 0)
             )
         assert sum(cl.numerosity for cl in classifiers_list) > cfg.max_population
         classifiers_list.delete_from_population()
-        assert sum(cl.numerosity for cl in classifiers_list) < cfg.max_population
+        assert sum(cl.numerosity for cl in classifiers_list) <= cfg.max_population
 
     def test_removes_correct_one(self, cfg):
         classifiers_list = ClassifiersList(cfg)

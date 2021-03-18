@@ -21,7 +21,7 @@ class ClassifiersList(TypedList):
         for c in self:
             if c.condition == cl.condition and c.action == cl.action:
                 c.numerosity += 1
-                return None
+                return 
         self.append(cl)
 
     def generate_covering_classifier(self, situation, action, time_stamp):
