@@ -99,8 +99,6 @@ class ClassifiersList(TypedList):
     def numerosity(self):
         return sum(cl.numerosity for cl in self)
 
-    # it is my creation, it very likely is wrong
-    # reasoning: fitness is used as prediction weight in prediction array
     @property
     def best_prediction(self):
         return max(cl.prediction * cl.fitness for cl in self)
