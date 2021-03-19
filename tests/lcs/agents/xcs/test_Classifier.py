@@ -67,3 +67,31 @@ class TestClassifier:
         assert cl.does_subsume(Classifier(cfg, Condition("1111"), 0, 0))
         assert not cl.does_subsume(Classifier(cfg, Condition("1111"), 1, 0))
         assert not cl.does_subsume(Classifier(cfg, Condition("0011"), 1, 0))
+
+    @pytest.mark.parametrize("cond1, cond2, act1, act2, result", [
+        ("1111", "1111", 1, 1, True),
+        ("#100", "#100", 0, 0, True),
+
+        ("1111", "1111", 1, 0, False),
+        ("1111", "1111", 0, 1, False),
+        ("1111", "1111", 1, 2, False),
+        ("1111", "1111", 1, 3, False),
+        ("1111", "1111", 2, 1, False),
+        ("1111", "1111", 3, 1, False),
+
+        ("1100", "1111", 1, 1, False),
+        ("1111", "1100", 1, 1, False),
+
+        ("1111", "####", 1, 1, False),
+        ("1111", "11##", 1, 1, False),
+        ("##11", "11##", 1, 1, False),
+        ("##11", "1111", 1, 1, False),
+
+        ("1111", "11", 1, 1, False),
+        ("11", "1111", 1, 1, False)
+    ])
+    def test_equals(self, cfg, cond1, cond2, act1, act2, result):
+        assert result == (Classifier(cfg=cfg, condition=Condition(cond1), action=act1, time_stamp=0) ==
+                          Classifier(cfg=cfg, condition=Condition(cond2), action=act2, time_stamp=0))
+
+

@@ -15,16 +15,21 @@ class TestCondition:
 
     @pytest.mark.parametrize("cond1, cond2, result", [
         ("########", "########", True),
-        ("1#######", "########", False),
-        ("########", "#######1", False),
+        ("1100####", "########", False),
+        ("########", "####1100", False),
         ("1111####", "####1111", False),
-        ("1111####", "########", False)
+        ("1111####", "########", False),
+
+        ("1100", "1100", True),
+        ("1100", "1111", False),
+        ("1111", "1100", False),
+
+        ("1111", "11", False),
+        ("11", "1100", False)
     ])
     def test_equal(self, cond1, cond2, result):
-        tmp = Condition(cond1) == Condition(cond2)
-        assert tmp == result
-        tmp = Condition(cond1) == Perception(cond2)
-        assert tmp == result
+        assert result == (Condition(cond1) == Condition(cond2))
+        assert result == (Condition(cond1) == Perception(cond2))
 
     def test_should_hash(self):
         assert hash(Condition('111')) == hash(Condition('111'))

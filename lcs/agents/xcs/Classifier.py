@@ -64,3 +64,8 @@ class Classifier:
     def __str__(self):
         return f"Cond:{self.condition} - Act:{self.action} - Num:{self.numerosity} " + \
             f"[fit: {self.fitness:.3f}, exp: {self.experience:3.2f}, pred: {self.prediction:2.3f}]"
+
+    def __eq__(self, other):
+        if other.action == self.action and other.condition == self.condition:
+                return True
+        return False

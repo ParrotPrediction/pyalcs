@@ -113,8 +113,3 @@ class TestClassifiersList:
             assert c.experience > 0
             assert c.prediction != cl.prediction
             assert c.error != cl.error
-
-    def test_equals(self, cfg, classifiers_list_diff_actions):
-        classifier_copy = copy(classifiers_list_diff_actions)
-        for cl, clc in zip(classifier_copy, classifiers_list_diff_actions):
-            assert cl == clc
