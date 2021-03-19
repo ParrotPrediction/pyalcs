@@ -34,7 +34,7 @@ class ClassifiersList(TypedList):
             else:
                 generalized.append(situation[i])
         cl = Classifier(cfg=self.cfg,
-                        condition=Condition(situation),
+                        condition=Condition(generalized),
                         action=action,
                         time_stamp=time_stamp)
         return cl
@@ -146,4 +146,3 @@ class ClassifiersList(TypedList):
             accuracy_sum += tmp_acc + cl.numerosity
         for cl, k in zip(self, accuracy_vector_k):
             cl.fitness += self.cfg.learning_rate * (k * cl.numerosity / accuracy_sum - cl.fitness)
-
