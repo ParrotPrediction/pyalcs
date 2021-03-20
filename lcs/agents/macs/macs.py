@@ -6,7 +6,7 @@ import random
 from itertools import groupby
 from operator import attrgetter
 from typing import Union, Optional, Dict, Generator, Set, Tuple, List, \
-    NamedTuple
+    NamedTuple, Callable
 
 from lcs import TypedList, Perception
 from lcs.agents import Agent, ImmutableSequence
@@ -56,14 +56,10 @@ class Condition(ImmutableSequence):
     def increase_eis(self, idx, beta):
         if self[idx] == self.WILDCARD:
             self.eis[idx] = (1 - beta) * self.eis[idx] + beta
-        else:
-            raise ValueError('Trying to modify eis for non wildcard')
 
     def decrease_eis(self, idx, beta):
         if self[idx] == self.WILDCARD:
             self.eis[idx] = (1 - beta) * self.eis[idx]
-        else:
-            raise ValueError('Trying to modify eis for non wildcard')
 
     def increase_ig(self, idx, beta):
         if self[idx] != self.WILDCARD:
@@ -109,6 +105,7 @@ class Condition(ImmutableSequence):
 
         eis = {idx: self.eis[idx] for idx, c in enumerate(self) if
                c == self.WILDCARD}
+
         return max(eis, key=eis.get)
 
     def feature_to_generalize(self) -> Optional[int]:
@@ -179,8 +176,12 @@ class Configuration:
                  inaccuracy_threshold: int = 5,
                  accuracy_threshold: int = 5,
                  oscillation_threshold: int = 5,
-                 specified_symbols: int = 1):
+                 metrics_trial_frequency: int = 5,
+                 user_metrics_collector_fcn: Callable = None):
+
         assert classifier_length == len(feature_possible_values)
+        assert 1 <= specified_effect_attributes <= classifier_length
+
         self.classifier_length = classifier_length
         self.number_of_possible_actions = number_of_possible_actions
         self.feature_possible_values = feature_possible_values
@@ -189,7 +190,8 @@ class Configuration:
         self.er = inaccuracy_threshold
         self.ea = accuracy_threshold
         self.eo = oscillation_threshold
-        self.specified_symbols = specified_symbols
+        self.metrics_trial_frequency = metrics_trial_frequency
+        self.user_metrics_collector_fcn = user_metrics_collector_fcn
 
 
 class Classifier:
@@ -197,12 +199,14 @@ class Classifier:
                  condition: Union[Condition, str, None] = None,
                  action: Optional[int] = None,
                  effect: Union[Effect, str, None] = None,
+                 debug: dict = dict(),
                  cfg: Optional[Configuration] = None):
 
         if cfg is None:
             raise TypeError("Configuration should be passed to Classifier")
 
         self.cfg = cfg
+        self.debug = debug
 
         def build_perception_string(cls, initial,
                                     length=self.cfg.classifier_length):
@@ -278,6 +282,7 @@ class LatentLearning:
         for cl in action_set:
             if cl.anticipates(p1):
                 cl.g += 1
+                cl.sg = p0
                 if cl.sb is not None:
                     for i, (p0i, bpi) in enumerate(zip(p0, cl.sb)):
                         if p0i == bpi:
@@ -286,6 +291,7 @@ class LatentLearning:
                             cl.condition.increase_eis(i, self.cfg.beta)
             else:
                 cl.b += 1
+                cl.sb = p0
                 if cl.sg is not None:
                     for i, (p0i, gpi) in enumerate(zip(p0, cl.sg)):
                         if p0i == gpi:
@@ -300,13 +306,15 @@ class LatentLearning:
 
     def specialize_conditions(self,
                               pop: ClassifiersList,
-                              perceptions: Set[Perception]) -> None:
+                              situations_seen: Set[Perception]) -> None:
 
         for cl in [cl for cl in pop if cl.is_oscillating]:
             feature_idx = cl.condition.feature_to_specialize()
             for new_cl in self.mutspec(cl, feature_idx):
-                if any(new_cl.does_match(p) for p in perceptions):
+                if any(new_cl.does_match(p) for p in situations_seen):
                     pop.append(new_cl)
+
+            pop.safe_remove(cl)  # TODO it was added
 
     def mutspec(self, cl: Classifier, feature_idx: int) -> Generator[
         Classifier]:
@@ -319,12 +327,13 @@ class LatentLearning:
                 condition=new_c,
                 action=cl.action,
                 effect=Effect(cl.effect),
+                debug={'origin': 'mutspec'},
                 cfg=cl.cfg
             )
 
     def generalize_conditions(self,
                               population: ClassifiersList,
-                              obs_situations: List[Perception],
+                              situations_seen: Set[Perception],
                               p0: Perception,
                               a0: int,
                               p1: Perception) -> None:
@@ -338,12 +347,14 @@ class LatentLearning:
 
         # Sort classifiers by effect for grouping
         set_a = sorted(set_a, key=attrgetter("effect"))
+        set_d: Set[Classifier] = set()  # conflicts
+
         for _, set_b in groupby(set_a, key=attrgetter("effect")):
             set_b = set(set_b)
             if all(cl.is_accurate for cl in set_b):
                 # Build [C] only when all classifiers from [B] are accurate
                 for cl in set_b:
-                    if all(ig <= 0.5 for ig in cl.condition.ig):
+                    if all(ig < 0.5 for ig in cl.condition.ig):
                         set_c.add(ChildClassifier(cl, None))
                     else:
                         spec_cond_idx = cl.condition.feature_to_generalize()
@@ -353,26 +364,26 @@ class LatentLearning:
                         new_cond[spec_cond_idx] = Condition.WILDCARD
                         new_cl = Classifier(condition=new_cond,
                                             action=cl.action, effect=cl.effect,
+                                            debug={'origin': 'set_c'},
                                             cfg=cl.cfg)
 
                         set_c.add(ChildClassifier(new_cl, cl))
 
-        # Check for conflicts in [C]
-        set_d: Set[Classifier] = set()  # conflicts
-        for p in obs_situations:
-            for existing_cl in [cl for cl in population if
-                                cl.does_match(p) and cl.action == a0]:
-                for new_cl in [cl for cl in set_c if cl.classifier.does_match(
-                    p) and cl.classifier.action == a0]:
-                    if existing_cl.effect.conflicts(new_cl.classifier.effect):
-                        assert new_cl.parent is not None
-                        set_d.add(new_cl.parent)
-                    else:
-                        set_d.add(new_cl.classifier)
+            # Check for conflicts in [C]
+            for p in situations_seen:
+                for existing_cl in [cl for cl in population if
+                                    cl.does_match(p) and cl.action == a0]:
+                    for new_cl in [cl for cl in set_c if cl.classifier.does_match(
+                        p) and cl.classifier.action == a0]:
+                        if existing_cl.effect.conflicts(new_cl.classifier.effect):
+                            assert new_cl.parent is not None
+                            set_d.add(new_cl.parent)
+                        else:
+                            set_d.add(new_cl.classifier)
 
         # Analyze every possible pair of [D] for duplicates (keep most general)
         for (c1, c2) in itertools.combinations(set_d, 2):
-            if c1.condition.is_more_general(c2.condition):
+            if c1.condition.is_more_general(c2.condition) and c2 in set_d:
                 set_d.remove(c2)
 
         # In the original population replace classifiers from [A]
@@ -400,6 +411,7 @@ class LatentLearning:
                         condition=possible_conditions[0],  # take most general
                         action=a0,
                         effect=ef,
+                        debug={'origin', 'covering'},
                         cfg=self.cfg)
                     to_add.add(new_cl)
 
@@ -439,6 +451,7 @@ class MACS(Agent):
         self.cfg = cfg
         self.population = population or ClassifiersList()
         self.desirability_values = desirability_values or dict()
+        self.ll = LatentLearning(cfg)
 
     def get_population(self):
         return self.population
@@ -464,14 +477,11 @@ class MACS(Agent):
         raw_state = env.reset()
 
         state = Perception(raw_state)
-        prev_state = None
-
-        action = None
-
         done = False
 
         while not done:
             logging.debug(f"Step {steps}, perception: {state}")
+            self.remember_situation(state)
 
             # Select an action
             action = random.randint(0, self.cfg.number_of_possible_actions - 1)
@@ -486,11 +496,23 @@ class MACS(Agent):
             prev_state = state
             state = Perception(raw_state)
 
+            seen_situations = set(self.desirability_values.keys())
+
+            self.ll.evaluate_classifiers(
+                self.population, prev_state, action, state)
+            self.ll.select_accurate(self.population)
+            self.ll.specialize_conditions(self.population, seen_situations)
+            self.ll.generalize_conditions(
+                self.population, seen_situations, prev_state, action, state)
+            self.ll.cover_transitions(
+                self.population, prev_state, action, state)
+
             steps += 1
 
         return TrialMetrics(steps, last_reward)
 
 
 if __name__ == '__main__':
-    cfg = Configuration(4, 2, feature_possible_values=[{0, 1}, {0, 1}, {0, 1}, {0, 1}])
+    state_values = {0, 1}
+    cfg = Configuration(4, 2, feature_possible_values=[state_values] * 4)
     agent = MACS(cfg)
