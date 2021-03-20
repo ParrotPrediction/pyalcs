@@ -8,7 +8,8 @@ class TestMACS:
 
     @pytest.fixture
     def cfg(self):
-        return Configuration(2, 2, feature_possible_values=[2, 2])
+        feature_vals = {'0', '1'}
+        return Configuration(2, 2, feature_possible_values=[feature_vals] * 2)
 
     @pytest.fixture
     def agent(self, cfg):

@@ -311,7 +311,7 @@ class LatentLearning:
     def mutspec(self, cl: Classifier, feature_idx: int) -> Generator[
         Classifier]:
         assert cl.condition[feature_idx] == Condition.WILDCARD
-        for feature in range(self.cfg.feature_possible_values[feature_idx]):
+        for feature in self.cfg.feature_possible_values[feature_idx]:
             new_c = Condition(cl.condition)
             new_c[feature_idx] = str(feature)
 
@@ -449,8 +449,8 @@ class MACS(Agent):
     def remember_situation(self, p: Perception):
         assert len(p) == self.cfg.classifier_length
 
-        for f_max, _p in zip(self.cfg.feature_possible_values, p):
-            assert int(_p) in range(0, f_max)
+        for f_vals, _p in zip(self.cfg.feature_possible_values, p):
+            assert _p in f_vals
 
         if p not in self.desirability_values:
             self.desirability_values[p] = 0.0
@@ -492,5 +492,5 @@ class MACS(Agent):
 
 
 if __name__ == '__main__':
-    cfg = Configuration(4, 2, feature_possible_values=[2, 2, 2, 2])
+    cfg = Configuration(4, 2, feature_possible_values=[{0, 1}, {0, 1}, {0, 1}, {0, 1}])
     agent = MACS(cfg)

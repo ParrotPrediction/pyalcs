@@ -15,7 +15,7 @@ class TestLatentLearning:
 
     @pytest.fixture
     def cfg(self):
-        return Configuration(4, 2, [2, 2, 2, 2])
+        return Configuration(4, 2, [{0, 1}, {0, 1}, {0, 1}, {0, 1}])
 
     @pytest.fixture
     def ll(self, cfg):
