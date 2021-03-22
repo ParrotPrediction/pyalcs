@@ -23,12 +23,7 @@ def run_ga(population: ClassifiersList,
         # select children
         parent1 = _select_offspring(action_set)
         parent2 = _select_offspring(action_set)
-        child1 = copy(parent1)
-        child2 = copy(parent2)
-        child1.numerosity = 1
-        child2.numerosity = 1
-        child1.experience = 0
-        child2.experience = 0
+        child1, child2 = _make_children(parent1, parent2)
         # apply crossover
         if np.random.rand() < cfg.chi:
             _apply_crossover(child1, child2)
@@ -61,6 +56,17 @@ def run_ga(population: ClassifiersList,
             population.insert_in_population(child1)
             population.insert_in_population(child2)
         population.delete_from_population()
+
+
+def _make_children(parent1, parent2):
+    child1 = copy(parent1)
+    child2 = copy(parent2)
+    child1.numerosity = 1
+    child2.numerosity = 1
+    child1.experience = 0
+    child2.experience = 0
+    return child1, child2
+
 
 def _select_offspring(action_set: ClassifiersList) -> Classifier:
     fitness_sum = 0

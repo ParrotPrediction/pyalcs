@@ -61,7 +61,7 @@ class ClassifiersList(TypedList):
         if cl.experience > self.cfg.deletion_threshold and \
                 cl.fitness / cl.numerosity > \
                 self.cfg.delta * average_fitness:
-            vote *= average_fitness / (cl.get_fitness() / cl.numerosity)
+            vote *= average_fitness / (cl.fitness / cl.numerosity)
         return vote
 
     # I toyed with numerosity -= 1

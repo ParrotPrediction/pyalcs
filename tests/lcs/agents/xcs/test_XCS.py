@@ -3,7 +3,7 @@ from copy import copy
 
 from lcs import Perception
 from lcs.agents.xcs import Configuration, Condition, Classifier, ClassifiersList, XCS, GeneticAlgorithm
-
+from lcs.strategies.reinforcement_learning import simple_q_learning
 
 class TestXCS:
 
@@ -96,6 +96,7 @@ class TestXCS:
         # Just to check for errors
         GeneticAlgorithm._apply_crossover(cl1, cl2)
 
+
     @pytest.mark.parametrize("chi", [
         1,
         0
@@ -110,3 +111,26 @@ class TestXCS:
         GeneticAlgorithm.run_ga(xcs.population, action_set, Perception("0000"), 100000, cfg)
         assert xcs.population[0].time_stamp != 0
         assert xcs.population.numerosity > 4
+
+    def test_simple_q_learning(self, cfg, classifiers_list_diff_actions):
+        reward = simple_q_learning(0, 0, cfg.learning_rate, cfg.gamma, 0)
+        assert reward == 0
+        reward = simple_q_learning(0, 10, cfg.learning_rate, cfg.gamma, 0)
+        assert reward > 0
+        new_reward = simple_q_learning(reward, 0, cfg.learning_rate, cfg.gamma, 0)
+        assert new_reward < reward
+
+    def test_make_children(self, cfg, classifiers_list_diff_actions):
+        child1, child2 = GeneticAlgorithm._make_children(
+            classifiers_list_diff_actions[0],
+            classifiers_list_diff_actions[1]
+        )
+        assert child1.numerosity == 1
+        assert child2.numerosity == 1
+        assert child1.experience == 0
+        assert child2.experience == 0
+        assert id(child1) != id(classifiers_list_diff_actions[0])
+        assert id(child2) != id(classifiers_list_diff_actions[0])
+        assert id(child1) != id(classifiers_list_diff_actions[1])
+        assert id(child2) != id(classifiers_list_diff_actions[1])
+
