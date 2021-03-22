@@ -82,10 +82,18 @@ class TestXCS:
         GeneticAlgorithm._apply_mutation(cl, cfg, Perception("1111"))
         assert cl.is_more_general(Classifier(cfg, Condition("1111"), 0, 0))
 
-    # only tests for errors and types
-    def test_crossover(self, cfg):
-        cl1 = Classifier(cfg, Condition("1111111"), 0, 0)
-        cl2 = Classifier(cfg, Condition("0000000"), 1, 0)
+    @pytest.mark.parametrize("cond1, cond2, x, y, end_cond1, end_cond2", [
+        ("11111", "#####", 0, 5, "#####", "11111"),
+        ("11111", "000", 0, 5, "00011", "111"),
+        ("11111", "#####", 1, 4, "1###1", "#111#")
+    ])
+    def test_crossover(self, cfg, cond1, cond2, x, y, end_cond1, end_cond2):
+        cl1 = Classifier(cfg, Condition(cond1), 0, 0)
+        cl2 = Classifier(cfg, Condition(cond2), 1, 0)
+        GeneticAlgorithm._apply_crossover_in_area(cl1, cl2, x, y)
+        assert cl1.condition == Condition(end_cond1)
+        assert cl2.condition == Condition(end_cond2)
+        # Just to check for errors
         GeneticAlgorithm._apply_crossover(cl1, cl2)
 
     @pytest.mark.parametrize("chi", [

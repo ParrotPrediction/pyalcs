@@ -62,7 +62,6 @@ def run_ga(population: ClassifiersList,
             population.insert_in_population(child2)
         population.delete_from_population()
 
-
 def _select_offspring(action_set: ClassifiersList) -> Classifier:
     fitness_sum = 0
     for cl in action_set:
@@ -76,15 +75,25 @@ def _select_offspring(action_set: ClassifiersList) -> Classifier:
 
 
 def _apply_crossover(child1: Classifier, child2: Classifier):
-    x = np.random.rand() * len(child1.condition)
-    y = np.random.rand() * len(child1.condition)
+    _apply_crossover_in_area(child1, child2,
+                             np.random.rand() * len(child1.condition),
+                             np.random.rand() * len(child1.condition)
+                             )
+
+
+def _apply_crossover_in_area(child1: Classifier, child2: Classifier, x, y):
     if x > y:
         x, y = y, x
+    if x > len(child2.condition):
+        return
+    if y > len(child2.condition):
+        y = len(child2.condition)
     i = 0
     while i < y:
         if x <= i < y:
-            child1.condition[i], child2.condition[i] =\
-                child1.condition[i], child2.condition[i]
+            temp = child1.condition[i]
+            child1.condition[i] = child2.condition[i]
+            child2.condition[i] = temp
         i += 1
 
 
