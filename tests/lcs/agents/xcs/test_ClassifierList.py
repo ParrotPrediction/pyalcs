@@ -86,13 +86,13 @@ class TestClassifiersList:
         assert len(classifiers_list) == 4
 
     def test_match_set(self, classifiers_list_diff_actions):
-        assert len(classifiers_list_diff_actions.form_match_set(Perception("1100"), 1)) == 4
-        match_set = classifiers_list_diff_actions.form_match_set(Perception("1111"), 1)
+        assert len(classifiers_list_diff_actions.generate_match_set(Perception("1100"), 1)) == 4
+        match_set = classifiers_list_diff_actions.generate_match_set(Perception("1111"), 1)
         assert len(match_set) == 4
         assert len(classifiers_list_diff_actions) == 8
 
     def test_action_set(self, cfg, classifiers_list_diff_actions):
-        action_set = classifiers_list_diff_actions.form_action_set(0)
+        action_set = classifiers_list_diff_actions.generate_action_set(0)
         assert len(action_set) == 1
         assert action_set[0].action == 0
         action_set[0].action = 1

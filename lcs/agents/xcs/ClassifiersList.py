@@ -78,7 +78,7 @@ class ClassifiersList(TypedList):
                     self.safe_remove(cl)
                 return None
 
-    def form_match_set(self, situation: Perception,  time_stamp):
+    def generate_match_set(self, situation: Perception, time_stamp):
         matching_ls = [cl for cl in self if cl.does_match(situation)]
         while len(matching_ls) < self.cfg.number_of_actions:
             action = self._find_not_present_action(matching_ls)
@@ -91,7 +91,7 @@ class ClassifiersList(TypedList):
             if all(cl.action != action for cl in matching_set):
                 return action
 
-    def form_action_set(self, action):
+    def generate_action_set(self, action):
         action_ls = [cl for cl in self if cl.action == action]
         return ClassifiersList(self.cfg, *action_ls)
 

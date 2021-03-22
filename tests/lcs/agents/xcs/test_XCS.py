@@ -51,7 +51,7 @@ class TestXCS:
     # only tests for errors and types
     # TODO: Do more tests here
     def test_do_action_set_subsumption(self, xcs):
-        action_set = xcs.population.form_action_set(0)
+        action_set = xcs.population.generate_action_set(0)
         xcs.do_action_set_subsumption(action_set)
 
     def test_distribute_and_update(self, cfg, situation, classifiers_list_diff_actions):
@@ -96,7 +96,7 @@ class TestXCS:
     def test_run_ga(self, cfg, classifiers_list_diff_actions, chi):
         cfg.do_GA_subsumption = True
         xcs = XCS(cfg, classifiers_list_diff_actions)
-        action_set = xcs.population.form_action_set(0)
+        action_set = xcs.population.generate_action_set(0)
         cfg.chi = chi  # do perform crossover
         cfg.do_GA_subsumption = False  # do not perform subsumption
         GeneticAlgorithm.run_ga(xcs.population, action_set, Perception("0000"), 100000, cfg)

@@ -59,10 +59,10 @@ class XCS(Agent):
         while not done:
             self.population.delete_from_population()
             # We are in t+1 here
-            match_set = self.population.form_match_set(state, self.time_stamp)
+            match_set = self.population.generate_match_set(state, self.time_stamp)
             prediction_array = match_set.prediction_array
             action = self.select_action(prediction_array, match_set)
-            action_set = match_set.form_action_set(action)
+            action_set = match_set.generate_action_set(action)
             # apply action to environment
             raw_state, step_reward, done, _ = env.step(action)
             state = self.cfg.environment_adapter.to_genotype(raw_state)
