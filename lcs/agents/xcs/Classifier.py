@@ -28,9 +28,6 @@ class Classifier:
         self.fitness = cfg.initial_fitness
         # p, Epsilon, f
 
-    def get_fitness(self):
-        return self.fitness
-
     def does_match(self, situation):
         if len(situation) != len(self):
             return False
