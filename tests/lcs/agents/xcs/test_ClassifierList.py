@@ -27,20 +27,32 @@ class TestClassifiersList:
     def test_init(self, cfg):
         assert len(ClassifiersList(cfg)) == 0
 
-    def test_insert_population(self, cfg):
-        classifiers_list = ClassifiersList(cfg)
-        assert len(classifiers_list) == 0
-        classifiers_list.insert_in_population(
-            Classifier(cfg, Condition("1111"), 0, 0))
-        assert len(classifiers_list) == 1
-        classifiers_list.insert_in_population(
-            Classifier(cfg, Condition("1111"), 0, 1))
-        assert len(classifiers_list) == 1
-        classifiers_list.insert_in_population(
-            Classifier(cfg, Condition("1111"), 1, 2))
-        assert len(classifiers_list) == 2
-        assert classifiers_list[0].numerosity == 2
-        assert classifiers_list[1].numerosity == 1
+
+    @pytest.mark.parametrize("cond, act", [
+        ("1100", 0),
+        ("1100", 1),
+        ("1100", 2),
+        ("1100", 3)
+    ])
+    def test_insert_population(self, classifiers_list_diff_actions, cfg, cond, act):
+        cl = Classifier(cfg=cfg, condition=Condition("1111"), action=0, time_stamp=0)
+        classifiers_list_diff_actions.insert_in_population(cl)
+        assert any(c == cl for c in classifiers_list_diff_actions)
+
+    @pytest.mark.parametrize("cond, act", [
+        ("1111", 0),
+        ("123", 1),
+        ("A", 2),
+        ("##11", 0),
+        ("#11#", 0),
+        ("112", 0),
+    ])
+    def test_insert_population_new_condition(self, classifiers_list_diff_actions, cfg, cond, act):
+        cl = Classifier(cfg=cfg, condition=Condition("1111"), action=0, time_stamp=0)
+        classifiers_list_diff_actions.insert_in_population(cl)
+        for c in classifiers_list_diff_actions:
+            assert c.numerosity == 1
+        assert classifiers_list_diff_actions[4] == cl
 
     def test_covering(self, cfg):
         classifiers_list = ClassifiersList(cfg)

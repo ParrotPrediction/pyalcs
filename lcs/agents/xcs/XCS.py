@@ -85,7 +85,7 @@ class XCS(Agent):
                 prev_state = copy(state)
                 prev_action = action
             self.time_stamp += 1
-        return TrialMetrics(self.time_stamp, sum(self.action_reward))
+        return TrialMetrics(self.time_stamp, self.action_reward)
 
     def _distribute_and_update(self, action_set, situation, p):
         if action_set is not None and len(action_set) > 0:
