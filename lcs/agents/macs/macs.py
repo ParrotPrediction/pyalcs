@@ -5,8 +5,8 @@ import logging
 import random
 from itertools import groupby
 from operator import attrgetter
-from typing import Union, Optional, Dict, Generator, Set, Tuple, List, \
-    NamedTuple, Callable
+from typing import Union, Optional, Dict, Generator, Set, Tuple, NamedTuple, \
+    Callable
 
 from lcs import TypedList, Perception
 from lcs.agents import Agent, ImmutableSequence
@@ -467,6 +467,22 @@ class MACS(Agent):
 
         if p not in self.desirability_values:
             self.desirability_values[p] = 0.0
+
+    def get_anticipations(self, p0: Perception, a: int) -> Generator[Perception]:
+        match_set = self.population.form_match_set(p0)
+        action_set = match_set.form_action_set(a)
+
+        effects = [cl.effect for cl in action_set]
+
+        anticipated_attribs = [set() for _ in range(len(p0))]
+        for pi in range(len(p0)):
+            for e in effects:
+                if e[pi] != Effect.WILDCARD:
+                    anticipated_attribs[pi].update(e[pi])
+
+        assert all(len(aa) > 0 for aa in anticipated_attribs)
+
+        yield from map(Perception, itertools.product(*anticipated_attribs))
 
     def _run_trial_explore(self, env, trials, current_trial) -> TrialMetrics:
         logging.debug("Running trial explore")
