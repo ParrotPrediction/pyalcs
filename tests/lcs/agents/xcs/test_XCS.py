@@ -87,15 +87,24 @@ class TestXCS:
         ("11111", "000", 0, 5, "00011", "111"),
         ("11111", "#####", 1, 4, "1###1", "#111#")
     ])
-    def test_crossover(self, cfg, cond1, cond2, x, y, end_cond1, end_cond2):
+    def test_crossover_area(self, cfg, cond1, cond2, x, y, end_cond1, end_cond2):
         cl1 = Classifier(cfg, Condition(cond1), 0, 0)
         cl2 = Classifier(cfg, Condition(cond2), 1, 0)
         GeneticAlgorithm._apply_crossover_in_area(cl1, cl2, x, y)
         assert cl1.condition == Condition(end_cond1)
         assert cl2.condition == Condition(end_cond2)
         # Just to check for errors
-        GeneticAlgorithm._apply_crossover(cl1, cl2)
 
+    def test_crossover_values(self, cfg, situation, classifiers_list_diff_actions):
+        cl1 = Classifier(cfg, Condition(situation), 0, 0)
+        cl2 = Classifier(cfg, Condition(situation), 1, 0)
+        GeneticAlgorithm._apply_crossover(cl1, cl2,
+                                          classifiers_list_diff_actions[0],
+                                          classifiers_list_diff_actions[1]
+                                          )
+        assert cl1.prediction == cl2.prediction
+        assert cl1.error == cl2.error
+        assert cl1.fitness == cl2.fitness
 
     @pytest.mark.parametrize("chi", [
         1,
@@ -133,4 +142,33 @@ class TestXCS:
         assert id(child2) != id(classifiers_list_diff_actions[0])
         assert id(child1) != id(classifiers_list_diff_actions[1])
         assert id(child2) != id(classifiers_list_diff_actions[1])
+
+    def test_do_ga_subsumption_does_subsume_true(self, cfg, classifiers_list_diff_actions, situation):
+        cfg.do_GA_subsumption = True
+        classifiers_list_diff_actions[0].error = 0
+        classifiers_list_diff_actions[1].error = 0
+        classifiers_list_diff_actions[0].expirience = 30
+        classifiers_list_diff_actions[1].expirience = 30
+        GeneticAlgorithm._perform_insertion_or_subsumption(
+            cfg, classifiers_list_diff_actions,
+            Classifier(cfg, Condition(situation), 0, 0),
+            Classifier(cfg, Condition(situation), 1, 0),
+            classifiers_list_diff_actions[0],
+            classifiers_list_diff_actions[1]
+        )
+        assert classifiers_list_diff_actions[0].numerosity > 1
+        assert classifiers_list_diff_actions[1].numerosity > 1
+
+    def test_do_ga_subsumption_does_subsume_false(self, cfg, classifiers_list_diff_actions, situation):
+        cfg.do_GA_subsumption = True
+        GeneticAlgorithm._perform_insertion_or_subsumption(
+            cfg, classifiers_list_diff_actions,
+            Classifier(cfg, Condition("####"), 0, 0),
+            Classifier(cfg, Condition("####"), 1, 0),
+            classifiers_list_diff_actions[0],
+            classifiers_list_diff_actions[1]
+        )
+        assert classifiers_list_diff_actions[0].numerosity == 1
+        assert classifiers_list_diff_actions[1].numerosity == 1
+        assert len(classifiers_list_diff_actions) == 6
 

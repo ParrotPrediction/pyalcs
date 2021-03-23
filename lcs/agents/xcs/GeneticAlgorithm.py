@@ -26,36 +26,37 @@ def run_ga(population: ClassifiersList,
         child1, child2 = _make_children(parent1, parent2)
         # apply crossover
         if np.random.rand() < cfg.chi:
-            _apply_crossover(child1, child2)
-            child1.prediction = (parent1.prediction + parent2.prediction) / 2
-            child1.error = 0.25 * (parent1.error + parent2.error) / 2
-            child1.fitness = (parent1.fitness + parent2.fitness) / 2
-            child2.prediction = child1.prediction
-            child2.error = child1.error
-            child2.fitness = child1.fitness
+            _apply_crossover(child1, child2, parent1, parent2)
         # apply mutation on both children
         _apply_mutation(child1, cfg, situation)
         _apply_mutation(child2, cfg, situation)
         # apply subsumption or just insert into population
-        if cfg.do_GA_subsumption:
-            if parent1.does_subsume(child1):
-                parent1.numerosity += 1
-            elif parent2.does_subsume(child1):
-                parent2.numerosity += 1
-            else:
-                population.insert_in_population(child1)
+        _perform_insertion_or_subsumption(cfg, population,
+                                          child1, child2,
+                                          parent1, parent2)
 
-            if parent1.does_subsume(child2):
-                parent1.numerosity += 1
-            elif parent2.does_subsume(child2):
-                parent2.numerosity += 1
-            else:
-                population.insert_in_population(child2)
 
+def _perform_insertion_or_subsumption(cfg: Configuration, population: ClassifiersList,
+                                      child1: Classifier, child2: Classifier,
+                                      parent1: Classifier, parent2: Classifier):
+    if cfg.do_GA_subsumption:
+        if parent1.does_subsume(child1):
+            parent1.numerosity += 1
+        elif parent2.does_subsume(child1):
+            parent2.numerosity += 1
         else:
             population.insert_in_population(child1)
+
+        if parent1.does_subsume(child2):
+            parent1.numerosity += 1
+        elif parent2.does_subsume(child2):
+            parent2.numerosity += 1
+        else:
             population.insert_in_population(child2)
-        population.delete_from_population()
+    else:
+        population.insert_in_population(child1)
+        population.insert_in_population(child2)
+    population.delete_from_population()
 
 
 def _make_children(parent1, parent2):
@@ -80,11 +81,18 @@ def _select_offspring(action_set: ClassifiersList) -> Classifier:
             return cl
 
 
-def _apply_crossover(child1: Classifier, child2: Classifier):
+def _apply_crossover(child1: Classifier, child2: Classifier,
+                     parent1: Classifier, parent2: Classifier):
     _apply_crossover_in_area(child1, child2,
                              np.random.rand() * len(child1.condition),
                              np.random.rand() * len(child1.condition)
                              )
+    child1.prediction = (parent1.prediction + parent2.prediction) / 2
+    child1.error = 0.25 * (parent1.error + parent2.error) / 2
+    child1.fitness = (parent1.fitness + parent2.fitness) / 2
+    child2.prediction = child1.prediction
+    child2.error = child1.error
+    child2.fitness = child1.fitness
 
 
 def _apply_crossover_in_area(child1: Classifier, child2: Classifier, x, y):
