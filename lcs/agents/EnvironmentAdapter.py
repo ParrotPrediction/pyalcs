@@ -3,7 +3,7 @@ class EnvironmentAdapter:
     Sometimes the observation returned by the OpenAI Gym environment
     does not suit the observation representation as used by the LCS.
     In that case there's a need for converter functions that map the LCS
-    representation to the environment representation and vice versa.
+    representation  to the environment representation and vice versa.
 
     The same goes for action representation.
 
