@@ -33,6 +33,9 @@ class TestCondition:
     def test_should_get_expected_improvements_property(self, _c, _res):
         assert Condition(_c).eis == _res
 
+    def test_should_create_general_condition(self):
+        assert Condition.general(4) == Condition('####')
+
     @pytest.mark.parametrize('_c, _p, _res', [
         ("#000", "0000", True),
         ("#000", "1000", True),
@@ -48,6 +51,16 @@ class TestCondition:
         p0 = Perception('0000')
 
         assert cond.does_match(p0)
+
+    @pytest.mark.parametrize('_cond, _other, _res', [
+        ('####', '1###', True),
+        ('####', '12##', True),
+        ('####', '####', True),
+        ('1###', '####', False),
+        ('1###', '1###', True),
+    ])
+    def test_should_detect_non_matching(self, _cond, _other, _res):
+        assert Condition(_other).non_matching(Condition(_cond)) == _res
 
     @pytest.mark.parametrize('_p, _res', [
         ('1', ['#', '1']),

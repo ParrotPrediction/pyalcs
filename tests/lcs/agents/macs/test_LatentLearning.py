@@ -90,6 +90,7 @@ class TestLatentLearning:
     def test_should_specialize_conditions(self, population, ll, cfg):
         # given
         [cl1, cl2, cl3, cl4, cl5] = population
+        # Cl3 is oscillating, it should be replaced
         cl3.g = 3
         cl3.b = 3
         perceptions = {self.P0}
@@ -98,7 +99,8 @@ class TestLatentLearning:
         ll.specialize_conditions(population, perceptions)
 
         # then
-        assert len(population) == 6
+        assert len(population) == 5
+        assert cl3 not in population
         assert any(cl.condition == Condition('10##') for cl in population)
 
     def test_should_update_ig_estimates(self, population, ll, cfg):
@@ -123,7 +125,7 @@ class TestLatentLearning:
         p0 = Perception('0010')
         a0 = 0
         p1 = Perception('1001')
-        obs_situations = [p0, p1, Perception('0100')]
+        obs_situations = {p0, p1, Perception('0100')}
 
         cl1 = Classifier(condition='#100', action=a0, effect='1???', cfg=cfg)
         cl2 = Classifier(condition='#001', action=a0, effect='1???', cfg=cfg)
@@ -154,6 +156,21 @@ class TestLatentLearning:
         assert all(cl in population for cl in [cl1, cl4, cl5, cl6])
         assert all(cl not in population for cl in [cl2, cl3])
         assert len([cl for cl in population if cl.condition == Condition('#00#')]) == 1
+
+    def test_should_cover_initial_transitions(self, ll, cfg):
+        # given
+        population = ClassifiersList()
+        assert len(population) == 0
+
+        # when
+        ll.cover_transitions(population, self.P0, self.ACTION, self.P1)
+
+        # then
+        assert len(population) == 4
+        assert all(cl.condition == Condition('####') for cl in population)
+        assert all(cl.action == self.ACTION for cl in population)
+        assert sorted(list(map(lambda cl: cl.effect, population))) == [
+            Effect('1???'), Effect('?0??'), Effect('??0?'), Effect('???1')]
 
     def test_should_cover_transitions(self, population, ll, cfg):
         # given
