@@ -9,7 +9,7 @@ from itertools import groupby
 from typing import Union, Optional, Generator, List, Dict, Callable
 
 from lcs import TypedList, Perception
-from lcs.agents import ImmutableSequence, Agent
+from lcs.agents import ImmutableSequence, Agent, EnvironmentAdapter
 from lcs.agents.Agent import TrialMetrics
 
 
@@ -32,6 +32,7 @@ class Configuration:
                  classifier_length: int,
                  number_of_possible_actions: int,
                  feature_possible_values: list,
+                 environment_adapter=EnvironmentAdapter,
                  trace_length: int = 5,
                  learning_rate: float = 0.1,
                  discount_factor: float = 0.9,
@@ -42,6 +43,7 @@ class Configuration:
         self.classifier_length = classifier_length
         self.number_of_possible_actions = number_of_possible_actions
         self.feature_possible_values = feature_possible_values
+        self.environment_adapter = environment_adapter
         self.trace_length = trace_length
         self.beta = learning_rate
         self.gamma = discount_factor
@@ -211,6 +213,9 @@ class Classifier:
         return all(t in self.trace for t in
                    [ClassifierTrace.GOOD, ClassifierTrace.BAD])
 
+    def is_reliable(self) -> bool:
+        return not self.oscillating
+
     def anticipation(self, obs: Perception) -> Perception:
         return self.effect.passthrough(obs)
 
@@ -225,6 +230,17 @@ class Classifier:
 
     def update_reward(self, env_reward):
         self.r = (1 - self.cfg.beta) * self.r + self.cfg.beta * env_reward
+
+    def predicts_successfully(self,
+                              p0: Perception,
+                              action: int,
+                              p1: Perception) -> bool:
+        if self.does_match(p0):
+            if self.action == action:
+                if self.effect == Effect.diff(p0, p1):
+                    return True
+
+        return False
 
 
 class ClassifiersList(TypedList[Classifier]):
@@ -280,7 +296,8 @@ class LatentLearning:
 
                 tries -= 1
                 if tries == 0:
-                    logging.warning(f'Unable to cover classifier for perception: {p1}')
+                    logging.warning(
+                        f'Unable to cover classifier for perception: {p1}')
                     return None
 
         # Create effect part
@@ -325,7 +342,8 @@ class LatentLearning:
             # Adjust expected improvement by specialization values
             for cl in [cl for cl in good_classifiers if
                        cl.last_bad_perception is not None]:
-                for i, (p0i, bpi) in enumerate(zip(p0, cl.last_bad_perception)):
+                for i, (p0i, bpi) in enumerate(
+                    zip(p0, cl.last_bad_perception)):
                     if p0i == bpi:
                         cl.condition.decrease_eis(i, self.cfg.beta)
                     else:
@@ -333,7 +351,8 @@ class LatentLearning:
 
             for cl in [cl for cl in wrong_classifiers if
                        cl.last_good_perception is not None]:
-                for i, (p0i, gpi) in enumerate(zip(p0, cl.last_good_perception)):
+                for i, (p0i, gpi) in enumerate(
+                    zip(p0, cl.last_good_perception)):
                     if p0i == gpi:
                         cl.condition.decrease_eis(i, self.cfg.beta)
                     else:
@@ -389,14 +408,18 @@ class LatentLearning:
                 summed_eis[idx] = sum(x[idx] for x in eis)
 
         if self.cfg.estimate_expected_improvements:
-            feature_idx = max(((idx, val) for idx, val in enumerate(summed_eis) if val is not None), key=lambda x: x[1])[0]
+            feature_idx = max(
+                ((idx, val) for idx, val in enumerate(summed_eis) if
+                 val is not None), key=lambda x: x[1])[0]
         else:
-            feature_idx = random.choice([idx for idx, val in enumerate(summed_eis) if val is not None])
+            feature_idx = random.choice(
+                [idx for idx, val in enumerate(summed_eis) if val is not None])
 
         for cl in pop:
             yield from self.mutspec(cl, feature_idx)
 
-    def mutspec(self, cl: Classifier, feature_idx: int) -> Generator[Classifier]:
+    def mutspec(self, cl: Classifier, feature_idx: int) -> Generator[
+        Classifier]:
         assert type(cl.condition[feature_idx]) == DontCare
 
         for feature in range(self.cfg.feature_possible_values[feature_idx]):
@@ -492,8 +515,7 @@ class YACS(Agent):
         steps = 0
         last_reward = 0
         raw_state = env.reset()
-
-        state = Perception(raw_state)
+        state = Perception(self.cfg.environment_adapter.to_genotype(raw_state))
 
         done = False
 
@@ -512,7 +534,7 @@ class YACS(Agent):
                 logging.debug("FOUND REWARD")
 
             prev_state = state
-            state = Perception(raw_state)
+            state = Perception(self.cfg.environment_adapter.to_genotype(raw_state))
 
             match_set = self.population.form_match_set(prev_state)
             action_set = match_set.form_action_set(action)

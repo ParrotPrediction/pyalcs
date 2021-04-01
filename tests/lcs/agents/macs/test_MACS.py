@@ -70,5 +70,7 @@ class TestMACS:
         # then
         assert len(anticipations) == 2
         assert anticipations == [
-            Perception('00110011'), Perception('00110111')]
+            Perception('00110011'),
+            Perception('00110111')
+        ]
 

@@ -1,10 +1,11 @@
 import logging
 from collections import namedtuple
+from timeit import default_timer as timer
 from typing import Callable, List, Tuple
 
-from lcs.metrics import basic_metrics
-
 import numpy as np
+
+from lcs.metrics import basic_metrics
 
 TrialMetrics = namedtuple('TrialMetrics', ['steps', 'reward'])
 
@@ -80,6 +81,7 @@ class Agent:
         Tuple
             population of classifiers and metrics
         """
+
         def switch_phases(env, steps, current_trial):
             if current_trial % 2 == 0:
                 return self._run_trial_explore(env, steps, current_trial)
@@ -119,12 +121,16 @@ class Agent:
 
         metrics: List = []
         while current_trial < n_trials:
+            start_ts = timer()
             steps_in_trial, reward = func(env, steps, current_trial)
+            end_ts = timer()
+
             steps += steps_in_trial
 
             # collect user metrics
             if current_trial % self.get_cfg().metrics_trial_frequency == 0:
-                m = basic_metrics(current_trial, steps_in_trial, reward)
+                m = basic_metrics(
+                    current_trial, steps_in_trial, reward, end_ts - start_ts)
 
                 user_metrics = self.get_cfg().user_metrics_collector_fcn
                 if user_metrics is not None:

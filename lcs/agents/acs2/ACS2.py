@@ -52,6 +52,8 @@ class ACS2(Agent):
                 steps += steps_ap
 
             state = Perception(state)
+            assert len(state) == self.cfg.classifier_length
+
             match_set = self.population.form_match_set(state)
 
             if steps > 0:

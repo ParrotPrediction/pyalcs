@@ -22,9 +22,14 @@ Added modifications:
 
 ### YACS
 - Different heuristics
+- Does not generalize wrt. payoff prediction (therefore classifiers itself don't store the information about the reward)
 
-### MACS
-todo
+### MACS 
+- Extends ACS, ACS2, YACS by the possibility to detect interactions between attributes (because they consider each situation as an unsecable whole - new value of the attribute may only depend upon the previous value of the same attribute).
+- A _"don't know (?)"_ symbol is used in effect part instead of _"don't change (#)"_.  
+
+References
+- _["Combining latent learning with dynamic programming in the modular anticipatory classifier system"](https://www.sciencedirect.com/science/article/pii/S0377221703006611)_ by P. Gérard, JA. Meyer, O. Sigaud 
 
 ## Documentation
 Documentation is available [here](https://pyalcs.readthedocs.io).

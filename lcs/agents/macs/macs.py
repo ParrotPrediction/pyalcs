@@ -41,6 +41,9 @@ class Condition(ImmutableSequence):
         """
         Checks if other condition is covered by current one.
         """
+        if self == o:
+            return True
+
         return any(ci != oi for ci, oi in zip(self, o) if ci != self.WILDCARD)
 
     @staticmethod
@@ -104,7 +107,7 @@ class Condition(ImmutableSequence):
 
         return other_more_general and different_tokens > 0
 
-    def feature_to_specialize(self) -> Optional[int]:
+    def feature_to_specialize(self, estimate_expected_improvements: bool) -> Optional[int]:
         """Returns index of the feature suggested for specialization"""
         if all(c != self.WILDCARD for c in self):
             return None
@@ -112,7 +115,10 @@ class Condition(ImmutableSequence):
         eis = {idx: self.eis[idx] for idx, c in enumerate(self) if
                c == self.WILDCARD}
 
-        return max(eis, key=eis.get)
+        if estimate_expected_improvements:
+            return max(eis, key=eis.get)
+        else:
+            return random.choice(list(eis.keys()))
 
     def feature_to_generalize(self) -> Optional[int]:
         """Returns index of the feature suggested for generalization"""
@@ -178,6 +184,7 @@ class Configuration:
                  number_of_possible_actions: int,
                  feature_possible_values: list,
                  specified_effect_attributes: int = 1,
+                 estimate_expected_improvements: bool = True,
                  learning_rate: float = 0.1,
                  inaccuracy_threshold: int = 5,
                  accuracy_threshold: int = 5,
@@ -191,6 +198,7 @@ class Configuration:
         self.number_of_possible_actions = number_of_possible_actions
         self.feature_possible_values = feature_possible_values
         self.specified_effect_attributes = specified_effect_attributes
+        self.estimate_expected_improvements = estimate_expected_improvements
         self.beta = learning_rate
         self.er = inaccuracy_threshold
         self.ea = accuracy_threshold
@@ -237,7 +245,7 @@ class Classifier:
         self.sb: Optional[Perception] = None
 
     def __repr__(self):
-        return f"{self.condition}-{self.action}-{self.effect} @ {hex(id(self))}"
+        return f"{self.condition}-{self.action}-{self.effect}, G: {self.g}, B: {self.b}, {self.debug}"
 
     @property
     def is_accurate(self) -> bool:
@@ -314,7 +322,9 @@ class LatentLearning:
                               situations_seen: Set[Perception]) -> None:
 
         for cl in [cl for cl in pop if cl.is_oscillating]:
-            feature_idx = cl.condition.feature_to_specialize()
+            feature_idx = cl.condition.feature_to_specialize(
+                self.cfg.estimate_expected_improvements)
+
             for new_cl in self.mutspec(cl, feature_idx):
                 if any(new_cl.does_match(p) for p in situations_seen):
                     assert new_cl not in pop
@@ -360,9 +370,9 @@ class LatentLearning:
             if all(cl.is_accurate for cl in set_b):
                 # Build [C] only when all classifiers from [B] are accurate
                 for cl in set_b:
-                    if all(ig < 0.5 for ig in cl.condition.ig):
+                    if all(ig <= 0.5 for ig in cl.condition.ig):
                         set_c.add(
-                            ChildClassifier(cl, None))  # TODO never called
+                            ChildClassifier(cl, cl))
                     else:
                         spec_cond_idx = cl.condition.feature_to_generalize()
                         assert spec_cond_idx is not None

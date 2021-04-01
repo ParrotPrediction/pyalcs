@@ -19,6 +19,7 @@ class TestEffect:
         ('??1?', '1211', True),
         ('??12', '1212', True),
         ('??2?', '1111', False),
+        ('??11', '1110', False),
     ])
     def test_should_match(self, _e, _p, _res):
         assert Effect(_e).does_match(Perception(_p)) == _res

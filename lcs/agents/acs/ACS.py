@@ -123,6 +123,5 @@ class ACS(Agent):
 
         return ClassifiersList(*cls)
 
-
     def _best_cl(self, match_set):
         return max(match_set, key=lambda cl: cl.fitness)

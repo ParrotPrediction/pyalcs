@@ -1,4 +1,4 @@
-from lcs.strategies.action_selection import RandomAction
+from lcs.strategies.action_selection.RandomAction import RandomAction
 import lcs.agents.acs2 as acs2
 
 
