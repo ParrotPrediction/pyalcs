@@ -3,7 +3,7 @@ import random
 import lcs.agents.acs as acs
 import lcs.agents.acs2 as acs2
 import lcs.agents.xcs as xcs
-from . import RandomAction
+from lcs.strategies.action_selection.RandomAction import RandomAction
 
 
 class BestAction:

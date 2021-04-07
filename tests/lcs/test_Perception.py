@@ -63,3 +63,14 @@ class TestPerception:
         assert Perception("111") == Perception("111")
         assert Perception("111") is not Perception("111")
         assert hash(Perception("111")) == hash(Perception("111"))
+
+    @pytest.mark.parametrize('_p1, _p2, _res', [
+        ('1111', '1111', True),
+        ('1111', '1112', False),
+        ('1111', '2222', False),
+    ])
+    def test_should_detect_equal_perceptions(self, _p1, _p2, _res):
+        if _res:
+            assert _p1 == _p2
+        else:
+            assert _p1 != _p2

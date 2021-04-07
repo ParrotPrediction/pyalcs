@@ -3,7 +3,9 @@ import random
 import pytest
 
 from lcs import Perception
-from lcs.agents.yacs.yacs import Configuration, Condition, Effect, Classifier, ClassifierTrace, ClassifiersList, LatentLearning
+from lcs.agents.yacs.yacs import Configuration, Condition, Effect, Classifier, \
+    ClassifierTrace, ClassifiersList, \
+    LatentLearning
 
 
 class TestLatentLearning:
@@ -109,8 +111,8 @@ class TestLatentLearning:
 
         # then
         assert len(new_cls) == 2
-        assert all(True for cl in new_cls if cl.action == 0)
-        assert all(True for cl in new_cls if cl.effect == Effect('####'))
+        assert all(cl.action == 0 for cl in new_cls)
+        assert all(cl.effect == Effect('####') for cl in new_cls)
         assert new_cls[0].condition == Condition('0###')
         assert new_cls[1].condition == Condition('1###')
 

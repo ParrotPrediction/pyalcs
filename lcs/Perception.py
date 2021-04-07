@@ -10,9 +10,7 @@ class Perception(collections.abc.Sequence):
     __slots__ = ['_items', 'oktypes']
 
     def __init__(self, observation, oktypes=(str,)):
-        for el in observation:
-            assert type(el) in oktypes
-
+        assert all(type(e) in oktypes for e in observation)
         self._items = tuple(observation)
 
     @classmethod
@@ -32,8 +30,4 @@ class Perception(collections.abc.Sequence):
         return ' '.join(map(str, self))
 
     def __eq__(self, other):
-        for si, oi in zip(self, other):
-            if si != oi:
-                return False
-
-        return True
+        return all(p0 == p1 for p0, p1 in zip(self, other))

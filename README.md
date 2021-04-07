@@ -3,6 +3,8 @@ Repository containing code implementation for various *Anticipatory Learning Cla
 
 [![Build Status](https://travis-ci.org/ParrotPrediction/pyalcs.svg?branch=master)](https://travis-ci.org/ParrotPrediction/pyalcs) [![Documentation Status](https://readthedocs.org/projects/pyalcs/badge/?version=latest)](https://pyalcs.readthedocs.io/en/latest/?badge=latest)
 
+The main advantage of *Learning Classifier Systems* with respect to other RL techniques it to afford generalization capabilities. This makes it possible to aggregate several situations within a common description so that the representation of the problem gets smaller.
+
 ## Agents
 
 ### ACS
@@ -19,10 +21,17 @@ Added modifications:
 - classifier has an extra property of "immediate reward".
 
 ### YACS
-todo
+- Different heuristics
+- Does not generalize wrt. payoff prediction (therefore classifiers itself don't store the information about the reward)
+- Only deals with deterministic and markov environments
 
 ### MACS
-todo
+- Extends ACS, ACS2, YACS by the possibility to detect interactions between attributes (because they consider each situation as an unsecable whole - new value of the attribute may only depend upon the previous value of the same attribute).
+- A _"don't know (?)"_ symbol is used in effect part instead of _"don't change (#)"_.
+- **TODO**: Still not running fully accurate on rotating maze environment
+
+References
+- _["Combining latent learning with dynamic programming in the modular anticipatory classifier system"](https://www.sciencedirect.com/science/article/pii/S0377221703006611)_ by P. Gérard, JA. Meyer, O. Sigaud 
 
 ## Documentation
 Documentation is available [here](https://pyalcs.readthedocs.io).

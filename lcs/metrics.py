@@ -1,8 +1,9 @@
-def basic_metrics(trial: int, steps: int, reward: int):
+def basic_metrics(trial: int, steps: int, reward: int, time: float):
     return {
         'trial': trial,
         'steps_in_trial': steps,
-        'reward': reward
+        'reward': reward,
+        'perf_time': time,
     }
 
 
