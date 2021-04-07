@@ -313,24 +313,32 @@ class LatentLearning:
                             cl.condition.increase_eis(i, self.cfg.beta)
 
     def select_accurate(self, pop: ClassifiersList) -> None:
-        for cl in pop:
-            if cl.is_inaccurate:
-                pop.safe_remove(cl)
+        inaccurate_cls = [cl for cl in pop if cl.is_inaccurate]
+        for cl in inaccurate_cls:
+            pop.safe_remove(cl)
 
     def specialize_conditions(self,
                               pop: ClassifiersList,
                               situations_seen: Set[Perception]) -> None:
 
+        to_add = []
+        to_remove = []
         for cl in [cl for cl in pop if cl.is_oscillating]:
+            to_remove.append(cl)
+
             feature_idx = cl.condition.feature_to_specialize(
                 self.cfg.estimate_expected_improvements)
 
             for new_cl in self.mutspec(cl, feature_idx):
                 if any(new_cl.does_match(p) for p in situations_seen):
-                    assert new_cl not in pop
-                    pop.append(new_cl)
+                    to_add.append(new_cl)
 
+        for cl in to_remove:
             pop.safe_remove(cl)
+
+        for new_cl in to_add:
+            assert new_cl not in pop
+            pop.append(new_cl)
 
     def mutspec(self, cl: Classifier, feature_idx: int) -> Generator[
         Classifier]:
@@ -425,10 +433,11 @@ class LatentLearning:
                           p0: Perception,
                           a0: int,
                           p1: Perception) -> None:
+
+        new_cls = []
         for ef in Effect.generate(p1, self.cfg.specified_effect_attributes):
-
-            if len([cl.condition for cl in population if cl.does_match(p0) and cl.action == a0 and cl.effect == ef]) == 0:
-
+            if len([cl for cl in population if cl.does_match(p0) and cl.action == a0 and cl.effect == ef]) == 0:
+                # extract conditions of existing classifiers
                 conditions = [cl.condition for cl in population if cl.action == a0 and cl.effect == ef]
 
                 def non_matching_existing(generated: Condition) -> bool:
@@ -455,8 +464,11 @@ class LatentLearning:
                     debug={'origin': 'covering'},
                     cfg=self.cfg)
 
-                assert new_cl not in population
-                population.append(new_cl)
+                new_cls.append(new_cl)
+
+        for new_cl in new_cls:
+            assert new_cl not in population
+            population.append(new_cl)
 
     def _update_igs(self,
                     population: ClassifiersList,
@@ -561,12 +573,12 @@ class MACS(Agent):
 
             self.ll.evaluate_classifiers(
                 self.population, prev_state, action, state)
-            self.ll.select_accurate(self.population)
             self.ll.specialize_conditions(self.population, seen_situations)
             self.ll.generalize_conditions(
                 self.population, seen_situations, prev_state, action, state)
             self.ll.cover_transitions(
                 self.population, prev_state, action, state)
+            self.ll.select_accurate(self.population)
 
             steps += 1
 

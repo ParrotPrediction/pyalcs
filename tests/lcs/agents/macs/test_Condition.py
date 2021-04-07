@@ -87,10 +87,15 @@ class TestCondition:
         ('1111', [0.2, 0.3, 0.5, 0.4], None),
     ])
     def test_should_return_index_to_specialize(self, _c, _eis, _res):
+        # given
         cond = Condition(_c)
         cond.eis = _eis
 
-        assert cond.feature_to_specialize() == _res
+        # when
+        idx = cond.feature_to_specialize(estimate_expected_improvements=True)
+
+        # then
+        assert idx == _res
 
     @pytest.mark.parametrize('_c, _ig, _res', [
         ('####', [0.2, 0.3, 0.5, 0.4], None),

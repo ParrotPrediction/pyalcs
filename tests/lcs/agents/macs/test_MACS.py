@@ -1,3 +1,5 @@
+from operator import attrgetter
+
 import pytest
 
 from lcs import Perception
@@ -68,8 +70,7 @@ class TestMACS:
         anticipations = list(agent.get_anticipations(p0, action))
 
         # then
-        assert len(anticipations) == 2
-        assert anticipations == [
+        assert sorted(anticipations, key=attrgetter('_items')) == [
             Perception('00110011'),
             Perception('00110111')
         ]
