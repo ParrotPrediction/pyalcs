@@ -2,6 +2,7 @@ import pytest
 
 from lcs.agents.xncs import Classifier, Configuration
 
+
 class TestClassifier:
 
     @pytest.fixture
