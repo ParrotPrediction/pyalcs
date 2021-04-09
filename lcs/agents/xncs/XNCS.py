@@ -1,20 +1,19 @@
-import logging
+from lcs.agents.xcs import XCS
+
+from typing import Optional
+
 import random
 import numpy as np
 from copy import copy
-from typing import Optional
 
-from lcs.agents import Agent
-from lcs.agents.xcs import Configuration, ClassifiersList, GeneticAlgorithm
+from lcs.agents.xcs import ClassifiersList
 from lcs.agents.Agent import TrialMetrics
 from lcs.strategies.reinforcement_learning import simple_q_learning
-from lcs.strategies.action_selection import EpsilonGreedy
+from lcs.agents.xncs import Configuration, Backpropagation
 
 
-logger = logging.getLogger(__name__)
+class XNCS(XCS):
 
-
-class XCS(Agent):
     def __init__(self,
                  cfg: Configuration,
                  population: Optional[ClassifiersList] = None
@@ -23,27 +22,8 @@ class XCS(Agent):
         :param cfg: object storing parameters of the experiment
         :param population: all classifiers at current time
         """
-        self.cfg = cfg
-        if population is not None:
-            self.population = population
-        else:
-            self.population = ClassifiersList(cfg=cfg)
-        self.time_stamp = 0
-        self.action_reward = [0 for _ in range(cfg.number_of_actions)]
-
-    def get_population(self):
-        return self.population
-
-    def get_cfg(self):
-        return self.cfg
-
-    def _run_trial_exploit(self, env, trials, current_trial) -> TrialMetrics:
-        # Doubling _run_trials_explore would cause too many issues.
-        temp = self.cfg.epsilon
-        self.cfg.epsilon = 0
-        metrics = self._run_trial_explore(env, trials, current_trial)
-        self.cfg.epsilon = temp
-        return metrics
+        self.back_propagation = Backpropagation(cfg)
+        super().__init__(cfg, population)
 
     def _run_trial_explore(self, env, trials, current_trial) -> TrialMetrics:
         prev_action_set = None
@@ -52,6 +32,7 @@ class XCS(Agent):
         prev_action = 0
         self.time_stamp = 0  # steps
         done = False  # eop
+        bp_update = 0
 
         raw_state = env.reset()
         state = self.cfg.environment_adapter.to_genotype(raw_state)
@@ -84,42 +65,18 @@ class XCS(Agent):
                 prev_reward[action] = copy(self.action_reward[action])
                 prev_state = copy(state)
                 prev_action = action
+
             self.time_stamp += 1
         return TrialMetrics(self.time_stamp, self.action_reward)
 
     def _distribute_and_update(self, action_set, situation, p):
-        if action_set is not None and len(action_set) > 0:
-            action_set.update_set(p)
-            if self.cfg.do_action_set_subsumption:
-                self.do_action_set_subsumption(action_set)
-            GeneticAlgorithm.run_ga(self.population,
-                                    action_set,
-                                    situation,
-                                    self.time_stamp,
-                                    self.cfg)
+        super()._distribute_and_update(action_set, situation, p)
+        self._compare_effect(action_set, situation)
 
-    # TODO: EspilonGreedy
-    # Run into a lot of issues where in EpsilonGreedy where BestAction was not callable
-    # Changing EpsilonGreed to:
-    # best = BestAction(all_actions=self.all_actions)
-    # return best(population)
-    # Fixed the issue but I want to solve it without changes to EpsilonGreedy.py
-    def select_action(self, prediction_array, match_set: ClassifiersList) -> int:
-        if np.random.rand() > self.cfg.epsilon:
-            return max((v, i) for i, v in enumerate(prediction_array))[1]
-        return match_set[random.randrange(len(match_set))].action
-
-    def do_action_set_subsumption(self, action_set: ClassifiersList) -> None:
-        cl = None
-        for c in action_set:
-            if c.could_subsume:
-                if cl is None or c.more_general(cl):
-                    cl = c
-        if cl is not None:
-            for c in action_set:
-                if cl.is_more_general(c):
-                    cl.numerosity += c.numerosity
-                    action_set.safe_remove(c)
-                    self.population.safe_remove(c)
-
-
+    def _compare_effect(self, action_set, situation):
+        for cl in action_set:
+            if cl.effect is None or not cl.effect.subsumes(situation):
+                self.back_propagation.insert_into_bp(cl, situation)
+            else:
+                self.back_propagation.update_bp()
+        self.back_propagation.check_and_update()

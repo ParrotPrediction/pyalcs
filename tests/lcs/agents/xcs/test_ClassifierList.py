@@ -27,7 +27,6 @@ class TestClassifiersList:
     def test_init(self, cfg):
         assert len(ClassifiersList(cfg)) == 0
 
-
     @pytest.mark.parametrize("cond, act", [
         ("1100", 0),
         ("1100", 1),
