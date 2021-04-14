@@ -78,9 +78,10 @@ class XNCS(XCS):
         self._compare_effect(action_set, situation)
 
     def _compare_effect(self, action_set, situation):
-        for cl in action_set:
-            if cl.effect is None or not cl.effect.subsumes(situation):
-                self.back_propagation.insert_into_bp(cl, situation)
-            else:
-                self.back_propagation.update_bp()
-        self.back_propagation.check_and_update()
+        if action_set is not None:
+            for cl in action_set:
+                if cl.effect is None or not cl.effect.subsumes(situation):
+                    self.back_propagation.insert_into_bp(cl, situation)
+                else:
+                    self.back_propagation.update_bp()
+            self.back_propagation.check_and_update()

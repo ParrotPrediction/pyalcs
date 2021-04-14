@@ -20,9 +20,9 @@ class Backpropagation:
     def update_bp(self):
         for cl, uv in zip(self.classifiers_for_update, self.update_vectors):
             if cl.effect is None:
-                cl.effect = copy(uv)
+                cl.effect = copy(Effect(uv))
             else:
-                cl.effect = copy(uv)
+                cl.effect = copy(Effect(uv))
                 cl.error = cl.error + self.cfg.lem
         self.classifiers_for_update = []
         self.update_vectors = []
