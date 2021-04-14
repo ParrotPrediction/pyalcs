@@ -1,15 +1,14 @@
-from lcs.agents.xcs import XCS
-
 from typing import Optional
-
 import random
 import numpy as np
 from copy import copy
 
-from lcs.agents.xcs import ClassifiersList
+from lcs.agents.xcs import XCS
+from lcs.agents.xncs import Configuration, Backpropagation
+# TODO: find typo that makes __init__ not do that
+from lcs.agents.xncs.ClassifiersList import ClassifiersList
 from lcs.agents.Agent import TrialMetrics
 from lcs.strategies.reinforcement_learning import simple_q_learning
-from lcs.agents.xncs import Configuration, Backpropagation
 
 
 class XNCS(XCS):
@@ -23,7 +22,13 @@ class XNCS(XCS):
         :param population: all classifiers at current time
         """
         self.back_propagation = Backpropagation(cfg)
-        super().__init__(cfg, population)
+        self.cfg = cfg
+        if population is not None:
+            self.population = population
+        else:
+            self.population = ClassifiersList(cfg=cfg)
+        self.time_stamp = 0
+        self.action_reward = [0 for _ in range(cfg.number_of_actions)]
 
     def _run_trial_explore(self, env, trials, current_trial) -> TrialMetrics:
         prev_action_set = None
@@ -32,7 +37,6 @@ class XNCS(XCS):
         prev_action = 0
         self.time_stamp = 0  # steps
         done = False  # eop
-        bp_update = 0
 
         raw_state = env.reset()
         state = self.cfg.environment_adapter.to_genotype(raw_state)
