@@ -2,8 +2,8 @@ import pytest
 from copy import copy
 
 from lcs import Perception
-from lcs.agents.xncs import XNCS, Classifier, Configuration, Backpropagation
-from lcs.agents.xcs import ClassifiersList, Condition
+from lcs.agents.xncs import XNCS, Classifier, Configuration, Backpropagation, ClassifiersList
+from lcs.agents.xcs import Condition
 
 
 class TestXNCS:
@@ -28,6 +28,7 @@ class TestXNCS:
     def test_init(self, cfg, classifiers_list_diff_actions):
         xncs = XNCS(cfg, classifiers_list_diff_actions)
         assert type(xncs.back_propagation) == Backpropagation
+        assert xncs.back_propagation is not None
         assert id(xncs.cfg) == id(cfg)
         assert len(xncs.population) == 4
 

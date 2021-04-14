@@ -2,6 +2,7 @@ from copy import copy
 
 from lcs.agents.xncs import Configuration, Classifier, Effect
 
+
 class Backpropagation:
 
     def __init__(self, cfg: Configuration):

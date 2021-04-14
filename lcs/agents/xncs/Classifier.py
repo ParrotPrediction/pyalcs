@@ -2,11 +2,11 @@ import logging
 from typing import Union, Optional
 
 from lcs.agents.xcs import Condition
-from lcs.agents.xcs import Classifier as ClassifierXCS
 from lcs.agents.xncs import Effect, Configuration
+import lcs.agents.xcs as xcs
 
 
-class Classifier(ClassifierXCS):
+class Classifier(xcs.Classifier):
     def __init__(self,
                  cfg: Optional[Configuration] = None,
                  condition: Union[Condition, str, None] = None,
@@ -16,3 +16,9 @@ class Classifier(ClassifierXCS):
         self.effect = effect
         super().__init__(cfg, condition, action, time_stamp)
 
+    def __eq__(self, other):
+        if other.action == self.action \
+           and other.condition == self.condition\
+           and other.effect == self.effect:
+                return True
+        return False

@@ -1,7 +1,7 @@
 import pytest
 
-from lcs.agents.xncs import Backpropagation, Configuration, Classifier, Effect
-from lcs.agents.xcs import Condition, ClassifiersList
+from lcs.agents.xncs import Backpropagation, Configuration, Classifier, Effect, ClassifiersList
+from lcs.agents.xcs import Condition
 
 
 class TestBackpropagation:

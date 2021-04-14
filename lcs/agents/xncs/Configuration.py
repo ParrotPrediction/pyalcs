@@ -1,16 +1,16 @@
 import numpy as np
 from typing import Callable
 
-from lcs.agents.xcs import Configuration as ConfXCS
+import lcs.agents.xcs as xcs
 from lcs.agents import EnvironmentAdapter
 
 
-class Configuration(ConfXCS):
+class Configuration(xcs.Configuration):
 
     def __init__(self,
-                 lmc: int,
-                 lem: float,
                  number_of_actions: int,  # theta_mna it is actually smart to make it equal to number of actions
+                 lmc: int = 100,
+                 lem: float = 1,
                  classifier_wildcard: str = '#',
                  environment_adapter=EnvironmentAdapter,
                  max_population: int = 200,  # n
