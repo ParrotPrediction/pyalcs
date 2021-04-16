@@ -21,7 +21,9 @@ class Classifier(xcs.Classifier):
            and other.condition == self.condition:
             if other.effect is None and self.effect is None:
                 return True
-            if other.effect is None or other.effect is None:
+            if other.effect is None:
+                return False
+            if self.effect is None:
                 return False
             if other.effect == self.effect:
                 return True

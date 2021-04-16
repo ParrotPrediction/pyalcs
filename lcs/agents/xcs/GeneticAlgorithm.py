@@ -4,17 +4,18 @@ from copy import copy
 from lcs.agents.xcs import Configuration, Classifier, ClassifiersList
 
 
+# TODO: Sometimes Child is Nonetype
 def run_ga(population: ClassifiersList,
            action_set: ClassifiersList,
            situation,
            time_stamp,
            cfg: Configuration):
     if action_set is None:
-        return None
+        return
 
     temp_numerosity = sum(cl.numerosity for cl in action_set)
     if temp_numerosity == 0:
-        return None
+        return
 
     if time_stamp - sum(cl.time_stamp * cl.numerosity for cl in action_set) \
             / temp_numerosity > cfg.ga_threshold:
@@ -23,6 +24,8 @@ def run_ga(population: ClassifiersList,
         # select children
         parent1 = _select_offspring(action_set)
         parent2 = _select_offspring(action_set)
+        if parent1 is None or parent2 is None:
+            return
         child1, child2 = _make_children(parent1, parent2)
         # apply crossover
         if np.random.rand() < cfg.chi:
@@ -39,6 +42,8 @@ def run_ga(population: ClassifiersList,
 def _perform_insertion_or_subsumption(cfg: Configuration, population: ClassifiersList,
                                       child1: Classifier, child2: Classifier,
                                       parent1: Classifier, parent2: Classifier):
+    if child1 is None or child2 is None:
+        return
     if cfg.do_GA_subsumption:
         if parent1.does_subsume(child1):
             parent1.numerosity += 1
