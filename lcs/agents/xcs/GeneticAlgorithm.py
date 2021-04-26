@@ -1,10 +1,10 @@
 import numpy as np
+import random
 from copy import copy
 
 from lcs.agents.xcs import Configuration, Classifier, ClassifiersList
 
 
-# TODO: Sometimes Child is Nonetype
 def run_ga(population: ClassifiersList,
            action_set: ClassifiersList,
            situation,
@@ -17,15 +17,13 @@ def run_ga(population: ClassifiersList,
     if temp_numerosity == 0:
         return
 
-    if time_stamp - sum(cl.time_stamp * cl.numerosity for cl in action_set) \
-            / temp_numerosity > cfg.ga_threshold:
+    if time_stamp - (sum(cl.time_stamp * cl.numerosity for cl in action_set) \
+            / temp_numerosity) > cfg.ga_threshold:
         for cl in action_set:
             cl.time_stamp = time_stamp
         # select children
         parent1 = _select_offspring(action_set)
         parent2 = _select_offspring(action_set)
-        if parent1 is None or parent2 is None:
-            return
         child1, child2 = _make_children(parent1, parent2)
         # apply crossover
         if np.random.rand() < cfg.chi:
@@ -84,6 +82,7 @@ def _select_offspring(action_set: ClassifiersList) -> Classifier:
         fitness_sum += cl.fitness
         if fitness_sum > choice_point:
             return cl
+    return action_set[random.randrange(len(action_set))]
 
 
 def _apply_crossover(child1: Classifier, child2: Classifier,
@@ -94,7 +93,7 @@ def _apply_crossover(child1: Classifier, child2: Classifier,
                              )
     child1.prediction = (parent1.prediction + parent2.prediction) / 2
     child1.error = 0.25 * (parent1.error + parent2.error) / 2
-    child1.fitness = (parent1.fitness + parent2.fitness) / 2
+    child1.fitness = 0.1 * (parent1.fitness + parent2.fitness) / 2
     child2.prediction = child1.prediction
     child2.error = child1.error
     child2.fitness = child1.fitness

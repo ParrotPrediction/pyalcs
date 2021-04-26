@@ -13,7 +13,7 @@ class Configuration(object):
                  learning_rate: float = 0.1,  # beta
                  alpha: float = 0.1,
                  epsilon_0: float = 10,
-                 v: int = 5,
+                 v: int = 5,  # nu
                  gamma: float = 0.71,
                  ga_threshold: int = 25,
                  chi: float = 0.5,
