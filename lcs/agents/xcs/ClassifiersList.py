@@ -59,14 +59,11 @@ class ClassifiersList(TypedList):
     def _deletion_vote(self, cl, average_fitness):
         vote = cl.action_set_size * cl.numerosity
         if cl.experience > self.cfg.deletion_threshold and \
-                cl.fitness / cl.numerosity > \
+                cl.fitness / cl.numerosity < \
                 self.cfg.delta * average_fitness:
             vote *= average_fitness / (cl.fitness / cl.numerosity)
         return vote
 
-    # I toyed with numerosity -= 1
-    # and had better results with same solution as hosford42
-    # which is deleting the classifier
     def _remove_based_on_votes(self, deletion_votes, selector):
         for cl, vote in zip(self, deletion_votes):
             selector -= vote
@@ -139,8 +136,14 @@ class ClassifiersList(TypedList):
             if cl.error < self.cfg.epsilon_0:
                 tmp_acc = 1
             else:
-                tmp_acc = self.cfg.alpha * pow(1/(cl.error * self.cfg.epsilon_0), self.cfg.v)
+                tmp_acc = (self.cfg.alpha *
+                           (cl.error * self.cfg.epsilon_0) **
+                           -self.cfg.v
+                           )
             accuracy_vector_k.append(tmp_acc)
             accuracy_sum += tmp_acc + cl.numerosity
         for cl, k in zip(self, accuracy_vector_k):
-            cl.fitness += self.cfg.learning_rate * (k * cl.numerosity / accuracy_sum - cl.fitness)
+            cl.fitness += (
+                self.cfg.learning_rate *
+                (k * cl.numerosity / accuracy_sum - cl.fitness)
+            )

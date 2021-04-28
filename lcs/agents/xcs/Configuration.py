@@ -17,7 +17,7 @@ class Configuration(object):
                  gamma: float = 0.71,
                  ga_threshold: int = 25,
                  chi: float = 0.5,
-                 mutation_chance: float = 0.01,
+                 mutation_chance: float = 0.01,  # mu
                  deletion_threshold: int = 20,  # theta_del
                  delta: float = 0.1,
                  subsumption_threshold: int = 20,  # theta_sub
