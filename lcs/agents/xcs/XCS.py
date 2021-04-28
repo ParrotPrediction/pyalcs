@@ -50,7 +50,7 @@ class XCS(Agent):
         prev_reward = [0 for _ in range(self.cfg.number_of_actions)]
         prev_state = None  # state is known as situation
         prev_action = 0
-        self.time_stamp = 0  # steps
+        prev_time_stamp = self.time_stamp  # steps
         done = False  # eop
 
         raw_state = env.reset()
@@ -85,7 +85,7 @@ class XCS(Agent):
                 prev_state = copy(state)
                 prev_action = action
             self.time_stamp += 1
-        return TrialMetrics(self.time_stamp, self.action_reward)
+        return TrialMetrics(self.time_stamp - prev_time_stamp, self.action_reward)
 
     def _distribute_and_update(self, action_set, situation, p):
         if action_set is not None and len(action_set) > 0:

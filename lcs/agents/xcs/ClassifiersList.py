@@ -68,7 +68,6 @@ class ClassifiersList(TypedList):
         for cl, vote in zip(self, deletion_votes):
             selector -= vote
             if selector <= 0:
-                assert cl in self
                 if cl.numerosity > 1:
                     cl.numerosity -= 1
                 else:

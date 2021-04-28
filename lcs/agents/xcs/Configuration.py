@@ -22,9 +22,9 @@ class Configuration(object):
                  delta: float = 0.1,
                  subsumption_threshold: int = 20,  # theta_sub
                  covering_wildcard_chance: float = 0.33,  # population wildcard
-                 initial_prediction: float = float(np.finfo(np.float32).tiny),  # p_i
-                 initial_error: float = float(np.finfo(np.float32).tiny),  # epsilon_i
-                 initial_fitness: float = float(np.finfo(np.float32).tiny),  # f_i
+                 initial_prediction: float = 0.000001,  # p_i
+                 initial_error: float = 0.000001,  # epsilon_i
+                 initial_fitness: float = 0.000001,  # f_i
                  epsilon: float = 0.5,  # p_exp, exploration probability
                  do_ga_subsumption: bool = False,
                  do_action_set_subsumption: bool = False,
