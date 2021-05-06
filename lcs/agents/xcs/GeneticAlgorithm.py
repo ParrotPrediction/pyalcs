@@ -1,4 +1,5 @@
 import numpy as np
+import random
 from copy import copy
 
 from lcs.agents.xcs import Configuration, Classifier, ClassifiersList
@@ -10,14 +11,15 @@ def run_ga(population: ClassifiersList,
            time_stamp,
            cfg: Configuration):
     if action_set is None:
-        return None
+        return
 
-    temp_numerosity = sum(cl.numerosity for cl in action_set)
-    if temp_numerosity == 0:
-        return None
+    # temp_numerosity = sum(cl.numerosity for cl in action_set)
+    # if temp_numerosity == 0:
+    #    return
 
-    if time_stamp - sum(cl.time_stamp * cl.numerosity for cl in action_set) \
-            / temp_numerosity > cfg.ga_threshold:
+    if time_stamp - (sum(cl.time_stamp * cl.numerosity for cl in action_set)
+                     # / temp_numerosity) > cfg.ga_threshold:
+                     / (sum(cl.numerosity for cl in action_set) or 1)) > cfg.ga_threshold:
         for cl in action_set:
             cl.time_stamp = time_stamp
         # select children
@@ -39,6 +41,8 @@ def run_ga(population: ClassifiersList,
 def _perform_insertion_or_subsumption(cfg: Configuration, population: ClassifiersList,
                                       child1: Classifier, child2: Classifier,
                                       parent1: Classifier, parent2: Classifier):
+    if child1 is None or child2 is None:
+        return
     if cfg.do_GA_subsumption:
         if parent1.does_subsume(child1):
             parent1.numerosity += 1
@@ -46,6 +50,7 @@ def _perform_insertion_or_subsumption(cfg: Configuration, population: Classifier
             parent2.numerosity += 1
         else:
             population.insert_in_population(child1)
+        population.delete_from_population()
 
         if parent1.does_subsume(child2):
             parent1.numerosity += 1
@@ -53,10 +58,12 @@ def _perform_insertion_or_subsumption(cfg: Configuration, population: Classifier
             parent2.numerosity += 1
         else:
             population.insert_in_population(child2)
+        population.delete_from_population()
     else:
         population.insert_in_population(child1)
+        population.delete_from_population()
         population.insert_in_population(child2)
-    population.delete_from_population()
+        population.delete_from_population()
 
 
 def _make_children(parent1, parent2):
@@ -79,6 +86,7 @@ def _select_offspring(action_set: ClassifiersList) -> Classifier:
         fitness_sum += cl.fitness
         if fitness_sum > choice_point:
             return cl
+    return action_set[random.randrange(len(action_set))]
 
 
 def _apply_crossover(child1: Classifier, child2: Classifier,
@@ -89,7 +97,7 @@ def _apply_crossover(child1: Classifier, child2: Classifier,
                              )
     child1.prediction = (parent1.prediction + parent2.prediction) / 2
     child1.error = 0.25 * (parent1.error + parent2.error) / 2
-    child1.fitness = (parent1.fitness + parent2.fitness) / 2
+    child1.fitness = 0.1 * (parent1.fitness + parent2.fitness) / 2
     child2.prediction = child1.prediction
     child2.error = child1.error
     child2.fitness = child1.fitness
