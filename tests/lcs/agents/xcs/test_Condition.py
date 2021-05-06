@@ -25,7 +25,8 @@ class TestCondition:
         ("1111", "1100", False),
 
         ("1111", "11", False),
-        ("11", "1100", False)
+        ("#1111#", "#1111#", True),
+        ("###01#", "###01#", True),
     ])
     def test_equal(self, cond1, cond2, result):
         assert result == (Condition(cond1) == Condition(cond2))

@@ -34,9 +34,24 @@ class TestClassifiersList:
         ("1100", 3)
     ])
     def test_insert_population(self, classifiers_list_diff_actions, cfg, cond, act):
-        cl = Classifier(cfg=cfg, condition=Condition("1111"), action=0, time_stamp=0)
+        cl = Classifier(cfg=cfg, condition=Condition(cond), action=act, time_stamp=0)
         classifiers_list_diff_actions.insert_in_population(cl)
         assert any(c == cl for c in classifiers_list_diff_actions)
+
+    @pytest.mark.parametrize("cond1, cond2, act1, act2, size", [
+        ("1111", "1111", 1, 1, 5),
+        ("#100", "#100", 0, 0, 5),
+        ("0##11#", "0##11#", 0, 0, 5),
+
+    ])
+    def test_insert_population_two(self, cfg, classifiers_list_diff_actions, cond1, cond2, act1, act2, size):
+        cl1 = Classifier(cfg=cfg, condition=Condition(cond1), action=act1, time_stamp=0)
+        cl2 = Classifier(cfg=cfg, condition=Condition(cond2), action=act2, time_stamp=0)
+        classifiers_list_diff_actions.insert_in_population(cl1)
+        classifiers_list_diff_actions.insert_in_population(cl2)
+        assert any(c == cl1 for c in classifiers_list_diff_actions)
+        assert any(c == cl2 for c in classifiers_list_diff_actions)
+        assert len(classifiers_list_diff_actions) == size
 
     @pytest.mark.parametrize("cond, act", [
         ("1111", 0),

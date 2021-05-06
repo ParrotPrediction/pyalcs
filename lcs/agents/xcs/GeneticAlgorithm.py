@@ -10,29 +10,29 @@ def run_ga(population: ClassifiersList,
            situation,
            time_stamp,
            cfg: Configuration):
+
     if action_set is None:
         return
 
-    # temp_numerosity = sum(cl.numerosity for cl in action_set)
-    # if temp_numerosity == 0:
-    #    return
+    assert isinstance(population, ClassifiersList)
+    assert isinstance(action_set, ClassifiersList)
+    assert isinstance(cfg, Configuration)
 
     if time_stamp - (sum(cl.time_stamp * cl.numerosity for cl in action_set)
-                     # / temp_numerosity) > cfg.ga_threshold:
                      / (sum(cl.numerosity for cl in action_set) or 1)) > cfg.ga_threshold:
         for cl in action_set:
             cl.time_stamp = time_stamp
-        # select children
+
         parent1 = _select_offspring(action_set)
         parent2 = _select_offspring(action_set)
-        child1, child2 = _make_children(parent1, parent2)
-        # apply crossover
+        child1, child2 = _make_children(parent1, parent2, cfg, time_stamp)
+
         if np.random.rand() < cfg.chi:
             _apply_crossover(child1, child2, parent1, parent2)
-        # apply mutation on both children
+
         _apply_mutation(child1, cfg, situation)
         _apply_mutation(child2, cfg, situation)
-        # apply subsumption or just insert into population
+
         _perform_insertion_or_subsumption(cfg, population,
                                           child1, child2,
                                           parent1, parent2)
@@ -41,42 +41,41 @@ def run_ga(population: ClassifiersList,
 def _perform_insertion_or_subsumption(cfg: Configuration, population: ClassifiersList,
                                       child1: Classifier, child2: Classifier,
                                       parent1: Classifier, parent2: Classifier):
-    if child1 is None or child2 is None:
-        return
+
+    assert isinstance(child1, Classifier)
+    assert isinstance(child2, Classifier)
+    assert isinstance(parent1, Classifier)
+    assert isinstance(parent2, Classifier)
+
     if cfg.do_GA_subsumption:
-        if parent1.does_subsume(child1):
-            parent1.numerosity += 1
-        elif parent2.does_subsume(child1):
-            parent2.numerosity += 1
-        else:
-            population.insert_in_population(child1)
-        population.delete_from_population()
-
-        if parent1.does_subsume(child2):
-            parent1.numerosity += 1
-        elif parent2.does_subsume(child2):
-            parent2.numerosity += 1
-        else:
-            population.insert_in_population(child2)
-        population.delete_from_population()
+        for child in child1, child2:
+            if parent1.does_subsume(child):
+                parent1.numerosity += 1
+            elif parent2.does_subsume(child):
+                parent2.numerosity += 1
+            else:
+                population.insert_in_population(child)
+            population.delete_from_population()
     else:
-        population.insert_in_population(child1)
-        population.delete_from_population()
-        population.insert_in_population(child2)
-        population.delete_from_population()
+        for child in child1, child2:
+            population.insert_in_population(child)
+            population.delete_from_population()
 
 
-def _make_children(parent1, parent2):
-    child1 = copy(parent1)
-    child2 = copy(parent2)
-    child1.numerosity = 1
-    child2.numerosity = 1
-    child1.experience = 0
-    child2.experience = 0
+def _make_children(parent1, parent2, cfg, time_stamp):
+    assert isinstance(parent1, Classifier)
+    assert isinstance(parent2, Classifier)
+
+    child1 = Classifier(cfg, parent1.condition, parent1.action, time_stamp)
+    child2 = Classifier(cfg, parent2.condition, parent2.action, time_stamp)
+
     return child1, child2
 
 
 def _select_offspring(action_set: ClassifiersList) -> Classifier:
+
+    assert isinstance(action_set, ClassifiersList)
+
     fitness_sum = 0
     for cl in action_set:
         fitness_sum += cl.fitness
@@ -91,16 +90,17 @@ def _select_offspring(action_set: ClassifiersList) -> Classifier:
 
 def _apply_crossover(child1: Classifier, child2: Classifier,
                      parent1: Classifier, parent2: Classifier):
-    _apply_crossover_in_area(child1, child2,
+
+    _apply_crossover_in_area(child1,
+                             child2,
                              np.random.rand() * len(child1.condition),
                              np.random.rand() * len(child1.condition)
                              )
-    child1.prediction = (parent1.prediction + parent2.prediction) / 2
-    child1.error = 0.25 * (parent1.error + parent2.error) / 2
-    child1.fitness = 0.1 * (parent1.fitness + parent2.fitness) / 2
-    child2.prediction = child1.prediction
-    child2.error = child1.error
-    child2.fitness = child1.fitness
+
+    for child in child1, child2:
+        child.prediction = (parent1.prediction + parent2.prediction) / 2
+        child.error = 0.25 * (parent1.error + parent2.error) / 2
+        child.fitness = 0.1 * (parent1.fitness + parent2.fitness) / 2
 
 
 def _apply_crossover_in_area(child1: Classifier, child2: Classifier, x, y):

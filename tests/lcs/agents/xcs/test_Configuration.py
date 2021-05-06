@@ -12,7 +12,5 @@ class TestConfiguration:
     def cfg(self):
         return Configuration(number_of_actions=4)
 
-    def test_minimum(self, cfg):
-        assert float(np.finfo(np.float32).tiny) == cfg.initial_prediction
 
 
