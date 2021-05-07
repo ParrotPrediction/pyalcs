@@ -1,15 +1,14 @@
 import logging
 import random
-import numpy as np
 from copy import copy
 from typing import Optional
 
-from lcs.agents import Agent
-from lcs.agents.xcs import Configuration, ClassifiersList, GeneticAlgorithm
-from lcs.agents.Agent import TrialMetrics
-from lcs.strategies.reinforcement_learning import simple_q_learning
-from lcs.strategies.action_selection import EpsilonGreedy
+import numpy as np
 
+from lcs.agents import Agent
+from lcs.agents.Agent import TrialMetrics
+from lcs.agents.xcs import Configuration, ClassifiersList, GeneticAlgorithm
+from lcs.strategies.reinforcement_learning import simple_q_learning
 
 logger = logging.getLogger(__name__)
 
@@ -121,5 +120,3 @@ class XCS(Agent):
                     cl.numerosity += c.numerosity
                     action_set.safe_remove(c)
                     self.population.safe_remove(c)
-
-

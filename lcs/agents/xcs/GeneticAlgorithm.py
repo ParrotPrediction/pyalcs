@@ -1,6 +1,6 @@
-import numpy as np
 import random
-from copy import copy
+
+import numpy as np
 
 from lcs.agents.xcs import Configuration, Classifier, ClassifiersList
 

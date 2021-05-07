@@ -67,3 +67,11 @@ class TestCondition:
     ])
     def test_is_more_general(self, cond1, cond2, result):
         assert Condition(cond1).is_more_general(Condition(cond2)) == result
+
+    @pytest.mark.parametrize("_c", [
+        ([0.1, 0.2]),
+        ([0, 1]),
+    ])
+    def test_should_fail_with_invalid_types(self, _c):
+        with pytest.raises(AssertionError) as _:
+            Condition(_c)

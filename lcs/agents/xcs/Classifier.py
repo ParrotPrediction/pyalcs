@@ -12,10 +12,13 @@ class Classifier:
                  condition: Union[Condition, str, None] = None,
                  action: Optional[int] = None,
                  time_stamp: int = None) -> None:
+
         if cfg is None:
             raise TypeError("Configuration should be passed to Classifier")
+
         if type(condition) != Condition:
-            condition = str(condition)
+            condition = Condition(condition)
+
         self.cfg = cfg                  # cfg
         self.condition = condition      # current situation
         self.action = action            # A - int action
@@ -42,13 +45,12 @@ class Classifier:
 
     @property
     def could_subsume(self):
-        if self.experience > self.cfg.subsumption_threshold and self.error < self.cfg.initial_error:
-                return True
-        return False
+        return self.experience > self.cfg.subsumption_threshold and self.error < self.cfg.initial_error
 
     def is_more_general(self, other):
         if self.wildcard_number <= other.wildcard_number:
             return False
+
         return self.condition.is_more_general(other.condition)
 
     @property
@@ -62,7 +64,8 @@ class Classifier:
         return f"Cond:{self.condition} - Act:{self.action} - Num:{self.numerosity} " + \
             f"[fit: {self.fitness:.3f}, exp: {self.experience:3.2f}, pred: {self.prediction:2.3f}]"
 
-    def __eq__(self, other):
-        if other.action == self.action and other.condition == self.condition:
-                return True
-        return False
+    def __eq__(self, o):
+        return o.condition == self.condition and o.action == self.action
+
+    def __hash__(self):
+        return hash((str(self.condition), self.action))

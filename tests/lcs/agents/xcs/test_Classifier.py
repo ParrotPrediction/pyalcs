@@ -93,10 +93,11 @@ class TestClassifier:
         ("0##11#", "0##11#", 0, 0, True),
         ("###000", "###000", 0, 0, True),
         ("###00#", "###00#", 1, 1, True),
-
     ])
     def test_equals(self, cfg, cond1, cond2, act1, act2, result):
-        assert result == (Classifier(cfg=cfg, condition=Condition(cond1), action=act1, time_stamp=0) ==
-                          Classifier(cfg=cfg, condition=Condition(cond2), action=act2, time_stamp=0))
+        cl1 = Classifier(condition=Condition(cond1), action=act1, time_stamp=0, cfg=cfg)
+        cl2 = Classifier(condition=Condition(cond2), action=act2, time_stamp=0, cfg=cfg)
+
+        assert result is (cl1 == cl2)
 
 
