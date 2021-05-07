@@ -21,7 +21,7 @@ class ClassifiersList(TypedList):
     def insert_in_population(self, cl: Classifier):
         existing_classifiers = [c for c in self if c == cl]
         if len(existing_classifiers) > 0:
-            assert len(existing_classifiers) == 1, 'duplicates found'
+            # assert len(existing_classifiers) == 1, 'duplicates found'
             existing_classifiers[0].numerosity += 1
         else:
             self.append(cl)
@@ -78,11 +78,11 @@ class ClassifiersList(TypedList):
 
     def generate_match_set(self, situation: Perception, time_stamp):
         matching_ls = [cl for cl in self if cl.does_match(situation)]
-        while len(matching_ls) < self.cfg.number_of_actions:
-            action = self._find_not_present_action(matching_ls)
-            cl = self._generate_covering_and_insert(situation, action,
-                                                    time_stamp)
+        action = self._find_not_present_action(matching_ls)
+        while action is not None:
+            cl = self._generate_covering_and_insert(situation, action, time_stamp)
             matching_ls.append(cl)
+            action = self._find_not_present_action(matching_ls)
         return ClassifiersList(self.cfg, *matching_ls)
 
     def _find_not_present_action(self, matching_set):
@@ -120,18 +120,19 @@ class ClassifiersList(TypedList):
             cl.experience += 1
             # update prediction, prediction error, action set size estimate
             if cl.experience < 1 / self.cfg.learning_rate:
-                cl.prediction += (p - cl.prediction) / cl.experience
-                cl.error += (abs(p - cl.prediction) - cl.error) / cl.experience
+                cl.prediction += \
+                    (p - cl.prediction) / cl.experience
+                cl.error += \
+                    (abs(p - cl.prediction) - cl.error) / cl.experience
                 cl.action_set_size += \
-                    (
-                            action_set_numerosity - cl.action_set_size) / cl.experience
+                    (action_set_numerosity - cl.action_set_size) / cl.experience
             else:
-                cl.prediction += self.cfg.learning_rate * (p - cl.prediction)
-                cl.error += self.cfg.learning_rate * (
-                        abs(p - cl.prediction) - cl.error)
+                cl.prediction +=\
+                    self.cfg.learning_rate * (p - cl.prediction)
+                cl.error += \
+                    self.cfg.learning_rate * (abs(p - cl.prediction) - cl.error)
                 cl.action_set_size += \
-                    self.cfg.learning_rate * (
-                            action_set_numerosity - cl.action_set_size)
+                    self.cfg.learning_rate * (action_set_numerosity - cl.action_set_size)
         self._update_fitness()
 
     def _update_fitness(self):

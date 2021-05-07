@@ -50,7 +50,6 @@ class Classifier:
     def is_more_general(self, other):
         if self.wildcard_number <= other.wildcard_number:
             return False
-
         return self.condition.is_more_general(other.condition)
 
     @property

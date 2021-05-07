@@ -25,6 +25,7 @@ def run_ga(population: ClassifiersList,
 
         parent1 = _select_offspring(action_set)
         parent2 = _select_offspring(action_set)
+
         child1, child2 = _make_children(parent1, parent2, cfg, time_stamp)
 
         if np.random.rand() < cfg.chi:
@@ -76,6 +77,7 @@ def _select_offspring(action_set: ClassifiersList) -> Classifier:
 
     assert isinstance(action_set, ClassifiersList)
 
+    # TODO: insert generator to calculate fitness_sum
     fitness_sum = 0
     for cl in action_set:
         fitness_sum += cl.fitness
