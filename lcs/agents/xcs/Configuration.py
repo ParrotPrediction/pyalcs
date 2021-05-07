@@ -29,7 +29,8 @@ class Configuration(object):
                  do_ga_subsumption: bool = False,
                  do_action_set_subsumption: bool = False,
                  metrics_trial_frequency: int = 5,
-                 user_metrics_collector_fcn: Callable = None
+                 user_metrics_collector_fcn: Callable = None,
+                 multistep_enfiroment: bool = True
                  ) -> None:
         """
         :param classifier_wildcard: Wildcard symbol
@@ -79,6 +80,8 @@ class Configuration(object):
 
         self.metrics_trial_frequency = metrics_trial_frequency
         self.user_metrics_collector_fcn = user_metrics_collector_fcn
+
+        self.multistep_enfiroment = multistep_enfiroment
 
     def __str__(self) -> str:
         return str(vars(self))

@@ -28,7 +28,7 @@ class XCS(Agent):
         else:
             self.population = ClassifiersList(cfg=cfg)
         self.time_stamp = 0
-        self.action_reward = [0 for _ in range(cfg.number_of_actions)]
+        self.reward = 0
 
     def get_population(self):
         return self.population
@@ -46,9 +46,8 @@ class XCS(Agent):
 
     def _run_trial_explore(self, env, trials, current_trial) -> TrialMetrics:
         prev_action_set = None
-        prev_reward = [0 for _ in range(self.cfg.number_of_actions)]
+        prev_reward = self.reward
         prev_state = None  # state is known as situation
-        prev_action = 0
         prev_time_stamp = self.time_stamp  # steps
         done = False  # eop
 
@@ -66,26 +65,22 @@ class XCS(Agent):
             # apply action to environment
             raw_state, step_reward, done, _ = env.step(action)
             state = self.cfg.environment_adapter.to_genotype(raw_state)
-            self.action_reward[action] = simple_q_learning(self.action_reward[action],
-                                                           step_reward,
-                                                           self.cfg.learning_rate,
-                                                           self.cfg.gamma,
-                                                           match_set.best_prediction)
+            if self.cfg.multistep_enfiroment:
+                self.reward = step_reward + self.cfg.gamma * self.reward
 
             self._distribute_and_update(prev_action_set,
                                         prev_state,
-                                        prev_reward[prev_action] + self.cfg.gamma * max(prediction_array))
+                                        prev_reward + self.cfg.gamma * max(prediction_array))
             if done:
                 self._distribute_and_update(action_set,
                                             state,
-                                            self.action_reward[action])
+                                            self.reward)
             else:
                 prev_action_set = copy(action_set)
-                prev_reward[action] = copy(self.action_reward[action])
+                prev_reward = self.reward
                 prev_state = copy(state)
-                prev_action = action
             self.time_stamp += 1
-        return TrialMetrics(self.time_stamp - prev_time_stamp, self.action_reward)
+        return TrialMetrics(self.time_stamp - prev_time_stamp, self.reward)
 
     def _distribute_and_update(self, action_set, situation, p):
         if action_set is not None and len(action_set) > 0:
