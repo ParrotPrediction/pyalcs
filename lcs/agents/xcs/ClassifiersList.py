@@ -1,6 +1,7 @@
-import numpy as np
-import random
 import logging
+import random
+
+import numpy as np
 
 from lcs import TypedList, Perception
 from lcs.agents.xcs import Classifier, Condition, Configuration
@@ -18,11 +19,12 @@ class ClassifiersList(TypedList):
         super().__init__(*args, oktypes=oktypes)
 
     def insert_in_population(self, cl: Classifier):
-        for c in self:
-            if c == cl:
-                c.numerosity += 1
-                return 
-        self.append(cl)
+        existing_classifiers = [c for c in self if c == cl]
+        if len(existing_classifiers) > 0:
+            assert len(existing_classifiers) == 1, 'duplicates found'
+            existing_classifiers[0].numerosity += 1
+        else:
+            self.append(cl)
 
     def generate_covering_classifier(self, situation, action, time_stamp):
         # both Perception and string has __getitem__
@@ -33,11 +35,11 @@ class ClassifiersList(TypedList):
                 generalized.append(self.cfg.classifier_wildcard)
             else:
                 generalized.append(situation[i])
-        cl = Classifier(cfg=self.cfg,
-                        condition=Condition(generalized),
-                        action=action,
-                        time_stamp=time_stamp)
-        return cl
+
+        return Classifier(condition=Condition(generalized),
+                          action=action,
+                          time_stamp=time_stamp,
+                          cfg=self.cfg)
 
     def _generate_covering_and_insert(self, situation, action, time_stamp):
         cl = self.generate_covering_classifier(situation, action, time_stamp)
@@ -59,8 +61,8 @@ class ClassifiersList(TypedList):
     def _deletion_vote(self, cl, average_fitness):
         vote = cl.action_set_size * cl.numerosity
         if cl.experience > self.cfg.deletion_threshold and \
-                cl.fitness / cl.numerosity < \
-                self.cfg.delta * average_fitness:
+            cl.fitness / cl.numerosity < \
+            self.cfg.delta * average_fitness:
             vote *= average_fitness / (cl.fitness / cl.numerosity)
         return vote
 
@@ -78,7 +80,8 @@ class ClassifiersList(TypedList):
         matching_ls = [cl for cl in self if cl.does_match(situation)]
         while len(matching_ls) < self.cfg.number_of_actions:
             action = self._find_not_present_action(matching_ls)
-            cl = self._generate_covering_and_insert(situation, action, time_stamp)
+            cl = self._generate_covering_and_insert(situation, action,
+                                                    time_stamp)
             matching_ls.append(cl)
         return ClassifiersList(self.cfg, *matching_ls)
 
@@ -116,16 +119,19 @@ class ClassifiersList(TypedList):
         for cl in self:
             cl.experience += 1
             # update prediction, prediction error, action set size estimate
-            if cl.experience < 1/self.cfg.learning_rate:
+            if cl.experience < 1 / self.cfg.learning_rate:
                 cl.prediction += (p - cl.prediction) / cl.experience
                 cl.error += (abs(p - cl.prediction) - cl.error) / cl.experience
-                cl.action_set_size +=\
-                    (action_set_numerosity - cl.action_set_size) / cl.experience
+                cl.action_set_size += \
+                    (
+                            action_set_numerosity - cl.action_set_size) / cl.experience
             else:
                 cl.prediction += self.cfg.learning_rate * (p - cl.prediction)
-                cl.error += self.cfg.learning_rate * (abs(p - cl.prediction) - cl.error)
+                cl.error += self.cfg.learning_rate * (
+                        abs(p - cl.prediction) - cl.error)
                 cl.action_set_size += \
-                    self.cfg.learning_rate * (action_set_numerosity - cl.action_set_size)
+                    self.cfg.learning_rate * (
+                            action_set_numerosity - cl.action_set_size)
         self._update_fitness()
 
     def _update_fitness(self):

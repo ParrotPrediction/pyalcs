@@ -56,6 +56,7 @@ class XCS(Agent):
         state = self.cfg.environment_adapter.to_genotype(raw_state)
 
         while not done:
+            assert len(self.population) == len(set(self.population)), 'duplicates found'
             self.population.delete_from_population()
             # We are in t+1 here
             match_set = self.population.generate_match_set(state, self.time_stamp)
@@ -97,7 +98,7 @@ class XCS(Agent):
                                     self.time_stamp,
                                     self.cfg)
 
-    # TODO: EspilonGreedy
+    # TODO: EpsilonGreedy
     # Run into a lot of issues where in EpsilonGreedy where BestAction was not callable
     # Changing EpsilonGreed to:
     # best = BestAction(all_actions=self.all_actions)
