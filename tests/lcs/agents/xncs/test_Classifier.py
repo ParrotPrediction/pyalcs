@@ -11,7 +11,7 @@ class TestClassifier:
         return Configuration(lmc=2, lem=0.2, number_of_actions=4)
 
     def test_init(self, cfg):
-        cl = Classifier(cfg)
+        cl = Classifier(condition='####', cfg=cfg)
         assert cl.cfg == cfg
         assert cl.effect is None
 

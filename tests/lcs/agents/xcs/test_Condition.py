@@ -25,7 +25,8 @@ class TestCondition:
         ("1111", "1100", False),
 
         ("1111", "11", False),
-        ("11", "1100", False)
+        ("#1111#", "#1111#", True),
+        ("###01#", "###01#", True),
     ])
     def test_equal(self, cond1, cond2, result):
         assert result == (Condition(cond1) == Condition(cond2))
@@ -66,3 +67,11 @@ class TestCondition:
     ])
     def test_is_more_general(self, cond1, cond2, result):
         assert Condition(cond1).is_more_general(Condition(cond2)) == result
+
+    @pytest.mark.parametrize("_c", [
+        ([0.1, 0.2]),
+        ([0, 1]),
+    ])
+    def test_should_fail_with_invalid_types(self, _c):
+        with pytest.raises(AssertionError) as _:
+            Condition(_c)

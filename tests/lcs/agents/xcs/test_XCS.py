@@ -132,7 +132,9 @@ class TestXCS:
     def test_make_children(self, cfg, classifiers_list_diff_actions):
         child1, child2 = GeneticAlgorithm._make_children(
             classifiers_list_diff_actions[0],
-            classifiers_list_diff_actions[1]
+            classifiers_list_diff_actions[1],
+            cfg,
+            0
         )
         assert child1.numerosity == 1
         assert child2.numerosity == 1
