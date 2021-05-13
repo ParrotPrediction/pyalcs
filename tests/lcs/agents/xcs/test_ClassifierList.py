@@ -141,7 +141,8 @@ class TestClassifiersList:
         classifiers_list_diff_actions[0].prediction = 10
         prediction_array = classifiers_list_diff_actions.prediction_array
         assert len(classifiers_list_diff_actions) == cfg.number_of_actions
-        assert prediction_array[0] > prediction_array[1]
+        assert all(prediction_array[0] >= prediction
+                   for prediction in prediction_array)
 
     def test_update_fitness(self, cfg, classifiers_list_diff_actions):
         classifiers_list_diff_actions._update_fitness()

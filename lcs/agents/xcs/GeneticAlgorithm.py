@@ -1,5 +1,5 @@
 import random
-
+from copy import copy
 import numpy as np
 
 from lcs.agents.xcs import Configuration, Classifier, ClassifiersList
@@ -67,8 +67,11 @@ def _make_children(parent1, parent2, cfg, time_stamp):
     assert isinstance(parent1, Classifier)
     assert isinstance(parent2, Classifier)
 
-    child1 = Classifier(cfg, parent1.condition, parent1.action, time_stamp)
-    child2 = Classifier(cfg, parent2.condition, parent2.action, time_stamp)
+    child1 = copy(parent1)
+    child1.time_stamp = time_stamp
+
+    child2 = copy(parent2)
+    child2.time_stamp = time_stamp
 
     return child1, child2
 

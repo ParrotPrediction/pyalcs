@@ -36,3 +36,12 @@ class TestXNCS:
         xncs = XNCS(cfg, classifiers_list_diff_actions)
         xncs._distribute_and_update(classifiers_list_diff_actions, "1100", 0.1)
         assert len(xncs.back_propagation.update_vectors) == 4
+
+    def test_correct_types(self,cfg):
+        xncs = XNCS(cfg)
+        assert isinstance(xncs.population, ClassifiersList)
+        xncs.population.insert_in_population(
+            Classifier(cfg, Condition("1100"), 0, 0)
+        )
+        assert isinstance(xncs.population[0], Classifier)
+        assert xncs.population[0].effect is None
