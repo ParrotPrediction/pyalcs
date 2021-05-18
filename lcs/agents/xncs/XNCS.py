@@ -19,7 +19,7 @@ class XNCS(XCS):
         :param cfg: object storing parameters of the experiment
         :param population: all classifiers at current time
         """
-        self.back_propagation = Backpropagation(cfg)
+
         if population is not None:
             self.population = population
         else:
@@ -29,6 +29,10 @@ class XNCS(XCS):
             population=self.population,
             cfg=self.cfg
         )
+        self.back_propagation = Backpropagation(
+            cfg=self.cfg,
+            population=self.population
+            )
         self.time_stamp = 0
         self.reward = 0
 

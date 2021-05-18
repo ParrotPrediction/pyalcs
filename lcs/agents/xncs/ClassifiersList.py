@@ -16,6 +16,8 @@ class ClassifiersList(xcs.ClassifiersList):
                  ) -> None:
         super().__init__(cfg, *args, oktypes=oktypes)
 
+    # without this function the Classifierlist will create XCS Classifiers
+    # instead of XNCS classifiers
     def generate_covering_classifier(self, situation, action, time_stamp):
         generalized = []
         for i in range(len(situation)):

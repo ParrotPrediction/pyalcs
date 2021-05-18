@@ -1,11 +1,13 @@
 from copy import copy
 
-from lcs.agents.xncs import Configuration, Classifier, Effect
+from lcs.agents.xncs import Configuration, Classifier, ClassifiersList, Effect
 
 
 class Backpropagation:
 
-    def __init__(self, cfg: Configuration):
+    def __init__(self, cfg: Configuration,
+                 population: ClassifiersList):
+        self.population = population
         self.classifiers_for_update = []
         self.update_vectors = []
         self.cfg = cfg
@@ -21,9 +23,14 @@ class Backpropagation:
         for cl, uv in zip(self.classifiers_for_update, self.update_vectors):
             if cl.effect is None:
                 cl.effect = copy(Effect(uv))
+                self.remove_copies(cl)
             else:
                 cl.effect = copy(Effect(uv))
-                cl.error = cl.error + self.cfg.lem
+                pop_cl = self.remove_copies(cl)
+                if pop_cl is None:
+                    cl.error += self.cfg.lem
+                else:
+                    pop_cl.error += self.cfg.lem
         self.classifiers_for_update = []
         self.update_vectors = []
         self.update_cycles = 0
@@ -32,3 +39,10 @@ class Backpropagation:
         self.update_cycles += 1
         if self.update_cycles >= self.cfg.lmc:
             self.update_bp()
+
+    def remove_copies(self, bp_cl):
+        for pop_cl in self.population:
+            if pop_cl == bp_cl:
+                self.population.remove(pop_cl)
+                return pop_cl
+        return None
