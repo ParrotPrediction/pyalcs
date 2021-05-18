@@ -7,9 +7,10 @@ import numpy as np
 
 from lcs.agents import Agent
 from lcs.agents.Agent import TrialMetrics
-from lcs.agents.xcs import Configuration, ClassifiersList, GeneticAlgorithm
+from lcs.agents.xcs import Configuration, ClassifiersList
+# TODO: delete old code
 from lcs.strategies.reinforcement_learning import simple_q_learning
-
+from lcs.agents.xcs import GeneticAlgorithm
 logger = logging.getLogger(__name__)
 
 
@@ -27,6 +28,10 @@ class XCS(Agent):
             self.population = population
         else:
             self.population = ClassifiersList(cfg=cfg)
+        self.ga = GeneticAlgorithm(
+            population=self.population,
+            cfg=self.cfg
+        )
         self.time_stamp = 0
         self.reward = 0
 
@@ -87,11 +92,11 @@ class XCS(Agent):
             action_set.update_set(p)
             if self.cfg.do_action_set_subsumption:
                 self.do_action_set_subsumption(action_set)
-            GeneticAlgorithm.run_ga(self.population,
-                                    action_set,
-                                    situation,
-                                    self.time_stamp,
-                                    self.cfg)
+            self.ga.run_ga(
+                action_set,
+                situation,
+                self.time_stamp
+            )
 
     # TODO: EpsilonGreedy
     # Run into a lot of issues where in EpsilonGreedy where BestAction was not callable

@@ -21,7 +21,7 @@ class ClassifiersList(TypedList):
     def insert_in_population(self, cl: Classifier):
         existing_classifiers = [c for c in self if c == cl]
         if len(existing_classifiers) > 0:
-            assert len(existing_classifiers) == 1, 'duplicates found'
+            # assert len(existing_classifiers) == 1, 'duplicates found, while inserting'
             existing_classifiers[0].numerosity += 1
         else:
             self.append(cl)

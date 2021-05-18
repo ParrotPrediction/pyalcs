@@ -5,10 +5,8 @@ from copy import copy
 
 from lcs.agents.xcs import XCS
 from lcs.agents.xncs import Configuration, Backpropagation
-# TODO: find typo that makes __init__ not do that
-from lcs.agents.xncs.ClassifiersList import ClassifiersList
-from lcs.agents.Agent import TrialMetrics
-from lcs.strategies.reinforcement_learning import simple_q_learning
+# TODO: find a way to not require super in __init__
+from lcs.agents.xncs import ClassifiersList, GeneticAlgorithm
 
 
 class XNCS(XCS):
@@ -27,6 +25,10 @@ class XNCS(XCS):
         else:
             self.population = ClassifiersList(cfg=cfg)
         self.cfg = cfg
+        self.ga = GeneticAlgorithm(
+            population=self.population,
+            cfg=self.cfg
+        )
         self.time_stamp = 0
         self.reward = 0
 

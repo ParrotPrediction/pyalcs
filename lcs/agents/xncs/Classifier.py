@@ -28,3 +28,6 @@ class Classifier(xcs.Classifier):
             if other.effect == self.effect:
                 return True
         return False
+
+    def __hash__(self):
+        return hash((str(self.condition), self.action))
