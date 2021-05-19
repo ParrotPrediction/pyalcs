@@ -8,6 +8,12 @@ testing_requires = [
     'pytest-xdist==2.2.1'
 ]
 
+mlflow_requires = [
+    'boto3',
+    'dill',
+    'mlflow'
+]
+
 docs_requires = [
     'sphinx',
     'nbsphinx',
@@ -45,6 +51,7 @@ setup(name='pyalcs',
           'dataslots>=1.0.1'
       ],
       extras_require={
+          'mlflow': mlflow_requires,
           'testing': testing_requires,
           'documentation': docs_requires
       },
