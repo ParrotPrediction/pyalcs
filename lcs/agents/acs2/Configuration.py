@@ -14,6 +14,7 @@ class Configuration(acs.Configuration):
                  user_metrics_collector_fcn: Callable = None,
                  fitness_fcn=None,
                  metrics_trial_frequency: int = 5,
+                 model_checkpoint_frequency: int = None,
                  do_pee: bool = False,
                  do_ga: bool = False,
                  do_subsumption: bool = True,
@@ -32,7 +33,8 @@ class Configuration(acs.Configuration):
                  theta_ga: int = 100,
                  theta_as: int = 20,
                  mu: float = 0.3,
-                 chi: float = 0.8):
+                 chi: float = 0.8,
+                 use_mlflow: bool = False):
 
         super(Configuration, self).__init__(
             classifier_length,
@@ -42,6 +44,7 @@ class Configuration(acs.Configuration):
             user_metrics_collector_fcn,
             fitness_fcn,
             metrics_trial_frequency,
+            model_checkpoint_frequency,
             do_subsumption,
             beta,
             theta_i,
@@ -49,7 +52,8 @@ class Configuration(acs.Configuration):
             epsilon,
             u_max,
             theta_exp,
-            theta_as)
+            theta_as,
+            use_mlflow)
 
         self.gamma = gamma
         self.do_pee = do_pee
