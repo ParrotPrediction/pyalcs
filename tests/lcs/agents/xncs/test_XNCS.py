@@ -35,7 +35,7 @@ class TestXNCS:
     def test_distribute_and_update(self, cfg, classifiers_list_diff_actions):
         xncs = XNCS(cfg, classifiers_list_diff_actions)
         xncs._distribute_and_update(classifiers_list_diff_actions, "1100", 0.1)
-        assert len(xncs.back_propagation.update_vectors) == 4
+        assert len(xncs.back_propagation.update_vectors) == 1
 
     def test_correct_types(self,cfg):
         xncs = XNCS(cfg)

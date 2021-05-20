@@ -40,11 +40,9 @@ class XNCS(XCS):
         super()._distribute_and_update(action_set, situation, p)
         self._compare_effect(action_set, situation)
 
-    def _compare_effect(self, action_set, situation):
+    def _compare_effect(self, action_set: ClassifiersList, situation):
         if action_set is not None:
-            for cl in action_set:
-                if cl.effect is None or not cl.effect.subsumes(situation):
-                    self.back_propagation.insert_into_bp(cl, situation)
-                else:
-                    self.back_propagation.update_bp()
-            self.back_propagation.check_and_update()
+            self.back_propagation.insert_into_bp(
+                action_set.fittest_classifier,
+                situation
+            )

@@ -49,3 +49,8 @@ class TestClassifiersList:
         assert action_set[0].action == 0
         action_set[0].action = 1
         assert classifiers_list_diff_actions[0].action == 1
+
+    def test_return_fittest(self, classifiers_list_diff_actions):
+        classifiers_list_diff_actions[2].prediction = 20
+        classifiers_list_diff_actions[2].fitness = 20
+        assert id(classifiers_list_diff_actions.fittest_classifier) == id(classifiers_list_diff_actions[2])
