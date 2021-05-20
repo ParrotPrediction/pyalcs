@@ -153,3 +153,8 @@ class ClassifiersList(TypedList):
                 self.cfg.learning_rate *
                 (k * cl.numerosity / accuracy_sum - cl.fitness)
             )
+
+    @property
+    def fittest_classifier(self):
+        assert len(self) > 0
+        return max(self, key=lambda cl: cl.fitness * cl.prediction)

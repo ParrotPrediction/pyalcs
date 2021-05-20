@@ -34,7 +34,3 @@ class ClassifiersList(xcs.ClassifiersList):
                         time_stamp=time_stamp,
                         effect=Effect(effect))
         return cl
-
-    @property
-    def fittest_classifier(self):
-        return max(self, key=lambda cl: cl.fitness * cl.prediction)

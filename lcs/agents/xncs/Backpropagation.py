@@ -18,31 +18,22 @@ class Backpropagation:
                        update_vector: Effect):
         self.classifiers_for_update.append(classifier)
         self.update_vectors.append(update_vector)
+        self._check_for_update()
 
-    def update_bp(self):
+    def _check_for_update(self):
+        self.update_cycles += 1
+        if self.update_cycles >= self.cfg.lmc:
+            self._update_bp()
+        # TODO: One of them is NoneType
+        elif self.classifiers_for_update[-1].effect == self.update_vectors[-1]:
+            self._update_bp()
+
+    def _update_bp(self):
         for cl, uv in zip(self.classifiers_for_update, self.update_vectors):
-            if cl.effect is None:
-                cl.effect = copy(Effect(uv))
-                self.remove_copies(cl)
-            else:
-                cl.effect = copy(Effect(uv))
-                pop_cl = self.remove_copies(cl)
-                if pop_cl is None:
-                    cl.error += self.cfg.lem
-                else:
-                    pop_cl.error += self.cfg.lem
+            if cl.effect != uv:
+                cl.effect = copy(uv)
+                cl.error += self.cfg.lem * cl.error
         self.classifiers_for_update = []
         self.update_vectors = []
         self.update_cycles = 0
 
-    def check_and_update(self):
-        self.update_cycles += 1
-        if self.update_cycles >= self.cfg.lmc:
-            self.update_bp()
-
-    def remove_copies(self, bp_cl):
-        for pop_cl in self.population:
-            if pop_cl == bp_cl:
-                self.population.remove(pop_cl)
-                return pop_cl
-        return None

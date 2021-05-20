@@ -2,7 +2,7 @@ import pytest
 from copy import copy
 
 from lcs import Perception
-from lcs.agents.xncs import XNCS, Classifier, Configuration, Backpropagation, ClassifiersList
+from lcs.agents.xncs import XNCS, Classifier, Configuration, Backpropagation, ClassifiersList, Effect
 from lcs.agents.xcs import Condition
 
 
@@ -19,10 +19,10 @@ class TestXNCS:
     @pytest.fixture
     def classifiers_list_diff_actions(self, cfg, situation):
         classifiers_list = ClassifiersList(cfg)
-        classifiers_list.insert_in_population(Classifier(cfg, Condition(situation), 0, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition(situation), 1, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition(situation), 2, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition(situation), 3, 0))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition(situation), 0, 0, Effect(situation)))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition(situation), 1, 0, Effect(situation)))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition(situation), 2, 0, Effect(situation)))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition(situation), 3, 0, Effect(situation)))
         return classifiers_list
 
     def test_init(self, cfg, classifiers_list_diff_actions):
@@ -32,12 +32,32 @@ class TestXNCS:
         assert id(xncs.cfg) == id(cfg)
         assert len(xncs.population) == 4
 
-    def test_distribute_and_update(self, cfg, classifiers_list_diff_actions):
+    def test_distribute_and_update(self, cfg: Configuration,
+                                   classifiers_list_diff_actions,
+                                   situation):
         xncs = XNCS(cfg, classifiers_list_diff_actions)
-        xncs._distribute_and_update(classifiers_list_diff_actions, "1100", 0.1)
-        assert len(xncs.back_propagation.update_vectors) == 1
+        action_set = xncs.population.generate_action_set(0)
+        assert action_set is not None
+        assert action_set.fittest_classifier is not None
+        xncs._distribute_and_update(action_set, situation, 0.1)
+        # update should happen because effect matched inserted vector
+        assert len(xncs.back_propagation.update_vectors) == 0
+        assert len(xncs.back_propagation.classifiers_for_update) == 0
+        assert xncs.back_propagation.update_cycles == 0
 
-    def test_correct_types(self,cfg):
+    def test_distribute_and_update_diff(self, cfg: Configuration,
+                                        classifiers_list_diff_actions,
+                                        situation):
+        xncs = XNCS(cfg, classifiers_list_diff_actions)
+        action_set = xncs.population.generate_action_set(0)
+        assert action_set is not None
+        assert action_set.fittest_classifier is not None
+        xncs._distribute_and_update(action_set, "####", 0.1)
+        assert len(xncs.back_propagation.update_vectors) == 1
+        assert len(xncs.back_propagation.classifiers_for_update) == 1
+        assert xncs.back_propagation.update_cycles == 1
+
+    def test_correct_types(self, cfg):
         xncs = XNCS(cfg)
         assert isinstance(xncs.population, ClassifiersList)
         xncs.population.insert_in_population(

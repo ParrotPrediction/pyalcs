@@ -22,7 +22,7 @@ class GeneticAlgorithm(XCSGeneticAlgorithm):
             copy(parent1.condition),
             copy(parent1.action),
             time_stamp,
-            effect=None
+            copy(parent1.effect)
         )
 
         child2 = Classifier(
@@ -30,7 +30,7 @@ class GeneticAlgorithm(XCSGeneticAlgorithm):
             copy(parent2.condition),
             copy(parent2.action),
             time_stamp,
-            effect=None
+            copy(parent2.effect)
         )
 
         return child1, child2
