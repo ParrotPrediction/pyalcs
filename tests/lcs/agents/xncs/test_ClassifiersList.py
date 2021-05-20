@@ -35,7 +35,7 @@ class TestClassifiersList:
         covering_cl = classifiers_list.generate_covering_classifier(Perception("1111"), 0, 0)
         assert covering_cl.does_match(Perception("1111"))
         assert classifiers_list.generate_covering_classifier("1111", 0, 0).action == 0
-        assert covering_cl.effect is None
+        assert len(covering_cl.effect) == len(covering_cl.condition)
 
     def test_match_set(self, classifiers_list_diff_actions):
         assert len(classifiers_list_diff_actions.generate_match_set(Perception("1100"), 1)) == 4
