@@ -3,7 +3,10 @@ from collections import namedtuple
 from timeit import default_timer as timer
 from typing import Callable, List, Tuple
 
+import dill
+import mlflow
 import numpy as np
+import tempfile
 
 from lcs.metrics import basic_metrics
 
@@ -116,6 +119,8 @@ class Agent:
         tuple
             population of classifiers and metrics
         """
+        using_mlflow = hasattr(self.get_cfg(), 'use_mlflow') and self.get_cfg().use_mlflow
+
         current_trial = 0
         steps = 0
 
@@ -137,6 +142,26 @@ class Agent:
                     m.update(user_metrics(self, env))
 
                 metrics.append(m)
+
+                if using_mlflow:
+                    mlflow.log_metrics(m, current_trial)
+
+            # checkpoint model and metrics
+            if self.get_cfg().model_checkpoint_freq:
+                if current_trial % self.get_cfg().model_checkpoint_freq == 0:
+                    prefix = f"-trial-{current_trial}"
+                    with tempfile.TemporaryDirectory(prefix) as td:
+                        logger.debug(f"checkpointing model to {td}")
+                        pop_path = f"{td}/population.dill"
+                        metrics_path = f"{td}/metrics.dill"
+
+                        dill.dump(self.get_population(),
+                                  open(pop_path, mode='wb'))
+
+                        dill.dump(metrics, open(metrics_path, mode='wb'))
+
+                        if using_mlflow:
+                            mlflow.log_artifacts(td, f"{current_trial}/")
 
             # Print last metric
             if current_trial % np.round(n_trials / 10) == 0:
