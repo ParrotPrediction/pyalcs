@@ -21,7 +21,7 @@ class ClassifiersList(TypedList):
     def insert_in_population(self, cl: Classifier):
         existing_classifiers = [c for c in self if c == cl]
         if len(existing_classifiers) > 0:
-            # assert len(existing_classifiers) == 1, 'duplicates found, while inserting'
+            assert len(existing_classifiers) == 1, 'duplicates found, while inserting'
             existing_classifiers[0].numerosity += 1
         else:
             self.append(cl)
@@ -50,7 +50,12 @@ class ClassifiersList(TypedList):
     # Roulette-Wheel Deletion
     # TODO: use strategies
     def delete_from_population(self):
-        if self.numerosity > self.cfg.max_population:
+        # TODO: change while to if
+        # there are places where more than one rule enters the population
+        # to remedy it I just made deletion run until it cleared all of them
+        # proffered method should be running it once, ideally inside
+        # insert_into_population
+        while self.numerosity > self.cfg.max_population:
             average_fitness = sum(cl.fitness for cl in self) / self.numerosity
             deletion_votes = []
             for cl in self:
@@ -72,9 +77,10 @@ class ClassifiersList(TypedList):
             if selector <= 0:
                 if cl.numerosity > 1:
                     cl.numerosity -= 1
+                    return cl
                 else:
                     self.safe_remove(cl)
-                return None
+                    return cl
 
     def generate_match_set(self, situation: Perception, time_stamp):
         matching_ls = [cl for cl in self if cl.does_match(situation)]
