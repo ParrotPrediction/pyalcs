@@ -16,21 +16,8 @@ class Classifier(xcs.Classifier):
         self.effect = effect
         super().__init__(cfg, condition, action, time_stamp)
 
-    def __eq__(self, other):
-        if other.action == self.action \
-           and other.condition == self.condition:
-            if other.effect is None and self.effect is None:
-                return True
-            if other.effect is None:
-                return False
-            if self.effect is None:
-                return False
-            if other.effect == self.effect:
-                return True
-        return False
-
     def __hash__(self):
-        return hash((str(self.condition),str(self.effect), self.action))
+       return hash((str(self.condition), self.action, self.effect))
 
     def __str__(self):
         return f"Cond:{self.condition} - Act:{self.action} - effect:{self.effect} - Num:{self.numerosity} " + \
