@@ -57,9 +57,12 @@ class TestXNCS:
         assert len(xncs.back_propagation.classifiers_for_update) == 1
         assert xncs.back_propagation.update_cycles == 1
 
-    def test_correct_types(self, cfg):
+    def test_correct_type_population(self, cfg):
         xncs = XNCS(cfg)
         assert isinstance(xncs.population, ClassifiersList)
+
+    def test_correct_type_classifier(self, cfg):
+        xncs = XNCS(cfg)
         xncs.population.insert_in_population(
             Classifier(cfg, Condition("1100"), 0, 0)
         )

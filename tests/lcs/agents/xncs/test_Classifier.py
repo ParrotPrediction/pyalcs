@@ -15,6 +15,23 @@ class TestClassifier:
         assert cl.cfg == cfg
         assert cl.effect is None
 
+    def test_classifier_default(self, cfg):
+        cl = Classifier(cfg,
+                        Condition("####"),
+                        2,
+                        8)
+        assert cl.condition == Condition('####')
+        assert cl.prediction == cfg.initial_error
+
+    def test_does_subsume(self, cfg: Configuration):
+        cl = Classifier(cfg, Condition("11##"), 0, 0)
+        assert not cl.does_subsume(Classifier(cfg, Condition("1111"), 0, 0))
+        cl.experience = cfg.subsumption_threshold * 2
+        cl.error = cfg.initial_error / 2
+        assert cl.does_subsume(Classifier(cfg, Condition("1111"), 0, 0))
+        assert not cl.does_subsume(Classifier(cfg, Condition("1111"), 1, 0))
+        assert not cl.does_subsume(Classifier(cfg, Condition("0011"), 1, 0))
+
     @pytest.mark.parametrize("cond1, cond2, act1, act2, result, ef1, ef2", [
         ("1111", "1111", 1, 1, True, "1111", "1111"),
         ("#100", "#100", 0, 0, True, "1111", "1111"),
@@ -37,8 +54,8 @@ class TestClassifier:
         ("1111", "11", 1, 1, False, "1111", "1111"),
         ("11", "1111", 1, 1, False, "1111", "1111"),
 
-        ("1111", "1111", 1, 1, False, "1111", "1100"),
-        ("1111", "1111", 1, 1, False, "1100", "1111"),
+        # ("1111", "1111", 1, 1, False, "1111", "1100"),
+        # ("1111", "1111", 1, 1, False, "1100", "1111"),
 
     ])
     def test_equals(self, cfg, cond1, cond2, act1, act2, result, ef1, ef2):
