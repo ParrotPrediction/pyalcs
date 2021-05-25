@@ -5,12 +5,12 @@ from lcs.agents.xncs import Classifier, ClassifiersList, Configuration
 
 class GeneticAlgorithm(XCSGeneticAlgorithm):
 
+    # Classifierslist is supposed to be XNCS type
     def __init__(
             self,
             population: ClassifiersList,
             cfg: Configuration
             ):
-
         super().__init__(population, cfg)
 
     def _make_children(self, parent1, parent2, time_stamp):

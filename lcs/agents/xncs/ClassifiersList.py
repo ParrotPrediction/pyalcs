@@ -27,7 +27,7 @@ class ClassifiersList(xcs.ClassifiersList):
                 generalized.append(self.cfg.classifier_wildcard)
             else:
                 generalized.append(situation[i])
-            effect.append(str(random.randint(0, 1)))
+            effect.append(str(random.choice(situation)))
         cl = Classifier(cfg=self.cfg,
                         condition=Condition(generalized),
                         action=action,
