@@ -9,7 +9,7 @@ class TestBackpropagation:
 
     @pytest.fixture
     def cfg(self):
-        return Configuration(lmc=2, lem=0.2, number_of_actions=4)
+        return Configuration(lmc=4, lem=20, number_of_actions=4)
 
     @pytest.fixture
     def situation(self):
@@ -45,7 +45,17 @@ class TestBackpropagation:
         cl = Classifier(cfg=cfg, condition=Condition("1111"), action=0, time_stamp=0, effect=Effect("1100"))
         bp.insert_into_bp(cl, Effect("0110"))
         bp._update_bp()
-        assert cl.effect == Effect("0110")
+        # Current version of XNCS doesn't change classifiers Effect
+        # It is possible version of BP to see if is more effective
+        # assert cl.effect == Effect("0110")
         assert cl.error > cfg.initial_error
 
+    def test_check_for_updates_lcm(self, bp, classifiers_list_diff_actions):
+        for cl in classifiers_list_diff_actions:
+            bp.insert_into_bp(cl, Effect("0011"))
+        assert len(bp.classifiers_for_update) == 0
+
+    def test_check_for_updates_correct_effect(self, bp, classifiers_list_diff_actions, situation):
+        bp.insert_into_bp(classifiers_list_diff_actions[0], Effect(situation))
+        assert len(bp.classifiers_for_update) == 0
 
