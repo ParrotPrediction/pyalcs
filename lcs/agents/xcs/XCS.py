@@ -63,10 +63,7 @@ class XCS(Agent):
             assert len(self.population) == len(set(self.population)), 'duplicates found'
             self.population.delete_from_population()
             # We are in t+1 here
-            match_set = self.population.generate_match_set(state, self.time_stamp)
-            prediction_array = match_set.prediction_array
-            action = self.select_action(prediction_array, match_set)
-            action_set = match_set.generate_action_set(action)
+            action_set, prediction_array, action = self._form_sets_and_choose_action(state)
             # apply action to environment
             raw_state, step_reward, done, _ = env.step(action)
             state = self.cfg.environment_adapter.to_genotype(raw_state)
@@ -86,6 +83,13 @@ class XCS(Agent):
                 prev_state = copy(state)
             self.time_stamp += 1
         return TrialMetrics(self.time_stamp - prev_time_stamp, self.reward)
+
+    def _form_sets_and_choose_action(self, state):
+        match_set = self.population.generate_match_set(state, self.time_stamp)
+        prediction_array = match_set.prediction_array
+        action = self.select_action(prediction_array, match_set)
+        action_set = match_set.generate_action_set(action)
+        return action_set, prediction_array, action
 
     def _distribute_and_update(self, action_set, situation, p):
         if action_set is not None and len(action_set) > 0:

@@ -3,6 +3,7 @@ import logging
 import random
 
 import lcs.agents.xcs as xcs
+from lcs import Perception
 from lcs.agents.xcs import Condition
 from lcs.agents.xncs import Classifier, Configuration, Effect, Backpropagation
 logger = logging.getLogger(__name__)
@@ -42,6 +43,15 @@ class ClassifiersList(xcs.ClassifiersList):
     def generate_action_set(self, action):
         action_ls = [cl for cl in self if cl.action == action]
         return ClassifiersList(self.cfg, *action_ls)
+
+    def generate_match_set(self, situation: Perception, time_stamp):
+        matching_ls = [cl for cl in self if cl.does_match(situation)]
+        action = self._find_not_present_action(matching_ls)
+        while action is not None:
+            cl = self._generate_covering_and_insert(situation, action, time_stamp)
+            matching_ls.append(cl)
+            action = self._find_not_present_action(matching_ls)
+        return ClassifiersList(self.cfg, *matching_ls)
 
     def least_fit_classifiers(self, percentage):
         assert 0 < percentage <= 1
