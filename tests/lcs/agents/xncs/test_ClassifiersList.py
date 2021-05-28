@@ -54,3 +54,23 @@ class TestClassifiersList:
         classifiers_list_diff_actions[2].prediction = 20
         classifiers_list_diff_actions[2].fitness = 20
         assert id(classifiers_list_diff_actions.fittest_classifier) == id(classifiers_list_diff_actions[2])
+
+    def test_return_least_fit(self, classifiers_list_diff_actions):
+        classifiers_list_diff_actions[0].prediction = 1250
+        classifiers_list_diff_actions[1].prediction = 1000
+        classifiers_list_diff_actions[2].prediction = 750
+        classifiers_list_diff_actions[3].prediction = 0.01
+        sort = classifiers_list_diff_actions.least_fit_classifiers(0.25)
+        assert sort[0] == classifiers_list_diff_actions[3]
+        assert len(sort) == 1
+
+    def test_return_multiple_least_fit(self, classifiers_list_diff_actions):
+        classifiers_list_diff_actions[0].prediction = 1250
+        classifiers_list_diff_actions[1].prediction = 1000
+        classifiers_list_diff_actions[2].prediction = 750
+        classifiers_list_diff_actions[3].prediction = 0.01
+        sort = classifiers_list_diff_actions.least_fit_classifiers(0.75)
+        assert sort[0] == classifiers_list_diff_actions[3]
+        assert sort[1] == classifiers_list_diff_actions[2]
+        assert sort[2] == classifiers_list_diff_actions[1]
+        assert len(sort) == 3

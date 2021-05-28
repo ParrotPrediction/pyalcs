@@ -32,7 +32,7 @@ class XNCS(XCS):
         )
         self.back_propagation = Backpropagation(
             cfg=self.cfg,
-            population=self.population
+            percentage=0.2
             )
         self.time_stamp = 0
         self.reward = 0
@@ -43,7 +43,7 @@ class XNCS(XCS):
 
     def _compare_effect(self, action_set: ClassifiersList, situation):
         if action_set is not None:
-            self.back_propagation.insert_into_bp(
-                action_set.fittest_classifier,
+            self.back_propagation.update_cycle(
+                action_set,
                 Effect(situation)
             )

@@ -5,7 +5,6 @@ import numpy as np
 
 from lcs import TypedList, Perception
 from lcs.agents.xcs import Classifier, Condition, Configuration
-
 logger = logging.getLogger(__name__)
 
 
@@ -148,10 +147,7 @@ class ClassifiersList(TypedList):
             if cl.error < self.cfg.epsilon_0:
                 tmp_acc = 1
             else:
-                tmp_acc = (self.cfg.alpha *
-                           (cl.error * self.cfg.epsilon_0) **
-                           -self.cfg.v
-                           )
+                tmp_acc = (pow(self.cfg.alpha * (cl.error * self.cfg.epsilon_0), -self.cfg.v))
             accuracy_vector_k.append(tmp_acc)
             accuracy_sum += tmp_acc + cl.numerosity
         for cl, k in zip(self, accuracy_vector_k):
@@ -160,7 +156,15 @@ class ClassifiersList(TypedList):
                 (k * cl.numerosity / accuracy_sum - cl.fitness)
             )
 
+    def least_fit_classifiers(self, percentage):
+        assert 0 < percentage <= 1
+        return sorted(
+                    self,
+                    key=lambda cl: cl.prediction * cl.fitness
+               )[0:int(len(self) * percentage)]
+
     @property
     def fittest_classifier(self):
         assert len(self) > 0
         return max(self, key=lambda cl: cl.fitness * cl.prediction)
+
