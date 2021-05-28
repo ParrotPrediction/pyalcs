@@ -30,7 +30,9 @@ class Backpropagation:
 
     def _update_bp(self):
         for cl, uv in zip(self.classifiers_for_update, self.update_vectors):
+            cl.queses += 1
             if cl.effect != uv:
+                cl.mistakes += 1
                 # cl.effect = copy(uv)
                 cl.error += self.cfg.lem * cl.error
         self.classifiers_for_update = []

@@ -14,6 +14,9 @@ class Classifier(xcs.Classifier):
                  time_stamp: int = None,
                  effect:  Union[Effect, str, None] = None) -> None:
         self.effect = effect
+        self.mistakes = 0
+        self.queses = 0
+
         super().__init__(cfg, condition, action, time_stamp)
 
     def __eq__(self, other):
@@ -32,6 +35,15 @@ class Classifier(xcs.Classifier):
     def __hash__(self):
         return hash((str(self.condition),str(self.effect), self.action))
 
+    @property
+    def accuracy(self):
+        if self.queses > 0:
+            return (self.queses - self.mistakes) / self.queses
+        else:
+            return 0
+
     def __str__(self):
         return f"Cond:{self.condition} - Act:{self.action} - effect:{self.effect} - Num:{self.numerosity} " + \
-            f"[fit: {self.fitness:.3f}, exp: {self.experience:3.2f}, pred: {self.prediction:2.3f}]"
+            f"[fit: {self.fitness:.3f}, exp: {self.experience:3.2f}, pred: {self.prediction:2.3f}, error:{self.error}]" + \
+            f"acc: {self.accuracy}"
+
