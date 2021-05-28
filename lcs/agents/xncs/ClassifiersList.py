@@ -4,7 +4,7 @@ import random
 
 import lcs.agents.xcs as xcs
 from lcs.agents.xcs import Condition
-from lcs.agents.xncs import Classifier, Configuration, Effect
+from lcs.agents.xncs import Classifier, Configuration, Effect, Backpropagation
 logger = logging.getLogger(__name__)
 
 
@@ -15,6 +15,10 @@ class ClassifiersList(xcs.ClassifiersList):
                  *args,
                  oktypes=(Classifier,),
                  ) -> None:
+        self.back_propagation = Backpropagation(
+            cfg=cfg,
+            percentage=0.2
+            )
         super().__init__(cfg, *args, oktypes=oktypes)
 
     # without this function the Classifierlist will create XCS Classifiers
@@ -34,3 +38,19 @@ class ClassifiersList(xcs.ClassifiersList):
                         time_stamp=time_stamp,
                         effect=Effect(effect))
         return cl
+
+    def generate_action_set(self, action):
+        action_ls = [cl for cl in self if cl.action == action]
+        return ClassifiersList(self.cfg, *action_ls)
+
+    def least_fit_classifiers(self, percentage):
+        assert 0 < percentage <= 1
+        return sorted(
+                    self,
+                    key=lambda cl: cl.prediction * cl.fitness
+               )[0:int(len(self) * percentage)]
+
+    @property
+    def fittest_classifier(self):
+        assert len(self) > 0
+        return max(self, key=lambda cl: cl.fitness * cl.prediction)

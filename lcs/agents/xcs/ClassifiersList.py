@@ -156,15 +156,4 @@ class ClassifiersList(TypedList):
                 (k * cl.numerosity / accuracy_sum - cl.fitness)
             )
 
-    def least_fit_classifiers(self, percentage):
-        assert 0 < percentage <= 1
-        return sorted(
-                    self,
-                    key=lambda cl: cl.prediction * cl.fitness
-               )[0:int(len(self) * percentage)]
-
-    @property
-    def fittest_classifier(self):
-        assert len(self) > 0
-        return max(self, key=lambda cl: cl.fitness * cl.prediction)
 
