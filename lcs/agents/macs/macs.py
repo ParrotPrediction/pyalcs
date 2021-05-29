@@ -712,18 +712,19 @@ class MACS(Agent):
 
             seen_situations = self.get_seen_situations()
 
-            self.ll.cover_transitions(
-                self.population, prev_state, action, state)
-
             self.ll.generalize_conditions(
                 self.population, seen_situations, prev_state, action, state
             )
+
+            self.ll.specialize_conditions(self.population, seen_situations)
+
+            self.ll.cover_transitions(
+                self.population, prev_state, action, state)
+
             self.ll.evaluate_classifiers(
                 self.population, prev_state, action, state)
 
             self.ll.select_accurate(self.population)
-
-            self.ll.specialize_conditions(self.population, seen_situations)
 
             steps += 1
 
