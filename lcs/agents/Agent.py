@@ -3,7 +3,6 @@ from collections import namedtuple
 from timeit import default_timer as timer
 from typing import Callable, List, Tuple
 
-import json
 
 import dill
 import mlflow
@@ -169,7 +168,7 @@ class Agent:
 
             # Print last metric
             if current_trial % np.round(n_trials / 10) == 0:
-                logger.info(json.dumps(metrics[-1], indent=2))
+                logger.info(metrics[-1])
 
             if decay:
                 # Gradually decrease the epsilon
