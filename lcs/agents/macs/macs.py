@@ -15,8 +15,6 @@ from lcs.agents.Agent import TrialMetrics
 
 
 class Condition(ImmutableSequence):
-    WILDCARD = "#"
-
     def __init__(self, observation):
         super().__init__(observation)
 
@@ -199,11 +197,6 @@ class Effect(ImmutableSequence):
     def does_match(self, p: Perception) -> bool:
         return all(ei == pi for ei, pi in zip(self, p) if ei != self.WILDCARD)
 
-    def effector_position(self) -> int:
-        for i, k in enumerate(self):
-            if k != self.WILDCARD:
-                return i
-
     def subsumes(self, other) -> bool:
         raise NotImplementedError('MACS has no subsume operator')
 
@@ -220,8 +213,8 @@ class Configuration:
                  accuracy_threshold: int = 5,
                  oscillation_threshold: int = 5,
                  metrics_trial_frequency: int = 5,
-                 user_metrics_collector_fcn: Callable = None,
-                 toggle_variations: List[bool] = []):
+                 user_metrics_collector_fcn: Callable = None):
+
         assert classifier_length == len(feature_possible_values)
         assert 1 <= specified_effect_attributes <= classifier_length
 
@@ -314,18 +307,6 @@ class Classifier:
                     return True
         return False
 
-    def clone(self) -> Classifier:
-        """
-        Recreate itself, but with a 'blank slate';
-        """
-        return Classifier(
-            condition=Condition(self.condition),
-            action=self.action,
-            effect=Effect(self.effect),
-            debug=self.debug,
-            cfg=self.cfg
-        )
-
 
 class ClassifiersList(TypedList[Classifier]):
     def __init__(self, *args, oktypes=(Classifier,)) -> None:
@@ -350,7 +331,6 @@ ChildClassifier = NamedTuple('ChildClassifier',
 class LatentLearning:
     def __init__(self, cfg: Configuration):
         self.cfg = cfg
-        self.covering_session_count = 0
 
     def evaluate_classifiers(self,
                              population: ClassifiersList,
@@ -427,9 +407,6 @@ class LatentLearning:
                 debug={'origin': cl.debug["origin"] + '/mutspec'},
                 cfg=cl.cfg
             )
-
-    def is_similar(self, c1, c2):
-        return c1.effects.matches(c2.effects)
 
     def generalize_conditions(self,
                               population: ClassifiersList,
@@ -543,8 +520,6 @@ class LatentLearning:
         if len(set_d) < 2:
             return
 
-        LDP = len(set_d)
-
         for (c1, c2) in itertools.permutations(set_d, 2):
             if c1 in set_d and c2 in set_d:
                 K = c1.condition.is_more_general(c2.condition)
@@ -555,16 +530,11 @@ class LatentLearning:
                 else:
                     set_d.remove(c2)
 
-        LD = len(set_d)
-
     def cover_transitions(self,
                           population: ClassifiersList,
                           p0: Perception,
                           a0: int,
-                          p1: Perception,
-                          seen_situations) -> None:
-        covering_session = None
-        new_cls = []
+                          p1: Perception) -> None:
 
         for ef in Effect.generate(p1):
             MatchAE = [
@@ -618,15 +588,11 @@ class LatentLearning:
                     print(conditions)
                     exit(1)
 
-                if covering_session is None:
-                    covering_session = "%4i" % self.covering_session_count
-                    self.covering_session_count += 1
-
                 new_cl = Classifier(
                     condition=selected_condition,
                     action=a0,
                     effect=ef,
-                    debug={'origin': 'covering' + covering_session},
+                    debug={'origin': 'covering'},
                     cfg=self.cfg
                 )
 
@@ -712,11 +678,6 @@ class MACS(Agent):
         if all(len(aa) > 0 for aa in anticipated_attribs):
             yield from map(Perception, itertools.product(*anticipated_attribs))
 
-    def assert_no_duplicates(self):
-        pop = self.get_population()
-
-        assert len(pop) == len(set([hash(cl) for cl in pop])), 'duplicate classifiers found'
-
     def get_seen_situations(self):
         return set(self.desirability_values.keys())
 
@@ -752,7 +713,7 @@ class MACS(Agent):
             seen_situations = self.get_seen_situations()
 
             self.ll.cover_transitions(
-                self.population, prev_state, action, state, seen_situations)
+                self.population, prev_state, action, state)
 
             self.ll.generalize_conditions(
                 self.population, seen_situations, prev_state, action, state
