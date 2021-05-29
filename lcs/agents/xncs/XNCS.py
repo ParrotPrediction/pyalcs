@@ -42,12 +42,18 @@ class XNCS(XCS):
         prediction_array = match_set.prediction_array
         action = self.select_action(prediction_array, match_set)
         action_set = match_set.generate_action_set(action)
-        self._insert_into_bp(action_set, state)
+        if action_set is not None:
+            self.back_propagation.update_classifiers_effect(
+                action_set.least_fit_classifiers(0.2),
+                action_set.fittest_classifier.effect
+            )
         return action_set, prediction_array, action
 
-    def _insert_into_bp(self, action_set: ClassifiersList, situation):
+    def _distribute_and_update(self, action_set, situation, p):
         if action_set is not None:
             self.back_propagation.update_cycle(
                 action_set,
                 Effect(situation)
             )
+        super()._distribute_and_update(action_set, situation, p)
+

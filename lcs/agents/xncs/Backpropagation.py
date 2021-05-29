@@ -23,21 +23,17 @@ class Backpropagation:
                 self.update_cycles = 0
             else:
                 self.update_cycles -= 1
-                self._update_classifiers_effect(
-                    action_set.least_fit_classifiers(self.percentage),
-                    update_vector
-                )
-                self._update_classifiers_error(
+                self.update_classifiers_error(
                     action_set,
                     update_vector
                 )
 
-    def _update_classifiers_effect(self, classifiers_for_update, update_vector):
+    def update_classifiers_effect(self, classifiers_for_update, update_vector):
         for cl in classifiers_for_update:
             if cl.effect != update_vector:
                 cl.effect = copy(update_vector)
 
-    def _update_classifiers_error(self, classifiers_for_update, update_vector):
+    def update_classifiers_error(self, classifiers_for_update, update_vector):
         for cl in classifiers_for_update:
             cl.queses += 1
             if cl.effect != update_vector:
