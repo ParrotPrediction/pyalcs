@@ -56,7 +56,8 @@ class TestXNCS:
         action_set = xncs.population.generate_action_set(0)
         assert action_set is not None
         assert action_set.fittest_classifier is not None
-        xncs._distribute_and_update(action_set, "####", "####", 0.1)
+        xncs._distribute_and_update(action_set, situation, "1111", 0.1)
+        assert len(xncs.back_propagation.classifiers_for_update) == 1
 
     def test_correct_type_population(self, cfg):
         xncs = XNCS(cfg)
@@ -69,3 +70,4 @@ class TestXNCS:
         )
         assert isinstance(xncs.population[0], Classifier)
         assert xncs.population[0].effect is None
+

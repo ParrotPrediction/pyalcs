@@ -51,3 +51,4 @@ class TestBackpropagation:
         bp = Backpropagation(cfg, 0.5)
         bp.update_cycle(classifiers_list_diff_actions, Effect("1111"))
         assert classifiers_list_diff_actions[0].error != cfg.initial_error
+
