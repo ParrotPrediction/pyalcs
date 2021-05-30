@@ -25,12 +25,8 @@ class Classifier(xcs.Classifier):
     @property
     def accuracy(self):
         if self.queses > 0:
-            accuracy = (self.queses - self.mistakes) / self.queses
-        else:
-            accuracy = 0
-        self.mistakes = 0
-        self.queses = 0
-        return accuracy
+            return (self.queses - self.mistakes) / self.queses
+        return 0
 
     def __str__(self):
         return f"Cond:{self.condition} - Act:{self.action} - effect:{self.effect} - Num:{self.numerosity} " + \

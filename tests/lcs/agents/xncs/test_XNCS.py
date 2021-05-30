@@ -45,9 +45,9 @@ class TestXNCS:
         action_set = xncs.population.generate_action_set(0)
         assert action_set is not None
         assert action_set.fittest_classifier is not None
-        xncs._distribute_and_update(action_set, situation, 0.1)
+        xncs._distribute_and_update(action_set, "####", "####", 0.1)
         # update should happen because effect matched inserted vector
-        assert xncs.back_propagation.update_cycles == 0
+        assert len(xncs.back_propagation.classifiers_for_update) == 1
 
     def test_distribute_and_update_diff(self, cfg: Configuration,
                                         classifiers_list_diff_actions,
@@ -56,8 +56,7 @@ class TestXNCS:
         action_set = xncs.population.generate_action_set(0)
         assert action_set is not None
         assert action_set.fittest_classifier is not None
-        xncs._distribute_and_update(action_set, "####", 0.1)
-        assert xncs.back_propagation.update_cycles == cfg.lmc - 1
+        xncs._distribute_and_update(action_set, "####", "####", 0.1)
 
     def test_correct_type_population(self, cfg):
         xncs = XNCS(cfg)

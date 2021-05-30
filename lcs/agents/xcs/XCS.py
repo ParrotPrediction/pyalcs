@@ -72,9 +72,11 @@ class XCS(Agent):
 
             self._distribute_and_update(prev_action_set,
                                         prev_state,
+                                        state,
                                         prev_reward + self.cfg.gamma * max(prediction_array))
             if done:
                 self._distribute_and_update(action_set,
+                                            state,
                                             state,
                                             self.reward)
             else:
@@ -91,14 +93,14 @@ class XCS(Agent):
         action_set = match_set.generate_action_set(action)
         return action_set, prediction_array, action
 
-    def _distribute_and_update(self, action_set, situation, p):
+    def _distribute_and_update(self, action_set, current_situation, next_situation, p):
         if action_set is not None and len(action_set) > 0:
             action_set.update_set(p)
             if self.cfg.do_action_set_subsumption:
                 self.do_action_set_subsumption(action_set)
             self.ga.run_ga(
                 action_set,
-                situation,
+                current_situation,
                 self.time_stamp
             )
 

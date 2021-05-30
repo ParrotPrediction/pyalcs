@@ -57,7 +57,7 @@ class ClassifiersList(xcs.ClassifiersList):
         assert 0 < percentage <= 1
         return sorted(
                     self,
-                    key=lambda cl: cl.prediction * cl.fitness
+                    key=lambda cl: cl.fitness
                )[0:int(len(self) * percentage)]
 
     @property

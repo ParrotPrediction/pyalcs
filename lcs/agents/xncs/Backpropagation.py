@@ -10,32 +10,38 @@ class Backpropagation:
                  percentage: float):
         self.percentage = percentage
         self.cfg = cfg
-        self.update_cycles = 0
+        self.classifiers_for_update = []
 
     def update_cycle(self,
                      action_set,
-                     update_vector: Effect):
-        if action_set.fittest_classifier.effect != update_vector:
-            self.update_cycles = self.cfg.lmc
-
-        if self.update_cycles > 0:
-            if action_set.fittest_classifier.effect == update_vector:
-                self.update_cycles = 0
-            else:
-                self.update_cycles -= 1
-                self.update_classifiers_error(
-                    action_set,
-                    update_vector
-                )
-
-    def update_classifiers_effect(self, classifiers_for_update, update_vector):
-        for cl in classifiers_for_update:
-            if cl.effect != update_vector:
-                cl.effect = copy(update_vector)
-
-    def update_classifiers_error(self, classifiers_for_update, update_vector):
-        for cl in classifiers_for_update:
+                     next_vector: Effect):
+        # for cl in action_set.least_fit_classifiers(self.percentage):
+        for cl in action_set:
             cl.queses += 1
-            if cl.effect != update_vector:
+            if cl.effect != next_vector:
                 cl.mistakes += 1
-                cl.error += self.cfg.lem * cl.error
+                if not any(cl == inside[0] for inside in self.classifiers_for_update):
+                    self.classifiers_for_update.append(
+                        [cl, next_vector, self.cfg.lmc]
+                    )
+        self.check_if_needed()
+        self.update_errors()
+
+    def check_if_needed(self):
+        for cl in self.classifiers_for_update:
+            if cl[0].effect == cl[1]:
+                self.classifiers_for_update.remove(cl)
+            else:
+                cl[2] -= 1
+            if cl[2] == 0:
+                self.classifiers_for_update.remove(cl)
+
+    def update_errors(self):
+        for cl in self.classifiers_for_update:
+            cl[0].error += self.cfg.lem
+
+    def update_effect(self,
+                      action_set):
+        effect = action_set.fittest_classifier.effect
+        for cl in action_set.least_fit_classifiers(self.percentage):
+            cl.effect = copy(effect)

@@ -32,7 +32,7 @@ class XNCS(XCS):
         )
         self.back_propagation = Backpropagation(
             cfg=self.cfg,
-            percentage=0.1
+            percentage=0.05
             )
         self.time_stamp = 0
         self.reward = 0
@@ -42,18 +42,14 @@ class XNCS(XCS):
         prediction_array = match_set.prediction_array
         action = self.select_action(prediction_array, match_set)
         action_set = match_set.generate_action_set(action)
-        if action_set is not None:
-            self.back_propagation.update_classifiers_effect(
-                action_set.least_fit_classifiers(0.2),
-                action_set.fittest_classifier.effect
-            )
+        self.back_propagation.update_effect(action_set)
         return action_set, prediction_array, action
 
-    def _distribute_and_update(self, action_set, situation, p):
+    def _distribute_and_update(self, action_set, current_situation, next_situation, p):
         if action_set is not None:
             self.back_propagation.update_cycle(
                 action_set,
-                Effect(situation)
+                Effect(next_situation)
             )
-        super()._distribute_and_update(action_set, situation, p)
+        super()._distribute_and_update(action_set, current_situation, next_situation, p)
 
