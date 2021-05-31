@@ -17,14 +17,14 @@ class TestClassifiersList:
 
     @pytest.fixture
     def classifiers_list_diff_actions(self, cfg, situation):
-        classifiers_list = ClassifiersList(cfg)
-        classifiers_list.insert_in_population(Classifier(cfg, Condition(situation), 0, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition(situation), 1, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition(situation), 2, 0))
-        classifiers_list.insert_in_population(Classifier(cfg, Condition(situation), 3, 0))
-        return classifiers_list
+        pop = ClassifiersList(cfg)
+        pop.insert_in_population(Classifier(cfg, Condition(situation), 0, 0))
+        pop.insert_in_population(Classifier(cfg, Condition(situation), 1, 0))
+        pop.insert_in_population(Classifier(cfg, Condition(situation), 2, 0))
+        pop.insert_in_population(Classifier(cfg, Condition(situation), 3, 0))
+        return pop
 
-    def test_init(self, cfg):
+    def test_should_be_empty_when_initialized(self, cfg):
         assert len(ClassifiersList(cfg)) == 0
 
     @pytest.mark.parametrize("cond, act", [
@@ -34,9 +34,37 @@ class TestClassifiersList:
         ("1100", 3)
     ])
     def test_insert_population(self, classifiers_list_diff_actions, cfg, cond, act):
-        cl = Classifier(cfg=cfg, condition=Condition("1111"), action=0, time_stamp=0)
+        # given
+        initial_size = len(classifiers_list_diff_actions)
+        cl = Classifier(cfg=cfg, condition=Condition(cond), action=act, time_stamp=0)
+
+        # when
         classifiers_list_diff_actions.insert_in_population(cl)
+
+        # then
+        assert len(classifiers_list_diff_actions) == initial_size
         assert any(c == cl for c in classifiers_list_diff_actions)
+        assert any(c.numerosity == 2 for c in classifiers_list_diff_actions)
+
+    @pytest.mark.parametrize("cond1, cond2, act1, act2, size", [
+        ("1111", "1111", 1, 1, 5),
+        ("#100", "#100", 0, 0, 5),
+        ("0##11#", "0##11#", 0, 0, 5),
+
+    ])
+    def test_insert_population_two(self, cfg, classifiers_list_diff_actions, cond1, cond2, act1, act2, size):
+        # given
+        cl1 = Classifier(condition=Condition(cond1), action=act1, cfg=cfg)
+        cl2 = Classifier(condition=Condition(cond2), action=act2, cfg=cfg)
+
+        # when
+        classifiers_list_diff_actions.insert_in_population(cl1)
+        classifiers_list_diff_actions.insert_in_population(cl2)
+
+        # then
+        assert any(c == cl1 for c in classifiers_list_diff_actions)
+        assert any(c == cl2 for c in classifiers_list_diff_actions)
+        assert len(classifiers_list_diff_actions) == size
 
     @pytest.mark.parametrize("cond, act", [
         ("1111", 0),
@@ -47,8 +75,13 @@ class TestClassifiersList:
         ("112", 0),
     ])
     def test_insert_population_new_condition(self, classifiers_list_diff_actions, cfg, cond, act):
-        cl = Classifier(cfg=cfg, condition=Condition("1111"), action=0, time_stamp=0)
+        # given
+        cl = Classifier(condition=Condition("1111"), action=0, cfg=cfg)
+
+        # when
         classifiers_list_diff_actions.insert_in_population(cl)
+
+        # then
         for c in classifiers_list_diff_actions:
             assert c.numerosity == 1
         assert classifiers_list_diff_actions[4] == cl
@@ -108,7 +141,8 @@ class TestClassifiersList:
         classifiers_list_diff_actions[0].prediction = 10
         prediction_array = classifiers_list_diff_actions.prediction_array
         assert len(classifiers_list_diff_actions) == cfg.number_of_actions
-        assert prediction_array[0] > prediction_array[1]
+        assert all(prediction_array[0] >= prediction
+                   for prediction in prediction_array)
 
     def test_update_fitness(self, cfg, classifiers_list_diff_actions):
         classifiers_list_diff_actions._update_fitness()

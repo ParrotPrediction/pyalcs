@@ -1,1 +1,1 @@
-# py.test --cov=xcs C:\Users\Metron\Documents\GitHub\pyalcs\tests\lcs\agents\xncs
+# py.test --cov=xcs C:\Users\Metron\Documents\GitHub\pyalcs\tests\lcs\agents\xcs

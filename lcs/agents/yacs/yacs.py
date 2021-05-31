@@ -38,9 +38,7 @@ class Configuration:
                  discount_factor: float = 0.9,
                  estimate_expected_improvements: bool = True,
                  metrics_trial_frequency: int = 5,
-                 model_checkpoint_frequency: int = None,
-                 user_metrics_collector_fcn: Callable = None,
-                 use_mlflow: bool = False):
+                 user_metrics_collector_fcn: Callable = None):
         assert classifier_length == len(feature_possible_values)
         self.classifier_length = classifier_length
         self.number_of_possible_actions = number_of_possible_actions
@@ -51,9 +49,7 @@ class Configuration:
         self.gamma = discount_factor
         self.estimate_expected_improvements = estimate_expected_improvements
         self.metrics_trial_frequency = metrics_trial_frequency
-        self.model_checkpoint_freq = model_checkpoint_frequency
         self.user_metrics_collector_fcn = user_metrics_collector_fcn
-        self.use_mlflow = use_mlflow
 
 
 class Condition(ImmutableSequence):

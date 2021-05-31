@@ -12,7 +12,6 @@ class Configuration(object):
                  user_metrics_collector_fcn: Callable = None,
                  fitness_fcn=None,
                  metrics_trial_frequency: int = 5,
-                 model_checkpoint_frequency: int = None,
                  do_subsumption: bool = True,
                  beta: float = 0.05,
                  # gamma: float = 0.95,
@@ -21,8 +20,7 @@ class Configuration(object):
                  epsilon: float = 0.5,
                  u_max: int = 100000,
                  theta_exp: int = 20,
-                 theta_as: int = 20,
-                 use_mlflow: bool = False) -> None:
+                 theta_as: int = 20) -> None:
         """
         Creates the configuration object used during training the ACS2 agent.
 
@@ -51,7 +49,6 @@ class Configuration(object):
         self.classifier_wildcard = classifier_wildcard
         self.environment_adapter = environment_adapter
         self.metrics_trial_frequency = metrics_trial_frequency
-        self.model_checkpoint_freq = model_checkpoint_frequency
         self.user_metrics_collector_fcn = user_metrics_collector_fcn
         self.fitness_fcn = fitness_fcn
         self.do_subsumption = do_subsumption
@@ -62,7 +59,6 @@ class Configuration(object):
         self.epsilon = epsilon
         self.u_max = u_max
         self.theta_as = theta_as
-        self.use_mlflow = use_mlflow
 
     def __str__(self) -> str:
         return str(vars(self))

@@ -2,13 +2,12 @@ from typing import Optional
 import random
 import numpy as np
 from copy import copy
-
+import queue
 from lcs.agents.xcs import XCS
-from lcs.agents.xncs import Configuration, Backpropagation
-# TODO: find typo that makes __init__ not do that
-from lcs.agents.xncs.ClassifiersList import ClassifiersList
 from lcs.agents.Agent import TrialMetrics
-from lcs.strategies.reinforcement_learning import simple_q_learning
+from lcs.agents.xncs import Configuration, Backpropagation
+# TODO: find a way to not require super in __init__
+from lcs.agents.xncs import ClassifiersList, GeneticAlgorithm, Effect
 
 
 class XNCS(XCS):
@@ -21,67 +20,59 @@ class XNCS(XCS):
         :param cfg: object storing parameters of the experiment
         :param population: all classifiers at current time
         """
-        self.back_propagation = Backpropagation(cfg)
-        self.cfg = cfg
+
         if population is not None:
             self.population = population
         else:
             self.population = ClassifiersList(cfg=cfg)
+        self.cfg = cfg
+        self.ga = GeneticAlgorithm(
+            population=self.population,
+            cfg=self.cfg
+        )
+        self.back_propagation = Backpropagation(
+            cfg=self.cfg,
+            percentage=0.1
+            )
         self.time_stamp = 0
-        self.action_reward = [0 for _ in range(cfg.number_of_actions)]
+        self.reward = 0
+        self.mistakes = []
 
-    def _run_trial_explore(self, env, trials, current_trial) -> TrialMetrics:
-        prev_action_set = None
-        prev_reward = [0 for _ in range(self.cfg.number_of_actions)]
-        prev_state = None  # state is known as situation
-        prev_action = 0
-        self.time_stamp = 0  # steps
-        done = False  # eop
+    def _form_sets_and_choose_action(self, state):
+        match_set = self.population.generate_match_set(state, self.time_stamp)
+        prediction_array = match_set.prediction_array
+        action = self.select_action(prediction_array, match_set)
+        action_set = match_set.generate_action_set(action)
+        return action_set, prediction_array, action
 
-        raw_state = env.reset()
-        state = self.cfg.environment_adapter.to_genotype(raw_state)
-
-        while not done:
-            self.population.delete_from_population()
-            # We are in t+1 here
-            match_set = self.population.generate_match_set(state, self.time_stamp)
-            prediction_array = match_set.prediction_array
-            action = self.select_action(prediction_array, match_set)
-            action_set = match_set.generate_action_set(action)
-            # apply action to environment
-            raw_state, step_reward, done, _ = env.step(action)
-            state = self.cfg.environment_adapter.to_genotype(raw_state)
-            self.action_reward[action] = simple_q_learning(self.action_reward[action],
-                                                           step_reward,
-                                                           self.cfg.learning_rate,
-                                                           self.cfg.gamma,
-                                                           match_set.best_prediction)
-
-            self._distribute_and_update(prev_action_set,
-                                        prev_state,
-                                        prev_reward[prev_action] + self.cfg.gamma * max(prediction_array))
-            if done:
-                self._distribute_and_update(action_set,
-                                            state,
-                                            self.action_reward[action])
-            else:
-                prev_action_set = copy(action_set)
-                prev_reward[action] = copy(self.action_reward[action])
-                prev_state = copy(state)
-                prev_action = action
-
-            self.time_stamp += 1
-        return TrialMetrics(self.time_stamp, self.action_reward)
-
-    def _distribute_and_update(self, action_set, situation, p):
-        super()._distribute_and_update(action_set, situation, p)
-        self._compare_effect(action_set, situation)
-
-    def _compare_effect(self, action_set, situation):
+    def _distribute_and_update(self, action_set, current_situation, next_situation, p):
         if action_set is not None:
-            for cl in action_set:
-                if cl.effect is None or not cl.effect.subsumes(situation):
-                    self.back_propagation.insert_into_bp(cl, situation)
-                else:
-                    self.back_propagation.update_bp()
-            self.back_propagation.check_and_update()
+            self.update_fraction_accuracy(action_set, next_situation)
+            self.back_propagation.update_effect(action_set, next_situation)
+            self.back_propagation.update_cycle(
+                action_set,
+                Effect(next_situation)
+            )
+        super()._distribute_and_update(action_set, current_situation, next_situation, p)
+
+    def update_fraction_accuracy(self, action_set, next_vector):
+        most_numerous = sorted(action_set, key=lambda cl: -1 * cl.numerosity)[0]
+        if most_numerous.effect != Effect(next_vector):
+            if len(self.mistakes) >= 100:
+                self.mistakes.pop(0)
+                self.mistakes.append(1)
+            else:
+                self.mistakes.append(1)
+        else:
+            if len(self.mistakes) >= 100:
+                self.mistakes.pop(0)
+                self.mistakes.append(0)
+            else:
+                self.mistakes.append(0)
+
+    @property
+    def fraction_accuracy(self):
+        if len(self.mistakes) > 0:
+            return sum(self.mistakes) / len(self.mistakes)
+        else:
+            return 0

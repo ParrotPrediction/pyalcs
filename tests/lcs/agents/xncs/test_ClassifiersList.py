@@ -35,7 +35,7 @@ class TestClassifiersList:
         covering_cl = classifiers_list.generate_covering_classifier(Perception("1111"), 0, 0)
         assert covering_cl.does_match(Perception("1111"))
         assert classifiers_list.generate_covering_classifier("1111", 0, 0).action == 0
-        assert covering_cl.effect is None
+        assert len(covering_cl.effect) == len(covering_cl.condition)
 
     def test_match_set(self, classifiers_list_diff_actions):
         assert len(classifiers_list_diff_actions.generate_match_set(Perception("1100"), 1)) == 4
@@ -49,3 +49,28 @@ class TestClassifiersList:
         assert action_set[0].action == 0
         action_set[0].action = 1
         assert classifiers_list_diff_actions[0].action == 1
+
+    def test_return_fittest(self, classifiers_list_diff_actions):
+        classifiers_list_diff_actions[2].prediction = 20
+        classifiers_list_diff_actions[2].fitness = 20
+        assert id(classifiers_list_diff_actions.fittest_classifier) == id(classifiers_list_diff_actions[2])
+
+    def test_return_least_fit(self, classifiers_list_diff_actions):
+        classifiers_list_diff_actions[0].fitness = 1250
+        classifiers_list_diff_actions[1].fitness = 1000
+        classifiers_list_diff_actions[2].fitness = 750
+        classifiers_list_diff_actions[3].fitness = 0.01
+        sort = classifiers_list_diff_actions.least_fit_classifiers(0.25)
+        assert sort[0] == classifiers_list_diff_actions[3]
+        assert len(sort) == 1
+
+    def test_return_multiple_least_fit(self, classifiers_list_diff_actions):
+        classifiers_list_diff_actions[0].fitness = 1250
+        classifiers_list_diff_actions[1].fitness = 1000
+        classifiers_list_diff_actions[2].fitness = 750
+        classifiers_list_diff_actions[3].fitness = 0.01
+        sort = classifiers_list_diff_actions.least_fit_classifiers(0.75)
+        assert sort[0] == classifiers_list_diff_actions[3]
+        assert sort[1] == classifiers_list_diff_actions[2]
+        assert sort[2] == classifiers_list_diff_actions[1]
+        assert len(sort) == 3

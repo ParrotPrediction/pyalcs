@@ -14,17 +14,22 @@ class Classifier(xcs.Classifier):
                  time_stamp: int = None,
                  effect:  Union[Effect, str, None] = None) -> None:
         self.effect = effect
+        self.mistakes = 0
+        self.queses = 0
+
         super().__init__(cfg, condition, action, time_stamp)
 
-    def __eq__(self, other):
-        if other.action == self.action \
-           and other.condition == self.condition:
-            if other.effect is None and self.effect is None:
-                return True
-            if other.effect is None:
-                return False
-            if self.effect is None:
-                return False
-            if other.effect == self.effect:
-                return True
-        return False
+    def __hash__(self):
+        return hash((str(self.condition),str(self.effect), self.action))
+
+    @property
+    def accuracy(self):
+        if self.queses > 0:
+            return (self.queses - self.mistakes) / self.queses
+        return None
+
+    def __str__(self):
+        return f"Cond:{self.condition} - Act:{self.action} - effect:{self.effect} - Num:{self.numerosity} " + \
+            f"[fit: {self.fitness:.3f}, exp: {self.experience:3.2f}, pred: {self.prediction:2.3f}, error:{self.error}]" + \
+            f"acc: {self.accuracy}"
+

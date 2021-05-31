@@ -9,40 +9,46 @@ class TestBackpropagation:
 
     @pytest.fixture
     def cfg(self):
-        return Configuration(lmc=2, lem=0.2, number_of_actions=4)
+        return Configuration(lmc=4, lem=20, number_of_actions=4)
 
-    def test_init(self, cfg):
-        bp = Backpropagation(cfg)
-        assert id(bp.cfg) == id(cfg)
+    @pytest.fixture
+    def situation(self):
+        return "1100"
 
-    def test_insert(self, cfg):
-        bp = Backpropagation(cfg)
-        cl = Classifier(cfg=cfg, condition=Condition("1111"), action=0, time_stamp=0)
-        ef = Effect("0110")
-        bp.insert_into_bp(cl, ef)
-        assert id(bp.classifiers_for_update[0]) == id(cl)
-        assert id(bp.update_vectors[0]) == id(ef)
-        assert bp.classifiers_for_update[0] == cl
-        assert bp.update_vectors[0] == ef
+    @pytest.fixture
+    def classifiers_list_diff_actions(self, cfg, situation):
+        classifiers_list = ClassifiersList(cfg)
+        classifiers_list.insert_in_population(Classifier(cfg, Condition(situation), 0, 0, Effect(situation)))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition(situation), 1, 0, Effect(situation)))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition(situation), 2, 0, Effect(situation)))
+        classifiers_list.insert_in_population(Classifier(cfg, Condition(situation), 3, 0, Effect(situation)))
+        return classifiers_list
 
-    def test_update(self, cfg):
-        bp = Backpropagation(cfg)
-        cl = Classifier(cfg=cfg, condition=Condition("1111"), action=0, time_stamp=0)
-        ef = Effect("0110")
-        bp.insert_into_bp(cl, ef)
-        bp.update_bp()
-        assert cl.effect == ef
-        bp.insert_into_bp(cl, ef)
-        bp.update_bp()
-        assert cl.effect == ef
-        assert cl.error != cfg.initial_error
+    def test_update_effect(self, cfg, classifiers_list_diff_actions):
+        classifiers_list_diff_actions[0].fitness = 1000
+        classifiers_list_diff_actions[1].fitness = 0
+        classifiers_list_diff_actions[2].fitness = 0
+        bp = Backpropagation(cfg, 0.5)
+        bp.update_effect(classifiers_list_diff_actions)
+        assert classifiers_list_diff_actions[1].effect == classifiers_list_diff_actions[0].effect
 
-    def test_update(self, cfg):
-        bp = Backpropagation(cfg)
-        cl = Classifier(cfg=cfg, condition=Condition("1111"), action=0, time_stamp=0)
-        ef = Effect("0110")
-        bp.insert_into_bp(cl, ef)
-        bp.check_and_update()
-        assert cl.effect is None
-        bp.check_and_update()
-        assert cl.effect is not None
+    def test_insertion(self, cfg, classifiers_list_diff_actions):
+        bp = Backpropagation(cfg, 0.5)
+        bp.update_cycle(classifiers_list_diff_actions, Effect("1111"))
+        assert len(bp.classifiers_for_update) == 4
+        bp.update_cycle(classifiers_list_diff_actions, Effect("1111"))
+        assert len(bp.classifiers_for_update) == 4
+
+    def test_deletion(self, cfg, classifiers_list_diff_actions):
+        bp = Backpropagation(cfg, 0.5)
+        bp.update_cycle(classifiers_list_diff_actions, Effect("1111"))
+        assert len(bp.classifiers_for_update) == 4
+        bp.classifiers_for_update[1][2] = 1
+        bp.update_cycle(classifiers_list_diff_actions, Effect("1111"))
+        assert len(bp.classifiers_for_update) == 3
+
+    def test_errors(self, cfg: Configuration, classifiers_list_diff_actions):
+        bp = Backpropagation(cfg, 0.5)
+        bp.update_cycle(classifiers_list_diff_actions, Effect("1111"))
+        assert classifiers_list_diff_actions[0].error != cfg.initial_error
+

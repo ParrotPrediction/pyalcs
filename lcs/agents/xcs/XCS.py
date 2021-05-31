@@ -1,16 +1,16 @@
 import logging
 import random
-import numpy as np
 from copy import copy
 from typing import Optional
 
+import numpy as np
+
 from lcs.agents import Agent
-from lcs.agents.xcs import Configuration, ClassifiersList, GeneticAlgorithm
 from lcs.agents.Agent import TrialMetrics
+from lcs.agents.xcs import Configuration, ClassifiersList
+# TODO: delete old code
 from lcs.strategies.reinforcement_learning import simple_q_learning
-from lcs.strategies.action_selection import EpsilonGreedy
-
-
+from lcs.agents.xcs import GeneticAlgorithm
 logger = logging.getLogger(__name__)
 
 
@@ -28,8 +28,12 @@ class XCS(Agent):
             self.population = population
         else:
             self.population = ClassifiersList(cfg=cfg)
+        self.ga = GeneticAlgorithm(
+            population=self.population,
+            cfg=self.cfg
+        )
         self.time_stamp = 0
-        self.action_reward = [0 for _ in range(cfg.number_of_actions)]
+        self.reward = 0
 
     def get_population(self):
         return self.population
@@ -47,9 +51,8 @@ class XCS(Agent):
 
     def _run_trial_explore(self, env, trials, current_trial) -> TrialMetrics:
         prev_action_set = None
-        prev_reward = [0 for _ in range(self.cfg.number_of_actions)]
+        prev_reward = self.reward
         prev_state = None  # state is known as situation
-        prev_action = 0
         prev_time_stamp = self.time_stamp  # steps
         done = False  # eop
 
@@ -57,48 +60,51 @@ class XCS(Agent):
         state = self.cfg.environment_adapter.to_genotype(raw_state)
 
         while not done:
+            assert len(self.population) == len(set(self.population)), 'duplicates found'
             self.population.delete_from_population()
             # We are in t+1 here
-            match_set = self.population.generate_match_set(state, self.time_stamp)
-            prediction_array = match_set.prediction_array
-            action = self.select_action(prediction_array, match_set)
-            action_set = match_set.generate_action_set(action)
+            action_set, prediction_array, action = self._form_sets_and_choose_action(state)
             # apply action to environment
             raw_state, step_reward, done, _ = env.step(action)
             state = self.cfg.environment_adapter.to_genotype(raw_state)
-            self.action_reward[action] = simple_q_learning(self.action_reward[action],
-                                                           step_reward,
-                                                           self.cfg.learning_rate,
-                                                           self.cfg.gamma,
-                                                           match_set.best_prediction)
+            if self.cfg.multistep_enfiroment:
+                self.reward = step_reward + self.cfg.gamma * self.reward
 
             self._distribute_and_update(prev_action_set,
                                         prev_state,
-                                        prev_reward[prev_action] + self.cfg.gamma * max(prediction_array))
+                                        state,
+                                        prev_reward + self.cfg.gamma * max(prediction_array))
             if done:
                 self._distribute_and_update(action_set,
                                             state,
-                                            self.action_reward[action])
+                                            state,
+                                            self.reward)
             else:
                 prev_action_set = copy(action_set)
-                prev_reward[action] = copy(self.action_reward[action])
+                prev_reward = self.reward
                 prev_state = copy(state)
-                prev_action = action
             self.time_stamp += 1
-        return TrialMetrics(self.time_stamp - prev_time_stamp, self.action_reward)
+        return TrialMetrics(self.time_stamp - prev_time_stamp, self.reward)
 
-    def _distribute_and_update(self, action_set, situation, p):
+    def _form_sets_and_choose_action(self, state):
+        match_set = self.population.generate_match_set(state, self.time_stamp)
+        prediction_array = match_set.prediction_array
+        action = self.select_action(prediction_array, match_set)
+        action_set = match_set.generate_action_set(action)
+        return action_set, prediction_array, action
+
+    def _distribute_and_update(self, action_set, current_situation, next_situation, p):
         if action_set is not None and len(action_set) > 0:
             action_set.update_set(p)
             if self.cfg.do_action_set_subsumption:
                 self.do_action_set_subsumption(action_set)
-            GeneticAlgorithm.run_ga(self.population,
-                                    action_set,
-                                    situation,
-                                    self.time_stamp,
-                                    self.cfg)
+            self.ga.run_ga(
+                action_set,
+                current_situation,
+                self.time_stamp
+            )
 
-    # TODO: EspilonGreedy
+    # TODO: EpsilonGreedy
     # Run into a lot of issues where in EpsilonGreedy where BestAction was not callable
     # Changing EpsilonGreed to:
     # best = BestAction(all_actions=self.all_actions)
@@ -121,5 +127,3 @@ class XCS(Agent):
                     cl.numerosity += c.numerosity
                     action_set.safe_remove(c)
                     self.population.safe_remove(c)
-
-
