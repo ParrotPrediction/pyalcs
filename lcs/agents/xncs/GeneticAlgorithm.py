@@ -24,6 +24,9 @@ class GeneticAlgorithm(XCSGeneticAlgorithm):
             time_stamp,
             copy(parent1.effect)
         )
+        child1.prediction = parent1.prediction
+        child1.error = parent1.error
+        child1.fitness = parent1.fitness
 
         child2 = Classifier(
             self.cfg,
@@ -32,5 +35,8 @@ class GeneticAlgorithm(XCSGeneticAlgorithm):
             time_stamp,
             copy(parent2.effect)
         )
+        child2.prediction = parent2.prediction
+        child2.error = parent2.error
+        child2.fitness = parent2.fitness
 
         return child1, child2

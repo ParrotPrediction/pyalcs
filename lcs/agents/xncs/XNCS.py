@@ -2,7 +2,7 @@ from typing import Optional
 import random
 import numpy as np
 from copy import copy
-
+import queue
 from lcs.agents.xcs import XCS
 from lcs.agents.Agent import TrialMetrics
 from lcs.agents.xncs import Configuration, Backpropagation
@@ -36,6 +36,7 @@ class XNCS(XCS):
             )
         self.time_stamp = 0
         self.reward = 0
+        self.mistakes = []
 
     def _form_sets_and_choose_action(self, state):
         match_set = self.population.generate_match_set(state, self.time_stamp)
@@ -46,6 +47,7 @@ class XNCS(XCS):
 
     def _distribute_and_update(self, action_set, current_situation, next_situation, p):
         if action_set is not None:
+            self.update_fraction_accuracy(action_set, next_situation)
             self.back_propagation.update_effect(action_set, next_situation)
             self.back_propagation.update_cycle(
                 action_set,
@@ -53,3 +55,24 @@ class XNCS(XCS):
             )
         super()._distribute_and_update(action_set, current_situation, next_situation, p)
 
+    def update_fraction_accuracy(self, action_set, next_vector):
+        most_numerous = sorted(action_set, key=lambda cl: -1 * cl.numerosity)[0]
+        if most_numerous.effect != Effect(next_vector):
+            if len(self.mistakes) >= 100:
+                self.mistakes.pop(0)
+                self.mistakes.append(1)
+            else:
+                self.mistakes.append(1)
+        else:
+            if len(self.mistakes) >= 100:
+                self.mistakes.pop(0)
+                self.mistakes.append(0)
+            else:
+                self.mistakes.append(0)
+
+    @property
+    def fraction_accuracy(self):
+        if len(self.mistakes) > 0:
+            return sum(self.mistakes) / len(self.mistakes)
+        else:
+            return 0

@@ -15,7 +15,6 @@ class Backpropagation:
     def update_cycle(self,
                      action_set,
                      next_vector: Effect):
-        # for cl in action_set.least_fit_classifiers(self.percentage):
         for cl in action_set:
             cl.queses += 1
             if cl.effect != next_vector:
