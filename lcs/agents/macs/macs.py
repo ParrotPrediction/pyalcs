@@ -3,10 +3,11 @@ from __future__ import annotations
 import itertools
 import logging
 import random
+
 from itertools import groupby
 from operator import attrgetter
-from typing import Union, Optional, Dict, Generator, Set, Tuple, NamedTuple, \
-    Callable
+from typing import List, Union, Optional, Dict, Generator, \
+    Set, Tuple, NamedTuple, Callable
 
 from lcs import TypedList, Perception
 from lcs.agents import Agent, ImmutableSequence
@@ -31,11 +32,24 @@ class Condition(ImmutableSequence):
         return Condition([cls.WILDCARD] * length)
 
     @property
+    def is_general(self) -> bool:
+        return set(self) == {self.WILDCARD}
+
+    @property
     def generality(self) -> int:
         return sum(1 for c in self if c == self.WILDCARD)
 
-    def does_match(self, p: Perception) -> bool:
-        return all(ci == pi for ci, pi in zip(self, p) if ci != self.WILDCARD)
+    @property
+    def specificity(self) -> int:
+        return sum(1 for c in self if c != self.WILDCARD)
+
+    def does_match(self, p: Union[Perception, Condition]) -> bool:
+        if isinstance(p, Perception):
+            return all(ci == pi for ci, pi in zip(self, p)
+                       if ci != self.WILDCARD)
+        else:
+            return all(ci == pi for ci, pi in zip(self, p)
+                       if ci != self.WILDCARD and pi != self.WILDCARD)
 
     def non_matching(self, o: Condition) -> bool:
         """
@@ -44,7 +58,11 @@ class Condition(ImmutableSequence):
         if self == o:
             return True
 
-        return any(ci != oi for ci, oi in zip(self, o) if ci != self.WILDCARD)
+        return any(
+            ci != oi
+            for ci, oi in zip(self, o)
+            if ci != self.WILDCARD
+        )
 
     @staticmethod
     def generate_matching(p: Perception) -> Generator[Condition]:
@@ -82,43 +100,47 @@ class Condition(ImmutableSequence):
         else:
             raise ValueError('Trying to modify if for a wildcard')
 
-    def is_more_general(self, other: Condition) -> bool:
-        """Checks if other condition is more general"""
+    def is_more_general(self, other: Condition) -> Optional[bool]:
+        """
+        Checks if other condition is more general.
+
+        This function is one way: it must be called for (c1, c2) and then by (c2, c1).
+
+        """
+
         if self == other:
             return True
 
-        # TODO validate if method below are useful
-        def is_more_general(s, o):
-            if o == self.WILDCARD:
-                return True
+        for i, (S, O) in enumerate(zip(self, other)):
+            if S != self.WILDCARD and O != self.WILDCARD:
+                if S != O:
+                    return None
 
-            return s == o
+            if S == self.WILDCARD and O != self.WILDCARD:
+                return None
 
-        def is_different(s, o):
-            if s == self.WILDCARD and o == self.WILDCARD:
-                return False
-            else:
-                return s != o
+        return True
 
-        other_more_general = all(
-            is_more_general(s, o) for s, o in zip(self, other))
-        different_tokens = sum(
-            1 for s, o in zip(self, other) if is_different(s, o))
-
-        return other_more_general and different_tokens > 0
-
-    def feature_to_specialize(self, estimate_expected_improvements: bool) -> Optional[int]:
+    def feature_to_specialize(self, estimate_expected_improvements: bool) -> List[int]:
         """Returns index of the feature suggested for specialization"""
         if all(c != self.WILDCARD for c in self):
-            return None
+            return []
 
-        eis = {idx: self.eis[idx] for idx, c in enumerate(self) if
-               c == self.WILDCARD}
+        eis = {
+            idx: self.eis[idx]
+            for idx, c in enumerate(self)
+            if c == self.WILDCARD and self.eis[idx] >= 0.5
+        }
 
         if estimate_expected_improvements:
-            return max(eis, key=eis.get)
+            # return sorted(eis, key=eis.get, reverse=True)
+            try:
+                return [max(eis, key=eis.get)]
+            except:
+                return []
+
         else:
-            return random.choice(list(eis.keys()))
+            return [random.choice(list(eis.keys()))]
 
     def feature_to_generalize(self) -> Optional[int]:
         """Returns index of the feature suggested for generalization"""
@@ -142,23 +164,24 @@ class Condition(ImmutableSequence):
     def subsumes(self, other) -> bool:
         raise NotImplementedError('MACS has no subsume operator')
 
+    def is_compatible(self, other: Condition, ps: List[Perception]) -> bool:
+        if self.does_match(other):
+            for p in ps:
+                if self.does_match(p) and other.does_match(p):
+                    return True
+
+        return False
 
 class Effect(ImmutableSequence):
     WILDCARD = '?'  # don't know symbol - matches any value
 
     @staticmethod
-    def generate(p: Perception, specific_count: int = 1) -> Generator[Effect]:
-        str_len = len(p)
-        combinations = itertools.combinations(
-            range(0, str_len), str_len - specific_count)
-
-        for combination in combinations:
-            items = list(p)
-
-            for wildcard_id in combination:
-                items[wildcard_id] = Effect.WILDCARD
-
-            yield Effect(items)
+    def generate(p: Perception) -> Generator[Effect]:
+        blank = [Effect.WILDCARD for k in p]
+        for i, F in enumerate(p):
+            w = blank[:]
+            w[i] = F
+            yield Effect(w)
 
     def __lt__(self, other: Effect):
         return self._items < other._items
@@ -191,6 +214,7 @@ class Configuration:
                  oscillation_threshold: int = 5,
                  metrics_trial_frequency: int = 5,
                  user_metrics_collector_fcn: Callable = None):
+
         assert classifier_length == len(feature_possible_values)
         assert 1 <= specified_effect_attributes <= classifier_length
 
@@ -205,6 +229,8 @@ class Configuration:
         self.eo = oscillation_threshold
         self.metrics_trial_frequency = metrics_trial_frequency
         self.user_metrics_collector_fcn = user_metrics_collector_fcn
+
+        self.model_checkpoint_freq = False
 
 
 class Classifier:
@@ -244,6 +270,15 @@ class Classifier:
         # Situation preceding last anticipation mistake
         self.sb: Optional[Perception] = None
 
+    def __key(self):
+        return str(self.condition) + str(self.action) + str(self.effect)
+
+    def __eq__(self, other):
+        return self.__key() == other.__key()
+
+    def __hash__(self):
+        return hash(self.__key())
+
     def __repr__(self):
         return f"{self.condition}-{self.action}-{self.effect}, G: {self.g}, B: {self.b}, {self.debug}"
 
@@ -265,6 +300,13 @@ class Classifier:
     def anticipates(self, situation: Perception) -> bool:
         return self.effect.does_match(situation)
 
+    def conflicts(self, other: Classifier) -> bool:
+        if self.action == other.action:
+            if self.condition.does_match(other.condition):
+                if self.effect.conflicts(other.effect):
+                    return True
+        return False
+
 
 class ClassifiersList(TypedList[Classifier]):
     def __init__(self, *args, oktypes=(Classifier,)) -> None:
@@ -277,6 +319,13 @@ class ClassifiersList(TypedList[Classifier]):
     def form_action_set(self, action: int) -> ClassifiersList:
         matching = [cl for cl in self if cl.action == action]
         return ClassifiersList(*matching)
+
+
+ChildClassifier = NamedTuple('ChildClassifier',
+                             [
+                                 ('classifier', Classifier),
+                                 ('parent', Classifier)
+                             ])
 
 
 class LatentLearning:
@@ -314,6 +363,7 @@ class LatentLearning:
 
     def select_accurate(self, pop: ClassifiersList) -> None:
         inaccurate_cls = [cl for cl in pop if cl.is_inaccurate]
+
         for cl in inaccurate_cls:
             pop.safe_remove(cl)
 
@@ -324,25 +374,28 @@ class LatentLearning:
         to_add = []
         to_remove = []
         for cl in [cl for cl in pop if cl.is_oscillating]:
+            feature_idxs = cl.condition.feature_to_specialize(
+                self.cfg.estimate_expected_improvements
+            )
+
+            for feature_idx in feature_idxs:
+                for new_cl in self.mutspec(cl, feature_idx):
+                    if any(new_cl.does_match(p) for p in situations_seen):
+                        to_add.append(new_cl)
+
             to_remove.append(cl)
-
-            feature_idx = cl.condition.feature_to_specialize(
-                self.cfg.estimate_expected_improvements)
-
-            for new_cl in self.mutspec(cl, feature_idx):
-                if any(new_cl.does_match(p) for p in situations_seen):
-                    to_add.append(new_cl)
 
         for cl in to_remove:
             pop.safe_remove(cl)
 
         for new_cl in to_add:
-            assert new_cl not in pop
-            pop.append(new_cl)
+            if new_cl not in pop:
+                pop.append(new_cl)
 
-    def mutspec(self, cl: Classifier, feature_idx: int) -> Generator[
-        Classifier]:
+    def mutspec(self, cl: Classifier, feature_idx: int) -> Generator[Classifier]:
+
         assert cl.condition[feature_idx] == Condition.WILDCARD
+
         for feature in self.cfg.feature_possible_values[feature_idx]:
             new_c = Condition(cl.condition)
             new_c[feature_idx] = str(feature)
@@ -351,7 +404,7 @@ class LatentLearning:
                 condition=new_c,
                 action=cl.action,
                 effect=Effect(cl.effect),
-                debug={'origin': 'mutspec'},
+                debug={'origin': cl.debug["origin"] + '/mutspec'},
                 cfg=cl.cfg
             )
 
@@ -364,69 +417,118 @@ class LatentLearning:
 
         set_a = self._update_igs(population, p0, a0, p1)
 
-        set_c: Set[ChildClassifier] = set()  # general set of classifiers
-        ChildClassifier = NamedTuple('ChildClassifier',
-                                     [('classifier', Classifier),
-                                      ('parent', Optional[Classifier])])
-
         # Sort classifiers by effect for grouping
         set_a = sorted(set_a, key=attrgetter("effect"))
-        set_d: Set[Classifier] = set()  # conflicts
 
-        for _, set_b in groupby(set_a, key=attrgetter("effect")):
+        E_GROUPS = groupby(set_a, key=attrgetter("effect"))
+
+        for _, set_b in E_GROUPS:
             set_b = set(set_b)
+
+            set_d: Set[Classifier] = set()  # conflicts
+
+            # Build [C] only when all classifiers from [B] are accurate
             if all(cl.is_accurate for cl in set_b):
-                # Build [C] only when all classifiers from [B] are accurate
+
+                set_c = self.process_set_b(set_b)
+
+                assert len(set_c) == len(set_b)
+
+                # Check for conflicts in [C]
+
+                set_d = self.set_c_conflicts(
+                    set_c, population, situations_seen, a0
+                )
+
+                self.set_d_generalization(set_d)
+
                 for cl in set_b:
-                    if all(ig <= 0.5 for ig in cl.condition.ig):
-                        set_c.add(
-                            ChildClassifier(cl, cl))
-                    else:
-                        spec_cond_idx = cl.condition.feature_to_generalize()
-                        assert spec_cond_idx is not None
+                    population.remove(cl)
 
-                        new_cond = Condition(cl.condition)
-                        new_cond[spec_cond_idx] = Condition.WILDCARD
-                        new_cl = Classifier(condition=new_cond,
-                                            action=cl.action,
-                                            effect=Effect(cl.effect),
-                                            debug={'origin': 'set_c'},
-                                            cfg=cl.cfg)
+                for cl in set_d:
+                    if cl not in population:
+                        population.append(cl)
 
-                        set_c.add(ChildClassifier(new_cl, cl))
+    def process_set_b(self, set_b):
 
-            # Check for conflicts in [C]
+        set_c: Set[ChildClassifier] = set()
+        for cl in set_b:
+            if all(ig <= 0.5 for ig in cl.condition.ig):
+                set_c.add(
+                    ChildClassifier(cl, cl)
+                )
+
+            else:
+                spec_cond_idx = cl.condition.feature_to_generalize()
+                assert spec_cond_idx is not None
+
+                new_cond = Condition(cl.condition)
+
+                new_cond[spec_cond_idx] = Condition.WILDCARD
+                new_cl = Classifier(
+                    condition=new_cond,
+                    action=cl.action,
+                    effect=Effect(cl.effect),
+                    debug={'origin': cl.debug["origin"] + '/set_c'},
+                    cfg=cl.cfg
+                )
+
+                set_c.add(ChildClassifier(new_cl, cl))
+
+        return set_c
+
+    def set_c_conflicts(self,
+                        set_c: Set[ChildClassifier],
+                        population: ClassifierList,
+                        situations_seen: Set[Perception],
+                        a0: int) -> Set[Classifier]:
+        set_d = set()
+
+        existing_cls = [
+            cl for cl in population
+            if cl.action == a0
+        ]
+        for new_cl in set_c:
+            CONFLICT = False
+
+            # SHORTCUT BOTH SITUATIONS.
+            #if new_cl.classifier.condition.is_general:
+            #    CONFLICT = True
+            if new_cl.classifier == new_cl.parent:
+                CONFLICT = True
+
+            # Iterate all situation seen
             for p in situations_seen:
-                existing_cls = [cl for cl in population if
-                                cl.does_match(p) and cl.action == a0]
-                new_cls = [cl for cl in set_c if cl.classifier.does_match(
-                    p) and cl.classifier.action == a0]
+                if CONFLICT:
+                    break
+                for existing_cl in existing_cls:
+                    if existing_cl.does_match(p):
+                        if new_cl.classifier.does_match(p):
+                            # assert new_cl.classifier.condition.does_match(existing_cl.condition)
+                            if new_cl.classifier.effect.conflicts(existing_cl.effect):
+                                CONFLICT = True
 
-                for (existing_cl, new_cl) in itertools.product(
-                    *[existing_cls, new_cls]):
-                    if existing_cl.effect.conflicts(new_cl.classifier.effect):
-                        assert new_cl.parent is not None
-                        set_d.add(new_cl.parent)
-                    else:
-                        set_d.add(new_cl.classifier)
+                                break
+            if CONFLICT:
+                set_d.add(new_cl.parent)
+            else:
+                set_d.add(new_cl.classifier)
 
-            # Analyze every possible pair of [D] for duplicates
-            # (keep most general)
-            for (c1, c2) in itertools.combinations(set_d, 2):
-                if c1.condition.is_more_general(c2.condition) and c1 in set_d:
+        return set_d
+
+    def set_d_generalization(self, set_d: Set[Classifier]) -> None:
+        if len(set_d) < 2:
+            return
+
+        for (c1, c2) in itertools.permutations(set_d, 2):
+            if c1 in set_d and c2 in set_d:
+                K = c1.condition.is_more_general(c2.condition)
+                if K is None:
+                    pass
+                elif K:
                     set_d.remove(c1)
-                elif c2.condition.is_more_general(
-                    c1.condition) and c2 in set_d:
+                else:
                     set_d.remove(c2)
-
-        # In the original population replace classifiers from [A]
-        # by those generated from [D]
-        for cl in set_a:
-            population.remove(cl)
-
-        for cl in set_d:
-            assert cl not in population
-            population.append(cl)
 
     def cover_transitions(self,
                           population: ClassifiersList,
@@ -434,41 +536,68 @@ class LatentLearning:
                           a0: int,
                           p1: Perception) -> None:
 
-        new_cls = []
-        for ef in Effect.generate(p1, self.cfg.specified_effect_attributes):
-            if len([cl for cl in population if cl.does_match(p0) and cl.action == a0 and cl.effect == ef]) == 0:
+        for ef in Effect.generate(p1):
+            MatchAE = [
+                cl
+                for cl in population
+                if cl.action == a0 and cl.effect == ef
+            ]
+
+            # No existing classifiers for given transition?
+            if not [
+                    cl for cl in MatchAE
+                    if cl.does_match(p0)
+            ]:
+
                 # extract conditions of existing classifiers
-                conditions = [cl.condition for cl in population if cl.action == a0 and cl.effect == ef]
+                conditions = [
+                    cl.condition
+                    for cl in MatchAE
+                ]
 
-                def non_matching_existing(generated: Condition) -> bool:
-                    return all(generated.non_matching(c) for c in conditions)
+                blank = [Condition.WILDCARD] * len(p0)
+                selected_condition = None
 
-                possible_conditions = list(filter(non_matching_existing, Condition.generate_matching(p0)))
-
-                foo = dict()
-                for k, v in itertools.groupby(possible_conditions, key=lambda c: c.generality):
-                    foo[k] = list(v)
-
-                c = None
-                max_generalization = max(foo, key=int)
-                for gcount in reversed(range(max_generalization + 1)):
-                    conditions = foo[gcount]
-                    if len(conditions):
-                        c = random.choice(conditions)
+                # Number of components to specialize
+                MINIMUM_SPEC = 0
+                for K in range(MINIMUM_SPEC, len(p0) + 1):
+                    if selected_condition is not None:
                         break
 
+                    combinations = list(
+                        itertools.combinations(
+                            range(len(p0)), K)
+                    )
+
+                    random.shuffle(combinations)
+                    for combination in combinations:
+                        basecond = blank[:]
+                        for v in combination:
+                            basecond[v] = p0[v]
+
+                        cond = Condition(basecond)
+
+                        if not any(cond.does_match(other_cond)
+                                   for other_cond in conditions):
+                            selected_condition = cond
+                            break
+
+                try:
+                    assert selected_condition is not None
+                except:
+                    print(conditions)
+                    exit(1)
+
                 new_cl = Classifier(
-                    condition=c,
+                    condition=selected_condition,
                     action=a0,
                     effect=ef,
                     debug={'origin': 'covering'},
-                    cfg=self.cfg)
+                    cfg=self.cfg
+                )
 
-                new_cls.append(new_cl)
+                population.append(new_cl)
 
-        for new_cl in new_cls:
-            assert new_cl not in population
-            population.append(new_cl)
 
     def _update_igs(self,
                     population: ClassifiersList,
@@ -480,11 +609,16 @@ class LatentLearning:
         Returns classifiers whose A part patches a0 and whose E part matches p1
         """
         set_a: Set[Classifier] = set()
+
         non_matching = [cl for cl in population if
                         not cl.does_match(p0) and cl.action == a0]
 
         for cl in non_matching:
-            for new_cond, idx in cl.condition.exhaustive_generalization():
+            for idx, cond in enumerate(cl.condition):
+                if cond == cl.condition.WILDCARD:
+                    continue
+                new_cond = Condition(cl.condition)
+                new_cond[idx] = cl.condition.WILDCARD
                 if new_cond.does_match(p0):
                     if cl.effect.does_match(p1):
                         cl.condition.increase_ig(idx, self.cfg.beta)
@@ -512,20 +646,28 @@ class MACS(Agent):
         return self.cfg
 
     def remember_situation(self, p: Perception):
+
         assert len(p) == self.cfg.classifier_length
 
         for f_vals, _p in zip(self.cfg.feature_possible_values, p):
-            assert _p in f_vals
+            try:
+                assert _p in f_vals
+            except:
+                print(p)
+                raise
 
         if p not in self.desirability_values:
             self.desirability_values[p] = 0.0
 
-    def get_anticipations(self, p0: Perception, a: int) -> Generator[
-        Perception]:
+    def get_anticipations(self, p0: Perception, a: int) -> Generator[Perception]:
+        assert len(p0) == self.cfg.classifier_length
+
         match_set = self.population.form_match_set(p0)
         action_set = match_set.form_action_set(a)
 
-        effects = [cl.effect for cl in action_set]
+        effects = [
+            cl.effect for cl in action_set
+        ]
 
         anticipated_attribs = [set() for _ in range(len(p0))]
         for pi in range(len(p0)):
@@ -536,9 +678,8 @@ class MACS(Agent):
         if all(len(aa) > 0 for aa in anticipated_attribs):
             yield from map(Perception, itertools.product(*anticipated_attribs))
 
-    def assert_no_duplicates(self):
-        pop = self.get_population()
-        assert len(pop) == len(set(pop._items)), 'duplicate classifiers found'
+    def get_seen_situations(self):
+        return set(self.desirability_values.keys())
 
     def _run_trial_explore(self, env, trials, current_trial) -> TrialMetrics:
         logging.debug("Running trial explore")
@@ -553,9 +694,8 @@ class MACS(Agent):
 
         while not done:
             logging.debug(f"Step {steps}, perception: {state}")
-            self.assert_no_duplicates()
-            self.remember_situation(state)
 
+            self.remember_situation(state)
             # Select an action
             action = random.randint(0, self.cfg.number_of_possible_actions - 1)
 
@@ -567,25 +707,25 @@ class MACS(Agent):
                 logging.debug("FOUND REWARD")
 
             prev_state = state
+
             state = Perception(raw_state)
 
-            seen_situations = set(self.desirability_values.keys())
+            seen_situations = self.get_seen_situations()
+
+            self.ll.generalize_conditions(
+                self.population, seen_situations, prev_state, action, state
+            )
+
+            self.ll.specialize_conditions(self.population, seen_situations)
+
+            self.ll.cover_transitions(
+                self.population, prev_state, action, state)
 
             self.ll.evaluate_classifiers(
                 self.population, prev_state, action, state)
-            self.ll.specialize_conditions(self.population, seen_situations)
-            self.ll.generalize_conditions(
-                self.population, seen_situations, prev_state, action, state)
-            self.ll.cover_transitions(
-                self.population, prev_state, action, state)
+
             self.ll.select_accurate(self.population)
 
             steps += 1
 
         return TrialMetrics(steps, last_reward)
-
-
-if __name__ == '__main__':
-    state_values = {0, 1}
-    cfg = Configuration(4, 2, feature_possible_values=[state_values] * 4)
-    agent = MACS(cfg)

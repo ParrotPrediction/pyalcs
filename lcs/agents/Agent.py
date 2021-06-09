@@ -3,6 +3,7 @@ from collections import namedtuple
 from timeit import default_timer as timer
 from typing import Callable, List, Tuple
 
+
 import dill
 import mlflow
 import numpy as np
@@ -16,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class Agent:
+    total_steps = 0
 
     def _run_trial_explore(self, env, trials, current_trial) -> TrialMetrics:
         raise NotImplementedError()
@@ -131,6 +133,7 @@ class Agent:
             end_ts = timer()
 
             steps += steps_in_trial
+            self.total_steps += steps_in_trial
 
             # collect user metrics
             if current_trial % self.get_cfg().metrics_trial_frequency == 0:

@@ -41,7 +41,7 @@ setup(name='pyalcs',
           'Tracking': 'https://github.com/ParrotPrediction/pyalcs/issues',
       },
       python_requires='>=3.5',
-      packages=find_packages(include=['lcs']),
+      packages=find_packages(),
       setup_requires=[
           'pytest-runner',
           'flake8'
