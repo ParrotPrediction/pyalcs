@@ -32,24 +32,68 @@ class XNCS(XCS):
         )
         self.back_propagation = Backpropagation(
             cfg=self.cfg,
-            percentage=0.1
+            percentage=self.cfg.update_percentage
             )
         self.time_stamp = 0
         self.reward = 0
         self.mistakes = []
+
+    def _run_trial_explore(self, env, trials, current_trial) -> TrialMetrics:
+        prev_action_set = None
+        prev_reward = self.reward
+        prev_state = None  # state is known as situation
+        prev_time_stamp = self.time_stamp  # steps
+        done = False  # eop
+
+        raw_state = env.reset()
+        state = self.cfg.environment_adapter.to_genotype(raw_state)
+
+        while not done:
+            assert len(self.population) == len(set(self.population)), 'duplicates found'
+            self.population.delete_from_population()
+            # We are in t+1 here
+            action_set, prediction_array, action, match_set = self._form_sets_and_choose_action(state)
+            # apply action to environment
+            raw_state, step_reward, done, _ = env.step(action)
+            state = self.cfg.environment_adapter.to_genotype(raw_state)
+
+            if self.cfg.multistep_enfiroment:
+                self.reward = step_reward + self.cfg.gamma * self.reward
+
+            self._distribute_and_update(prev_action_set,
+                                        prev_state,
+                                        state,
+                                        prev_reward + self.cfg.gamma * max(prediction_array))
+            if done:
+                self._distribute_and_update(action_set,
+                                            state,
+                                            state,
+                                            self.reward)
+            else:
+                prev_action_set = copy(action_set)
+                prev_reward = self.reward
+                prev_state = copy(state)
+            self.time_stamp += 1
+        return TrialMetrics(self.time_stamp - prev_time_stamp, self.reward)
 
     def _form_sets_and_choose_action(self, state):
         match_set = self.population.generate_match_set(state, self.time_stamp)
         prediction_array = match_set.prediction_array
         action = self.select_action(prediction_array, match_set)
         action_set = match_set.generate_action_set(action)
-        return action_set, prediction_array, action
+        return action_set, prediction_array, action, match_set
 
     def _distribute_and_update(self, action_set, current_situation, next_situation, p):
         if action_set is not None:
+            for cl in action_set:
+                if cl.effect is None:
+                    cl.effect = Effect(next_situation)
             self.update_fraction_accuracy(action_set, next_situation)
-            self.back_propagation.update_effect(action_set, next_situation)
-            self.back_propagation.update_cycle(
+            if self.cfg.update_env_input:
+                self.back_propagation.update_effect(action_set, next_situation)
+            else:
+                self.back_propagation.update_effect(action_set, action_set.fittest_classifier.effect)
+            self.back_propagation.run_bp(
                 action_set,
                 Effect(next_situation)
             )

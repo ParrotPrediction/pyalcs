@@ -33,11 +33,15 @@ class ClassifiersList(xcs.ClassifiersList):
             else:
                 generalized.append(situation[i])
             effect.append(str(random.choice(situation)))
+        if self.cfg.cover_env_input:
+            effect = None
+        else:
+            effect = Effect(effect)
         cl = Classifier(cfg=self.cfg,
                         condition=Condition(generalized),
                         action=action,
                         time_stamp=time_stamp,
-                        effect=Effect(effect))
+                        effect=effect)
         return cl
 
     def generate_action_set(self, action):

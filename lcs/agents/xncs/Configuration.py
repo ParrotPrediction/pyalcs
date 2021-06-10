@@ -36,10 +36,17 @@ class Configuration(xcs.Configuration):
                  do_action_set_subsumption: bool = False,
                  metrics_trial_frequency: int = 5,
                  user_metrics_collector_fcn: Callable = None,
-                 multistep_enfiroment: bool = True
+                 multistep_enfiroment: bool = True,
+                 update_percentage: float = 0.2,
+                 update_env_input: bool = False,
+                 cover_env_input: bool = False,
                  ) -> None:
         self.lmc = lmc
         self.lem = lem
+        self.update_env_input = update_env_input
+        self.cover_env_input = cover_env_input
+        self.update_percentage = update_percentage
+
         super().__init__(
             number_of_actions=number_of_actions,
             classifier_wildcard=classifier_wildcard,

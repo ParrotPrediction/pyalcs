@@ -12,11 +12,11 @@ class Backpropagation:
         self.cfg = cfg
         self.classifiers_for_update = []
 
-    def update_cycle(self,
-                     action_set,
-                     next_vector: Effect):
+    def run_bp(self,
+               action_set,
+               next_vector: Effect):
         for cl in action_set:
-            cl.queses += 1
+            cl.guesses += 1
             if cl.effect != next_vector:
                 cl.mistakes += 1
                 if not any(cl == inside[0] for inside in self.classifiers_for_update):

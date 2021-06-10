@@ -12,7 +12,6 @@ class GeneticAlgorithm:
             population: ClassifiersList,
             cfg: Configuration
             ):
-
         self.population = population
         self.cfg = cfg
 
@@ -23,26 +22,19 @@ class GeneticAlgorithm:
 
         if action_set is None:
             return
-
         # sometimes action set is empty, which is expected
         assert isinstance(action_set, ClassifiersList)
-
         if time_stamp - (sum(cl.time_stamp * cl.numerosity for cl in action_set)
            / (sum(cl.numerosity for cl in action_set) or 1)) > self.cfg.ga_threshold:
             for cl in action_set:
                 cl.time_stamp = time_stamp
-
             parent1 = self._select_offspring(action_set)
             parent2 = self._select_offspring(action_set)
-
             child1, child2 = self._make_children(parent1, parent2, time_stamp)
-
             if np.random.rand() < self.cfg.chi:
                 self._apply_crossover(child1, child2, parent1, parent2)
-
             self._apply_mutation(child1, self.cfg, situation)
             self._apply_mutation(child2, self.cfg, situation)
-
             self._perform_insertion_or_subsumption(
                 child1, child2,
                 parent1, parent2
@@ -87,7 +79,6 @@ class GeneticAlgorithm:
 
     @staticmethod
     def _select_offspring(action_set: ClassifiersList) -> Classifier:
-
         assert isinstance(action_set, ClassifiersList)
 
         # TODO: insert generator to calculate fitness_sum

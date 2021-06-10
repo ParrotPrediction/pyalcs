@@ -15,7 +15,7 @@ class Classifier(xcs.Classifier):
                  effect:  Union[Effect, str, None] = None) -> None:
         self.effect = effect
         self.mistakes = 0
-        self.queses = 0
+        self.guesses = 0
 
         super().__init__(cfg, condition, action, time_stamp)
 
@@ -24,8 +24,8 @@ class Classifier(xcs.Classifier):
 
     @property
     def accuracy(self):
-        if self.queses > 0:
-            return (self.queses - self.mistakes) / self.queses
+        if self.guesses > 0:
+            return (self.guesses - self.mistakes) / self.guesses
         return None
 
     def __str__(self):

@@ -77,10 +77,8 @@ class Configuration(object):
         self.number_of_actions = number_of_actions
         self.do_GA_subsumption = do_ga_subsumption
         self.do_action_set_subsumption = do_action_set_subsumption
-
         self.metrics_trial_frequency = metrics_trial_frequency
         self.user_metrics_collector_fcn = user_metrics_collector_fcn
-
         self.multistep_enfiroment = multistep_enfiroment
 
     def __str__(self) -> str:
