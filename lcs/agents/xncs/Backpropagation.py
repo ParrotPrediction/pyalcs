@@ -6,9 +6,7 @@ from lcs.agents.xncs import Configuration, Effect
 class Backpropagation:
 
     def __init__(self,
-                 cfg: Configuration,
-                 percentage: float):
-        self.percentage = percentage
+                 cfg: Configuration):
         self.cfg = cfg
         self.classifiers_for_update = []
 
@@ -43,5 +41,5 @@ class Backpropagation:
                       action_set, next_situation):
         # effect = action_set.fittest_classifier.effect
         effect = Effect(next_situation)
-        for cl in action_set.least_fit_classifiers(self.percentage):
+        for cl in action_set.least_fit_classifiers(self.cfg.update_percentage):
             cl.effect = copy(effect)

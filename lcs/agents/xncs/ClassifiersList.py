@@ -16,10 +16,6 @@ class ClassifiersList(xcs.ClassifiersList):
                  *args,
                  oktypes=(Classifier,),
                  ) -> None:
-        self.back_propagation = Backpropagation(
-            cfg=cfg,
-            percentage=0.2
-            )
         super().__init__(cfg, *args, oktypes=oktypes)
 
     # without this function the Classifierlist will create XCS Classifiers

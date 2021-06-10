@@ -31,8 +31,7 @@ class XNCS(XCS):
             cfg=self.cfg
         )
         self.back_propagation = Backpropagation(
-            cfg=self.cfg,
-            percentage=self.cfg.update_percentage
+            cfg=self.cfg
             )
         self.time_stamp = 0
         self.reward = 0
