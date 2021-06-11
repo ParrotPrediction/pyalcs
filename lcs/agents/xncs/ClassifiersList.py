@@ -18,8 +18,6 @@ class ClassifiersList(xcs.ClassifiersList):
                  ) -> None:
         super().__init__(cfg, *args, oktypes=oktypes)
 
-    # without this function the Classifierlist will create XCS Classifiers
-    # instead of XNCS classifiers
     def generate_covering_classifier(self, situation, action, time_stamp):
         generalized = []
         effect = []
@@ -28,11 +26,10 @@ class ClassifiersList(xcs.ClassifiersList):
                 generalized.append(self.cfg.classifier_wildcard)
             else:
                 generalized.append(situation[i])
-            effect.append(str(random.choice(situation)))
+            if not self.cfg.cover_env_input:
+                effect.append(str(random.choice(situation)))
         if self.cfg.cover_env_input:
             effect = None
-        else:
-            effect = Effect(effect)
         cl = Classifier(cfg=self.cfg,
                         condition=Condition(generalized),
                         action=action,

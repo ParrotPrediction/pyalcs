@@ -37,9 +37,7 @@ class Backpropagation:
         for cl in self.classifiers_for_update:
             cl[0].error += self.cfg.lem
 
-    def update_effect(self,
-                      action_set, next_situation):
-        # effect = action_set.fittest_classifier.effect
+    def update_effect(self, action_set, next_situation):
         effect = Effect(next_situation)
         for cl in action_set.least_fit_classifiers(self.cfg.update_percentage):
             cl.effect = copy(effect)
