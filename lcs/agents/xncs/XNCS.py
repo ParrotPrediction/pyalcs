@@ -55,18 +55,19 @@ class XNCS(XCS):
 
     def update_fraction_accuracy(self, action_set, next_vector):
         most_numerous = sorted(action_set, key=lambda cl: -1 * cl.numerosity)[0]
-        if most_numerous.effect != Effect(next_vector):
-            if len(self.mistakes) >= 100:
-                self.mistakes.pop(0)
-                self.mistakes.append(1)
+        if most_numerous.effect is not None and next_vector is not None:
+            if most_numerous.effect != Effect(next_vector):
+                if len(self.mistakes) >= 100:
+                    self.mistakes.pop(0)
+                    self.mistakes.append(1)
+                else:
+                    self.mistakes.append(1)
             else:
-                self.mistakes.append(1)
-        else:
-            if len(self.mistakes) >= 100:
-                self.mistakes.pop(0)
-                self.mistakes.append(0)
-            else:
-                self.mistakes.append(0)
+                if len(self.mistakes) >= 100:
+                    self.mistakes.pop(0)
+                    self.mistakes.append(0)
+                else:
+                    self.mistakes.append(0)
 
     @property
     def fraction_accuracy(self):

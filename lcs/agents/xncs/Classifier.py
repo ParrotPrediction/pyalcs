@@ -20,7 +20,7 @@ class Classifier(xcs.Classifier):
         super().__init__(cfg, condition, action, time_stamp)
 
     def __hash__(self):
-        return hash((str(self.condition),str(self.effect), self.action))
+        return hash((str(self.condition), str(self.effect), self.action))
 
     @property
     def accuracy(self):

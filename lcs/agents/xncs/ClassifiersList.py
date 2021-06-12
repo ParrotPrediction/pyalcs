@@ -30,6 +30,8 @@ class ClassifiersList(xcs.ClassifiersList):
                 effect.append(str(random.choice(situation)))
         if self.cfg.cover_env_input:
             effect = None
+        else:
+            effect = Effect(effect)
         cl = Classifier(cfg=self.cfg,
                         condition=Condition(generalized),
                         action=action,

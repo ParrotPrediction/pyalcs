@@ -15,12 +15,13 @@ class Backpropagation:
                next_vector: Effect):
         for cl in action_set:
             cl.guesses += 1
-            if cl.effect != next_vector:
-                cl.mistakes += 1
-                if not any(cl == inside[0] for inside in self.classifiers_for_update):
-                    self.classifiers_for_update.append(
-                        [cl, next_vector, self.cfg.lmc]
-                    )
+            if cl.effect is not None:
+                if cl.effect != next_vector:
+                    cl.mistakes += 1
+                    if not any(cl == inside[0] for inside in self.classifiers_for_update):
+                        self.classifiers_for_update.append(
+                            [cl, next_vector, self.cfg.lmc]
+                        )
         self.check_if_needed()
         self.update_errors()
 
