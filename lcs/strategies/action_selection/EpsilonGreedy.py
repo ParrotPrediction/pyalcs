@@ -1,8 +1,7 @@
 import numpy as np
 
-from lcs.strategies.action_selection.RandomAction import RandomAction
 from lcs.strategies.action_selection.BestAction import BestAction
-
+from lcs.strategies.action_selection.RandomAction import RandomAction
 
 class EpsilonGreedy:
 

@@ -8,7 +8,7 @@ class TestClassifier:
 
     @pytest.fixture
     def cfg(self):
-        return Configuration(4, 4)
+        return Configuration(classifier_length=4, number_of_possible_actions=4)
 
     def test_should_create_general_classifier(self, cfg):
         cl = Classifier.general(action=1, cfg=cfg)

@@ -7,7 +7,10 @@ class TestAnticipatoryLearningProcess:
 
     def test_should_insert_alp_offspring_1(self):
         # given
-        cfg = acs2.Configuration(8, 8)
+        cfg = acs2.Configuration(
+            classifier_length=8,
+            number_of_possible_actions=8)
+
         population = acs2.ClassifiersList()
         new_list = acs2.ClassifiersList()
 
@@ -81,7 +84,9 @@ class TestAnticipatoryLearningProcess:
 
     def test_should_insert_alp_offspring_2(self):
         # given
-        cfg = acs2.Configuration(8, 8)
+        cfg = acs2.Configuration(
+            classifier_length=8,
+            number_of_possible_actions=8)
         population = acs2.ClassifiersList()
         new_list = acs2.ClassifiersList()
 

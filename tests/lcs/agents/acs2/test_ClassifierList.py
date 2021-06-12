@@ -9,7 +9,9 @@ class TestClassifierList:
 
     @pytest.fixture
     def cfg(self):
-        return Configuration(8, 8)
+        return Configuration(
+            classifier_length=8,
+            number_of_possible_actions=8)
 
     def test_should_deny_insertion_illegal_types(self, cfg):
         population = ClassifiersList()

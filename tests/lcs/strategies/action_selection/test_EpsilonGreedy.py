@@ -9,11 +9,17 @@ class TestEpsilonGreedy:
 
     @pytest.fixture
     def acs_cfg(self):
-        return acs.Configuration(4, 4, epsilon=0.5)
+        return acs.Configuration(
+            classifier_length=4,
+            number_of_possible_actions=4,
+            epsilon=0.5)
 
     @pytest.fixture
     def acs2_cfg(self):
-        return acs2.Configuration(4, 4, epsilon=0.5)
+        return acs2.Configuration(
+            classifier_length=4,
+            number_of_possible_actions=4,
+            epsilon=0.5)
 
     def test_should_raise_error_when_epsilon_is_missing(self):
         with pytest.raises(KeyError):

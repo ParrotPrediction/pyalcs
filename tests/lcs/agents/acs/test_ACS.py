@@ -8,7 +8,7 @@ class TestACS:
 
     @pytest.fixture
     def cfg(self):
-        return Configuration(4, 4)
+        return Configuration(classifier_length=4, number_of_possible_actions=4)
 
     def test_should_build_initial_population(self, cfg):
         agent = ACS(cfg)

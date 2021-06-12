@@ -8,7 +8,10 @@ class TestYACS:
 
     @pytest.fixture
     def cfg(self):
-        return Configuration(2, 2, feature_possible_values=[2, 2])
+        return Configuration(
+            classifier_length=2,
+            number_of_possible_actions=2,
+            feature_possible_values=[2, 2])
 
     @pytest.fixture
     def agent(self, cfg):

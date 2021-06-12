@@ -9,7 +9,9 @@ class TestClassifier:
 
     @pytest.fixture
     def cfg(self):
-        return Configuration(8, 8)
+        return Configuration(
+            classifier_length=8,
+            number_of_possible_actions=8)
 
     @pytest.mark.parametrize("_c1, _a1, _e1, _c2, _a2, _e2, _result", [
         # Similar classifiers - everything the same

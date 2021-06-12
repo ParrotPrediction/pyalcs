@@ -28,32 +28,48 @@ class ClassifierTrace(Enum):
 
 
 class Configuration:
-    def __init__(self,
-                 classifier_length: int,
-                 number_of_possible_actions: int,
-                 feature_possible_values: list,
-                 environment_adapter=EnvironmentAdapter,
-                 trace_length: int = 5,
-                 learning_rate: float = 0.1,
-                 discount_factor: float = 0.9,
-                 estimate_expected_improvements: bool = True,
-                 metrics_trial_frequency: int = 5,
-                 model_checkpoint_frequency: int = None,
-                 user_metrics_collector_fcn: Callable = None,
-                 use_mlflow: bool = False):
-        assert classifier_length == len(feature_possible_values)
-        self.classifier_length = classifier_length
-        self.number_of_possible_actions = number_of_possible_actions
-        self.feature_possible_values = feature_possible_values
-        self.environment_adapter = environment_adapter
-        self.trace_length = trace_length
-        self.beta = learning_rate
-        self.gamma = discount_factor
-        self.estimate_expected_improvements = estimate_expected_improvements
-        self.metrics_trial_frequency = metrics_trial_frequency
-        self.model_checkpoint_freq = model_checkpoint_frequency
-        self.user_metrics_collector_fcn = user_metrics_collector_fcn
-        self.use_mlflow = use_mlflow
+    def __init__(self, **kwargs):
+        # length of the classifier
+        self.classifier_length: int = kwargs.get('classifier_length')
+
+        # number of possible actions
+        self.number_of_possible_actions: int = kwargs.get(
+            'number_of_possible_actions')
+
+        self.feature_possible_values: list = kwargs.get(
+            'feature_possible_values')
+
+        self.environment_adapter: EnvironmentAdapter = kwargs.get(
+            'environment_adapter', EnvironmentAdapter())
+
+        self.trace_length: int = kwargs.get('trace_length', 5)
+
+        # learning rate
+        self.beta: float = kwargs.get('beta', 0.1)
+
+        # discount factor
+        self.gamma: float = kwargs.get('gamma', 0.9)
+
+        # whether to estimate the expected improvement of each attribute
+        self.estimate_expected_improvements: bool = kwargs.get(
+            'estimate_expected_improvements', True)
+
+        # frequency of collecting metrics
+        self.metrics_trial_frequency: int = kwargs.get(
+            'metrics_trial_frequency', 1)
+
+        # custom function for collecting customized metrics
+        self.user_metrics_collector_fcn: Optional[Callable] = kwargs.get(
+            'user_metrics_collector_fcn', None)
+
+        # whether to use mlflow
+        self.use_mlflow: bool = kwargs.get('use_mlflow', False)
+
+        # how often dump model object with mlflow
+        self.model_checkpoint_freq: Optional[int] = kwargs.get(
+            'model_checkpoint_frequency', None)
+
+        assert self.classifier_length == len(self.feature_possible_values)
 
 
 class Condition(ImmutableSequence):
@@ -538,7 +554,8 @@ class YACS(Agent):
                 logging.debug("FOUND REWARD")
 
             prev_state = state
-            state = Perception(self.cfg.environment_adapter.to_genotype(raw_state))
+            state = Perception(
+                self.cfg.environment_adapter.to_genotype(raw_state))
 
             match_set = self.population.form_match_set(prev_state)
             action_set = match_set.form_action_set(action)

@@ -5,7 +5,7 @@ from lcs import Perception
 from lcs.agents.Agent import TrialMetrics
 from lcs.strategies.action_planning.action_planning import \
     search_goal_sequence, suitable_cl_exists
-from lcs.strategies.action_selection import BestAction
+from lcs.strategies.action_selection.BestAction import BestAction
 from . import ClassifiersList, Configuration
 from ...agents import Agent
 
@@ -161,8 +161,7 @@ class ACS2(Agent):
                     self.cfg.gamma)
 
             # Here when exploiting always choose best action
-            action = BestAction(
-                all_actions=self.cfg.number_of_possible_actions)(match_set)
+            action = BestAction(all_actions=self.cfg.number_of_possible_actions)(match_set)
             iaction = self.cfg.environment_adapter.to_env_action(action)
             action_set = match_set.form_action_set(action)
 

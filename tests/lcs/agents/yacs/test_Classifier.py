@@ -7,7 +7,10 @@ class TestClassifier:
 
     @pytest.fixture
     def cfg(self):
-        return Configuration(2, 2, feature_possible_values=[2, 2])
+        return Configuration(
+            classifier_length=2,
+            number_of_possible_actions=2,
+            feature_possible_values=[2, 2])
 
     def test_should_add_to_trace(self, cfg):
         cls = Classifier(cfg=cfg)

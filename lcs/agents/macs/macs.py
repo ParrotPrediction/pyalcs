@@ -172,12 +172,13 @@ class Condition(ImmutableSequence):
 
         return False
 
+
 class Effect(ImmutableSequence):
     WILDCARD = '?'  # don't know symbol - matches any value
 
     @staticmethod
     def generate(p: Perception) -> Generator[Effect]:
-        blank = [Effect.WILDCARD for k in p]
+        blank = [Effect.WILDCARD for _ in p]
         for i, F in enumerate(p):
             w = blank[:]
             w[i] = F
@@ -404,7 +405,7 @@ class LatentLearning:
                 condition=new_c,
                 action=cl.action,
                 effect=Effect(cl.effect),
-                debug={'origin': cl.debug["origin"] + '/mutspec'},
+                debug={'origin': 'mutspec'},
                 cfg=cl.cfg
             )
 
@@ -469,7 +470,7 @@ class LatentLearning:
                     condition=new_cond,
                     action=cl.action,
                     effect=Effect(cl.effect),
-                    debug={'origin': cl.debug["origin"] + '/set_c'},
+                    debug={'origin': 'set_c'},
                     cfg=cl.cfg
                 )
 

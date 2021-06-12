@@ -3,7 +3,7 @@ import random
 import lcs.agents.acs as acs
 import lcs.agents.acs2 as acs2
 import lcs.agents.xcs as xcs
-from lcs.strategies.action_selection.RandomAction import RandomAction
+import numpy as np
 
 
 class BestAction:
@@ -38,7 +38,7 @@ class BestAction:
                 return best_classifier.action
 
         # If there is no classifier - return random action
-        return RandomAction(all_actions=self.all_actions)(population)
+        return np.random.randint(self.all_actions)
 
     def _handle_best_action_for_xcs(self, population) -> int:
         best_classifier = max(population, key=lambda cl: cl.fitness)

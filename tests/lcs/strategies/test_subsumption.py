@@ -32,7 +32,9 @@ class TestSubsumption:
 
     @pytest.fixture
     def acs2_cfg(self):
-        return acs2.Configuration(8, 8)
+        return acs2.Configuration(
+            classifier_length=8,
+            number_of_possible_actions=8)
 
     @pytest.fixture
     def racs_cfg(self):
@@ -238,8 +240,7 @@ class TestSubsumption:
         assert subsumers[0] == most_general
 
     def test_should_randomly_select_one_of_equally_general_subsumers(
-            self, acs2_cfg):
-
+        self, acs2_cfg):
         # given
         subsumer1 = acs2.Classifier(condition='1##0####',
                                     action=3,
@@ -283,7 +284,7 @@ class TestSubsumption:
         (15, .92, False),  # not experienced enough
     ])
     def test_should_distinguish_classifier_as_subsumer(
-            self, _exp, _q, _is_subsumer, acs2_cfg):
+        self, _exp, _q, _is_subsumer, acs2_cfg):
         # given
         cl = acs2.Classifier(experience=_exp, quality=_q, cfg=acs2_cfg)
 
@@ -292,7 +293,7 @@ class TestSubsumption:
         assert is_subsumer(cl, acs2_cfg.theta_exp) is _is_subsumer
 
     def test_should_not_distinguish_marked_classifier_as_subsumer(
-            self, acs2_cfg):
+        self, acs2_cfg):
         # given
         # Now check if the fact that classifier is marked will block
         # it from being considered as a subsumer
@@ -319,8 +320,7 @@ class TestSubsumption:
     def test_should_subsume_another_classifier(
         self, _cl1c, _cl1a, _cl1e, _cl1q, _cl1r, _cl1exp,
         _cl2c, _cl2a, _cl2e, _cl2q, _cl2r, _cl2exp,
-            _result, acs2_cfg):
-
+        _result, acs2_cfg):
         # given
         cl = acs2.Classifier(condition=_cl1c, action=_cl1a, effect=_cl1e,
                              quality=_cl1q, reward=_cl1r,

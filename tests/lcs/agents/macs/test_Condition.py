@@ -81,10 +81,10 @@ class TestCondition:
         assert conditions == list(map(Condition, _res))
 
     @pytest.mark.parametrize('_c, _eis, _res', [
-        ('####', [0.2, 0.3, 0.5, 0.4], 2),
-        ('##1#', [0.2, 0.3, 0.5, 0.4], 3),
-        ('1###', [0.5, 0.5, 0.5, 0.5], 1),
-        ('1111', [0.2, 0.3, 0.5, 0.4], None),
+        ('####', [0.2, 0.3, 0.5, 0.4], [2]),
+        ('##1#', [0.2, 0.3, 0.5, 0.4], []),
+        ('1###', [0.5, 0.5, 0.5, 0.5], [1]),
+        ('1111', [0.2, 0.3, 0.5, 0.4], []),
     ])
     def test_should_return_index_to_specialize(self, _c, _eis, _res):
         # given

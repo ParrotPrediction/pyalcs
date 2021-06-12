@@ -10,7 +10,10 @@ class TestActionPlanning:
 
     @pytest.fixture
     def cfg(self):
-        return Configuration(8, 8, theta_r=0.9)
+        return Configuration(
+            classifier_length=8,
+            number_of_possible_actions=8,
+            theta_r=0.9)
 
     def test_should_find_suitable_classifier(self, cfg):
         # given

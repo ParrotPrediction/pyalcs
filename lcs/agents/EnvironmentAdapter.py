@@ -16,32 +16,28 @@ class EnvironmentAdapter:
     for a specific environment.
     """
 
-    @classmethod
-    def to_lcs_action(cls, env_action):
+    def to_lcs_action(self, env_action):
         """
         Converts environment representation of an action to LCS
         representation.
         """
         return env_action
 
-    @classmethod
-    def to_genotype(cls, phenotype):
+    def to_genotype(self, phenotype):
         """
         Converts environment representation of a state to LCS
         representation.
         """
         return phenotype
 
-    @classmethod
-    def to_env_action(cls, lcs_action):
+    def to_env_action(self, lcs_action):
         """
         Converts LCS representation of an action to environment
         representation.
         """
         return lcs_action
 
-    @classmethod
-    def to_phenotype(cls, genotype):
+    def to_phenotype(self, genotype):
         """
         Converts LCS representation of a state to environment
         representation.
