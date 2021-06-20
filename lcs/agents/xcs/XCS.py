@@ -61,7 +61,6 @@ class XCS(Agent):
 
         while not done:
             assert len(self.population) == len(set(self.population)), 'duplicates found'
-            self.population.delete_from_population()
             # We are in t+1 here
             action_set, prediction_array, action = self._form_sets_and_choose_action(state)
             # apply action to environment

@@ -30,6 +30,5 @@ class Classifier(xcs.Classifier):
 
     def __str__(self):
         return f"Cond:{self.condition} - Act:{self.action} - effect:{self.effect} - Num:{self.numerosity} " + \
-            f"[fit: {self.fitness:.3f}, exp: {self.experience:3.2f}, pred: {self.prediction:2.3f}, error:{self.error}]" + \
-            f"acc: {self.accuracy}"
+            f"[fit: {self.fitness:.3f}, exp: {self.experience:3.2f}, pred: {self.prediction:2.3f}, error:{self.error:.2f}]"
 

@@ -46,14 +46,10 @@ class ClassifiersList(TypedList):
         self.delete_from_population()
         return cl
 
-    # Roulette-Wheel Deletion
-    # TODO: use strategies
     def delete_from_population(self):
         # TODO: change while to if
-        # there are places where more than one rule enters the population
-        # to remedy it I just made deletion run until it cleared all of them
-        # proffered method should be running it once, ideally inside
-        # insert_into_population
+        # During woods the number of rules grew over max number
+        # To remedy this I added while instead of if. Correct issue should be changed.
         while self.numerosity > self.cfg.max_population:
             average_fitness = sum(cl.fitness for cl in self) / self.numerosity
             deletion_votes = []
@@ -147,9 +143,9 @@ class ClassifiersList(TypedList):
             if cl.error < self.cfg.epsilon_0:
                 tmp_acc = 1
             else:
-                tmp_acc = (pow(self.cfg.alpha * (cl.error * self.cfg.epsilon_0), -self.cfg.v))
+                tmp_acc = (pow(self.cfg.alpha * (cl.error * self.cfg.epsilon_0), - self.cfg.v))
             accuracy_vector_k.append(tmp_acc)
-            accuracy_sum += tmp_acc + cl.numerosity
+            accuracy_sum += tmp_acc * cl.numerosity
         for cl, k in zip(self, accuracy_vector_k):
             cl.fitness += (
                 self.cfg.learning_rate *
