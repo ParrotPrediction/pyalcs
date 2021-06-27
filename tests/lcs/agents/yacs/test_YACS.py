@@ -11,7 +11,7 @@ class TestYACS:
         return Configuration(
             classifier_length=2,
             number_of_possible_actions=2,
-            feature_possible_values=[2, 2])
+            feature_possible_values=[{'0', '1'}, {'0', '1'}])
 
     @pytest.fixture
     def agent(self, cfg):

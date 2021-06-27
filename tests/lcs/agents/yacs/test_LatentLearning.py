@@ -17,7 +17,7 @@ class TestLatentLearning:
         return Configuration(classifier_length=4,
                              number_of_possible_actions=2,
                              trace_length=5,
-                             feature_possible_values=[2, 2, 2, 2])
+                             feature_possible_values=[{0, 1}] * 4)
 
     @pytest.fixture
     def ll(self, cfg):

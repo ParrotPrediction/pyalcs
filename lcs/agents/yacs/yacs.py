@@ -442,7 +442,7 @@ class LatentLearning:
         Classifier]:
         assert type(cl.condition[feature_idx]) == DontCare
 
-        for feature in range(self.cfg.feature_possible_values[feature_idx]):
+        for feature in self.cfg.feature_possible_values[feature_idx]:
             # Build condition
             new_c = Condition(cl.condition)
             new_c[feature_idx] = str(feature)
@@ -522,8 +522,8 @@ class YACS(Agent):
     def remember_situation(self, p: Perception):
         assert len(p) == self.cfg.classifier_length
 
-        for f_max, _p in zip(self.cfg.feature_possible_values, p):
-            assert int(_p) in range(0, f_max)
+        for allowed, _p in zip(self.cfg.feature_possible_values, p):
+            assert _p in allowed, f'value {_p} not allowed'
 
         if p not in self.desirability_values:
             self.desirability_values[p] = 0.0
@@ -587,7 +587,7 @@ class YACS(Agent):
         steps = 0
         last_reward = 0
         raw_state = env.reset()
-        state = Perception(raw_state)
+        state = Perception(self.cfg.environment_adapter.to_genotype(raw_state))
         done = False
 
         while not done:
@@ -609,12 +609,17 @@ class YACS(Agent):
             if last_reward > 0:
                 logging.debug("FOUND REWARD")
 
-            state = Perception(raw_state)
+            state = Perception(
+                self.cfg.environment_adapter.to_genotype(raw_state))
             steps += 1
 
         return TrialMetrics(steps, last_reward)
 
 
 if __name__ == '__main__':
-    cfg = Configuration(4, 2, feature_possible_values=[2, 2, 2, 2])
+    cfg = Configuration(
+        classifier_length=4,
+        number_of_possible_actions=2,
+        feature_possible_values=[{0, 1}, {0, 1}, {0, 1}, {0, 1}])
+
     agent = YACS(cfg)
