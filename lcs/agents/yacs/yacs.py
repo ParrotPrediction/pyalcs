@@ -491,13 +491,18 @@ class PolicyLearning:
                       match_set: ClassifiersList,
                       desirability_values: Dict[Perception, float],
                       obs: Perception) -> int:
+
         def quality(cl: Classifier):
             anticipated_obs = cl.anticipation(obs)
             return cl.r + self.cfg.gamma * desirability_values.get(
                 anticipated_obs, 0.0)
 
+        if len(match_set) == 0:
+            return random.randint(0, self.cfg.number_of_possible_actions - 1)
+
         selected_cl = max(match_set, key=quality)
-        # print(f"\t{selected_cl}")
+        assert selected_cl.does_match(obs)
+
         return selected_cl.action
 
 
