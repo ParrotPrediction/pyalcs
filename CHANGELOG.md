@@ -1,3 +1,9 @@
+## 2.0.2 (2021-10-25)
+
+### Fix
+
+- agent trial numbering starts from 1 (not 0)
+
 ## 2.0.1 (2021-10-25)
 
 ### Fix
