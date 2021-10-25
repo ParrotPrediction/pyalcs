@@ -1,7 +1,5 @@
 from typing import Callable, Optional
 
-from lcs.agents import EnvironmentAdapter
-
 
 class Configuration(object):
 
@@ -19,10 +17,6 @@ class Configuration(object):
 
         # wildcard symbol
         self.classifier_wildcard: str = kwargs.get('classifier_wildcard', '#')
-
-        # adapter parsing environmental observation and actions
-        self.environment_adapter: EnvironmentAdapter = kwargs.get(
-            'environment_adapter', EnvironmentAdapter())
 
         # how often metric are collected
         self.metrics_trial_frequency: int = kwargs.get(

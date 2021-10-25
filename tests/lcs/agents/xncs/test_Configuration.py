@@ -1,9 +1,7 @@
-import pytest
-
 from lcs.agents.xncs import Configuration
 
-class TestEffect:
 
+class TestEffect:
     def test_init(self):
         cfg = Configuration(2, 3, 4)
         assert cfg.lmc == 3

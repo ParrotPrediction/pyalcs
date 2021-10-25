@@ -1,14 +1,10 @@
-import numpy as np
 from typing import Callable
-
-from lcs.agents import EnvironmentAdapter
 
 
 class Configuration(object):
     def __init__(self,
                  number_of_actions: int,  # theta_mna it is actually smart to make it equal to number of actions
                  classifier_wildcard: str = '#',
-                 environment_adapter=EnvironmentAdapter,
                  max_population: int = 200,  # n
                  learning_rate: float = 0.1,  # beta
                  alpha: float = 0.1,
@@ -29,8 +25,9 @@ class Configuration(object):
                  do_ga_subsumption: bool = False,
                  do_action_set_subsumption: bool = False,
                  metrics_trial_frequency: int = 5,
-                 user_metrics_collector_fcn: Callable = None
-                 ) -> None:
+                 user_metrics_collector_fcn: Callable = None,
+                 use_mlflow: bool = False,
+                 model_checkpoint_freq: int = 50) -> None:
         """
         :param classifier_wildcard: Wildcard symbol
         :param max_population: maximum size of the population
@@ -55,7 +52,6 @@ class Configuration(object):
         :param do_action_set_subsumption: specifies if action sets are to be tested for subsuming classifiers
         """
         self.classifier_wildcard = classifier_wildcard
-        self.environment_adapter = environment_adapter
         self.max_population = max_population
         self.learning_rate = learning_rate
         self.alpha = alpha
@@ -76,9 +72,10 @@ class Configuration(object):
         self.number_of_actions = number_of_actions
         self.do_GA_subsumption = do_ga_subsumption
         self.do_action_set_subsumption = do_action_set_subsumption
-
         self.metrics_trial_frequency = metrics_trial_frequency
         self.user_metrics_collector_fcn = user_metrics_collector_fcn
+        self.use_mlflow = use_mlflow
+        self.model_checkpoint_freq = model_checkpoint_freq
 
     def __str__(self) -> str:
         return str(vars(self))

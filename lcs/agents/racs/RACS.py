@@ -43,8 +43,7 @@ class RACS(Agent):
 
         # Initial conditions
         steps = 0
-        raw_state = env.reset()
-        state = self.cfg.environment_adapter.to_genotype(raw_state)
+        state = env.reset()
 
         action = env.action_space.sample()
         reward = 0
@@ -97,9 +96,8 @@ class RACS(Agent):
             action_set = match_set.form_action_set(action)
 
             prev_state = state
-            iaction = self.cfg.environment_adapter.to_lcs_action(action)
-            raw_state, reward, done, _ = env.step(iaction)
-            state = self.cfg.environment_adapter.to_genotype(raw_state)
+            raw_state, reward, done, _ = env.step(action)
+            state = raw_state
 
             if done:
                 ClassifierList.apply_alp(
@@ -140,8 +138,7 @@ class RACS(Agent):
         logger.debug("** Running trial exploit **")
 
         steps = 0
-        raw_state = env.reset()
-        state = self.cfg.environment_adapter.to_genotype(raw_state)
+        state = env.reset()
 
         reward = 0
         action_set = ClassifierList()
@@ -164,11 +161,9 @@ class RACS(Agent):
                 self.cfg.number_of_possible_actions,
                 epsilon=0.0,
                 biased_exploration_prob=0.0)
-            iaction = self.cfg.environment_adapter.to_lcs_action(action)
             action_set = match_set.form_action_set(action)
 
-            raw_state, reward, done, _ = env.step(iaction)
-            state = self.cfg.environment_adapter.to_genotype(raw_state)
+            state, reward, done, _ = env.step(action)
 
             if done:
                 ClassifierList.apply_reinforcement_learning(

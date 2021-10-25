@@ -1,13 +1,12 @@
 import logging
 import random
 
+import lcs.agents.acs.alp as alp
+import lcs.strategies.reinforcement_learning as rl
 from lcs import Perception
 from lcs.agents import Agent
 from lcs.agents.Agent import TrialMetrics
 from lcs.agents.acs import ClassifiersList, Configuration, Classifier
-
-import lcs.agents.acs.alp as alp
-import lcs.strategies.reinforcement_learning as rl
 
 logger = logging.getLogger(__name__)
 
@@ -30,8 +29,7 @@ class ACS(Agent):
         logger.debug("** Running trial explore ** ")
         # Initial conditions
         steps = 0
-        raw_state = env.reset()
-        state = self.cfg.environment_adapter.to_genotype(raw_state)
+        state = env.reset()
         action = env.action_space.sample()
         last_reward = 0
         prev_state = Perception.empty()
@@ -62,15 +60,12 @@ class ACS(Agent):
                 selected_cl = self._best_cl(match_set)
 
             action = selected_cl.action
-            iaction = self.cfg.environment_adapter.to_lcs_action(action)
             logger.debug("\tExecuting action: [%d]", action)
 
             prev_state = Perception(state)
 
-            raw_state, last_reward, done, _ = env.step(iaction)
-
-            state = self.cfg.environment_adapter.to_genotype(raw_state)
-            state = Perception(state)
+            raw_state, last_reward, done, _ = env.step(action)
+            state = Perception(raw_state)
 
             if done:
                 alp.apply(prev_state,
@@ -91,8 +86,7 @@ class ACS(Agent):
         logger.debug("** Running trial exploit **")
         # Initial conditions
         steps = 0
-        raw_state = env.reset()
-        state = self.cfg.environment_adapter.to_genotype(raw_state)
+        state = env.reset()
         action = env.action_space.sample()
         last_reward = 0
         prev_state = Perception.empty()
@@ -106,12 +100,10 @@ class ACS(Agent):
 
             selected_cl = self._best_cl(match_set)
             action = selected_cl.action
-            iaction = self.cfg.environment_adapter.to_lcs_action(action)
             logger.debug("\tExecuting action: [%d]", action)
 
-            raw_state, last_reward, done, _ = env.step(iaction)
-            state = self.cfg.environment_adapter.to_genotype(raw_state)
-            state = Perception(state)
+            raw_state, last_reward, done, _ = env.step(action)
+            state = Perception(raw_state)
             steps += 1
 
         return TrialMetrics(steps, last_reward)

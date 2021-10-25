@@ -32,8 +32,7 @@ class ACS2(Agent):
         logger.debug("** Running trial explore ** ")
         # Initial conditions
         steps = 0
-        raw_state = env.reset()
-        state = self.cfg.environment_adapter.to_genotype(raw_state)
+        state = env.reset()
         action = env.action_space.sample()
         last_reward = 0
         prev_state = Perception.empty()
@@ -90,15 +89,12 @@ class ACS2(Agent):
                         self.cfg.theta_exp)
 
             action = self.cfg.action_selector(match_set)
-            iaction = self.cfg.environment_adapter.to_lcs_action(action)
             logger.debug("\tExecuting action: [%d]", action)
             action_set = match_set.form_action_set(action)
 
             prev_state = Perception(state)
-            raw_state, last_reward, done, _ = env.step(iaction)
-
-            state = self.cfg.environment_adapter.to_genotype(raw_state)
-            state = Perception(state)
+            raw_state, last_reward, done, _ = env.step(action)
+            state = Perception(raw_state)
 
             if done:
                 ClassifiersList.apply_alp(
@@ -141,9 +137,7 @@ class ACS2(Agent):
         logger.debug("** Running trial exploit **")
         # Initial conditions
         steps = 0
-        raw_state = env.reset()
-        state = self.cfg.environment_adapter.to_genotype(raw_state)
-        state = Perception(state)
+        state = Perception(env.reset())
 
         last_reward = 0
         action_set = ClassifiersList()
@@ -162,11 +156,9 @@ class ACS2(Agent):
 
             # Here when exploiting always choose best action
             action = BestAction(all_actions=self.cfg.number_of_possible_actions)(match_set)
-            iaction = self.cfg.environment_adapter.to_env_action(action)
             action_set = match_set.form_action_set(action)
 
-            raw_state, last_reward, done, _ = env.step(iaction)
-            state = self.cfg.environment_adapter.to_genotype(raw_state)
+            state, last_reward, done, _ = env.step(action)
             state = Perception(state)
 
             if done:
@@ -227,8 +219,7 @@ class ACS2(Agent):
         done = False
 
         while not done:
-            goal_situation = self.cfg.environment_adapter.to_genotype(
-                env.env.get_goal_state())
+            goal_situation = env.env.get_goal_state()
 
             if goal_situation is None:
                 break
@@ -278,12 +269,8 @@ class ACS2(Agent):
                 action = act
                 action_set = ClassifiersList.form_action_set(match_set, action)
 
-                iaction = self.cfg.environment_adapter.to_lcs_action(action)
-
-                raw_state, last_reward, done, _ = env.step(iaction)
                 prev_state = state
-
-                state = self.cfg.environment_adapter.to_genotype(raw_state)
+                state, last_reward, done, _ = env.step(action)
                 state = Perception(state)
 
                 if not suitable_cl_exists(action_set, prev_state,

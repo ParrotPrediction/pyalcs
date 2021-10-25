@@ -1,6 +1,5 @@
 from typing import Callable
 
-from lcs.agents import EnvironmentAdapter
 from lcs.representations import UBR
 
 
@@ -9,7 +8,6 @@ class Configuration:
                  classifier_length: int,
                  number_of_possible_actions: int,
                  encoder=None,
-                 environment_adapter=EnvironmentAdapter,
                  user_metrics_collector_fcn: Callable = None,
                  metrics_trial_frequency: int = 5,
                  do_ga: bool = False,
@@ -38,8 +36,6 @@ class Configuration:
         self.classifier_length = classifier_length
         self.number_of_possible_actions = number_of_possible_actions
         self.classifier_wildcard = UBR(*self.encoder.range)
-
-        self.environment_adapter = environment_adapter
 
         self.metrics_trial_frequency = metrics_trial_frequency
         self.user_metrics_collector_fcn = user_metrics_collector_fcn

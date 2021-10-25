@@ -9,7 +9,7 @@ from itertools import groupby
 from typing import Union, Optional, Generator, List, Dict, Callable
 
 from lcs import TypedList, Perception
-from lcs.agents import ImmutableSequence, Agent, EnvironmentAdapter
+from lcs.agents import ImmutableSequence, Agent
 from lcs.agents.Agent import TrialMetrics
 
 
@@ -38,9 +38,6 @@ class Configuration:
 
         self.feature_possible_values: list = kwargs.get(
             'feature_possible_values')
-
-        self.environment_adapter: EnvironmentAdapter = kwargs.get(
-            'environment_adapter', EnvironmentAdapter())
 
         self.trace_length: int = kwargs.get('trace_length', 5)
 
@@ -435,8 +432,8 @@ class LatentLearning:
             feature_idx = random.choice(
                 [idx for idx, val in enumerate(summed_eis) if val is not None])
 
-        for cl in pop:
-            yield from self.mutspec(cl, feature_idx)
+            for cl in pop:
+                yield from self.mutspec(cl, feature_idx)
 
     def mutspec(self, cl: Classifier, feature_idx: int) -> Generator[
         Classifier]:
@@ -540,7 +537,7 @@ class YACS(Agent):
         steps = 0
         last_reward = 0
         raw_state = env.reset()
-        state = Perception(self.cfg.environment_adapter.to_genotype(raw_state))
+        state = Perception(raw_state)
 
         done = False
 
@@ -559,8 +556,7 @@ class YACS(Agent):
                 logging.debug("FOUND REWARD")
 
             prev_state = state
-            state = Perception(
-                self.cfg.environment_adapter.to_genotype(raw_state))
+            state = Perception(raw_state)
 
             match_set = self.population.form_match_set(prev_state)
             action_set = match_set.form_action_set(action)
@@ -592,7 +588,7 @@ class YACS(Agent):
         steps = 0
         last_reward = 0
         raw_state = env.reset()
-        state = Perception(self.cfg.environment_adapter.to_genotype(raw_state))
+        state = Perception(raw_state)
         done = False
 
         while not done:
@@ -614,8 +610,7 @@ class YACS(Agent):
             if last_reward > 0:
                 logging.debug("FOUND REWARD")
 
-            state = Perception(
-                self.cfg.environment_adapter.to_genotype(raw_state))
+            state = Perception(raw_state)
             steps += 1
 
         return TrialMetrics(steps, last_reward)

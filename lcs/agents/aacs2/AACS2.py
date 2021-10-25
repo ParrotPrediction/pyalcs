@@ -5,7 +5,8 @@ import numpy as np
 from lcs import Perception
 from lcs.agents.Agent import TrialMetrics
 from lcs.agents.acs2 import ClassifiersList
-from lcs.strategies.action_selection import BestAction, RandomAction
+from lcs.strategies.action_selection.BestAction import BestAction
+from lcs.strategies.action_selection.RandomAction import RandomAction
 from . import Configuration
 from ...agents import Agent
 
@@ -34,8 +35,7 @@ class AACS2(Agent):
         logger.debug("** Running trial explore ** ")
         # Initial conditions
         steps = 0
-        raw_state = env.reset()
-        state = self.cfg.environment_adapter.to_genotype(raw_state)
+        state = env.reset()
         action = env.action_space.sample()
         last_reward = 0
         prev_state = Perception.empty()
@@ -82,16 +82,13 @@ class AACS2(Agent):
                         self.cfg.theta_exp)
 
             action, was_greedy = self._epsilon_greedy(match_set)
-            iaction = self.cfg.environment_adapter.to_lcs_action(action)
             logger.debug("\tExecuting action: [%d]", action)
             action_set = match_set.form_action_set(action)
 
             prev_state = Perception(state)
             prev_M_best_fitness = match_set.get_maximum_fitness()
 
-            raw_state, last_reward, done, _ = env.step(iaction)
-
-            state = self.cfg.environment_adapter.to_genotype(raw_state)
+            state, last_reward, done, _ = env.step(action)
             state = Perception(state)
 
             if done:
@@ -135,9 +132,7 @@ class AACS2(Agent):
         logger.debug("** Running trial exploit **")
         # Initial conditions
         steps = 0
-        raw_state = env.reset()
-        state = self.cfg.environment_adapter.to_genotype(raw_state)
-        state = Perception(state)
+        state = Perception(env.reset())
 
         last_reward = 0
         action_set = ClassifiersList()
@@ -159,13 +154,11 @@ class AACS2(Agent):
             # Here when exploiting always choose best action
             action = BestAction(
                 all_actions=self.cfg.number_of_possible_actions)(match_set)
-            iaction = self.cfg.environment_adapter.to_env_action(action)
             action_set = match_set.form_action_set(action)
 
             prev_M_best_fitness = match_set.get_maximum_fitness()
 
-            raw_state, last_reward, done, _ = env.step(iaction)
-            state = self.cfg.environment_adapter.to_genotype(raw_state)
+            state, last_reward, done, _ = env.step(action)
             state = Perception(state)
 
             if done:

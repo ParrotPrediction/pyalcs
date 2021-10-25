@@ -2,7 +2,6 @@ import numpy as np
 from typing import Callable
 
 import lcs.agents.xcs as xcs
-from lcs.agents import EnvironmentAdapter
 
 
 class Configuration(xcs.Configuration):
@@ -12,7 +11,6 @@ class Configuration(xcs.Configuration):
                  lmc: int = 100,
                  lem: float = 1,
                  classifier_wildcard: str = '#',
-                 environment_adapter=EnvironmentAdapter,
                  max_population: int = 200,  # n
                  learning_rate: float = 0.1,  # beta
                  alpha: float = 0.1,
@@ -38,7 +36,6 @@ class Configuration(xcs.Configuration):
         self.lmc = lmc
         self.lem = lem
         self.classifier_wildcard = classifier_wildcard
-        self.environment_adapter = environment_adapter
         self.max_population = max_population
         self.learning_rate = learning_rate
         self.alpha = alpha

@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 import random
 import logging
@@ -127,6 +129,9 @@ class ClassifiersList(TypedList):
                 cl.action_set_size += \
                     self.cfg.learning_rate * (action_set_numerosity - cl.action_set_size)
         self._update_fitness()
+
+    def get_best_classifier(self) -> Optional[Classifier]:
+        return max(self, key=lambda cl: cl.fitness)
 
     def _update_fitness(self):
         accuracy_sum = 0
