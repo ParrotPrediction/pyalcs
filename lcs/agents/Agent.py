@@ -123,11 +123,11 @@ class Agent:
         """
         using_mlflow = hasattr(self.get_cfg(), 'use_mlflow') and self.get_cfg().use_mlflow
 
-        current_trial = 0
+        current_trial = 1
         steps = 0
 
         metrics: List = []
-        while current_trial < n_trials:
+        while current_trial <= n_trials:
             start_ts = timer()
             steps_in_trial, reward = func(env, steps, current_trial)
             end_ts = timer()
