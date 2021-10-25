@@ -1,3 +1,9 @@
+## 2.0.1 (2021-10-25)
+
+### Fix
+
+- **yacs**: prevention iterating empty expected improvements when specializing condition
+
 ## 2.0.0 (2021-10-25)
 
 ### Fix

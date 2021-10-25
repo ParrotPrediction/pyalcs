@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 testing_requires = [
-    'twine>=2.0.0',
+    'twine>=2.0.1',
     'pytest>=5.2',
     'pytest-cov==2.11.1',
     'pytest-mock==3.5.1',
@@ -21,7 +21,7 @@ docs_requires = [
 ]
 
 setup(name='pyalcs',
-      version='2.0.0',
+      version='2.0.1',
       description='Implementation of Anticipatory Learning Classifiers',
       keywords='acs lcs machine-learning reinforcement-learning openai',
       url='https://github.com/ParrotPrediction/pyalcs',
