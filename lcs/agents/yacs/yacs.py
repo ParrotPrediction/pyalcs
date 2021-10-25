@@ -424,13 +424,14 @@ class LatentLearning:
             if all(x[idx] is not None for x in eis):
                 summed_eis[idx] = sum(x[idx] for x in eis)
 
-        if self.cfg.estimate_expected_improvements:
-            feature_idx = max(
-                ((idx, val) for idx, val in enumerate(summed_eis) if
-                 val is not None), key=lambda x: x[1])[0]
-        else:
-            feature_idx = random.choice(
-                [idx for idx, val in enumerate(summed_eis) if val is not None])
+        if not all(val is None for val in summed_eis):
+            if self.cfg.estimate_expected_improvements:
+                feature_idx = max(
+                    ((idx, val) for idx, val in enumerate(summed_eis) if
+                     val is not None), key=lambda x: x[1])[0]
+            else:
+                feature_idx = random.choice(
+                    [idx for idx, val in enumerate(summed_eis) if val is not None])
 
             for cl in pop:
                 yield from self.mutspec(cl, feature_idx)
@@ -522,10 +523,11 @@ class YACS(Agent):
         return self.cfg
 
     def remember_situation(self, p: Perception):
-        assert len(p) == self.cfg.classifier_length
+        assert len(p) == self.cfg.classifier_length,\
+            f'Perception [{p}]'
 
         for allowed, _p in zip(self.cfg.feature_possible_values, p):
-            assert _p in allowed, f'value {_p} not allowed'
+            assert _p in allowed, f'value [{_p}] not allowed'
 
         if p not in self.desirability_values:
             self.desirability_values[p] = 0.0
