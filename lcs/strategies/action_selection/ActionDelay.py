@@ -21,8 +21,8 @@ class ActionDelay:
         assert 0 <= self.biased_exploration_prob <= 1
 
     def __call__(self, population) -> int:
-        if np.random.rand() < self.epsilon:
-            if np.random.rand() < self.biased_exploration_prob:
+        if np.random.uniform() < self.epsilon:
+            if np.random.uniform() < self.biased_exploration_prob:
                 # We are in biased exploration
                 if type(population) is acs.ClassifiersList:
                     raise NotImplementedError()

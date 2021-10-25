@@ -12,5 +12,7 @@ class EpsilonGreedy:
         assert 0 <= self.epsilon <= 1
 
     def __call__(self, population) -> int:
-        if np.random.rand() < self.epsilon:
+        if np.random.uniform() > self.epsilon:
+            return BestAction(all_actions=self.all_actions)(population)
+        else:
             return RandomAction(all_actions=self.all_actions)(population)
