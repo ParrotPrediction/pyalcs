@@ -222,3 +222,14 @@ class ClassifiersList(acs.ClassifiersList):
                                      gamma: float) -> None:
         for cl in action_set:
             rl.update_classifier(cl, reward, p, beta, gamma)
+
+    def get_best_classifier(self) -> Optional[Classifier]:
+        anticipated_change_cls = [cl for cl in self if
+                                  cl.does_anticipate_change()]
+
+        if len(anticipated_change_cls) > 0:
+            random.shuffle(anticipated_change_cls)
+            return max(anticipated_change_cls,
+                                  key=lambda cl: cl.fitness * cl.num)
+
+        return None

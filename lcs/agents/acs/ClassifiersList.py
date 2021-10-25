@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Optional
+
 from lcs import TypedList, Perception
 from lcs.agents.acs import Classifier
 
@@ -27,13 +29,16 @@ class ClassifiersList(TypedList):
             fitness value
         """
         anticipated_change_cls = [cl for cl in self
-                                  if cl.does_anticipate_change()]
+                                 if cl.does_anticipate_change()]
 
         if len(anticipated_change_cls) > 0:
             best_cl = max(anticipated_change_cls, key=lambda cl: cl.fitness)
             return best_cl.fitness
 
         return 0.0
+
+    def get_best_classifier(self) -> Optional[Classifier]:
+        return max(self, key=lambda cl: cl.fitness)
 
     def __str__(self):
         return "\n".join(str(classifier)

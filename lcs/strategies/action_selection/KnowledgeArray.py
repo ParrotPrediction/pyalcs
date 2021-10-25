@@ -20,12 +20,12 @@ class KnowledgeArray:
         self.all_actions = all_actions
         self.epsilon = kwargs['epsilon']
         self.biased_exploration_prob = kwargs['biased_exploration_prob']
-        assert 0 <= self.epsilon < 1
-        assert 0 <= self.biased_exploration_prob < 1
+        assert 0 <= self.epsilon <= 1
+        assert 0 <= self.biased_exploration_prob <= 1
 
     def __call__(self, population) -> int:
-        if np.random.rand() < self.epsilon:
-            if np.random.rand() < self.biased_exploration_prob:
+        if np.random.uniform() < self.epsilon:
+            if np.random.uniform() < self.biased_exploration_prob:
                 # We are in biased exploration
                 if type(population) is acs.ClassifiersList:
                     raise NotImplementedError()
