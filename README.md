@@ -5,6 +5,12 @@ Repository containing code implementation for various *Anticipatory Learning Cla
 
 The main advantage of *Learning Classifier Systems* with respect to other RL techniques it to afford generalization capabilities. This makes it possible to aggregate several situations within a common description so that the representation of the problem gets smaller.
 
+## Development
+```
+pip install -U commitizen
+
+```
+
 ## Agents
 
 ### ACS
