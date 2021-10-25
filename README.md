@@ -8,7 +8,7 @@ The main advantage of *Learning Classifier Systems* with respect to other RL tec
 ## Development
 ```
 pip install -U commitizen
-
+cz bump --check-consistency --changelog
 ```
 
 ## Agents
