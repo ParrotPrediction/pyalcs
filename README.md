@@ -9,7 +9,7 @@ The main advantage of *Learning Classifier Systems* with respect to other RL tec
 ```
 pip install -U commitizen
 cz bump --check-consistency --changelog
-git push --follow-tags origin
+git push origin --tags
 ```
 
 ## Agents
