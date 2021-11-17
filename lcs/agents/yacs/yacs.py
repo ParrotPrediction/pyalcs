@@ -599,11 +599,9 @@ class YACS(Agent):
             # Select an action
             match_set = self.population.form_match_set(state)
             if len(match_set) == 0:
-                logging.error(
-                    f"Unknown state [{state}] encountered. Please retrain the agent")
+                logging.error(f"Unknown state [{state}] encountered. Please retrain the agent")
 
-            action = self.pl.select_action(match_set, self.desirability_values,
-                                           state)
+            action = self.pl.select_action(match_set, self.desirability_values, state)
 
             # Act in environment
             logging.info(f"\tExecuting action {action}")
