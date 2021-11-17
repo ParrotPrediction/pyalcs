@@ -1,3 +1,9 @@
+## 3.0.0 (2021-11-17)
+
+### Refactor
+
+- **agent**: explore/exploit methods does not return population
+
 ## 2.0.2 (2021-10-25)
 
 ### Fix
