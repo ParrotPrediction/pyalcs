@@ -1,13 +1,12 @@
 import logging
+import tempfile
 from collections import namedtuple
 from timeit import default_timer as timer
 from typing import Callable, List, Tuple
 
-
 import dill
 import mlflow
 import numpy as np
-import tempfile
 
 from lcs.metrics import basic_metrics
 
@@ -31,7 +30,7 @@ class Agent:
     def get_cfg(self):
         raise NotImplementedError()
 
-    def explore(self, env, trials, decay: bool = False) -> Tuple:
+    def explore(self, env, trials, decay: bool = False) -> List:
         """
         Explores the environment in given set of trials.
 
@@ -51,7 +50,7 @@ class Agent:
         """
         return self._evaluate(env, trials, self._run_trial_explore, decay)
 
-    def exploit(self, env, trials) -> Tuple:
+    def exploit(self, env, trials) -> List:
         """
         Exploits the environments in given set of trials (always executing
         best possible action - no exploration).
@@ -70,7 +69,7 @@ class Agent:
         """
         return self._evaluate(env, trials, self._run_trial_exploit)
 
-    def explore_exploit(self, env, trials) -> Tuple:
+    def explore_exploit(self, env, trials) -> List:
         """
         Alternates between exploration and exploitation phases.
 
@@ -99,7 +98,7 @@ class Agent:
                   env,
                   n_trials: int,
                   func: Callable,
-                  decay: bool = False) -> Tuple:
+                  decay: bool = False) -> List:
         """
         Runs the classifier in desired strategy (see `func`) and collects
         metrics.
@@ -118,8 +117,8 @@ class Agent:
 
         Returns
         -------
-        tuple
-            population of classifiers and metrics
+        list
+            run metrics
         """
         using_mlflow = hasattr(self.get_cfg(), 'use_mlflow') and self.get_cfg().use_mlflow
 
@@ -158,9 +157,7 @@ class Agent:
                         pop_path = f"{td}/population.dill"
                         metrics_path = f"{td}/metrics.dill"
 
-                        dill.dump(self.get_population(),
-                                  open(pop_path, mode='wb'))
-
+                        dill.dump(self.get_population(), open(pop_path, mode='wb'))
                         dill.dump(metrics, open(metrics_path, mode='wb'))
 
                         if using_mlflow:
@@ -178,4 +175,4 @@ class Agent:
 
             current_trial += 1
 
-        return self.get_population(), metrics
+        return metrics
