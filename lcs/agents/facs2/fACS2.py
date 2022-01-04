@@ -27,8 +27,7 @@ class fACS2(Agent):
         logger.debug("** Running trial explore ** ")
         # Initial conditions
         steps = 0
-        raw_state = env.reset()
-        state = self.cfg.environment_adapter.to_genotype(raw_state)
+        state = env.reset()
         action = env.action_space.sample()
         last_reward = 0
         prev_state = Perception.empty()
@@ -37,8 +36,8 @@ class fACS2(Agent):
 
         while not done:
             state = Perception(state)
-            state_to_calculate = Perception(self.cfg.environment_adapter.change_state_type(state))
-            membership_func_values = self.cfg.environment_adapter.to_membership_function(state)
+            state_to_calculate = Perception(env.change_state_type(state))
+            membership_func_values = env.to_membership_function(state)
             match_set = self.population.form_match_set(membership_func_values)
 
             if steps > 0:
@@ -75,19 +74,17 @@ class fACS2(Agent):
                         self.cfg.theta_exp)
 
             if random.random() > self.cfg.epsilon:
-                action = self.select_action(match_set, membership_func_values)
+                action = self.select_action(env, match_set, membership_func_values)
             else:
                 action = random.choice(range(self.cfg.number_of_possible_actions))
 
-            iaction = self.cfg.environment_adapter.to_lcs_action(action)
             action_set = match_set.form_action_set(action)
 
             prev_state = Perception(state_to_calculate)
-            raw_state, last_reward, done, _ = env.step(iaction)
+            raw_state, last_reward, done, _ = env.step(action)
 
-            state = self.cfg.environment_adapter.to_genotype(raw_state)
-            state = Perception(state)
-            state_to_calculate = Perception(self.cfg.environment_adapter.change_state_type(state))
+            state = Perception(raw_state)
+            state_to_calculate = Perception(env.change_state_type(state))
 
             if done:
                 ClassifiersList.apply_alp(
@@ -130,9 +127,8 @@ class fACS2(Agent):
         logger.debug("** Running trial exploit **")
         # Initial conditions
         steps = 0
-        raw_state = env.reset()
-        state = self.cfg.environment_adapter.to_genotype(raw_state)
-        state = Perception(state)
+
+        state = Perception(env.reset())
 
         last_reward = 0
         action_set = ClassifiersList()
@@ -141,7 +137,7 @@ class fACS2(Agent):
         while not done:
             env.render()
             state = Perception(state)
-            membership_func_values = self.cfg.environment_adapter.to_membership_function(state)
+            membership_func_values = env.to_membership_function(state)
 
             match_set = self.population.form_match_set(membership_func_values)
 
@@ -154,14 +150,12 @@ class fACS2(Agent):
                     self.cfg.gamma)
 
             # Here when exploiting always choose best action
-            action = self.select_action(match_set, membership_func_values)
-            iaction = self.cfg.environment_adapter.to_env_action(action)
+            action = self.select_action(env, match_set, membership_func_values)
             action_set = match_set.form_action_set(action)
 
-            raw_state, last_reward, done, _ = env.step(iaction)
+            raw_state, last_reward, done, _ = env.step(action)
 
-            state = self.cfg.environment_adapter.to_genotype(raw_state)
-            state = Perception(state)
+            state = Perception(raw_state)
 
             if done:
                 ClassifiersList.apply_reinforcement_learning(
@@ -174,6 +168,25 @@ class fACS2(Agent):
     def calculate_min_value_for_each_clasifier(self,
                                                match_set,
                                                memberships_values):
+        """
+        Select min value from all memberships function values
+        where classifier had active rule.
+
+        Parameters
+        ----------
+        match_set
+            match set of classifiers
+        memberships_values
+            membership values for current environment state
+
+        Returns
+        -------
+        [[float, int]]
+            min values of membership for each classifier
+            and action of that classifier
+
+        """
+
         if not match_set:
             return
         elif type(match_set) == Classifier:
@@ -195,6 +208,21 @@ class fACS2(Agent):
         return values
 
     def select_max_action_value(self, output_values):
+        """
+        Select max membership value for each possible action
+
+        Parameters
+        ----------
+        output_values
+            min values of each classifier and proposed action
+
+        Returns
+        -------
+        possible_actions
+            all posible actions with max membership value
+            of it
+
+        """
         possible_actions = [0 for _ in range(
             self.cfg.number_of_possible_actions)]
         for value, action_index in output_values:
@@ -202,13 +230,28 @@ class fACS2(Agent):
                 possible_actions[action_index] = value
         return possible_actions
 
-    def select_action(self, match_set, memberships_values):
+    def select_action(self, env, match_set, memberships_values):
+        """
+        Select final action from match_set
+
+        Parameters
+        ----------
+        env
+        match_set
+        memberships_values
+
+        Returns
+        -------
+        action
+            selected action
+
+        """
         calculate = self.calculate_min_value_for_each_clasifier
         min_values = calculate(match_set, memberships_values)
         if not min_values:
             return random.choice(range(self.cfg.number_of_possible_actions))
         actions = self.select_max_action_value(min_values)
-        actions_func_shape = self.cfg.environment_adapter. \
+        actions_func_shape = env. \
             calculate_final_actions_func_shape(actions)
-        return round(self.cfg.environment_adapter.calculate_centroid(
+        return round(env.calculate_centroid(
             actions_func_shape)[0])

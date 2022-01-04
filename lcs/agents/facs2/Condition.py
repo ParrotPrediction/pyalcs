@@ -15,7 +15,19 @@ class Condition(acs.Condition):
                     self[idx] = '0.0'
 
     def does_match(self, p: Perception) -> bool:
+        """
+        Check if condition match given observations
 
+        Parameters
+        ----------
+        p: Union[Perception, Condition]
+            perception or condition object
+
+        Returns
+        -------
+        bool
+            True if condition match given list, False otherwise
+        """
         j = 0
         for ci, oi in zip(self, p):
             i = j

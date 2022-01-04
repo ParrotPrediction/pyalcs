@@ -24,7 +24,6 @@ def expected_case(cl: Classifier,
                   p0: Perception,
                   time: int) -> Optional[Classifier]:
 
-
     diff = cl.mark.get_differences(p0)
 
     if diff.specificity == 0:

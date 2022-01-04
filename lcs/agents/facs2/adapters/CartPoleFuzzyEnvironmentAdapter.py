@@ -15,7 +15,8 @@ class CartPoleFuzzyEnvironmentAdapter(FuzzyEnvironmentAdapter):
 
     condition_length = 18
 
-    def __init__(self):
+    def __init__(self, env):
+        super().__init__(env)
         self._position_functions = [
             self._generate_left_linear_function,
             self._generate_triangular_function,

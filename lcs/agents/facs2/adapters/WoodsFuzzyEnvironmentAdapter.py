@@ -7,7 +7,8 @@ class WoodsFuzzyEnvironmentAdapter(FuzzyEnvironmentAdapter):
     _reward = 9
     condition_length = 12
 
-    def __init__(self):
+    def __init__(self, env):
+        super().__init__(env)
         self._functions = [
             self._generate_left_linear_function,
             self._generate_triangular_function,
