@@ -45,8 +45,8 @@ class Agent:
 
         Returns
         -------
-        Tuple
-            population of classifiers and metrics
+        List
+            run metrics
         """
         return self._evaluate(env, trials, self._run_trial_explore, decay)
 
