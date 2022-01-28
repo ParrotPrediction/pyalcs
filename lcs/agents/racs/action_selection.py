@@ -30,7 +30,7 @@ def choose_action(cll,
     int
         number of chosen action
     """
-    if random.random() < epsilon:
+    if np.random.uniform() < epsilon:
         logger.debug("\t\tExploration path")
         return explore(cll, all_actions, biased_exploration_prob)
 
@@ -56,9 +56,9 @@ def explore(cll, all_actions: int, pb: float) -> int:
     int
         action to be executed
     """
-    if random.random() < pb:
+    if np.random.uniform() < pb:
         # We are in the biased exploration
-        if random.random() < 0.5:
+        if np.random.uniform() < 0.5:
             return choose_latest_action(cll, all_actions)
         else:
             return choose_action_from_knowledge_array(cll, all_actions)
