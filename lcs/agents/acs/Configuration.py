@@ -43,7 +43,7 @@ class Configuration(object):
         self.theta_r: float = kwargs.get('theta_r', 0.9)
 
         # Probability of executing random action.
-        # Otherwise the action from best classifier is selected.
+        # Otherwise, the action from the best classifier is selected.
         self.epsilon: float = kwargs.get('epsilon', 0.5)
 
         self.u_max: int = kwargs.get('u_max', 100000)
