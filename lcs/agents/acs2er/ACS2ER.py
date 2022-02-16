@@ -21,7 +21,8 @@ class ACS2ER(Agent):
                  replay_memory: ReplayMemory = None) -> None:
         self.cfg = cfg
         self.population = population or ClassifiersList()
-        self.replay_memory = replay_memory or ReplayMemory()
+        self.replay_memory = replay_memory or ReplayMemory(
+            max_size=cfg.er_buffer_size)
 
     def get_population(self):
         return self.population
@@ -53,12 +54,15 @@ class ACS2ER(Agent):
             raw_state, last_reward, done, _ = env.step(action)
             state = Perception(raw_state)
 
-            self.replay_memory.append(ReplyMemorySample(
+            # Add new sample to the buffer, potenially remove if exceed max size
+            self.replay_memory.update(ReplyMemorySample(
                 prev_state, action, last_reward, state))
 
-            if len(self.replay_memory) >= self.cfg.buffer_size:
+            if len(self.replay_memory) >= self.cfg.er_min_samples:
+
+                # Rand samples indexes from the replay memory buffer
                 samples = random.sample(
-                    range(0, self.cfg.buffer_size), self.cfg.samples_number)
+                    range(0, len(self.replay_memory)), self.cfg.er_samples_number)
                 for sample_index in samples:
                     sample: ReplyMemorySample = self.replay_memory[sample_index]
                     er_match_set = self.population.form_match_set(
@@ -98,8 +102,6 @@ class ACS2ER(Agent):
                             self.cfg.theta_as,
                             self.cfg.do_subsumption,
                             self.cfg.theta_exp)
-
-                self.replay_memory.pop(0)
 
             steps += 1
 
