@@ -195,7 +195,7 @@ class ClassifiersList(acs.ClassifiersList):
 
                     # Update quality and reward
                     child1.q = child2.q = float(sum([child1.q, child2.q]) / 2)
-                    child2.r = child2.r = float(sum([child1.r, child2.r]) / 2)
+                    child1.r = child2.r = float(sum([child1.r, child2.r]) / 2)
 
             child1.q /= 2
             child2.q /= 2
