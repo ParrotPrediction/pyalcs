@@ -1,5 +1,4 @@
 import logging
-from typing import List, Tuple
 import random
 from lcs import Perception
 from lcs.agents.Agent import TrialMetrics
@@ -56,7 +55,7 @@ class ACS2ER(Agent):
 
             # Add new sample to the buffer, potenially remove if exceed max size
             self.replay_memory.update(ReplyMemorySample(
-                prev_state, action, last_reward, state))
+                prev_state, action, last_reward, state, done))
 
             if len(self.replay_memory) >= self.cfg.er_min_samples:
 
@@ -85,7 +84,7 @@ class ACS2ER(Agent):
                     ClassifiersList.apply_reinforcement_learning(
                         er_action_set,
                         sample.reward,
-                        er_next_match_set.get_maximum_fitness(),
+                        0 if sample.done else er_next_match_set.get_maximum_fitness(),
                         self.cfg.beta,
                         self.cfg.gamma
                     )

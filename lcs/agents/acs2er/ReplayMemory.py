@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional
-
-from lcs import TypedList, Perception
-from lcs.agents.acs import Classifier
+from lcs import TypedList
 from lcs.agents.acs2er.ReplyMemorySample import ReplyMemorySample
 
 
