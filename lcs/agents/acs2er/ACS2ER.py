@@ -92,7 +92,7 @@ class ACS2ER(Agent):
                         ClassifiersList.apply_ga(
                             time + steps,
                             self.population,
-                            er_next_match_set,
+                            ClassifiersList() if sample.done else er_next_match_set,
                             er_action_set,
                             sample.next_state,
                             self.cfg.theta_ga,
