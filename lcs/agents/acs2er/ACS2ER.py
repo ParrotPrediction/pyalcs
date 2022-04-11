@@ -16,12 +16,10 @@ class ACS2ER(Agent):
 
     def __init__(self,
                  cfg: Configuration,
-                 population: ClassifiersList = None,
-                 replay_memory: ReplayMemory = None) -> None:
+                 population: ClassifiersList = None) -> None:
         self.cfg = cfg
         self.population = population or ClassifiersList()
-        self.replay_memory = replay_memory or ReplayMemory(
-            max_size=cfg.er_buffer_size)
+        self.replay_memory = ReplayMemory(max_size=cfg.er_buffer_size)
 
     def get_population(self):
         return self.population
