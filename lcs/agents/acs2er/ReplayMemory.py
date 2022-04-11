@@ -14,7 +14,7 @@ class ReplayMemory(TypedList):
         self.max_size = max_size
 
     def update(self, sample: ReplayMemorySample) -> None:
-        if(len(self) >= self.max_size):
+        if len(self) >= self.max_size:
             self.pop(0)
 
         self.append(sample)
