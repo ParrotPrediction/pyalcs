@@ -6,7 +6,7 @@ from lcs.agents.acs2er.ReplayMemorySample import ReplayMemorySample
 
 from lcs.agents.acs2er.ReplayMemory import ReplayMemory
 
-class TestReplayMemory:
+class TestACS2ER:
 
     @pytest.fixture
     def cfg(self):
