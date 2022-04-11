@@ -3,10 +3,10 @@ import random
 from lcs import Perception
 from lcs.agents.Agent import TrialMetrics
 from lcs.agents.acs2er.ReplayMemory import ReplayMemory
-from lcs.agents.acs2er.ReplyMemorySample import ReplyMemorySample
+from lcs.agents.acs2er.ReplayMemorySample import ReplayMemorySample
 from lcs.strategies.action_selection.BestAction import BestAction
-from lcs.agents.acs2er import ClassifiersList
-from lcs.agents.acs2er import Configuration
+from lcs.agents.acs2 import ClassifiersList
+from lcs.agents.acs2 import Configuration
 from lcs.agents.Agent import Agent
 
 logger = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ class ACS2ER(Agent):
             state = Perception(raw_state)
 
             # Add new sample to the buffer, potenially remove if exceed max size
-            self.replay_memory.update(ReplyMemorySample(
+            self.replay_memory.update(ReplayMemorySample(
                 prev_state, action, last_reward, state, done))
 
             if len(self.replay_memory) >= self.cfg.er_min_samples:
@@ -63,7 +63,7 @@ class ACS2ER(Agent):
                 samples = random.sample(
                     range(0, len(self.replay_memory)), self.cfg.er_samples_number)
                 for sample_index in samples:
-                    sample: ReplyMemorySample = self.replay_memory[sample_index]
+                    sample: ReplayMemorySample = self.replay_memory[sample_index]
                     er_match_set = self.population.form_match_set(
                         sample.state)
                     er_action_set = er_match_set.form_action_set(

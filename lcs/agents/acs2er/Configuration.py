@@ -1,5 +1,4 @@
 import lcs.agents.acs2 as acs2
-from lcs.strategies.action_selection import EpsilonGreedy
 
 
 class Configuration(acs2.Configuration):
@@ -7,7 +6,7 @@ class Configuration(acs2.Configuration):
         super(Configuration, self).__init__(**kwargs)
 
         # ER replay memory buffer size
-        self.er_buffer_size = kwargs.get('er_buffer_size', 3000)
+        self.er_buffer_size = kwargs.get('er_buffer_size', 10000)
 
         # ER replay memory min samples
         self.er_min_samples = kwargs.get('er_min_samples', 1000)

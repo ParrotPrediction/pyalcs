@@ -2,7 +2,7 @@ from __future__ import annotations
 from lcs import Perception
 
 
-class ReplyMemorySample:
+class ReplayMemorySample:
     __slots__ = ['state', 'action', 'reward', 'next_state', 'done']
 
     def __init__(self,
