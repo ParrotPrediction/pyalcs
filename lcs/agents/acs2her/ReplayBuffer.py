@@ -3,7 +3,7 @@ from __future__ import annotations
 import random
 
 from lcs import TypedList
-from lcs.agents.acs2er.ReplayMemorySample import ReplayMemorySample
+from lcs.agents.acs2er import ReplayMemorySample
 
 
 class ReplayBuffer(TypedList):
@@ -21,5 +21,7 @@ class ReplayBuffer(TypedList):
             self.pop(0)
         self.append(sample)
 
-    def sample(self):
-        return random.sample(self, k=self.batch_size)
+    def sample(self) -> [ReplayMemorySample]:
+        return random.sample(self, k=self.batch_size) if self.batch_size < len(self) else self
+
+

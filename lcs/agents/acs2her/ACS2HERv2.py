@@ -1,18 +1,19 @@
 import logging
 import random
-from lcs import Perception
+
 from lcs.agents.Agent import Agent
 from lcs.agents.Agent import TrialMetrics
 from lcs.agents.acs2 import ClassifiersList
 from lcs.agents.acs2er import ReplayMemorySample
 from lcs.agents.acs2her import Configuration
+from lcs.agents.acs2her.PerceptionExtensionBuilder import *
 from lcs.agents.acs2her.ReplayBuffer import ReplayBuffer
 from lcs.strategies.action_selection.BestAction import BestAction
 
 logger = logging.getLogger(__name__)
 
 
-class ACS2HER(Agent):
+class ACS2HERv2(Agent):
 
     def __init__(self,
                  cfg: Configuration,
@@ -21,11 +22,8 @@ class ACS2HER(Agent):
         self.population = population or ClassifiersList()
         self.memory = ReplayBuffer(max_size=cfg.er_buffer_size,
                                    samples_number=cfg.er_samples_number)
-        if self.cfg.her_strategy is None:
-            if self.cfg.her_goals_number == 1:
-                self.cfg.her_strategy = 'final'
-            else:
-                self.cfg.her_strategy = 'future'
+        self.additional_goals = []
+        self.main_goal = Perception.empty()
 
     def get_population(self):
         return self.population
@@ -47,7 +45,7 @@ class ACS2HER(Agent):
 
         trial_steps = []
 
-        self.main_goal = Perception(env.get_desired_goal_state())
+        self.main_goal = Perception(env.get_accurate_goal_state())
 
         while not done:
             state = Perception(state)
@@ -65,29 +63,31 @@ class ACS2HER(Agent):
             trial_steps.append(
                 [prev_state, action, last_reward, state, done])
 
-        for index, step in enumerate(trial_steps):
-            state, action, reward, next_state, done = step
-
             self.memory.add(ReplayMemorySample(
-                ACS2HER.state_goal_concat(state, self.main_goal),
+                state_goal_concat(prev_state, self.main_goal),
                 action,
                 last_reward,
-                ACS2HER.state_goal_concat(next_state, self.main_goal),
+                state_goal_concat(state, self.main_goal),
                 done))
 
-            additional_goals = self.sample_goals(trial_steps, index)
+        if state != self.main_goal:
+            for index, step in enumerate(trial_steps):
+                state, action, reward, next_state, done = step
 
-            for goal in additional_goals:
-                new_reward = self.reward_function(next_state, goal)
+                self.additional_goals = self.sample_goals(trial_steps, index)
 
-                self.memory.add(ReplayMemorySample(
-                    ACS2HER.state_goal_concat(state, goal),
-                    action,
-                    new_reward,
-                    ACS2HER.state_goal_concat(next_state, goal),
-                    False))
+                for goal in self.additional_goals:
+                    new_reward = self.reward_function(next_state, goal)
 
-            self.learn(time, len(trial_steps))
+                    self.memory.add(ReplayMemorySample(
+                        state_goal_concat(state, goal),
+                        action,
+                        new_reward,
+                        state_goal_concat(next_state, goal),
+                        False))
+
+        for _ in trial_steps:
+            self.try_learn(time, len(trial_steps))
 
         return TrialMetrics(len(trial_steps), last_reward)
 
@@ -105,7 +105,7 @@ class ACS2HER(Agent):
 
         while not done:
             match_set = self.population.form_match_set(
-                ACS2HER.state_goal_concat(state, self.main_goal))
+                empty_goal_to_state(state, self.cfg.classifier_wildcard))
 
             if steps > 0:
                 ClassifiersList.apply_reinforcement_learning(
@@ -131,69 +131,63 @@ class ACS2HER(Agent):
 
         return TrialMetrics(steps, last_reward)
 
-    def learn(self, time, steps):
-        experiences = self.memory.sample()
-        for exp in experiences:
-            er_match_set = self.population.form_match_set(
-                exp.state)
-            er_action_set = er_match_set.form_action_set(
-                exp.action)
-            er_next_match_set = self.population.form_match_set(
-                exp.next_state)
-            # Apply learning in the replied action set
-            ClassifiersList.apply_alp(
-                self.population,
-                er_next_match_set,
-                er_action_set,
-                exp.state,
-                exp.action,
-                exp.next_state,
-                time + steps,
-                self.cfg.theta_exp,
-                self.cfg)
-            ClassifiersList.apply_reinforcement_learning(
-                er_action_set,
-                exp.reward,
-                0 if exp.done
-                else er_next_match_set.get_maximum_fitness(),
-                self.cfg.beta,
-                self.cfg.gamma
-            )
-            if self.cfg.do_ga:
-                ClassifiersList.apply_ga(
-                    time + steps,
+    def try_learn(self, time, steps):
+        if len(self.memory) >= self.cfg.er_min_samples:
+            experiences = self.memory.sample()
+            for exp in experiences:
+                er_match_set = self.population.form_match_set(
+                    exp.state)
+                er_action_set = er_match_set.form_action_set(
+                    exp.action)
+                er_next_match_set = self.population.form_match_set(
+                    exp.next_state)
+                # Apply learning in the replied action set
+                ClassifiersList.apply_alp(
                     self.population,
-                    ClassifiersList() if exp.done else er_next_match_set,
+                    er_next_match_set,
                     er_action_set,
+                    exp.state,
+                    exp.action,
                     exp.next_state,
-                    self.cfg.theta_ga,
-                    self.cfg.mu,
-                    self.cfg.chi,
-                    self.cfg.theta_as,
-                    self.cfg.do_subsumption,
-                    self.cfg.theta_exp)
+                    time + steps,
+                    self.cfg.theta_exp,
+                    self.cfg)
+                ClassifiersList.apply_reinforcement_learning(
+                    er_action_set,
+                    exp.reward,
+                    0 if exp.done
+                    else er_next_match_set.get_maximum_fitness(),
+                    self.cfg.beta,
+                    self.cfg.gamma
+                )
+                if self.cfg.do_ga:
+                    ClassifiersList.apply_ga(
+                        time + steps,
+                        self.population,
+                        ClassifiersList() if exp.done else er_next_match_set,
+                        er_action_set,
+                        exp.next_state,
+                        self.cfg.theta_ga,
+                        self.cfg.mu,
+                        self.cfg.chi,
+                        self.cfg.theta_as,
+                        self.cfg.do_subsumption,
+                        self.cfg.theta_exp)
 
     def sample_goals(self, trial_steps, index):
-        steps = []
-        if self.cfg.her_strategy == 'final':
+        if self.cfg.her_goals_number == 1:
+            # 'final' strategy
             steps = [trial_steps[-1]]
-        elif self.cfg.her_strategy == 'future':
+        else:
+            # 'future' strategy
             steps_taken = len(trial_steps)
             k = min(self.cfg.her_goals_number, steps_taken - index)
-            steps = random.sample(trial_steps[index:], k=k) if k > 0 else []
-        elif self.cfg.her_strategy == 'episode':
-            steps_taken = len(trial_steps)
-            k = min(self.cfg.her_goals_number, steps_taken)
-            steps = random.sample(trial_steps, k=k) if k > 0 else []
 
-        return [s[3] for s in steps]
+            steps = random.sample(trial_steps[index:],
+                                  k=k) if k > 0 else []
 
-    def reward_function(self, state, new_goal):
-        if self.cfg.her_reward_generator is None:
-            return 1 if state == new_goal else 0
-        else:
-            return self.cfg.her_reward_generator(state, new_goal)
+        return [s[-2] for s in steps]
 
     @staticmethod
-    def state_goal_concat(state: Perception, goal: Perception) -> Perception:
-        return Perception(tuple(state) + tuple(goal))
+    def reward_function(state, new_goal):
+        return 0 if state == new_goal else -1
